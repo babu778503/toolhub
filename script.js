@@ -497,12 +497,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     });
 
+    // --- 💡 THIS IS THE NEW AND IMPROVED FUNCTION 💡 ---
     function initializeApp(data) {
-        toolsData = data;
+        toolsData = data; // This data is now sorted by NEWEST FIRST
         loadAndScheduleAlarms(); 
         updateYourWorkBadge();
-        renderTools(popularGrid, toolsData.slice(0, 20), true); 
-        renderTools(newGrid, toolsData.slice(20, 40), true);
+
+        // --- NEW LOGIC ---
+        // For "New Tools", just take the first 18 tools from the list.
+        renderTools(newGrid, toolsData.slice(0, 18), true); 
+
+        // For "Popular Tools", shuffle the entire list and take a random 24.
+        // This makes it feel different and more dynamic than the "New" section.
+        const shuffled = [...toolsData].sort(() => 0.5 - Math.random());
+        renderTools(popularGrid, shuffled.slice(0, 24), true);
+
         document.getElementById('copyright-year').textContent = new Date().getFullYear();
         const mobileBanner = document.getElementById('mobile-top-banner-ad-rotator'); 
         const mainHeader = document.querySelector('.main-header');
@@ -592,4 +601,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadData();
 });
+
 
