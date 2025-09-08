@@ -1,7 +1,7 @@
-// generate-tools-json.mjs
+// generate-tools-json.mjs (NEW AND IMPROVED VERSION)
 
 // Part 1: Getting our tools from the toolbox.
-// 'fs' lets us read and write files. 'path' helps us deal with file paths like C:\folder\file.txt or /home/user/file.
+// 'fs' lets us read and write files. 'path' helps us deal with file paths.
 import fs from 'fs';
 import path from 'path';
 
@@ -23,40 +23,47 @@ try {
     
     console.log(`Found ${htmlFiles.length} HTML tool files.`);
 
-    // Go through each HTML filename, one by one, and turn it into a structured piece of data.
+    // Go through each HTML filename, one by one, and gather all its details.
     const toolsData = htmlFiles.map(filename => {
         const filePath = path.join(toolsDirectory, filename);
         
-        // To be fast, we only read the first 5 lines of each HTML file to find its category.
+        // --- NEW FEATURE: Get file creation time ---
+        // This gives us information about the file, including when it was created.
+        const stats = fs.statSync(filePath);
+        // We get the creation time as a timestamp (a large number).
+        const creationTime = stats.birthtimeMs; 
+
+        // Read the first 5 lines of the HTML file to find its category.
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const firstLines = fileContent.split('\n').slice(0, 5).join('\n');
         
-        // We look for a special comment like <!-- Category: Health -->
+        // Look for the special comment, e.g., <!-- Category: Health -->
         const categoryMatch = firstLines.match(/<!--\s*Category:\s*([^>]+?)\s*-->/);
-        // If we find a category in the comment, we use it. If not, we'll just call it 'Utility'.
+        // If a category is found, use it. If not, default to 'Utility'.
         const category = categoryMatch ? categoryMatch[1].trim() : 'Utility'; 
 
-        // Now, we create the tool's ID and Name directly from its filename.
-        // For example, "App-Usage-Monitor.html" becomes:
-        const id = filename.replace('.html', '');             // id: "App-Usage-Monitor"
-        const name = id.replace(/-/g, ' ');                   // Name: "App Usage Monitor"
+        // Create the tool's ID and Name from its filename.
+        const id = filename.replace('.html', '');
+        const name = id.replace(/-/g, ' ');
 
-        // We return a neat object with all the details for this one tool.
+        // Return a neat object with all the details, including the new creation date.
         return {
             id: id,
             Name: name,
-            Category: category
+            Category: category,
+            createdAt: creationTime // NEW: Add the creation timestamp to our data
         };
     });
 
-    // To keep the list tidy, we sort all the tools alphabetically by their name.
-    toolsData.sort((a, b) => a.Name.localeCompare(b.Name));
+    // --- NEW SORTING LOGIC ---
+    // Instead of sorting alphabetically, we sort by the creation timestamp.
+    // `b.createdAt - a.createdAt` sorts from the biggest number (newest) to the smallest (oldest).
+    toolsData.sort((a, b) => b.createdAt - a.createdAt);
 
-    // Finally, we take our complete, sorted list and write it into the 'tools.json' file.
-    // The 'null, 2' part just makes the file nicely formatted and easy for a human to read.
+    // Finally, we take our complete, sorted list (newest first) and write it into the 'tools.json' file.
     fs.writeFileSync(outputFilePath, JSON.stringify(toolsData, null, 2));
     
-    console.log(`Success! The 'tools.json' file was created with ${toolsData.length} tools.`);
+    console.log(`Success! The 'tools.json' file was created with ${toolsData.length} tools, sorted by newest first.`);
 
 } catch (error) {
     // This is our safety net. If anything goes wrong, this code will run.
