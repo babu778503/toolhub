@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     let toolsData = [];
+    // This fallback list is now a safety net, used only if tools.json fails to load.
     const toolsData_fallback = [
       { "id": "App-Usage-Monitor", "Name": "App Usage Monitor", "Category": "Utility" },
       { "id": "Asthma-Trigger-Monitor", "Name": "Asthma Trigger Monitor", "Category": "Health" },
@@ -224,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderCategoriesView = () => { const categories = [...new Set(toolsData.map(tool => tool.Category))].sort(); categoriesView.innerHTML = `<div class="container"><h2><i class="fas fa-list" style="color:#6366f1;"></i> All Categories</h2><div class="category-grid">${categories.map(cat => `<div class="category-card" data-category-name="${sanitizeHTML(cat)}">${sanitizeHTML(cat)}</div>`).join('')}</div></div>`; };
     const renderYourToolsView = () => { const bookmarkedTools = toolsData.filter(tool => bookmarks.includes(tool.id)); const gridId = 'your-tools-grid'; yourToolsView.innerHTML = `<div class="container"><h2><i class="fas fa-bookmark" style="color:#ef4444;"></i> My Tools</h2><div class="tool-grid" id="${gridId}"></div></div>`; renderTools(document.getElementById(gridId), bookmarkedTools, false, 'You have no bookmarked tools yet.', true); };
-    const renderCategoryToolsView = (categoryName) => { const filteredTools = toolsData.filter(tool => tool.Category === categoryName); const gridId = 'category-tools-grid'; categoryToolsView.innerHTML = `<div class="container"><div class="sub-view-header"><button id="back-to-categories-btn" class="btn-back"><i class="fas fa-arrow-left"></i></button><h2>${sanitizeHTML(categoryName)} Tools</h2></div><div class="tool-grid" id="${gridId}"></div></div>`; renderTools(document.getElementById(gridId), filteredTools, false); };
+    const renderCategoryToolsView = (categoryName) => { const filteredTools = toolsData.filter(tool => tool.Category === categoryName); const gridId = 'category-tools-grid'; categoryToolsView.innerHTML = `<div class="container"><div class="sub-view-header"><button id="back-to-categories-btn" class="btn-back"><i class="fas fa-arrow-left"></i></button><h2>${sanitizeHTML(categoryName)} Tools</h2></div><div class="tool-grid" id="${gridId}"></div></div>`; renderTools(document.getElementById(gridId), filteredTools, true); };
     const renderYourWorkView = () => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -423,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (query.length < 2) { searchResultsHeading.textContent = `Please type at least 2 characters...`; searchResultsGrid.innerHTML = ''; return; }
         const filteredTools = toolsData.filter(tool => tool.Name.toLowerCase().includes(query)); searchResultsHeading.innerHTML = `Found ${filteredTools.length} tools for "<strong>${safeQuery}</strong>"`;
         const emptyMessage = `Found 0 tools for "<strong>${safeQuery}</strong>". Please email the tool name to <a href="mailto:aktar.babu@gmail.com">aktar.babu@gmail.com</a>. Your requested tool will be added shortly with Name.<div class="idea-credit"><i class="fas fa-lightbulb"></i> Idea Share: Ayra, New York, USA</div>`;
-        renderTools(searchResultsGrid, filteredTools, false, emptyMessage);
+        renderTools(searchResultsGrid, filteredTools, true, emptyMessage);
     };
     searchInput.addEventListener('input', debounce(handleSearch, 300));
 
@@ -575,18 +576,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadData() { 
         try { 
-            // In a real application, you would fetch a JSON file like this:
-            // const response = await fetch('tools.json'); 
-            // if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); 
-            // initializeApp(await response.json()); 
-            
-            // For this example, we'll use the fallback data directly.
-            // In your project, you might want to have a `tools.json` file.
-            initializeApp(toolsData_fallback); 
+            const response = await fetch('tools.json'); 
+            if (!response.ok) {
+                console.warn(`Could not load tools.json (status: ${response.status}), using the built-in fallback list.`);
+                initializeApp(toolsData_fallback);
+                return;
+            }
+            const jsonData = await response.json();
+            initializeApp(jsonData);
+
         } catch (error) { 
-            console.error("Could not load tools data, using fallback.", error);
+            console.error("Failed to fetch or parse tools.json, using built-in fallback data.", error);
             initializeApp(toolsData_fallback); 
         } 
     }
     loadData();
-});
+});plase relook all code
