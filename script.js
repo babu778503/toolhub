@@ -591,4 +591,5 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     }
     loadData();
-});plase relook all code
+});
+
