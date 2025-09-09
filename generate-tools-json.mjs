@@ -1,72 +1,55 @@
-// generate-tools-json.mjs (NEW AND IMPROVED VERSION)
-
-// Part 1: Getting our tools from the toolbox.
-// 'fs' lets us read and write files. 'path' helps us deal with file paths.
 import fs from 'fs';
 import path from 'path';
 
-// Part 2: Setting up our workspace.
-// We tell the script where to find the folder with all your tool files.
-const toolsDirectory = path.join(process.cwd(), 'tools');
-// And we tell it where to save the final list.
-const outputFilePath = path.join(process.cwd(), 'tools.json');
+const toolsDir = 'tools';
+const outputFile = 'tools.json';
 
-console.log('Starting to build the tool list...');
-
-// Part 3: The main work, wrapped in a safety net.
 try {
-    // Read all the filenames inside the '/tools/' directory.
-    const filenames = fs.readdirSync(toolsDirectory);
+    // Check if the tools directory exists
+    if (!fs.existsSync(toolsDir)) {
+        console.warn(`Warning: Directory '${toolsDir}' not found. Creating an empty tools.json.`);
+        fs.writeFileSync(outputFile, JSON.stringify([], null, 2));
+        process.exit(0); // Exit successfully
+    }
+
+    console.log(`Scanning directory: ${toolsDir}`);
+    const files = fs.readdirSync(toolsDir).filter(file => file.endsWith('.html'));
     
-    // From that list, we only want the files that end in '.html'.
-    const htmlFiles = filenames.filter(file => file.endsWith('.html'));
-    
-    console.log(`Found ${htmlFiles.length} HTML tool files.`);
+    if (files.length === 0) {
+        console.warn(`Warning: No HTML files found in '${toolsDir}'. Creating an empty tools.json.`);
+        fs.writeFileSync(outputFile, JSON.stringify([], null, 2));
+        process.exit(0); // Exit successfully
+    }
 
-    // Go through each HTML filename, one by one, and gather all its details.
-    const toolsData = htmlFiles.map(filename => {
-        const filePath = path.join(toolsDirectory, filename);
+    console.log(`Found ${files.length} HTML tool files.`);
+
+    const toolsData = files.map(file => {
+        const filePath = path.join(toolsDir, file);
+        const content = fs.readFileSync(filePath, 'utf-8');
         
-        // --- NEW FEATURE: Get file creation time ---
-        // This gives us information about the file, including when it was created.
-        const stats = fs.statSync(filePath);
-        // We get the creation time as a timestamp (a large number).
-        const creationTime = stats.birthtimeMs; 
+        // 1. Extract tool name from the <title> tag
+        const titleMatch = content.match(/<title>(.*?)<\/title>/i);
+        const name = titleMatch ? titleMatch[1].trim() : 'Unnamed Tool';
 
-        // Read the first 5 lines of the HTML file to find its category.
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const firstLines = fileContent.split('\n').slice(0, 5).join('\n');
+        // 2. Extract category from the specific comment format: <!-- Category: ... -->
+        const categoryMatch = content.match(/<!--\s*Category:\s*(.*?)\s*-->/i);
+        const category = categoryMatch ? categoryMatch[1].trim() : 'Utility'; // Default to 'Utility' if not found
+
+        // 3. Use the filename (without .html) as the unique ID
+        const id = path.basename(file, '.html');
         
-        // Look for the special comment, e.g., <!-- Category: Health -->
-        const categoryMatch = firstLines.match(/<!--\s*Category:\s*([^>]+?)\s*-->/);
-        // If a category is found, use it. If not, default to 'Utility'.
-        const category = categoryMatch ? categoryMatch[1].trim() : 'Utility'; 
-
-        // Create the tool's ID and Name from its filename.
-        const id = filename.replace('.html', '');
-        const name = id.replace(/-/g, ' ');
-
-        // Return a neat object with all the details, including the new creation date.
-        return {
-            id: id,
-            Name: name,
-            Category: category,
-            createdAt: creationTime // NEW: Add the creation timestamp to our data
-        };
+        return { id, Name: name, Category: category };
     });
 
-    // --- NEW SORTING LOGIC ---
-    // Instead of sorting alphabetically, we sort by the creation timestamp.
-    // `b.createdAt - a.createdAt` sorts from the biggest number (newest) to the smallest (oldest).
-    toolsData.sort((a, b) => b.createdAt - a.createdAt);
-
-    // Finally, we take our complete, sorted list (newest first) and write it into the 'tools.json' file.
-    fs.writeFileSync(outputFilePath, JSON.stringify(toolsData, null, 2));
+    // Sort all tools alphabetically by their name for a consistent order
+    toolsData.sort((a, b) => a.Name.localeCompare(b.Name));
     
-    console.log(`Success! The 'tools.json' file was created with ${toolsData.length} tools, sorted by newest first.`);
+    // Write the sorted data to the JSON file with pretty formatting (2-space indentation)
+    fs.writeFileSync(outputFile, JSON.stringify(toolsData, null, 2));
+    
+    console.log(`✅ Successfully generated ${outputFile} with ${toolsData.length} tools.`);
 
 } catch (error) {
-    // This is our safety net. If anything goes wrong, this code will run.
-    console.error('An error happened while creating the tool list:', error);
-    process.exit(1); // This stops the deployment to prevent a broken site from going live.
+    console.error('❌ Error generating tools.json:', error);
+    process.exit(1); // Exit with an error code to fail the build process
 }
