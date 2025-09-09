@@ -1634,16 +1634,29 @@ const { toolId, toolName } = openBtn.dataset; if (toolId && toolName) showTool(t
 
         function initializeApp(data) {
             toolsData = data;
-            loadAndScheduleAlarms(); 
+            loadAndScheduleAlarms();
             updateYourWorkBadge();
             const shuffledTools = [...data].sort(() => 0.5 - Math.random());
-            renderTools(popularGrid, shuffledTools.slice(0, 18)); 
-            renderTools(newGrid, shuffledTools.slice(18, 36).reverse());
+
+            const numPopular = 18;
+            const numNew = 18;
+
+            // Slice for Popular Tools - will not fail if there are fewer than 18 tools
+            const popularTools = shuffledTools.slice(0, numPopular);
+
+            // Slice for New Tools - take a different part of the shuffled array from the end
+            // This is robust and works even if the total number of tools is very small
+            const newTools = shuffledTools.slice(-numNew);
+
+            renderTools(popularGrid, popularTools);
+            // Reverse the "new" tools list to make it feel distinct from the popular list
+            renderTools(newGrid, newTools.reverse());
+
             document.getElementById('copyright-year').textContent = new Date().getFullYear();
-            const mobileBanner = document.getElementById('mobile-top-banner-ad-rotator'); 
+            const mobileBanner = document.getElementById('mobile-top-banner-ad-rotator');
             const mainHeader = document.querySelector('.main-header');
-            if (mobileBanner && mainHeader && window.getComputedStyle(mobileBanner).display !== 'none') { 
-                mainHeader.style.top = '50px'; 
+            if (mobileBanner && mainHeader && window.getComputedStyle(mobileBanner).display !== 'none') {
+                mainHeader.style.top = '50px';
             }
             switchView('home');
         }
