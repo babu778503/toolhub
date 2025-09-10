@@ -78,7 +78,7 @@
 
     <header class="main-header">
         <div class="container">
-            <a href="#" class="logo"><i class="fas fa-screwdriver-wrench"></i> ToolHub Free</a>
+            <a href="/" class="logo"><i class="fas fa-screwdriver-wrench"></i> ToolHub Free</a>
             <div class="marquee-container">
                 <div class="marquee-text">
                     <div class="stat-pill pill-blue"><i class="fas fa-tools"></i> 50,000+ Total Tools</div>
@@ -360,7 +360,7 @@
             const bookmarkedClass = isBookmarked(tool.id) ? 'bookmarked' : '';
             const hasAlarm = isYourToolsView && Object.values(activeAlarms).some(alarm => alarm.toolId === tool.id && !alarm.triggered);
             const alarmIconHTML = hasAlarm ? `<i class="fas fa-bell" style="color: #f59e0b; margin-left: 8px;" title="Alarm is set for this tool" aria-label="Alarm is set"></i>` : '';
-            return `<div class="tool-card" data-tool-id="${tool.id}"><h3 class="tool-title">${sanitizeHTML(tool.Name)}${alarmIconHTML}</h3><div class="tool-actions-bar"><a href="#" class="action-btn btn-open" data-tool-id="${tool.id}" data-tool-name="${tool.Name}">Open</a><button class="action-btn btn-bookmark ${bookmarkedClass}" data-tool-id="${tool.id}" aria-label="Bookmark tool"><i class="fas fa-bookmark"></i></button><button class="action-btn btn-share" data-tool-id="${tool.id}" data-tool-title="${tool.Name}" aria-label="Share tool"><i class="fas fa-share-alt"></i></button></div></div>`;
+            return `<div class="tool-card" data-tool-id="${tool.id}"><h3 class="tool-title">${sanitizeHTML(tool.Name)}${alarmIconHTML}</h3><div class="tool-actions-bar"><a href="/tool/${tool.id}" class="action-btn btn-open" data-tool-id="${tool.id}" data-tool-name="${tool.Name}">Open</a><button class="action-btn btn-bookmark ${bookmarkedClass}" data-tool-id="${tool.id}" aria-label="Bookmark tool"><i class="fas fa-bookmark"></i></button><button class="action-btn btn-share" data-tool-id="${tool.id}" data-tool-title="${tool.Name}" aria-label="Share tool"><i class="fas fa-share-alt"></i></button></div></div>`;
         };
         
         const renderTools = (container, tools, injectAds = false, emptyMessage = "", isYourToolsView = false) => {
@@ -492,7 +492,9 @@
         const showTool = (toolId, toolName, saveHistory = true) => {
             document.body.classList.add('tool-view-active'); mainContentWrapper.style.display = 'none'; toolViewerContainer.innerHTML = createToolViewerHTML(toolId, toolName); toolViewerContainer.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            history.pushState({ toolId: toolId }, toolName, `#tool/${toolId}`);
+            if (saveHistory) { // NEW: Only push state if we are initiating the action
+                history.pushState({ toolId: toolId }, toolName, `/tool/${toolId}`); // CHANGED: Removed the '#'
+            }
             const reminderInput = document.getElementById('reminderInput'); const setReminderBtn = document.getElementById('setReminderBtn'); const frequencySelect = document.getElementById('reminderFrequencyDesktop'); const addEventMobileBtn = document.querySelector('.add-event-mobile-btn');
             const handleReminderSet = () => {
                 if (!reminderInput.value) { if (window.getComputedStyle(setReminderBtn).display !== 'none') { alert('Pick a date & time first'); } return; }
@@ -510,7 +512,7 @@
                 toolViewerContainer.innerHTML = ''; 
                 mainContentWrapper.style.display = 'block'; 
                 if (updateHistory) {
-                    history.pushState({ view: currentView }, '', window.location.pathname);
+                    history.pushState({ view: currentView }, '', '/'); // CHANGED: Always go to root path '/' when hiding
                 }
             } 
         };
@@ -519,20 +521,38 @@
         
         // --- Event Listeners ---
         hamburgerMenu.addEventListener('click', () => mainNav.classList.toggle('active'));
-        logoLink.addEventListener('click', (e) => { e.preventDefault(); switchView('home'); });
+        logoLink.addEventListener('click', (e) => { e.preventDefault(); history.pushState({view: 'home'}, '', '/'); switchView('home'); }); // NEW: update history on logo click
         
-        const handleDataViewClick = (e) => { const link = e.target.closest('a[data-view]'); if (link) { e.preventDefault(); switchView(link.dataset.view); } };
+        const handleDataViewClick = (e) => { const link = e.target.closest('a[data-view]'); if (link) { e.preventDefault(); history.pushState({view: link.dataset.view}, '', '/'); switchView(link.dataset.view); } }; // NEW: update history on nav click
         mainNav.addEventListener('click', handleDataViewClick);
         footerLinks.forEach(link => link.addEventListener('click', handleDataViewClick));
 
         const showModal = () => signInModal.classList.add('show'); const hideModal = () => signInModal.classList.remove('show');
         modalCloseBtn.addEventListener('click', hideModal); signInModal.addEventListener('click', (e) => { if (e.target === signInModal) hideModal(); });
 
-        window.addEventListener('popstate', (event) => {
-            if (document.body.classList.contains('tool-view-active')) {
-                hideTool(false); // false because we don't want to push another state
+        // NEW: Smart router for initial load and back/forward buttons
+        const handleRouteChange = () => {
+            const path = window.location.pathname;
+            const toolMatch = path.match(/^\/tool\/([a-zA-Z0-9-]+)/);
+
+            if (toolMatch) {
+                const toolId = toolMatch[1];
+                const tool = toolsData.find(t => t.id === toolId);
+                if (tool) {
+                    showTool(tool.id, tool.Name, false); // `false` prevents pushing a new history state
+                } else {
+                    // Invalid tool ID in URL, go home
+                    history.replaceState({ view: 'home' }, '', '/');
+                    switchView('home');
+                }
+            } else {
+                // Not a tool URL, so it's a main view like /, /categories etc.
+                hideTool(false); // Make sure tool viewer is hidden
+                switchView(history.state?.view || 'home');
             }
-        });
+        };
+
+        window.addEventListener('popstate', handleRouteChange); // CHANGED: Replaced old listener with the router
 
         window.addEventListener('scroll', () => {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -616,13 +636,15 @@
             saveBookmarks(); if (currentView === 'your-tools') renderYourToolsView();
         };
         const handleShareClick = async (button) => {
-            const { toolId, toolTitle } = button.dataset; const url = `${window.location.origin}/tools/${toolId}.html`; const shareData = { title: `Check out: ${toolTitle}`, text: `I found a great free tool on ToolHub: ${toolTitle}`, url };
+            const { toolId, toolTitle } = button.dataset; const url = `${window.location.origin}/tool/${toolId}`; const shareData = { title: `Check out: ${toolTitle}`, text: `I found a great free tool on ToolHub: ${toolTitle}`, url };
             try { await navigator.share(shareData); } catch (err) { try { await navigator.clipboard.writeText(url); const originalIcon = button.innerHTML; button.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => { button.innerHTML = originalIcon; }, 2000); } catch (err) { alert('Could not copy URL. Please copy it manually: ' + url); } }
         };
         document.body.addEventListener('click', (e) => {
             const openBtn = e.target.closest('.btn-open'); const bookmarkBtn = e.target.closest('.btn-bookmark'); const shareBtn = e.target.closest('.btn-share'); const backBtn = e.target.closest('#back-to-tools-btn'); const categoryCard = e.target.closest('.category-card'); const backToCategoriesBtn = e.target.closest('#back-to-categories-btn');
-            if (openBtn) { e.preventDefault();
-const { toolId, toolName } = openBtn.dataset; if (toolId && toolName) showTool(toolId, toolName, !openBtn.closest('#search-results-view')); 
+            if (openBtn) { 
+                e.preventDefault();
+                const { toolId, toolName } = openBtn.dataset; 
+                if (toolId && toolName) showTool(toolId, toolName, true); // `true` to push state
             }
             if (bookmarkBtn) handleBookmarkClick(bookmarkBtn); 
             if (shareBtn) handleShareClick(shareBtn);
@@ -686,7 +708,7 @@ const { toolId, toolName } = openBtn.dataset; if (toolId && toolName) showTool(t
             if (mobileBanner && mainHeader && window.getComputedStyle(mobileBanner).display !== 'none') {
                 mainHeader.style.top = '0px'; // Mobile header starts at top now
             }
-            switchView('home');
+            handleRouteChange(); // CHANGED: Replaced switchView('home') with the router
         }
         
         const bannerRotator = document.getElementById('mobile-top-banner-ad-rotator');
@@ -705,7 +727,7 @@ const { toolId, toolName } = openBtn.dataset; if (toolId && toolName) showTool(t
         
         async function loadData() { 
             try { 
-                const response = await fetch(`tools.json?v=${Date.now()}`); 
+                const response = await fetch(`/tools.json?v=${Date.now()}`); // CHANGED: Use root-relative path for fetch
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); 
                 initializeApp(await response.json()); 
             } catch (error) { 
