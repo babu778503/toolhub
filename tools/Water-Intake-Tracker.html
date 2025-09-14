@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<!-- Category: Health & Fitness -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Water Intake Tracker - Track your daily water consumption, set goals, and stay hydrated with this easy-to-use tool.">
+    <meta name="keywords" content="water tracker, hydration tracker, water intake, health tracker, fitness tool">
+    <meta name="author" content="Health & Fitness Tools">
+    <title>Water Intake Tracker - Stay Hydrated Daily</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            --secondary-gradient: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+            --water-blue: #1a2980;
+            --water-teal: #26d0ce;
+            --water-green: #43cea2;
+            --water-dark: #185a9d;
+            --success: #4BB543;
+            --warning: #ffa502;
+            --error: #ff4757;
+            --light-bg: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--secondary-gradient);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 Q50,20 100,0 L100,100 L0,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: cover;
+            z-index: -1;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--light-bg);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+
+        h1 {
+            font-weight: 600;
+            font-size: 2.2rem;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 8px;
+            font-weight: 300;
+            position: relative;
+            z-index: 2;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 18px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            background: rgba(38, 208, 206, 0.1);
+        }
+
+        .tab.active {
+            color: var(--water-blue);
+            border-bottom: 3px solid var(--water-blue);
+            background: rgba(26, 41, 128, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .water-glass-container {
+            position: relative;
+            width: 200px;
+            height: 250px;
+            margin: 0 auto 25px;
+        }
+
+        .glass-outline {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 5px solid var(--water-blue);
+            border-radius: 10px 10px 40px 40px;
+            background: transparent;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .water-level {
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            right: 5px;
+            background: var(--secondary-gradient);
+            border-radius: 5px 5px 35px 35px;
+            transition: height 1s ease;
+            box-shadow: inset 0 -10px 20px rgba(255,255,255,0.3);
+        }
+
+        .bubbles {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-200px) scale(1.2); opacity: 0; }
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--water-blue);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--water-blue);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .goal-section {
+            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--water-blue), var(--water-teal));
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--water-blue);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .goal-input-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .goal-input {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 5px 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .goal-input i {
+            color: var(--water-blue);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .goal-input input {
+            width: 120px;
+            padding: 15px;
+            border: none;
+            font-size: 1.2rem;
+            text-align: center;
+            background: transparent;
+            font-weight: 600;
+        }
+
+        .goal-input input:focus {
+            outline: 2px solid var(--water-teal);
+        }
+
+        .unit {
+            font-size: 1.2rem;
+            color: #666;
+            margin-left: 5px;
+        }
+
+        .preset-goals {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .preset-btn {
+            background: white;
+            border: 2px solid #bbdefb;
+            color: var(--water-blue);
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .preset-btn:hover, .preset-btn:focus {
+            background: var(--water-blue);
+            color: white;
+            border-color: var(--water-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.3);
+        }
+
+        .set-goal-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(26, 41, 128, 0.3);
+            display: block;
+            margin: 25px auto 0;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .set-goal-btn:hover, .set-goal-btn:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(26, 41, 128, 0.4);
+        }
+
+        .add-water-section {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .quick-add {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .quick-btn {
+            background: white;
+            border: 2px solid #bbdefb;
+            color: var(--water-blue);
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .quick-btn:hover, .quick-btn:focus {
+            background: var(--water-blue);
+            color: white;
+            border-color: var(--water-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(26, 41, 128, 0.3);
+        }
+
+        .quick-btn i {
+            font-size: 2rem;
+        }
+
+        .custom-intake {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-input {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 5px 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .custom-input i {
+            color: var(--water-blue);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .custom-input input {
+            width: 100px;
+            padding: 15px;
+            border: none;
+            font-size: 1.1rem;
+            text-align: center;
+            background: transparent;
+            font-weight: 500;
+        }
+
+        .custom-input input:focus {
+            outline: 2px solid var(--water-teal);
+        }
+
+        .add-custom-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.3);
+        }
+
+        .add-custom-btn:hover, .add-custom-btn:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 41, 128, 0.4);
+        }
+
+        .history-section {
+            margin-top: 35px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .history-title {
+            font-size: 1.5rem;
+            color: var(--water-blue);
+            font-weight: 600;
+        }
+
+        #historyList {
+            list-style: none;
+        }
+
+        #historyList li {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        #historyList li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        #historyList li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .history-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .history-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .history-amount {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--water-blue);
+        }
+
+        .history-time {
+            color: #777;
+            font-size: 0.95rem;
+        }
+
+        .delete-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-btn:hover, .delete-btn:focus {
+            background: #ff2e43;
+            transform: scale(1.05);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .reset-btn:hover, .reset-btn:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            color: var(--water-blue);
+            font-weight: 600;
+        }
+
+        .chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+        }
+
+        .chart-bar {
+            width: 40px;
+            background: var(--primary-gradient);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: height 1s ease;
+            box-shadow: 0 3px 10px rgba(26, 41, 128, 0.2);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .chart-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: 600;
+            color: var(--water-blue);
+            font-size: 0.9rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 35px;
+        }
+
+        .achievement-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #ff8e53;
+        }
+
+        .achievement-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--water-blue);
+        }
+
+        .achievement-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: var(--success);
+            color: white;
+            padding: 22px 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            transform: translateX(200%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            max-width: 380px;
+            border-left: 5px solid #2e7d32;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--error);
+            border-left: 5px solid #c0392b;
+        }
+
+        .notification.warning {
+            background: var(--warning);
+            border-left: 5px solid #e67e22;
+        }
+
+        .notification-icon {
+            font-size: 2rem;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-message {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .notification-detail {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .notification-close:hover, .notification-close:focus {
+            opacity: 1;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .subtitle {
+                display: none;
+            }
+            
+            .tabs {
+                font-size: 0.9rem;
+            }
+            
+            .tab {
+                padding: 15px 5px;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .tab-content {
+                padding: 20px 15px;
+            }
+            
+            .water-glass-container {
+                width: 150px;
+                height: 180px;
+            }
+            
+            .stat-value {
+                font-size: 1.8rem;
+            }
+            
+            .goal-input-group {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .custom-intake {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .quick-add {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Water animation */
+        @keyframes waterWave {
+            0% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-5px) scaleY(1.02); }
+            100% { transform: translateY(0) scaleY(1); }
+        }
+
+        .water-level {
+            animation: waterWave 3s infinite ease-in-out;
+        }
+
+        /* Focus styles for accessibility */
+        button:focus, input:focus, .tab:focus {
+            outline: 3px solid var(--water-teal);
+            outline-offset: 2px;
+        }
+
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tint" aria-hidden="true"></i> Advanced Water Intake Tracker</h1>
+            <div class="subtitle">Stay hydrated and track your daily water consumption</div>
+        </header>
+        
+        <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="dashboard-tab">
+                <i class="fas fa-home" aria-hidden="true"></i> Dashboard
+            </button>
+            <button class="tab" data-tab="tracker" role="tab" aria-selected="false" aria-controls="tracker-tab">
+                <i class="fas fa-plus-circle" aria-hidden="true"></i> Add Water
+            </button>
+            <button class="tab" data-tab="history" role="tab" aria-selected="false" aria-controls="history-tab">
+                <i class="fas fa-history" aria-hidden="true"></i> History
+            </button>
+            <button class="tab" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analytics-tab">
+                <i class="fas fa-chart-line" aria-hidden="true"></i> Analytics
+            </button>
+        </div>
+        
+        <div class="tab-content active" id="dashboard-tab" role="tabpanel" aria-labelledby="dashboard">
+            <div class="dashboard-section">
+                <div class="water-glass-container" aria-label="Water level visualization">
+                    <div class="glass-outline"></div>
+                    <div class="water-level" id="waterLevel" role="img" aria-label="Current water level"></div>
+                    <div class="bubbles" id="bubbles"></div>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon" aria-hidden="true">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="stat-value" id="consumedValue">0</div>
+                        <div class="stat-label">Consumed (ml)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" aria-hidden="true">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="stat-value" id="goalValue">2000</div>
+                        <div class="stat-label">Daily Goal (ml)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" aria-hidden="true">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-value" id="percentageValue">0%</div>
+                        <div class="stat-label">Goal Progress</div>
+                    </div>
+                </div>
+                
+                <div class="goal-section">
+                    <h2 class="section-title">Set Your Daily Water Goal</h2>
+                    <div class="goal-input-group">
+                        <div class="goal-input">
+                            <i class="fas fa-tint" aria-hidden="true"></i>
+                            <label for="waterGoal" class="sr-only">Daily water goal in milliliters</label>
+                            <input type="number" id="waterGoal" min="500" max="5000" step="100" value="2000" aria-describedby="goalHelp">
+                            <span class="unit">ml</span>
+                        </div>
+                        <div id="goalHelp" class="sr-only">Enter your daily water goal in milliliters between 500 and 5000</div>
+                    </div>
+                    
+                    <div class="preset-goals">
+                        <button class="preset-btn" data-goal="1.5" aria-label="Set goal to 1.5 liters">1.5L</button>
+                        <button class="preset-btn" data-goal="2" aria-label="Set goal to 2 liters">2L</button>
+                        <button class="preset-btn" data-goal="2.5" aria-label="Set goal to 2.5 liters">2.5L</button>
+                        <button class="preset-btn" data-goal="3" aria-label="Set goal to 3 liters">3L</button>
+                    </div>
+                    
+                    <button id="setGoalBtn" class="set-goal-btn">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i> Set Daily Goal
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tracker-tab" role="tabpanel" aria-labelledby="tracker">
+            <div class="add-water-section">
+                <h2 class="section-title">Quick Add Water</h2>
+                <div class="quick-add">
+                    <button class="quick-btn" data-amount="100" aria-label="Add 100 milliliters of water">
+                        <i class="fas fa-wine-glass-alt" aria-hidden="true"></i>
+                        <span>100ml</span>
+                        <small>Sip</small>
+                    </button>
+                    <button class="quick-btn" data-amount="250" aria-label="Add 250 milliliters of water">
+                        <i class="fas fa-glass-whiskey" aria-hidden="true"></i>
+                        <span>250ml</span>
+                        <small>Glass</small>
+                    </button>
+                    <button class="quick-btn" data-amount="500" aria-label="Add 500 milliliters of water">
+                        <i class="fas fa-wine-bottle" aria-hidden="true"></i>
+                        <span>500ml</span>
+                        <small>Bottle</small>
+                    </button>
+                    <button class="quick-btn" data-amount="1000" aria-label="Add 1000 milliliters of water">
+                        <i class="fas fa-prescription-bottle" aria-hidden="true"></i>
+                        <span>1000ml</span>
+                        <small>Large</small>
+                    </button>
+                </div>
+                
+                <h2 class="section-title">Custom Amount</h2>
+                <div class="custom-intake">
+                    <div class="custom-input">
+                        <i class="fas fa-tint" aria-hidden="true"></i>
+                        <label for="customAmount" class="sr-only">Custom water amount in milliliters</label>
+                        <input type="number" id="customAmount" min="50" max="2000" step="50" placeholder="Enter ml" aria-describedby="customHelp">
+                        <div id="customHelp" class="sr-only">Enter custom water amount in milliliters between 50 and 2000</div>
+                    </div>
+                    <button id="addCustomBtn" class="add-custom-btn" aria-label="Add custom water amount">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add Water
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="history-tab" role="tabpanel" aria-labelledby="history">
+            <div class="history-section">
+                <div class="history-header">
+                    <h2 class="history-title"><i class="fas fa-history" aria-hidden="true"></i> Today's Water Intake</h2>
+                    <button id="resetBtn" class="reset-btn" aria-label="Reset today's water intake">
+                        <i class="fas fa-redo" aria-hidden="true"></i> Reset Today
+                    </button>
+                </div>
+                <ul id="historyList" aria-label="Today's water intake history">
+                    <li style="text-align: center; padding: 40px; color: #777;">
+                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #bbdefb;" aria-hidden="true"></i>
+                        <div>No water intake recorded yet</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">Start tracking your water consumption!</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="analytics-tab" role="tabpanel" aria-labelledby="analytics">
+            <div class="chart-container">
+                <h3 class="chart-title"><i class="fas fa-chart-bar" aria-hidden="true"></i> Weekly Water Intake</h3>
+                <div class="chart" id="waterChart" aria-label="Weekly water intake chart">
+                    <!-- Chart bars will be generated by JS -->
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="achievement-card">
+                    <div class="achievement-icon" aria-hidden="true">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="achievement-title">Best Streak</div>
+                    <div class="achievement-desc" id="bestStreak">0 days</div>
+                </div>
+                
+                <div class="achievement-card">
+                    <div class="achievement-icon" aria-hidden="true">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="achievement-title">Best Day</div>
+                    <div class="achievement-desc" id="bestDay">0ml</div>
+                </div>
+                
+                <div class="achievement-card">
+                    <div class="achievement-icon" aria-hidden="true">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="achievement-title">Average Intake</div>
+                    <div class="achievement-desc" id="avgIntake">0ml</div>
+                </div>
+                
+                <div class="achievement-card">
+                    <div class="achievement-icon" aria-hidden="true">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="achievement-title">Total Consumed</div>
+                    <div class="achievement-desc" id="totalConsumed">0ml</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification" role="alert" aria-live="polite">
+        <div class="notification-icon" aria-hidden="true">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-message" id="notificationMessage">Operation completed successfully!</div>
+            <div class="notification-detail" id="notificationDetail"></div>
+        </div>
+        <button class="notification-close" aria-label="Close notification">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const waterGoalInput = document.getElementById('waterGoal');
+            const setGoalBtn = document.getElementById('setGoalBtn');
+            const waterLevel = document.getElementById('waterLevel');
+            const bubblesContainer = document.getElementById('bubbles');
+            const consumedValue = document.getElementById('consumedValue');
+            const goalValue = document.getElementById('goalValue');
+            const percentageValue = document.getElementById('percentageValue');
+            const quickBtns = document.querySelectorAll('.quick-btn');
+            const customAmountInput = document.getElementById('customAmount');
+            const addCustomBtn = document.getElementById('addCustomBtn');
+            const historyList = document.getElementById('historyList');
+            const resetBtn = document.getElementById('resetBtn');
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const notificationDetail = document.getElementById('notificationDetail');
+            const notificationClose = document.querySelector('.notification-close');
+            const waterChart = document.getElementById('waterChart');
+            
+            // Stats elements
+            const bestStreak = document.getElementById('bestStreak');
+            const bestDay = document.getElementById('bestDay');
+            const avgIntake = document.getElementById('avgIntake');
+            const totalConsumed = document.getElementById('totalConsumed');
+            
+            // Initialize
+            let dailyGoal = 2000;
+            let currentIntake = 0;
+            let intakeHistory = [];
+            let weeklyData = {};
+            
+            // Load data from localStorage
+            loadData();
+            
+            // Event Listeners
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+                
+                tab.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const tabName = tab.getAttribute('data-tab');
+                        switchTab(tabName);
+                    }
+                });
+            });
+            
+            setGoalBtn.addEventListener('click', setWaterGoal);
+            addCustomBtn.addEventListener('click', addCustomIntake);
+            resetBtn.addEventListener('click', resetIntake);
+            notificationClose.addEventListener('click', () => {
+                notification.classList.remove('show');
+            });
+            
+            // Preset goal buttons
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const goal = parseFloat(this.getAttribute('data-goal'));
+                    waterGoalInput.value = goal * 1000; // Convert liters to ml
+                    setWaterGoal();
+                });
+            });
+            
+            // Quick add buttons
+            quickBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const amount = parseInt(this.getAttribute('data-amount'));
+                    addWaterIntake(amount);
+                });
+            });
+            
+            // Keyboard accessibility for form elements
+            waterGoalInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    setWaterGoal();
+                }
+            });
+            
+            customAmountInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    addCustomIntake();
+                }
+            });
+            
+            // Set water goal
+            function setWaterGoal() {
+                const goal = parseInt(waterGoalInput.value);
+                if (goal && goal >= 500 && goal <= 5000) {
+                    dailyGoal = goal;
+                    goalValue.textContent = dailyGoal;
+                    updateProgress();
+                    saveData();
+                    showNotification('Goal Updated!', `Daily goal set to ${dailyGoal}ml`, 'success');
+                } else {
+                    showNotification('Invalid Goal', 'Please enter a valid goal (500-5000ml)', 'error');
+                }
+            }
+            
+            // Add water intake
+            function addWaterIntake(amount) {
+                if (amount > 0) {
+                    currentIntake += amount;
+                    const intakeItem = {
+                        amount: amount,
+                        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        timestamp: new Date().toISOString(),
+                        date: new Date().toDateString()
+                    };
+                    intakeHistory.push(intakeItem);
+                    
+                    // Update weekly data
+                    const today = new Date().toDateString();
+                    if (!weeklyData[today]) {
+                        weeklyData[today] = 0;
+                    }
+                    weeklyData[today] += amount;
+                    
+                    updateProgress();
+                    updateHistory();
+                    saveData();
+                    showNotification('Water Added!', `Added ${amount}ml of water`, 'success');
+                    
+                    // Check for achievements
+                    checkAchievements();
+                }
+            }
+            
+            // Add custom intake
+            function addCustomIntake() {
+                const amount = parseInt(customAmountInput.value);
+                if (amount && amount > 0 && amount <= 2000) {
+                    addWaterIntake(amount);
+                    customAmountInput.value = '';
+                } else {
+                    showNotification('Invalid Amount', 'Please enter a valid amount (1-2000ml)', 'error');
+                }
+            }
+            
+            // Update progress bar and stats
+            function updateProgress() {
+                const percentage = Math.min(100, Math.round((currentIntake / dailyGoal) * 100));
+                const waterHeight = Math.min(100, percentage);
+                
+                waterLevel.style.height = `${waterHeight}%`;
+                percentageValue.textContent = `${percentage}%`;
+                consumedValue.textContent = currentIntake;
+                
+                // Update bubbles based on water level
+                updateBubbles(percentage);
+            }
+            
+            // Update bubbles
+            function updateBubbles(percentage) {
+                bubblesContainer.innerHTML = '';
+                const bubbleCount = Math.floor(percentage / 10);
+                
+                for (let i = 0; i < bubbleCount; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    bubble.style.left = `${Math.random() * 80 + 10}%`;
+                    bubble.style.width = `${Math.random() * 10 + 5}px`;
+                    bubble.style.height = bubble.style.width;
+                    bubble.style.animationDelay = `${Math.random() * 2}s`;
+                    bubblesContainer.appendChild(bubble);
+                }
+            }
+            
+            // Update history list
+            function updateHistory() {
+                if (intakeHistory.length === 0) {
+                    historyList.innerHTML = `
+                        <li style="text-align: center; padding: 40px; color: #777;">
+                            <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #bbdefb;" aria-hidden="true"></i>
+                            <div>No water intake recorded yet</div>
+                            <div style="font-size: 0.9rem; margin-top: 10px;">Start tracking your water consumption!</div>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                // Sort history by timestamp (newest first)
+                intakeHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                historyList.innerHTML = '';
+                intakeHistory.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="history-details">
+                            <div class="history-icon" aria-hidden="true">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div>
+                                <div class="history-amount">+${item.amount}ml</div>
+                                <div class="history-time">${item.time}</div>
+                            </div>
+                        </div>
+                        <button class="delete-btn" data-index="${index}" aria-label="Remove ${item.amount}ml entry">
+                            <i class="fas fa-trash" aria-hidden="true"></i> Remove
+                        </button>
+                    `;
+                    historyList.appendChild(li);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        deleteHistoryItem(index);
+                    });
+                });
+            }
+            
+            // Delete history item
+            function deleteHistoryItem(index) {
+                if (index >= 0 && index < intakeHistory.length) {
+                    const removedAmount = intakeHistory[index].amount;
+                    currentIntake -= removedAmount;
+                    
+                    // Update weekly data
+                    const itemDate = intakeHistory[index].date;
+                    if (weeklyData[itemDate]) {
+                        weeklyData[itemDate] -= removedAmount;
+                        if (weeklyData[itemDate] <= 0) {
+                            delete weeklyData[itemDate];
+                        }
+                    }
+                    
+                    intakeHistory.splice(index, 1);
+                    updateProgress();
+                    updateHistory();
+                    saveData();
+                    showNotification('Entry Removed', `Removed ${removedAmount}ml from your intake`, 'warning');
+                }
+            }
+            
+            // Reset today's intake
+            function resetIntake() {
+                if (confirm('Are you sure you want to reset today\'s intake?')) {
+                    currentIntake = 0;
+                    intakeHistory = intakeHistory.filter(item => item.date !== new Date().toDateString());
+                    updateProgress();
+                    updateHistory();
+                    saveData();
+                    showNotification('Reset Complete', 'Today\'s intake has been reset', 'warning');
+                }
+            }
+            
+            // Save data to localStorage
+            function saveData() {
+                try {
+                    const data = {
+                        goal: dailyGoal,
+                        intake: currentIntake,
+                        history: intakeHistory,
+                        weeklyData: weeklyData,
+                        lastUpdate: new Date().toDateString()
+                    };
+                    localStorage.setItem('advancedWaterIntakeData', JSON.stringify(data));
+                } catch (e) {
+                    console.error('Failed to save data to localStorage', e);
+                }
+            }
+            
+            // Load data from localStorage
+            function loadData() {
+                try {
+                    const savedData = localStorage.getItem('advancedWaterIntakeData');
+                    if (savedData) {
+                        const data = JSON.parse(savedData);
+                        
+                        // Check if it's a new day
+                        const today = new Date().toDateString();
+                        if (data.lastUpdate !== today) {
+                            // Reset for new day but keep weekly data
+                            currentIntake = 0;
+                            intakeHistory = [];
+                            data.intake = 0;
+                            data.history = [];
+                            data.lastUpdate = today;
+                            localStorage.setItem('advancedWaterIntakeData', JSON.stringify(data));
+                        } else {
+                            // Load existing data
+                            dailyGoal = data.goal || 2000;
+                            currentIntake = data.intake || 0;
+                            intakeHistory = data.history || [];
+                            weeklyData = data.weeklyData || {};
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to load data from localStorage', e);
+                }
+                
+                // Update UI
+                waterGoalInput.value = dailyGoal;
+                goalValue.textContent = dailyGoal;
+                updateProgress();
+                updateHistory();
+            }
+            
+            // Show notification
+            function showNotification(message, detail = '', type = 'success') {
+                notificationMessage.textContent = message;
+                notificationDetail.textContent = detail;
+                notification.className = 'notification ' + type;
+                notification.classList.add('show');
+                
+                // Auto close after 4 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 4000);
+            }
+            
+            // Check for achievements
+            function checkAchievements() {
+                // Check if goal is reached
+                if (currentIntake >= dailyGoal && currentIntake - (intakeHistory[intakeHistory.length - 1]?.amount || 0) < dailyGoal) {
+                    showNotification('Achievement Unlocked!', 'You reached your daily water goal! 🎉', 'success');
+                }
+                
+                // Check for half goal
+                if (currentIntake >= dailyGoal / 2 && currentIntake - (intakeHistory[intakeHistory.length - 1]?.amount || 0) < dailyGoal / 2) {
+                    showNotification('Halfway There!', 'You\'ve consumed 50% of your daily goal!', 'success');
+                }
+            }
+            
+            // Update analytics
+            function updateAnalytics() {
+                // Best streak (consecutive days with goal met)
+                let streak = 0;
+                let maxStreak = 0;
+                const today = new Date();
+                const dates = Object.keys(weeklyData).sort((a, b) => new Date(a) - new Date(b));
+                
+                for (let i = 0; i < dates.length; i++) {
+                    const date = new Date(dates[i]);
+                    if (weeklyData[dates[i]] >= dailyGoal) {
+                        streak++;
+                        maxStreak = Math.max(maxStreak, streak);
+                    } else {
+                        streak = 0;
+                    }
+                }
+                bestStreak.textContent = `${maxStreak} days`;
+                
+                // Best day
+                let maxDay = 0;
+                for (const date in weeklyData) {
+                    maxDay = Math.max(maxDay, weeklyData[date]);
+                }
+                bestDay.textContent = `${maxDay}ml`;
+                
+                // Average intake
+                if (dates.length > 0) {
+                    const total = dates.reduce((sum, date) => sum + weeklyData[date], 0);
+                    avgIntake.textContent = `${Math.round(total / dates.length)}ml`;
+                } else {
+                    avgIntake.textContent = '0ml';
+                }
+                
+                // Total consumed
+                const total = Object.values(weeklyData).reduce((sum, val) => sum + val, 0);
+                totalConsumed.textContent = `${total}ml`;
+            }
+            
+            // Render chart
+            function renderChart() {
+                waterChart.innerHTML = '';
+                
+                if (Object.keys(weeklyData).length === 0) {
+                    waterChart.innerHTML = '<div style="text-align:center;width:100%;color:#777;padding:40px;">No data to display</div>';
+                    return;
+                }
+                
+                // Get last 7 days
+                const dates = Object.keys(weeklyData).sort((a, b) => new Date(b) - new Date(a)).slice(0, 7);
+                const maxAmount = Math.max(...Object.values(weeklyData));
+                
+                dates.forEach(date => {
+                    const amount = weeklyData[date];
+                    const barHeight = maxAmount > 0 ? (amount / maxAmount) * 150 : 0;
+                    const day = new Date(date).toLocaleDateString('en-US', {weekday: 'short'});
+                    
+                    const bar = document.createElement('div');
+                    bar.className = 'chart-bar';
+                    bar.style.height = `${barHeight}px`;
+                    bar.innerHTML = `
+                        <div class="chart-value">${amount}</div>
+                        <div class="chart-label">${day}</div>
+                    `;
+                    waterChart.appendChild(bar);
+                });
+            }
+            
+            // Switch tab function
+            function switchTab(tabName) {
+                // Update active tab
+                tabs.forEach(t => {
+                    const isSelected = t.getAttribute('data-tab') === tabName;
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', isSelected);
+                    if (isSelected) t.classList.add('active');
+                });
+                
+                // Show active content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabName}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+                
+                // Update analytics when switching to analytics tab
+                if (tabName === 'analytics') {
+                    updateAnalytics();
+                    renderChart();
+                }
+            }
+            
+            // Set up periodic reminder
+            function setupReminder() {
+                if ('Notification' in window && 'serviceWorker' in navigator) {
+                    if (Notification.permission === 'default') {
+                        setTimeout(() => {
+                            Notification.requestPermission().then(permission => {
+                                if (permission === 'granted') {
+                                    scheduleReminders();
+                                }
+                            }).catch(err => {
+                                console.error('Notification permission request failed', err);
+                            });
+                        }, 3000);
+                    } else if (Notification.permission === 'granted') {
+                        scheduleReminders();
+                    }
+                }
+            }
+            
+            // Schedule reminders
+            function scheduleReminders() {
+                try {
+                    // Check if we should show daily reminder
+                    const lastReminder = localStorage.getItem('waterDailyReminder');
+                    const today = new Date().toDateString();
+                    
+                    if (lastReminder !== today) {
+                        // Show daily reminder after 1 second
+                        setTimeout(() => {
+                            if (Notification.permission === 'granted') {
+                                new Notification('💧 Water Intake Reminder', {
+                                    body: 'Start your day with a glass of water! Stay hydrated throughout the day.',
+                                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💧</text></svg>',
+                                    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%231a2980"/></svg>'
+                                });
+                                localStorage.setItem('waterDailyReminder', today);
+                            }
+                        }, 1000);
+                    }
+                    
+                    // Set up recurring hourly reminders
+                    setInterval(() => {
+                        if (currentIntake < dailyGoal * 0.8 && Notification.permission === 'granted') {
+                            new Notification('💧 Hydration Reminder', {
+                                body: 'You\'re behind on your water intake goal. Time to drink some water!',
+                                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💧</text></svg>'
+                            });
+                        }
+                    }, 60 * 60 * 1000); // Every hour
+                } catch (e) {
+                    console.error('Failed to schedule reminders', e);
+                }
+            }
+            
+            // Initialize reminder
+            setupReminder();
+            
+            // Add welcome message for first visit
+            if (!localStorage.getItem('waterVisited')) {
+                localStorage.setItem('waterVisited', 'true');
+                setTimeout(() => {
+                    showNotification('Welcome!', 'Track your daily water intake and stay hydrated! 💧', 'success');
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
