@@ -1,0 +1,614 @@
+<!-- Category: Health -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Cycle Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: block;
+        }
+        
+        .mobile-view {
+            display: none;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: 2px solid #4cc9f0;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        button {
+            background: #4361ee;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        button:hover {
+            background: #3a56d4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.6);
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .results h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .sleep-times {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .sleep-cycle {
+            background: rgba(67, 97, 238, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .cycle-count {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .cycle-time {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .notification-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        
+        .notification-section h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .reminder-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .reminder-controls button {
+            flex: 1;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        
+        .history-section h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .desktop-view {
+                display: none;
+            }
+            
+            .mobile-view {
+                display: block;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .mobile-header {
+                height: 50px;
+                background: rgba(0, 0, 0, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 15px;
+            }
+            
+            .mobile-header h1 {
+                font-size: 1.4rem;
+                margin: 0;
+            }
+            
+            .mobile-content {
+                padding: 20px;
+            }
+            
+            .calculator-card {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            label {
+                font-size: 1rem;
+            }
+            
+            input, select {
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 1.1rem;
+            }
+            
+            .results {
+                padding: 20px;
+            }
+            
+            .sleep-times {
+                grid-template-columns: 1fr;
+            }
+            
+            .notification-section, .history-section {
+                padding: 20px;
+                margin-top: 20px;
+            }
+            
+            .reminder-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop View -->
+    <div class="desktop-view">
+        <div class="container">
+            <header>
+                <h1>Sleep Cycle Calculator</h1>
+                <p class="subtitle">Calculate your optimal sleep times for better rest</p>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="wakeTime">Desired Wake Up Time</label>
+                    <input type="time" id="wakeTime" value="07:00">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sleepTime">Current Bedtime (Optional)</label>
+                    <input type="time" id="sleepTime">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sleepCycles">Preferred Number of Sleep Cycles</label>
+                    <select id="sleepCycles">
+                        <option value="4">4 Cycles (3 hours)</option>
+                        <option value="5">5 Cycles (3 hours 45 minutes)</option>
+                        <option value="6" selected>6 Cycles (4 hours 30 minutes)</option>
+                        <option value="7">7 Cycles (5 hours 15 minutes)</option>
+                        <option value="8">8 Cycles (6 hours)</option>
+                    </select>
+                </div>
+                
+                <button id="calculateBtn">Calculate Sleep Times</button>
+            </div>
+            
+            <div class="results" id="results">
+                <h2>Recommended Bedtimes</h2>
+                <p>For optimal rest, try falling asleep at one of these times:</p>
+                <div class="sleep-times" id="sleepTimesContainer"></div>
+            </div>
+            
+            <div class="notification-section">
+                <h2>Sleep Reminders</h2>
+                <p>Set a reminder to go to bed at your optimal time</p>
+                <div class="reminder-controls">
+                    <button id="setReminderBtn">Set Bedtime Reminder</button>
+                    <button id="cancelReminderBtn">Cancel Reminder</button>
+                </div>
+                <p id="reminderStatus" style="margin-top: 15px; text-align: center;"></p>
+            </div>
+            
+            <div class="history-section">
+                <h2>Your Sleep History</h2>
+                <div class="history-list" id="historyList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile View -->
+    <div class="mobile-view">
+        <div class="mobile-header">
+            <h1>Sleep Cycle Calculator</h1>
+        </div>
+        
+        <div class="mobile-content">
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="mobileWakeTime">Wake Up Time</label>
+                    <input type="time" id="mobileWakeTime" value="07:00">
+                </div>
+                
+                <div class="input-group">
+                    <label for="mobileSleepTime">Bedtime (Optional)</label>
+                    <input type="time" id="mobileSleepTime">
+                </div>
+                
+                <div class="input-group">
+                    <label for="mobileSleepCycles">Sleep Cycles</label>
+                    <select id="mobileSleepCycles">
+                        <option value="4">4 Cycles</option>
+                        <option value="5">5 Cycles</option>
+                        <option value="6" selected>6 Cycles</option>
+                        <option value="7">7 Cycles</option>
+                        <option value="8">8 Cycles</option>
+                    </select>
+                </div>
+                
+                <button id="mobileCalculateBtn">Calculate</button>
+            </div>
+            
+            <div class="results" id="mobileResults">
+                <h2>Recommended Bedtimes</h2>
+                <div class="sleep-times" id="mobileSleepTimesContainer"></div>
+            </div>
+            
+            <div class="notification-section">
+                <h2>Reminders</h2>
+                <div class="reminder-controls">
+                    <button id="mobileSetReminderBtn">Set Reminder</button>
+                    <button id="mobileCancelReminderBtn">Cancel</button>
+                </div>
+                <p id="mobileReminderStatus" style="margin-top: 15px; text-align: center;"></p>
+            </div>
+            
+            <div class="history-section">
+                <h2>Sleep History</h2>
+                <div class="history-list" id="mobileHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if device is mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // DOM Elements
+        const wakeTimeInput = isMobile ? document.getElementById('mobileWakeTime') : document.getElementById('wakeTime');
+        const sleepTimeInput = isMobile ? document.getElementById('mobileSleepTime') : document.getElementById('sleepTime');
+        const sleepCyclesSelect = isMobile ? document.getElementById('mobileSleepCycles') : document.getElementById('sleepCycles');
+        const calculateBtn = isMobile ? document.getElementById('mobileCalculateBtn') : document.getElementById('calculateBtn');
+        const resultsDiv = isMobile ? document.getElementById('mobileResults') : document.getElementById('results');
+        const sleepTimesContainer = isMobile ? document.getElementById('mobileSleepTimesContainer') : document.getElementById('sleepTimesContainer');
+        const setReminderBtn = isMobile ? document.getElementById('mobileSetReminderBtn') : document.getElementById('setReminderBtn');
+        const cancelReminderBtn = isMobile ? document.getElementById('mobileCancelReminderBtn') : document.getElementById('cancelReminderBtn');
+        const reminderStatus = isMobile ? document.getElementById('mobileReminderStatus') : document.getElementById('reminderStatus');
+        const historyList = isMobile ? document.getElementById('mobileHistoryList') : document.getElementById('historyList');
+        
+        // Sleep cycle duration (90 minutes in minutes)
+        const CYCLE_DURATION = 90;
+        
+        // Load saved data
+        function loadSavedData() {
+            const savedHistory = localStorage.getItem('sleepHistory');
+            if (savedHistory) {
+                const history = JSON.parse(savedHistory);
+                updateHistoryDisplay(history);
+            }
+            
+            const savedReminder = localStorage.getItem('sleepReminder');
+            if (savedReminder) {
+                const reminder = JSON.parse(savedReminder);
+                updateReminderStatus(reminder);
+            }
+        }
+        
+        // Save to localStorage
+        function saveToStorage(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+        
+        // Calculate sleep times
+        function calculateSleepTimes(wakeTime, cycles) {
+            const wakeDate = new Date();
+            const [hours, minutes] = wakeTime.split(':').map(Number);
+            wakeDate.setHours(hours, minutes, 0, 0);
+            
+            const sleepTimes = [];
+            
+            // Calculate 3 recommended bedtimes (current cycles, +1, -1)
+            for (let i = -1; i <= 1; i++) {
+                const cycleCount = parseInt(cycles) + i;
+                if (cycleCount >= 4 && cycleCount <= 9) {
+                    const sleepDate = new Date(wakeDate);
+                    sleepDate.setMinutes(sleepDate.getMinutes() - (cycleCount * CYCLE_DURATION) - 15); // 15 min to fall asleep
+                    
+                    sleepTimes.push({
+                        cycles: cycleCount,
+                        time: sleepDate.toTimeString().substring(0, 5),
+                        date: sleepDate
+                    });
+                }
+            }
+            
+            return sleepTimes;
+        }
+        
+        // Display sleep times
+        function displaySleepTimes(times) {
+            sleepTimesContainer.innerHTML = '';
+            
+            times.forEach(time => {
+                const cycleElement = document.createElement('div');
+                cycleElement.className = 'sleep-cycle';
+                cycleElement.innerHTML = `
+                    <div class="cycle-count">${time.cycles} Cycles</div>
+                    <div class="cycle-time">${time.time}</div>
+                    <div class="cycle-duration">${Math.floor((time.cycles * CYCLE_DURATION) / 60)}h ${(time.cycles * CYCLE_DURATION) % 60}m</div>
+                `;
+                sleepTimesContainer.appendChild(cycleElement);
+            });
+            
+            resultsDiv.style.display = 'block';
+        }
+        
+        // Update history display
+        function updateHistoryDisplay(history) {
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; opacity: 0.7;">No history yet</p>';
+                return;
+            }
+            
+            // Show last 5 entries
+            const recentHistory = history.slice(-5).reverse();
+            
+            recentHistory.forEach(entry => {
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.innerHTML = `
+                    <div><strong>Wake:</strong> ${entry.wakeTime} | <strong>Bed:</strong> ${entry.sleepTime}</div>
+                    <div><small>${new Date(entry.timestamp).toLocaleDateString()}</small></div>
+                `;
+                historyList.appendChild(historyElement);
+            });
+        }
+        
+        // Add to history
+        function addToHistory(wakeTime, sleepTime) {
+            const history = JSON.parse(localStorage.getItem('sleepHistory') || '[]');
+            
+            history.push({
+                wakeTime: wakeTime,
+                sleepTime: sleepTime,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Keep only last 20 entries
+            if (history.length > 20) {
+                history.shift();
+            }
+            
+            saveToStorage('sleepHistory', history);
+            updateHistoryDisplay(history);
+        }
+        
+        // Set bedtime reminder
+        function setBedtimeReminder(time) {
+            const reminder = {
+                time: time,
+                enabled: true,
+                timestamp: new Date().toISOString()
+            };
+            
+            saveToStorage('sleepReminder', reminder);
+            updateReminderStatus(reminder);
+            
+            // Request notification permission
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        // Schedule notification (simplified for demo)
+                        reminderStatus.innerHTML += '<br><small>Notifications enabled</small>';
+                    }
+                });
+            }
+        }
+        
+        // Cancel reminder
+        function cancelReminder() {
+            localStorage.removeItem('sleepReminder');
+            reminderStatus.textContent = 'No active reminder';
+            reminderStatus.style.color = '#ff6b6b';
+        }
+        
+        // Update reminder status display
+        function updateReminderStatus(reminder) {
+            if (reminder && reminder.enabled) {
+                reminderStatus.innerHTML = `Reminder set for <strong>${reminder.time}</strong>`;
+                reminderStatus.style.color = '#4cc9f0';
+            } else {
+                reminderStatus.textContent = 'No active reminder';
+                reminderStatus.style.color = '#ff6b6b';
+            }
+        }
+        
+        // Show notification (if supported)
+        function showNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">😴</text></svg>'
+                });
+            } else if ('serviceWorker' in navigator && 'PushManager' in window) {
+                // Push notification logic would go here
+                console.log('Push notifications would be sent here');
+            }
+        }
+        
+        // Event Listeners
+        calculateBtn.addEventListener('click', () => {
+            const wakeTime = wakeTimeInput.value;
+            const cycles = sleepCyclesSelect.value;
+            
+            if (!wakeTime) {
+                alert('Please select a wake up time');
+                return;
+            }
+            
+            const sleepTimes = calculateSleepTimes(wakeTime, cycles);
+            displaySleepTimes(sleepTimes);
+            
+            // Save to history (using the first recommended time)
+            if (sleepTimes.length > 0) {
+                addToHistory(wakeTime, sleepTimes[0].time);
+            }
+        });
+        
+        setReminderBtn.addEventListener('click', () => {
+            const wakeTime = wakeTimeInput.value;
+            const cycles = sleepCyclesSelect.value;
+            
+            if (!wakeTime) {
+                alert('Please select a wake up time first');
+                return;
+            }
+            
+            const sleepTimes = calculateSleepTimes(wakeTime, cycles);
+            if (sleepTimes.length > 0) {
+                setBedtimeReminder(sleepTimes[0].time);
+            }
+        });
+        
+        cancelReminderBtn.addEventListener('click', cancelReminder);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+            
+            // Set current time as default for sleep time
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - 30); // 30 minutes ago
+            const timeString = now.toTimeString().substring(0, 5);
+            
+            if (sleepTimeInput) {
+                sleepTimeInput.value = timeString;
+            }
+            if (isMobile && document.getElementById('mobileSleepTime')) {
+                document.getElementById('mobileSleepTime').value = timeString;
+            }
+        });
+        
+        // Handle notification permission
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                // Will request when setting reminder
+            } else if (Notification.permission === 'granted') {
+                reminderStatus.innerHTML += '<br><small>Notifications enabled</small>';
+            }
+        }
+    </script>
+</body>
+</html>
