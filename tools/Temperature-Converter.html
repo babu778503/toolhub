@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<!-- Category: Science -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Temperature Converter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile First Styles */
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
+            padding: 0 15px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .calculator {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0072ff;
+            font-size: 15px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        
+        input:focus, select:focus {
+            border-color: #0072ff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0, 114, 255, 0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 1px solid #bbdefb;
+        }
+        
+        .result-card h3 {
+            color: #0072ff;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #0072ff;
+            font-size: 16px;
+        }
+        
+        .converted-temperature {
+            font-size: 28px;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-weight: 700;
+            color: #0072ff;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .temperature-scale {
+            font-size: 16px;
+            color: #0072ff;
+            margin-top: 5px;
+        }
+        
+        .history {
+            margin: 25px 0;
+        }
+        
+        .history h3 {
+            margin-bottom: 15px;
+            color: #0072ff;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0072ff;
+            font-size: 18px;
+        }
+        
+        .history-item {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 3px solid #0072ff;
+        }
+        
+        .history-conversion {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0072ff;
+        }
+        
+        .history-date {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            align-self: flex-end;
+            transition: background 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .tabs {
+            display: flex;
+            margin: 20px 0 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: #0072ff;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-100px);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+        
+        .close-notification {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+        }
+        
+        .export-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .export-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0072ff;
+        }
+        
+        .quick-convert {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .quick-btn {
+            background: #bbdefb;
+            color: #0072ff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            background: #90caf9;
+        }
+        
+        /* Desktop Styles (for larger screens) */
+        @media (min-width: 769px) {
+            body {
+                padding: 20px;
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                min-height: auto;
+            }
+            
+            .header {
+                padding: 30px 20px;
+                height: auto;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .calculator {
+                padding: 30px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+            
+            .input-section {
+                grid-column: 1;
+            }
+            
+            .result-section {
+                grid-column: 2;
+            }
+            
+            .history-section {
+                grid-column: 1 / -1;
+            }
+            
+            .btn, .export-btn {
+                padding: 16px;
+                font-size: 18px;
+            }
+            
+            .result-card {
+                padding: 25px;
+            }
+            
+            .result-card h3 {
+                font-size: 22px;
+            }
+            
+            .result-item {
+                padding: 15px 0;
+            }
+            
+            .result-label, .result-value {
+                font-size: 16px;
+            }
+            
+            .converted-temperature {
+                font-size: 36px;
+                padding: 25px;
+            }
+            
+            .history-item {
+                flex-direction: row;
+                align-items: center;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .history-details {
+                flex: 1;
+            }
+            
+            .delete-btn {
+                align-self: center;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .tabs {
+                flex-direction: row;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+            
+            .summary-card h4 {
+                font-size: 14px;
+            }
+            
+            .summary-card .value {
+                font-size: 18px;
+            }
+            
+            .notification {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%) translateY(-100px);
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .notification.show {
+                transform: translateX(-50%) translateY(0);
+            }
+            
+            .quick-convert {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn, .export-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+            
+            .result-item {
+                padding: 10px 0;
+            }
+            
+            .result-label, .result-value {
+                font-size: 14px;
+            }
+            
+            .converted-temperature {
+                font-size: 24px;
+                padding: 15px;
+            }
+            
+            .history-item {
+                padding: 12px;
+            }
+            
+            .history-conversion {
+                font-size: 15px;
+            }
+            
+            .quick-convert {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Temperature Converter</h1>
+        </div>
+        
+        <div class="calculator">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="temperature">Temperature Value</label>
+                    <input type="number" id="temperature" step="0.01" value="0" placeholder="Enter temperature">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fromUnit">From Unit</label>
+                    <select id="fromUnit">
+                        <option value="celsius">Celsius (°C)</option>
+                        <option value="fahrenheit">Fahrenheit (°F)</option>
+                        <option value="kelvin">Kelvin (K)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="toUnit">To Unit</label>
+                    <select id="toUnit">
+                        <option value="fahrenheit">Fahrenheit (°F)</option>
+                        <option value="celsius">Celsius (°C)</option>
+                        <option value="kelvin">Kelvin (K)</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="convertBtn">Convert Temperature</button>
+                <button class="export-btn" id="exportBtn">Export History</button>
+                
+                <div class="quick-convert">
+                    <button class="quick-btn" data-from="celsius" data-to="fahrenheit">°C → °F</button>
+                    <button class="quick-btn" data-from="fahrenheit" data-to="celsius">°F → °C</button>
+                    <button class="quick-btn" data-from="celsius" data-to="kelvin">°C → K</button>
+                    <button class="quick-btn" data-from="kelvin" data-to="celsius">K → °C</button>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-card">
+                    <h3>Conversion Result</h3>
+                    <div class="result-item">
+                        <span class="result-label">Input:</span>
+                        <span class="result-value" id="inputValue">0°C</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Output:</span>
+                        <span class="result-value" id="outputValue">32°F</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Conversion Formula:</span>
+                        <span class="result-value" id="formula">(°C × 9/5) + 32</span>
+                    </div>
+                    
+                    <div class="converted-temperature">
+                        <div id="convertedValue">32.00</div>
+                        <div class="temperature-scale" id="convertedScale">°F</div>
+                    </div>
+                </div>
+                
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h4>Conversions</h4>
+                        <div class="value" id="conversionCount">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Last Unit</h4>
+                        <div class="value" id="lastUnit">°C → °F</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Avg Temp</h4>
+                        <div class="value" id="averageTemp">0°C</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Max Temp</h4>
+                        <div class="value" id="maxTemp">0°C</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <div class="tabs">
+                    <div class="tab active" data-tab="history">Conversion History</div>
+                    <div class="tab" data-tab="reference">Reference</div>
+                </div>
+                
+                <div class="tab-content active" id="historyTab">
+                    <div class="history">
+                        <h3>Recent Conversions</h3>
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="referenceTab">
+                    <div class="result-card">
+                        <h3>Temperature Reference</h3>
+                        <div class="result-item">
+                            <span class="result-label">Water Freezing:</span>
+                            <span class="result-value">0°C / 32°F / 273.15K</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Water Boiling:</span>
+                            <span class="result-value">100°C / 212°F / 373.15K</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Absolute Zero:</span>
+                            <span class="result-value">-273.15°C / -459.67°F / 0K</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Room Temp:</span>
+                            <span class="result-value">20-25°C / 68-77°F / 293-298K</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Human Body:</span>
+                            <span class="result-value">37°C / 98.6°F / 310.15K</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <button class="close-notification" id="closeNotification">&times;</button>
+        <span id="notificationText">Conversion history exported successfully!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const temperatureInput = document.getElementById('temperature');
+            const fromUnitSelect = document.getElementById('fromUnit');
+            const toUnitSelect = document.getElementById('toUnit');
+            const convertBtn = document.getElementById('convertBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            
+            const inputValueEl = document.getElementById('inputValue');
+            const outputValueEl = document.getElementById('outputValue');
+            const formulaEl = document.getElementById('formula');
+            const convertedValueEl = document.getElementById('convertedValue');
+            const convertedScaleEl = document.getElementById('convertedScale');
+            
+            const historyList = document.getElementById('historyList');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const closeNotification = document.getElementById('closeNotification');
+            
+            // Summary elements
+            const conversionCountEl = document.getElementById('conversionCount');
+            const lastUnitEl = document.getElementById('lastUnit');
+            const averageTempEl = document.getElementById('averageTemp');
+            const maxTempEl = document.getElementById('maxTemp');
+            
+            // Tab elements
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Quick convert buttons
+            const quickButtons = document.querySelectorAll('.quick-btn');
+            
+            // Format temperature
+            function formatTemperature(temp) {
+                return parseFloat(temp).toFixed(2);
+            }
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(`${tabName}Tab`).classList.add('active');
+                });
+            });
+            
+            // Close notification
+            closeNotification.addEventListener('click', () => {
+                notification.classList.remove('show');
+            });
+            
+            // Load saved data
+            loadSavedData();
+            loadHistory();
+            
+            // Convert button event
+            convertBtn.addEventListener('click', convertTemperature);
+            
+            // Quick convert buttons
+            quickButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const from = this.getAttribute('data-from');
+                    const to = this.getAttribute('data-to');
+                    
+                    fromUnitSelect.value = from;
+                    toUnitSelect.value = to;
+                    convertTemperature();
+                });
+            });
+            
+            // Export button event
+            exportBtn.addEventListener('click', exportHistory);
+            
+            // Input validation
+            [temperatureInput, fromUnitSelect, toUnitSelect].forEach(input => {
+                input.addEventListener('change', saveData);
+            });
+            
+            // Load saved data function
+            function loadSavedData() {
+                const savedData = JSON.parse(localStorage.getItem('temperatureConverterData')) || {};
+                
+                if (savedData.temperature) temperatureInput.value = savedData.temperature;
+                if (savedData.fromUnit) fromUnitSelect.value = savedData.fromUnit;
+                if (savedData.toUnit) toUnitSelect.value = savedData.toUnit;
+            }
+            
+            // Save data function
+            function saveData() {
+                const data = {
+                    temperature: temperatureInput.value,
+                    fromUnit: fromUnitSelect.value,
+                    toUnit: toUnitSelect.value
+                };
+                
+                localStorage.setItem('temperatureConverterData', JSON.stringify(data));
+            }
+            
+            // Load history function
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('temperatureConverterHistory')) || [];
+                renderHistory(history);
+                updateSummary(history);
+            }
+            
+            // Save to history function
+            function saveToHistory(inputValue, inputUnit, outputValue, outputUnit) {
+                let history = JSON.parse(localStorage.getItem('temperatureConverterHistory')) || [];
+                
+                const entry = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString(),
+                    inputValue: parseFloat(inputValue),
+                    inputUnit: inputUnit,
+                    outputValue: parseFloat(outputValue),
+                    outputUnit: outputUnit
+                };
+                
+                history.unshift(entry);
+                
+                // Keep only last 20 entries
+                if (history.length > 20) {
+                    history = history.slice(0, 20);
+                }
+                
+                localStorage.setItem('temperatureConverterHistory', JSON.stringify(history));
+                renderHistory(history);
+                updateSummary(history);
+            }
+            
+            // Render history
+            function renderHistory(history) {
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; padding: 20px; color: #7f8c8d; font-size: 15px;">No conversions yet</p>';
+                    return;
+                }
+                
+                history.forEach(entry => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-details">
+                            <div class="history-conversion">
+                                ${formatTemperature(entry.inputValue)}°${getUnitSymbol(entry.inputUnit)} → 
+                                ${formatTemperature(entry.outputValue)}°${getUnitSymbol(entry.outputUnit)}
+                            </div>
+                            <div class="history-date">${entry.date}</div>
+                        </div>
+                        <button class="delete-btn" data-id="${entry.id}">Delete</button>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteHistoryEntry(id);
+                    });
+                });
+            }
+            
+            // Delete history entry
+            function deleteHistoryEntry(id) {
+                let history = JSON.parse(localStorage.getItem('temperatureConverterHistory')) || [];
+                history = history.filter(entry => entry.id !== id);
+                localStorage.setItem('temperatureConverterHistory', JSON.stringify(history));
+                renderHistory(history);
+                updateSummary(history);
+                showNotification('Conversion deleted successfully!');
+            }
+            
+            // Update summary
+            function updateSummary(history) {
+                conversionCountEl.textContent = history.length;
+                
+                if (history.length > 0) {
+                    const lastEntry = history[0];
+                    lastUnitEl.textContent = `${getUnitSymbol(lastEntry.inputUnit)} → ${getUnitSymbol(lastEntry.outputUnit)}`;
+                    
+                    // Calculate average and max temperature
+                    const temps = history.map(entry => entry.inputValue);
+                    const avgTemp = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
+                    const maxTemp = Math.max(...temps);
+                    
+                    averageTempEl.textContent = `${formatTemperature(avgTemp)}°${getUnitSymbol(history[0].inputUnit)}`;
+                    maxTempEl.textContent = `${formatTemperature(maxTemp)}°${getUnitSymbol(history[0].inputUnit)}`;
+                }
+            }
+            
+            // Get unit symbol
+            function getUnitSymbol(unit) {
+                switch(unit) {
+                    case 'celsius': return 'C';
+                    case 'fahrenheit': return 'F';
+                    case 'kelvin': return 'K';
+                    default: return '';
+                }
+            }
+            
+            // Get unit name
+            function getUnitName(unit) {
+                switch(unit) {
+                    case 'celsius': return 'Celsius';
+                    case 'fahrenheit': return 'Fahrenheit';
+                    case 'kelvin': return 'Kelvin';
+                    default: return '';
+                }
+            }
+            
+            // Get unit symbol
+            function getUnitSymbol(unit) {
+                switch(unit) {
+                    case 'celsius': return 'C';
+                    case 'fahrenheit': return 'F';
+                    case 'kelvin': return 'K';
+                    default: return '';
+                }
+            }
+            
+            // Get unit name
+            function getUnitName(unit) {
+                switch(unit) {
+                    case 'celsius': return 'Celsius';
+                    case 'fahrenheit': return 'Fahrenheit';
+                    case 'kelvin': return 'Kelvin';
+                    default: return '';
+                }
+            }
+            
+            // Convert temperature function
+            function convertTemperature() {
+                const inputValue = parseFloat(temperatureInput.value);
+                const fromUnit = fromUnitSelect.value;
+                const toUnit = toUnitSelect.value;
+                
+                // Validate input
+                if (isNaN(inputValue)) {
+                    showNotification('Please enter a valid temperature value', 'error');
+                    return;
+                }
+                
+                // Convert to Celsius first (as base unit)
+                let celsiusValue;
+                switch(fromUnit) {
+                    case 'celsius':
+                        celsiusValue = inputValue;
+                        break;
+                    case 'fahrenheit':
+                        celsiusValue = (inputValue - 32) * 5/9;
+                        break;
+                    case 'kelvin':
+                        celsiusValue = inputValue - 273.15;
+                        break;
+                }
+                
+                // Convert from Celsius to target unit
+                let outputValue;
+                switch(toUnit) {
+                    case 'celsius':
+                        outputValue = celsiusValue;
+                        break;
+                    case 'fahrenheit':
+                        outputValue = (celsiusValue * 9/5) + 32;
+                        break;
+                    case 'kelvin':
+                        outputValue = celsiusValue + 273.15;
+                        break;
+                }
+                
+                // Display results
+                inputValueEl.textContent = `${formatTemperature(inputValue)}°${getUnitSymbol(fromUnit)}`;
+                outputValueEl.textContent = `${formatTemperature(outputValue)}°${getUnitSymbol(toUnit)}`;
+                convertedValueEl.textContent = formatTemperature(outputValue);
+                convertedScaleEl.textContent = `°${getUnitSymbol(toUnit)}`;
+                
+                // Display formula
+                let formula = '';
+                if (fromUnit === 'celsius' && toUnit === 'fahrenheit') {
+                    formula = '(°C × 9/5) + 32';
+                } else if (fromUnit === 'fahrenheit' && toUnit === 'celsius') {
+                    formula = '(°F - 32) × 5/9';
+                } else if (fromUnit === 'celsius' && toUnit === 'kelvin') {
+                    formula = '°C + 273.15';
+                } else if (fromUnit === 'kelvin' && toUnit === 'celsius') {
+                    formula = 'K - 273.15';
+                } else if (fromUnit === 'fahrenheit' && toUnit === 'kelvin') {
+                    formula = '((°F - 32) × 5/9) + 273.15';
+                } else if (fromUnit === 'kelvin' && toUnit === 'fahrenheit') {
+                    formula = '((K - 273.15) × 9/5) + 32';
+                } else {
+                    formula = 'No conversion needed';
+                }
+                formulaEl.textContent = formula;
+                
+                // Save to history
+                saveToHistory(inputValue, fromUnit, outputValue, toUnit);
+                
+                // Save data
+                saveData();
+            }
+            
+            // Show notification function
+            function showNotification(message, type = 'success') {
+                notificationText.textContent = message;
+                notification.style.background = type === 'error' ? 
+                    'linear-gradient(135deg, #e74c3c, #c0392b)' : 
+                    'linear-gradient(135deg, #27ae60, #2ecc71)';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 4000);
+            }
+            
+            // Export history function
+            function exportHistory() {
+                const history = JSON.parse(localStorage.getItem('temperatureConverterHistory')) || [];
+                
+                if (history.length === 0) {
+                    showNotification('No conversion history to export', 'error');
+                    return;
+                }
+                
+                // Generate CSV content
+                let csvContent = "Temperature Conversion History\n\n";
+                csvContent += "Date,Input Value,Input Unit,Output Value,Output Unit\n";
+                
+                history.forEach(entry => {
+                    csvContent += `${entry.date},${entry.inputValue},${getUnitName(entry.inputUnit)},${entry.outputValue},${getUnitName(entry.outputUnit)}\n`;
+                });
+                
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `temperature_conversions_${new Date().toISOString().slice(0,10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('Conversion history exported successfully!');
+            }
+            
+            // Initialize
+            convertTemperature();
+        });
+    </script>
+</body>
+</html>

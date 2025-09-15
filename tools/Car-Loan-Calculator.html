@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Car Loan Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile First Styles */
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 0 15px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .calculator {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .range-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .range-inputs input[type="range"] {
+            flex: 1;
+        }
+        
+        .range-value {
+            min-width: 80px;
+            text-align: center;
+            font-weight: 700;
+            color: #3498db;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e1e5eb;
+            font-size: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 1px solid #bbdefb;
+        }
+        
+        .result-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #2980b9;
+            font-size: 16px;
+        }
+        
+        .total-payment {
+            font-size: 22px;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-weight: 700;
+            color: #2c3e50;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .chart-container {
+            height: 160px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #3498db, #2980b9);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            min-width: 35px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 4px;
+        }
+        
+        .chart-bar.interest {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .history {
+            margin: 25px 0;
+        }
+        
+        .history h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            font-size: 18px;
+        }
+        
+        .history-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 3px solid #3498db;
+        }
+        
+        .history-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2980b9;
+        }
+        
+        .history-date {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            align-self: flex-end;
+            transition: background 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .tabs {
+            display: flex;
+            margin: 20px 0 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .amortization-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 13px;
+        }
+        
+        .amortization-table th {
+            background: #3498db;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .amortization-table td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .amortization-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .amortization-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-100px);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+        
+        .close-notification {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+        }
+        
+        .export-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .export-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2980b9;
+        }
+        
+        /* Desktop Styles (for larger screens) */
+        @media (min-width: 769px) {
+            body {
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                min-height: auto;
+            }
+            
+            .header {
+                padding: 30px 20px;
+                height: auto;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .calculator {
+                padding: 30px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+            
+            .input-section {
+                grid-column: 1;
+            }
+            
+            .result-section {
+                grid-column: 2;
+            }
+            
+            .history {
+                grid-column: 1 / -1;
+            }
+            
+            .amortization-schedule {
+                grid-column: 1 / -1;
+            }
+            
+            .range-container {
+                flex-direction: row;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .range-inputs {
+                gap: 15px;
+            }
+            
+            .range-value {
+                min-width: 80px;
+                font-size: 16px;
+            }
+            
+            .btn, .export-btn {
+                padding: 16px;
+                font-size: 18px;
+            }
+            
+            .result-card {
+                padding: 25px;
+            }
+            
+            .result-card h3 {
+                font-size: 22px;
+            }
+            
+            .result-item {
+                padding: 15px 0;
+            }
+            
+            .result-label, .result-value {
+                font-size: 16px;
+            }
+            
+            .total-payment {
+                font-size: 28px;
+                padding: 20px;
+            }
+            
+            .chart-container {
+                height: 220px;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .chart-bar {
+                min-width: 40px;
+                font-size: 14px;
+            }
+            
+            .history-item {
+                flex-direction: row;
+                align-items: center;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .history-details {
+                flex: 1;
+            }
+            
+            .history-meta {
+                text-align: right;
+                min-width: 200px;
+            }
+            
+            .delete-btn {
+                align-self: center;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .tabs {
+                flex-direction: row;
+            }
+            
+            .amortization-table {
+                font-size: 14px;
+            }
+            
+            .amortization-table th, 
+            .amortization-table td {
+                padding: 15px 12px;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+            
+            .summary-card h4 {
+                font-size: 14px;
+            }
+            
+            .summary-card .value {
+                font-size: 18px;
+            }
+            
+            .notification {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%) translateY(-100px);
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .notification.show {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn, .export-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+            
+            .result-item {
+                padding: 10px 0;
+            }
+            
+            .result-label, .result-value {
+                font-size: 14px;
+            }
+            
+            .chart-container {
+                height: 140px;
+                padding: 12px;
+                gap: 8px;
+            }
+            
+            .chart-bar {
+                min-width: 25px;
+                font-size: 10px;
+            }
+            
+            .history-item {
+                padding: 12px;
+            }
+            
+            .history-amount {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Car Loan Calculator</h1>
+        </div>
+        
+        <div class="calculator">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="carPrice">Car Price ($)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="carPriceRange" min="5000" max="100000" step="1000" value="30000">
+                            <input type="number" id="carPrice" min="5000" max="100000" step="1000" value="30000">
+                        </div>
+                        <span class="range-value" id="carPriceValue">$30,000</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="downPayment">Down Payment ($)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="downPaymentRange" min="0" max="50000" step="500" value="5000">
+                            <input type="number" id="downPayment" min="0" max="50000" step="500" value="5000">
+                        </div>
+                        <span class="range-value" id="downPaymentValue">$5,000</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interestRate">Interest Rate (%)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="interestRateRange" min="0" max="20" step="0.1" value="4.5">
+                            <input type="number" id="interestRate" min="0" max="20" step="0.1" value="4.5">
+                        </div>
+                        <span class="range-value" id="interestRateValue">4.5%</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loanTerm">Loan Term (Years)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="loanTermRange" min="1" max="10" step="1" value="5">
+                            <input type="number" id="loanTerm" min="1" max="10" step="1" value="5">
+                        </div>
+                        <span class="range-value" id="loanTermValue">5 years</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loanType">Loan Type</label>
+                    <select id="loanType">
+                        <option value="new">New Car Loan</option>
+                        <option value="used">Used Car Loan</option>
+                        <option value="refinance">Refinance Loan</option>
+                        <option value="lease">Lease Buyout</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="extraPayment">Extra Monthly Payment ($)</label>
+                    <input type="number" id="extraPayment" min="0" step="10" value="0" placeholder="Optional">
+                </div>
+                
+                <button class="btn" id="calculateBtn">Calculate Loan</button>
+                <button class="export-btn" id="exportBtn">Export Schedule</button>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-card">
+                    <h3>Loan Summary</h3>
+                    <div class="result-item">
+                        <span class="result-label">Monthly Payment:</span>
+                        <span class="result-value" id="monthlyPayment">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Interest:</span>
+                        <span class="result-value" id="totalInterest">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Payment:</span>
+                        <span class="result-value" id="totalPayment">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Loan Amount:</span>
+                        <span class="result-value" id="loanPrincipal">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Payoff Time:</span>
+                        <span class="result-value" id="payoffTime">0 years 0 months</span>
+                    </div>
+                    
+                    <div class="total-payment">
+                        <div>Total Monthly Payment</div>
+                        <div id="totalMonthlyPayment">$0.00</div>
+                    </div>
+                </div>
+                
+                <div class="amortization">
+                    <h3>Payment Breakdown</h3>
+                    <div class="chart-container" id="chartContainer">
+                        <!-- Chart bars will be generated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h4>Original Term</h4>
+                        <div class="value" id="originalTerm">0 months</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Actual Payoff</h4>
+                        <div class="value" id="actualPayoff">0 months</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Interest Saved</h4>
+                        <div class="value" id="interestSaved">$0.00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Time Saved</h4>
+                        <div class="value" id="monthsSaved">0 months</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history">
+                <h3>Recent Calculations</h3>
+                <div id="historyList"></div>
+            </div>
+            
+            <div class="amortization-schedule">
+                <div class="tabs">
+                    <div class="tab active" data-tab="schedule">Schedule</div>
+                    <div class="tab" data-tab="summary">Summary</div>
+                </div>
+                
+                <div class="tab-content active" id="scheduleTab">
+                    <table class="amortization-table" id="amortizationTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Payment</th>
+                                <th>Principal</th>
+                                <th>Interest</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="amortizationBody">
+                            <!-- Table rows will be generated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="summaryTab">
+                    <div class="result-card">
+                        <h3>Payment Summary</h3>
+                        <div class="result-item">
+                            <span class="result-label">Original Loan Term:</span>
+                            <span class="result-value" id="originalTermDetail">0 months</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Actual Payoff Time:</span>
+                            <span class="result-value" id="actualPayoffDetail">0 months</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Interest Saved:</span>
+                            <span class="result-value" id="interestSavedDetail">$0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Months Saved:</span>
+                            <span class="result-value" id="monthsSavedDetail">0 months</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <button class="close-notification" id="closeNotification">&times;</button>
+        <span id="notificationText">Loan calculation saved successfully!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const carPriceInput = document.getElementById('carPrice');
+            const carPriceRange = document.getElementById('carPriceRange');
+            const carPriceValue = document.getElementById('carPriceValue');
+            
+            const downPaymentInput = document.getElementById('downPayment');
+            const downPaymentRange = document.getElementById('downPaymentRange');
+            const downPaymentValue = document.getElementById('downPaymentValue');
+            
+            const interestRateInput = document.getElementById('interestRate');
+            const interestRateRange = document.getElementById('interestRateRange');
+            const interestRateValue = document.getElementById('interestRateValue');
+            
+            const loanTermInput = document.getElementById('loanTerm');
+            const loanTermRange = document.getElementById('loanTermRange');
+            const loanTermValue = document.getElementById('loanTermValue');
+            
+            const loanTypeSelect = document.getElementById('loanType');
+            const extraPaymentInput = document.getElementById('extraPayment');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            
+            const monthlyPaymentEl = document.getElementById('monthlyPayment');
+            const totalInterestEl = document.getElementById('totalInterest');
+            const totalPaymentEl = document.getElementById('totalPayment');
+            const loanPrincipalEl = document.getElementById('loanPrincipal');
+            const totalMonthlyPaymentEl = document.getElementById('totalMonthlyPayment');
+            const payoffTimeEl = document.getElementById('payoffTime');
+            const chartContainer = document.getElementById('chartContainer');
+            const historyList = document.getElementById('historyList');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const closeNotification = document.getElementById('closeNotification');
+            
+            const amortizationBody = document.getElementById('amortizationBody');
+            const originalTermEl = document.getElementById('originalTerm');
+            const actualPayoffEl = document.getElementById('actualPayoff');
+            const interestSavedEl = document.getElementById('interestSaved');
+            const monthsSavedEl = document.getElementById('monthsSaved');
+            
+            const originalTermDetailEl = document.getElementById('originalTermDetail');
+            const actualPayoffDetailEl = document.getElementById('actualPayoffDetail');
+            const interestSavedDetailEl = document.getElementById('interestSavedDetail');
+            const monthsSavedDetailEl = document.getElementById('monthsSavedDetail');
+            
+            // Tab elements
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Format number with commas
+            function formatNumber(num) {
+                return parseFloat(num).toLocaleString();
+            }
+            
+            // Format currency
+            function formatCurrency(amount) {
+                return '$' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+            
+            // Format time period
+            function formatTimePeriod(months) {
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                if (years > 0) {
+                    return `${years} yr ${remainingMonths} mo`;
+                }
+                return `${remainingMonths} mo`;
+            }
+            
+            // Sync range and number inputs
+            function syncInputs(range, input, value, suffix = '') {
+                range.addEventListener('input', () => {
+                    input.value = range.value;
+                    value.textContent = formatNumber(range.value) + suffix;
+                    saveData();
+                });
+                
+                input.addEventListener('input', () => {
+                    range.value = input.value;
+                    value.textContent = formatNumber(input.value) + suffix;
+                    saveData();
+                });
+            }
+            
+            // Sync all inputs
+            syncInputs(carPriceRange, carPriceInput, carPriceValue, '');
+            syncInputs(downPaymentRange, downPaymentInput, downPaymentValue, '');
+            syncInputs(interestRateRange, interestRateInput, interestRateValue, '%');
+            syncInputs(loanTermRange, loanTermInput, loanTermValue, ' years');
+            
+            // Save data when inputs change
+            [extraPaymentInput, loanTypeSelect].forEach(input => {
+                input.addEventListener('change', saveData);
+            });
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(`${tabName}Tab`).classList.add('active');
+                });
+            });
+            
+            // Close notification
+            closeNotification.addEventListener('click', () => {
+                notification.classList.remove('show');
+            });
+            
+            // Load saved data
+            loadSavedData();
+            loadHistory();
+            
+            // Calculate button event
+            calculateBtn.addEventListener('click', calculateLoan);
+            
+            // Export button event
+            exportBtn.addEventListener('click', exportSchedule);
+            
+            // Load saved data function
+            function loadSavedData() {
+                const savedData = JSON.parse(localStorage.getItem('carLoanCalculatorData')) || {};
+                
+                if (savedData.carPrice) {
+                    carPriceInput.value = savedData.carPrice;
+                    carPriceRange.value = savedData.carPrice;
+                    carPriceValue.textContent = formatNumber(savedData.carPrice);
+                }
+                
+                if (savedData.downPayment) {
+                    downPaymentInput.value = savedData.downPayment;
+                    downPaymentRange.value = savedData.downPayment;
+                    downPaymentValue.textContent = formatNumber(savedData.downPayment);
+                }
+                
+                if (savedData.interestRate) {
+                    interestRateInput.value = savedData.interestRate;
+                    interestRateRange.value = savedData.interestRate;
+                    interestRateValue.textContent = savedData.interestRate + '%';
+                }
+                
+                if (savedData.loanTerm) {
+                    loanTermInput.value = savedData.loanTerm;
+                    loanTermRange.value = savedData.loanTerm;
+                    loanTermValue.textContent = savedData.loanTerm + ' years';
+                }
+                
+                if (savedData.extraPayment) extraPaymentInput.value = savedData.extraPayment;
+                if (savedData.loanType) loanTypeSelect.value = savedData.loanType;
+            }
+            
+            // Save data function
+            function saveData() {
+                const data = {
+                    carPrice: carPriceInput.value,
+                    downPayment: downPaymentInput.value,
+                    interestRate: interestRateInput.value,
+                    loanTerm: loanTermInput.value,
+                    extraPayment: extraPaymentInput.value,
+                    loanType: loanTypeSelect.value
+                };
+                
+                localStorage.setItem('carLoanCalculatorData', JSON.stringify(data));
+            }
+            
+            // Calculate loan function
+            function calculateLoan() {
+                const carPrice = parseFloat(carPriceInput.value);
+                const downPayment = parseFloat(downPaymentInput.value) || 0;
+                const interestRate = parseFloat(interestRateInput.value) / 100;
+                const loanTerm = parseFloat(loanTermInput.value);
+                const extraPayment = parseFloat(extraPaymentInput.value) || 0;
+                const loanType = loanTypeSelect.value;
+                
+                // Validate inputs
+                if (isNaN(carPrice) || isNaN(interestRate) || isNaN(loanTerm) || carPrice <= 0 || loanTerm <= 0) {
+                    showNotification('Please enter valid positive numbers for all required fields', 'error');
+                    return;
+                }
+                
+                if (downPayment >= carPrice) {
+                    showNotification('Down payment cannot be greater than or equal to car price', 'error');
+                    return;
+                }
+                
+                // Calculate loan details
+                const principal = carPrice - downPayment;
+                const monthlyRate = interestRate / 12;
+                const numberOfPayments = loanTerm * 12;
+                
+                // Monthly payment calculation
+                const monthlyPayment = principal * 
+                    (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+                    (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+                
+                // Generate amortization schedule
+                const schedule = generateAmortizationSchedule(principal, monthlyRate, numberOfPayments, monthlyPayment, extraPayment);
+                
+                // Calculate totals
+                const totalPayment = schedule.totalPayment;
+                const totalInterest = schedule.totalInterest;
+                const actualPayoffMonths = schedule.payoffMonth;
+                
+                // Display results
+                monthlyPaymentEl.textContent = formatCurrency(monthlyPayment);
+                totalInterestEl.textContent = formatCurrency(totalInterest);
+                totalPaymentEl.textContent = formatCurrency(totalPayment);
+                loanPrincipalEl.textContent = formatCurrency(principal);
+                totalMonthlyPaymentEl.textContent = formatCurrency(monthlyPayment + extraPayment);
+                payoffTimeEl.textContent = formatTimePeriod(actualPayoffMonths);
+                
+                // Update summary cards
+                originalTermEl.textContent = formatTimePeriod(numberOfPayments);
+                actualPayoffEl.textContent = formatTimePeriod(actualPayoffMonths);
+                interestSavedEl.textContent = formatCurrency(schedule.interestSaved);
+                monthsSavedEl.textContent = formatTimePeriod(schedule.monthsSaved);
+                
+                // Update detail summary
+                originalTermDetailEl.textContent = formatTimePeriod(numberOfPayments);
+                actualPayoffDetailEl.textContent = formatTimePeriod(actualPayoffMonths);
+                interestSavedDetailEl.textContent = formatCurrency(schedule.interestSaved);
+                monthsSavedDetailEl.textContent = formatTimePeriod(schedule.monthsSaved);
+                
+                // Update chart
+                updateChart(principal, totalInterest);
+                
+                // Update amortization table
+                updateAmortizationTable(schedule.schedule);
+                
+                // Save to history
+                saveToHistory(carPrice, downPayment, interestRate * 100, loanTerm, loanType, monthlyPayment, totalInterest, extraPayment);
+                
+                // Show notification
+                showNotification('Loan calculation completed successfully!');
+            }
+            
+            // Generate amortization schedule
+            function generateAmortizationSchedule(principal, monthlyRate, numberOfPayments, monthlyPayment, extraPayment) {
+                let balance = principal;
+                let totalInterest = 0;
+                let totalPayment = 0;
+                let schedule = [];
+                let payoffMonth = numberOfPayments;
+                let originalInterest = 0;
+                
+                // Calculate original interest without extra payments
+                for (let month = 1; month <= numberOfPayments; month++) {
+                    const interestPayment = balance * monthlyRate;
+                    originalInterest += interestPayment;
+                    const principalPayment = monthlyPayment - interestPayment;
+                    balance -= principalPayment;
+                    if (balance <= 0) break;
+                }
+                
+                // Reset balance for actual calculation
+                balance = principal;
+                
+                // Generate schedule with extra payments
+                for (let month = 1; month <= numberOfPayments; month++) {
+                    const interestPayment = balance * monthlyRate;
+                    totalInterest += interestPayment;
+                    
+                    let principalPayment = monthlyPayment - interestPayment;
+                    let totalMonthly = monthlyPayment;
+                    
+                    // Apply extra payment
+                    if (extraPayment > 0) {
+                        const extraToApply = Math.min(extraPayment, balance - principalPayment);
+                        principalPayment += extraToApply;
+                        totalMonthly += extraToApply;
+                    }
+                    
+                    totalPayment += totalMonthly;
+                    balance -= principalPayment;
+                    
+                    schedule.push({
+                        month: month,
+                        payment: totalMonthly,
+                        principal: principalPayment,
+                        interest: interestPayment,
+                        balance: Math.max(0, balance)
+                    });
+                    
+                    if (balance <= 0) {
+                        payoffMonth = month;
+                        break;
+                    }
+                }
+                
+                const interestSaved = originalInterest - totalInterest;
+                const monthsSaved = numberOfPayments - payoffMonth;
+                
+                return {
+                    schedule: schedule,
+                    totalInterest: totalInterest,
+                    totalPayment: totalPayment,
+                    payoffMonth: payoffMonth,
+                    interestSaved: interestSaved,
+                    monthsSaved: monthsSaved
+                };
+            }
+            
+            // Update amortization table
+            function updateAmortizationTable(schedule) {
+                amortizationBody.innerHTML = '';
+                
+                // Show only first 12 months and last 6 months for mobile performance
+                const displaySchedule = schedule.length > 18 ? 
+                    [...schedule.slice(0, 12), {break: true}, ...schedule.slice(-6)] : 
+                    schedule;
+                
+                displaySchedule.forEach(entry => {
+                    if (entry.break) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td colspan="5" style="text-align: center; font-weight: bold;">...</td>`;
+                        amortizationBody.appendChild(row);
+                    } else {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${entry.month}</td>
+                            <td>${formatCurrency(entry.payment)}</td>
+                            <td>${formatCurrency(entry.principal)}</td>
+                            <td>${formatCurrency(entry.interest)}</td>
+                            <td>${formatCurrency(entry.balance)}</td>
+                        `;
+                        amortizationBody.appendChild(row);
+                    }
+                });
+            }
+            
+            // Update chart function
+            function updateChart(principal, interest) {
+                chartContainer.innerHTML = '';
+                
+                // Create bars
+                const principalBar = document.createElement('div');
+                principalBar.className = 'chart-bar';
+                const principalHeight = (principal / (principal + interest)) * 100;
+                principalBar.style.height = `${Math.max(20, principalHeight)}%`;
+                principalBar.innerHTML = `
+                    <div>${formatCurrency(principal)}</div>
+                    <div class="chart-label">Principal</div>
+                `;
+                
+                const interestBar = document.createElement('div');
+                interestBar.className = 'chart-bar interest';
+                const interestHeight = (interest / (principal + interest)) * 100;
+                interestBar.style.height = `${Math.max(20, interestHeight)}%`;
+                interestBar.innerHTML = `
+                    <div>${formatCurrency(interest)}</div>
+                    <div class="chart-label">Interest</div>
+                `;
+                
+                chartContainer.appendChild(principalBar);
+                chartContainer.appendChild(interestBar);
+            }
+            
+            // Save to history function
+            function saveToHistory(carPrice, downPayment, interestRate, loanTerm, loanType, monthlyPayment, totalInterest, extraPayment) {
+                let history = JSON.parse(localStorage.getItem('carLoanCalculatorHistory')) || [];
+                
+                const entry = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString(),
+                    carPrice,
+                    downPayment,
+                    interestRate,
+                    loanTerm,
+                    loanType,
+                    monthlyPayment,
+                    totalInterest,
+                    extraPayment
+                };
+                
+                history.unshift(entry);
+                
+                // Keep only last 10 entries
+                if (history.length > 10) {
+                    history = history.slice(0, 10);
+                }
+                
+                localStorage.setItem('carLoanCalculatorHistory', JSON.stringify(history));
+                loadHistory();
+            }
+            
+            // Load history function
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('carLoanCalculatorHistory')) || [];
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; padding: 20px; color: #7f8c8d; font-size: 15px;">No calculations yet</p>';
+                    return;
+                }
+                
+                history.forEach(entry => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-details">
+                            <div class="history-amount">${formatCurrency(entry.monthlyPayment)}</div>
+                            <div class="history-date">${entry.date}</div>
+                        </div>
+                        <div class="history-meta">
+                            <div>${formatCurrency(entry.carPrice)} • ${entry.loanTerm} yrs</div>
+                            <div>Down: ${formatCurrency(entry.downPayment)}</div>
+                        </div>
+                        <button class="delete-btn" data-id="${entry.id}">Delete</button>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteHistoryEntry(id);
+                    });
+                });
+            }
+            
+            // Delete history entry
+            function deleteHistoryEntry(id) {
+                let history = JSON.parse(localStorage.getItem('carLoanCalculatorHistory')) || [];
+                history = history.filter(entry => entry.id !== id);
+                localStorage.setItem('carLoanCalculatorHistory', JSON.stringify(history));
+                loadHistory();
+                showNotification('Calculation deleted successfully!');
+            }
+            
+            // Show notification function
+            function showNotification(message, type = 'success') {
+                notificationText.textContent = message;
+                notification.style.background = type === 'error' ? 
+                    'linear-gradient(135deg, #e74c3c, #c0392b)' : 
+                    'linear-gradient(135deg, #27ae60, #2ecc71)';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 4000);
+            }
+            
+            // Export schedule function
+            function exportSchedule() {
+                const carPrice = parseFloat(carPriceInput.value);
+                const downPayment = parseFloat(downPaymentInput.value) || 0;
+                const interestRate = parseFloat(interestRateInput.value);
+                const loanTerm = parseFloat(loanTermInput.value);
+                
+                if (!carPrice || !interestRate || !loanTerm) {
+                    showNotification('Please calculate a loan first', 'error');
+                    return;
+                }
+                
+                // Generate CSV content
+                let csvContent = "Car Loan Amortization Schedule\n\n";
+                csvContent += `Car Price: $${carPrice.toFixed(2)}\n`;
+                csvContent += `Down Payment: $${downPayment.toFixed(2)}\n`;
+                csvContent += `Loan Amount: $${(carPrice - downPayment).toFixed(2)}\n`;
+                csvContent += `Interest Rate: ${interestRate}%\n`;
+                csvContent += `Loan Term: ${loanTerm} years\n\n`;
+                csvContent += "Month,Payment,Principal,Interest,Balance\n";
+                
+                // Get current schedule data
+                const principal = carPrice - downPayment;
+                const monthlyRate = (interestRate / 100) / 12;
+                const numberOfPayments = loanTerm * 12;
+                const monthlyPayment = principal * 
+                    (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+                    (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+                const extraPayment = parseFloat(extraPaymentInput.value) || 0;
+                
+                const scheduleData = generateAmortizationSchedule(principal, monthlyRate, numberOfPayments, monthlyPayment, extraPayment);
+                
+                scheduleData.schedule.forEach(entry => {
+                    csvContent += `${entry.month},${entry.payment.toFixed(2)},${entry.principal.toFixed(2)},${entry.interest.toFixed(2)},${entry.balance.toFixed(2)}\n`;
+                });
+                
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `car_loan_amortization_${new Date().toISOString().slice(0,10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('Amortization schedule exported successfully!');
+            }
+            
+            // Initial calculation
+            calculateLoan();
+        });
+    </script>
+</body>
+</html>

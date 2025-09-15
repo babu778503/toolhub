@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inflation Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile First Styles */
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #d31027, #ea384d);
+            color: white;
+            padding: 0 15px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .calculator {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #d31027;
+            font-size: 15px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid #ffebee;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        
+        input:focus, select:focus {
+            border-color: #ea384d;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(234, 56, 77, 0.2);
+        }
+        
+        .range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .range-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .range-inputs input[type="range"] {
+            flex: 1;
+        }
+        
+        .range-value {
+            min-width: 80px;
+            text-align: center;
+            font-weight: 700;
+            color: #ea384d;
+            background: #ffebee;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ffcdd2;
+            font-size: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #ea384d, #d31027);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(234, 56, 77, 0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 1px solid #ffcdd2;
+        }
+        
+        .result-card h3 {
+            color: #d31027;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #ffcdd2;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #d31027;
+            font-size: 16px;
+        }
+        
+        .inflation-impact {
+            font-size: 22px;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-weight: 700;
+            color: #d31027;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .chart-container {
+            height: 160px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #ffebee;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #ea384d, #d31027);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            min-width: 35px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 4px;
+        }
+        
+        .chart-bar.future {
+            background: linear-gradient(to top, #4a90e2, #007aff);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #d31027;
+        }
+        
+        .history {
+            margin: 25px 0;
+        }
+        
+        .history h3 {
+            margin-bottom: 15px;
+            color: #d31027;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ea384d;
+            font-size: 18px;
+        }
+        
+        .history-item {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 3px solid #ea384d;
+        }
+        
+        .history-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d31027;
+        }
+        
+        .history-date {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            align-self: flex-end;
+            transition: background 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .tabs {
+            display: flex;
+            margin: 20px 0 15px;
+            background: #ffebee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: #ea384d;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .yearly-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 13px;
+        }
+        
+        .yearly-table th {
+            background: #ea384d;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .yearly-table td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .yearly-table tr:nth-child(even) {
+            background: #ffebee;
+        }
+        
+        .yearly-table tr:hover {
+            background: #ffcdd2;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-100px);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+        
+        .close-notification {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+        }
+        
+        .export-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .export-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #d31027;
+        }
+        
+        .currency-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .currency-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ffebee;
+            border-radius: 8px;
+            background: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .currency-btn.active {
+            background: #ea384d;
+            color: white;
+            border-color: #d31027;
+        }
+        
+        /* Desktop Styles (for larger screens) */
+        @media (min-width: 769px) {
+            body {
+                padding: 20px;
+                background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                min-height: auto;
+            }
+            
+            .header {
+                padding: 30px 20px;
+                height: auto;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .calculator {
+                padding: 30px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+            
+            .input-section {
+                grid-column: 1;
+            }
+            
+            .result-section {
+                grid-column: 2;
+            }
+            
+            .history {
+                grid-column: 1 / -1;
+            }
+            
+            .inflation-schedule {
+                grid-column: 1 / -1;
+            }
+            
+            .range-container {
+                flex-direction: row;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .range-inputs {
+                gap: 15px;
+            }
+            
+            .range-value {
+                min-width: 80px;
+                font-size: 16px;
+            }
+            
+            .btn, .export-btn {
+                padding: 16px;
+                font-size: 18px;
+            }
+            
+            .result-card {
+                padding: 25px;
+            }
+            
+            .result-card h3 {
+                font-size: 22px;
+            }
+            
+            .result-item {
+                padding: 15px 0;
+            }
+            
+            .result-label, .result-value {
+                font-size: 16px;
+            }
+            
+            .inflation-impact {
+                font-size: 28px;
+                padding: 20px;
+            }
+            
+            .chart-container {
+                height: 220px;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .chart-bar {
+                min-width: 40px;
+                font-size: 14px;
+            }
+            
+            .history-item {
+                flex-direction: row;
+                align-items: center;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .history-details {
+                flex: 1;
+            }
+            
+            .history-meta {
+                text-align: right;
+                min-width: 200px;
+            }
+            
+            .delete-btn {
+                align-self: center;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .tabs {
+                flex-direction: row;
+            }
+            
+            .yearly-table {
+                font-size: 14px;
+            }
+            
+            .yearly-table th, 
+            .yearly-table td {
+                padding: 15px 12px;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+            
+            .summary-card h4 {
+                font-size: 14px;
+            }
+            
+            .summary-card .value {
+                font-size: 18px;
+            }
+            
+            .notification {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%) translateY(-100px);
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .notification.show {
+                transform: translateX(-50%) translateY(0);
+            }
+            
+            .currency-selector {
+                gap: 15px;
+            }
+            
+            .currency-btn {
+                padding: 15px;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn, .export-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+            
+            .result-item {
+                padding: 10px 0;
+            }
+            
+            .result-label, .result-value {
+                font-size: 14px;
+            }
+            
+            .chart-container {
+                height: 140px;
+                padding: 12px;
+                gap: 8px;
+            }
+            
+            .chart-bar {
+                min-width: 25px;
+                font-size: 10px;
+            }
+            
+            .history-item {
+                padding: 12px;
+            }
+            
+            .history-amount {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Inflation Calculator</h1>
+        </div>
+        
+        <div class="calculator">
+            <div class="input-section">
+                <div class="currency-selector">
+                    <button class="currency-btn active" data-currency="USD">USD</button>
+                    <button class="currency-btn" data-currency="EUR">EUR</button>
+                    <button class="currency-btn" data-currency="GBP">GBP</button>
+                    <button class="currency-btn" data-currency="CAD">CAD</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="initialAmount">Initial Amount ($)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="initialAmountRange" min="100" max="100000" step="100" value="10000">
+                            <input type="number" id="initialAmount" min="100" max="100000" step="100" value="10000">
+                        </div>
+                        <span class="range-value" id="initialAmountValue">$10,000</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inflationRate">Inflation Rate (%)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="inflationRateRange" min="0" max="20" step="0.1" value="3">
+                            <input type="number" id="inflationRate" min="0" max="20" step="0.1" value="3">
+                        </div>
+                        <span class="range-value" id="inflationRateValue">3%</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timePeriod">Time Period (Years)</label>
+                    <div class="range-container">
+                        <div class="range-inputs">
+                            <input type="range" id="timePeriodRange" min="1" max="50" step="1" value="10">
+                            <input type="number" id="timePeriod" min="1" max="50" step="1" value="10">
+                        </div>
+                        <span class="range-value" id="timePeriodValue">10 years</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="startYear">Start Year</label>
+                    <select id="startYear">
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+                
+                <button class="btn" id="calculateBtn">Calculate Inflation</button>
+                <button class="export-btn" id="exportBtn">Export Results</button>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-card">
+                    <h3>Inflation Impact</h3>
+                    <div class="result-item">
+                        <span class="result-label">Initial Amount:</span>
+                        <span class="result-value" id="initialValue">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Future Value:</span>
+                        <span class="result-value" id="futureValue">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Purchasing Power Loss:</span>
+                        <span class="result-value" id="powerLoss">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Real Value:</span>
+                        <span class="result-value" id="realValue">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Equivalent Spending:</span>
+                        <span class="result-value" id="equivalentSpending">$0.00</span>
+                    </div>
+                    
+                    <div class="inflation-impact">
+                        <div>Loss of Purchasing Power</div>
+                        <div id="powerLossPercent">0%</div>
+                    </div>
+                </div>
+                
+                <div class="inflation">
+                    <h3>Value Comparison</h3>
+                    <div class="chart-container" id="chartContainer">
+                        <!-- Chart bars will be generated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h4>Time Period</h4>
+                        <div class="value" id="timePeriodCard">0 years</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Inflation Rate</h4>
+                        <div class="value" id="inflationRateCard">0%</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Value Change</h4>
+                        <div class="value" id="valueChange">$0.00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Annual Loss</h4>
+                        <div class="value" id="annualLoss">$0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history">
+                <h3>Recent Calculations</h3>
+                <div id="historyList"></div>
+            </div>
+            
+            <div class="inflation-schedule">
+                <div class="tabs">
+                    <div class="tab active" data-tab="yearly">Yearly Breakdown</div>
+                    <div class="tab" data-tab="summary">Summary</div>
+                </div>
+                
+                <div class="tab-content active" id="yearlyTab">
+                    <table class="yearly-table" id="yearlyTable">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Value</th>
+                                <th>Change</th>
+                                <th>Cumulative</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yearlyBody">
+                            <!-- Table rows will be generated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="summaryTab">
+                    <div class="result-card">
+                        <h3>Inflation Summary</h3>
+                        <div class="result-item">
+                            <span class="result-label">Total Inflation:</span>
+                            <span class="result-value" id="totalInflation">0%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Average Annual:</span>
+                            <span class="result-value" id="averageAnnual">0%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Equivalent in Today's Dollars:</span>
+                            <span class="result-value" id="todayDollars">$0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Time Value Factor:</span>
+                            <span class="result-value" id="timeValueFactor">1.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <button class="close-notification" id="closeNotification">&times;</button>
+        <span id="notificationText">Inflation calculation saved successfully!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const initialAmountInput = document.getElementById('initialAmount');
+            const initialAmountRange = document.getElementById('initialAmountRange');
+            const initialAmountValue = document.getElementById('initialAmountValue');
+            
+            const inflationRateInput = document.getElementById('inflationRate');
+            const inflationRateRange = document.getElementById('inflationRateRange');
+            const inflationRateValue = document.getElementById('inflationRateValue');
+            
+            const timePeriodInput = document.getElementById('timePeriod');
+            const timePeriodRange = document.getElementById('timePeriodRange');
+            const timePeriodValue = document.getElementById('timePeriodValue');
+            
+            const startYearSelect = document.getElementById('startYear');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            
+            const initialValueEl = document.getElementById('initialValue');
+            const futureValueEl = document.getElementById('futureValue');
+            const powerLossEl = document.getElementById('powerLoss');
+            const realValueEl = document.getElementById('realValue');
+            const equivalentSpendingEl = document.getElementById('equivalentSpending');
+            const powerLossPercentEl = document.getElementById('powerLossPercent');
+            
+            const chartContainer = document.getElementById('chartContainer');
+            const historyList = document.getElementById('historyList');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const closeNotification = document.getElementById('closeNotification');
+            
+            const yearlyBody = document.getElementById('yearlyBody');
+            
+            const timePeriodCardEl = document.getElementById('timePeriodCard');
+            const inflationRateCardEl = document.getElementById('inflationRateCard');
+            const valueChangeEl = document.getElementById('valueChange');
+            const annualLossEl = document.getElementById('annualLoss');
+            
+            const totalInflationEl = document.getElementById('totalInflation');
+            const averageAnnualEl = document.getElementById('averageAnnual');
+            const todayDollarsEl = document.getElementById('todayDollars');
+            const timeValueFactorEl = document.getElementById('timeValueFactor');
+            
+            // Tab elements
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Currency buttons
+            const currencyButtons = document.querySelectorAll('.currency-btn');
+            let currentCurrency = 'USD';
+            
+            // Format number with commas
+            function formatNumber(num) {
+                return parseFloat(num).toLocaleString();
+            }
+            
+            // Format currency
+            function formatCurrency(amount, currency = 'USD') {
+                const formatter = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: currency,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                return formatter.format(amount);
+            }
+            
+            // Sync range and number inputs
+            function syncInputs(range, input, value, suffix = '') {
+                range.addEventListener('input', () => {
+                    input.value = range.value;
+                    value.textContent = formatNumber(range.value) + suffix;
+                    saveData();
+                });
+                
+                input.addEventListener('input', () => {
+                    range.value = input.value;
+                    value.textContent = formatNumber(input.value) + suffix;
+                    saveData();
+                });
+            }
+            
+            // Sync all inputs
+            syncInputs(initialAmountRange, initialAmountInput, initialAmountValue, '');
+            syncInputs(inflationRateRange, inflationRateInput, inflationRateValue, '%');
+            syncInputs(timePeriodRange, timePeriodInput, timePeriodValue, ' years');
+            
+            // Currency selection
+            currencyButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currencyButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCurrency = btn.getAttribute('data-currency');
+                    saveData();
+                    calculateInflation(); // Recalculate with new currency
+                });
+            });
+            
+            // Populate start year dropdown
+            function populateStartYear() {
+                const currentYear = new Date().getFullYear();
+                for (let year = currentYear; year >= currentYear - 50; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    startYearSelect.appendChild(option);
+                }
+                startYearSelect.value = currentYear;
+            }
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(`${tabName}Tab`).classList.add('active');
+                });
+            });
+            
+            // Close notification
+            closeNotification.addEventListener('click', () => {
+                notification.classList.remove('show');
+            });
+            
+            // Load saved data
+            loadSavedData();
+            populateStartYear();
+            loadHistory();
+            
+            // Calculate button event
+            calculateBtn.addEventListener('click', calculateInflation);
+            
+            // Export button event
+            exportBtn.addEventListener('click', exportResults);
+            
+            // Load saved data function
+            function loadSavedData() {
+                const savedData = JSON.parse(localStorage.getItem('inflationCalculatorData')) || {};
+                
+                if (savedData.initialAmount) {
+                    initialAmountInput.value = savedData.initialAmount;
+                    initialAmountRange.value = savedData.initialAmount;
+                    initialAmountValue.textContent = formatNumber(savedData.initialAmount);
+                }
+                
+                if (savedData.inflationRate) {
+                    inflationRateInput.value = savedData.inflationRate;
+                    inflationRateRange.value = savedData.inflationRate;
+                    inflationRateValue.textContent = savedData.inflationRate + '%';
+                }
+                
+                if (savedData.timePeriod) {
+                    timePeriodInput.value = savedData.timePeriod;
+                    timePeriodRange.value = savedData.timePeriod;
+                    timePeriodValue.textContent = savedData.timePeriod + ' years';
+                }
+                
+                if (savedData.startYear) {
+                    startYearSelect.value = savedData.startYear;
+                }
+                
+                if (savedData.currency) {
+                    currentCurrency = savedData.currency;
+                    currencyButtons.forEach(btn => {
+                        btn.classList.toggle('active', btn.getAttribute('data-currency') === currentCurrency);
+                    });
+                }
+            }
+            
+            // Save data function
+            function saveData() {
+                const data = {
+                    initialAmount: initialAmountInput.value,
+                    inflationRate: inflationRateInput.value,
+                    timePeriod: timePeriodInput.value,
+                    startYear: startYearSelect.value,
+                    currency: currentCurrency
+                };
+                
+                localStorage.setItem('inflationCalculatorData', JSON.stringify(data));
+            }
+            
+            // Calculate inflation function
+            function calculateInflation() {
+                const initialAmount = parseFloat(initialAmountInput.value);
+                const inflationRate = parseFloat(inflationRateInput.value) / 100;
+                const timePeriod = parseFloat(timePeriodInput.value);
+                const startYear = parseInt(startYearSelect.value);
+                
+                // Validate inputs
+                if (isNaN(initialAmount) || isNaN(inflationRate) || isNaN(timePeriod) || 
+                    initialAmount <= 0 || timePeriod <= 0) {
+                    showNotification('Please enter valid positive numbers for all required fields', 'error');
+                    return;
+                }
+                
+                // Calculate future value
+                const futureValue = initialAmount * Math.pow(1 + inflationRate, timePeriod);
+                const powerLoss = futureValue - initialAmount;
+                const realValue = initialAmount / Math.pow(1 + inflationRate, timePeriod);
+                const equivalentSpending = initialAmount * Math.pow(1 + inflationRate, timePeriod);
+                const powerLossPercent = ((futureValue - initialAmount) / initialAmount) * 100;
+                
+                // Display results
+                initialValueEl.textContent = formatCurrency(initialAmount, currentCurrency);
+                futureValueEl.textContent = formatCurrency(futureValue, currentCurrency);
+                powerLossEl.textContent = formatCurrency(powerLoss, currentCurrency);
+                realValueEl.textContent = formatCurrency(realValue, currentCurrency);
+                equivalentSpendingEl.textContent = formatCurrency(equivalentSpending, currentCurrency);
+                powerLossPercentEl.textContent = powerLossPercent.toFixed(1) + '%';
+                
+                // Update summary cards
+                timePeriodCardEl.textContent = timePeriod + ' years';
+                inflationRateCardEl.textContent = (inflationRate * 100).toFixed(1) + '%';
+                valueChangeEl.textContent = formatCurrency(powerLoss, currentCurrency);
+                annualLossEl.textContent = formatCurrency(powerLoss / timePeriod, currentCurrency);
+                
+                // Update summary tab
+                totalInflationEl.textContent = powerLossPercent.toFixed(1) + '%';
+                averageAnnualEl.textContent = (inflationRate * 100).toFixed(1) + '%';
+                todayDollarsEl.textContent = formatCurrency(realValue, currentCurrency);
+                timeValueFactorEl.textContent = (1 / Math.pow(1 + inflationRate, timePeriod)).toFixed(2);
+                
+                // Update chart
+                updateChart(initialAmount, futureValue);
+                
+                // Generate yearly breakdown
+                generateYearlyBreakdown(initialAmount, inflationRate, timePeriod, startYear);
+                
+                // Save to history
+                saveToHistory(initialAmount, inflationRate * 100, timePeriod, startYear, futureValue, powerLoss);
+                
+                // Show notification
+                showNotification('Inflation calculation completed successfully!');
+            }
+            
+            // Update chart function
+            function updateChart(initialAmount, futureValue) {
+                chartContainer.innerHTML = '';
+                
+                // Create bars
+                const initialBar = document.createElement('div');
+                initialBar.className = 'chart-bar';
+                initialBar.style.height = '40%';
+                initialBar.innerHTML = `
+                    <div>${formatCurrency(initialAmount, currentCurrency)}</div>
+                    <div class="chart-label">Initial</div>
+                `;
+                
+                const futureBar = document.createElement('div');
+                futureBar.className = 'chart-bar future';
+                futureBar.style.height = '100%';
+                futureBar.innerHTML = `
+                    <div>${formatCurrency(futureValue, currentCurrency)}</div>
+                    <div class="chart-label">Future</div>
+                `;
+                
+                chartContainer.appendChild(initialBar);
+                chartContainer.appendChild(futureBar);
+            }
+            
+            // Generate yearly breakdown
+            function generateYearlyBreakdown(initialAmount, inflationRate, timePeriod, startYear) {
+                yearlyBody.innerHTML = '';
+                
+                let currentValue = initialAmount;
+                let cumulativeLoss = 0;
+                
+                for (let year = 0; year <= Math.min(timePeriod, 20); year++) {
+                    const previousValue = year > 0 ? currentValue / (1 + inflationRate) : initialAmount;
+                    const annualLoss = currentValue - previousValue;
+                    cumulativeLoss += annualLoss;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${startYear + year}</td>
+                        <td>${formatCurrency(currentValue, currentCurrency)}</td>
+                        <td>${formatCurrency(annualLoss, currentCurrency)}</td>
+                        <td>${formatCurrency(cumulativeLoss, currentCurrency)}</td>
+                    `;
+                    yearlyBody.appendChild(row);
+                    
+                    currentValue *= (1 + inflationRate);
+                }
+                
+                // If more than 20 years, show last year
+                if (timePeriod > 20) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="4" style="text-align: center; font-weight: bold;">...</td>`;
+                    yearlyBody.appendChild(row);
+                    
+                    const finalValue = initialAmount * Math.pow(1 + inflationRate, timePeriod);
+                    const finalRow = document.createElement('tr');
+                    finalRow.innerHTML = `
+                        <td>${startYear + timePeriod}</td>
+                        <td>${formatCurrency(finalValue, currentCurrency)}</td>
+                        <td>${formatCurrency(finalValue - (initialAmount * Math.pow(1 + inflationRate, timePeriod-1)), currentCurrency)}</td>
+                        <td>${formatCurrency(finalValue - initialAmount, currentCurrency)}</td>
+                    `;
+                    yearlyBody.appendChild(finalRow);
+                }
+            }
+            
+            // Save to history function
+            function saveToHistory(initialAmount, inflationRate, timePeriod, startYear, futureValue, powerLoss) {
+                let history = JSON.parse(localStorage.getItem('inflationCalculatorHistory')) || [];
+                
+                const entry = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString(),
+                    initialAmount,
+                    inflationRate,
+                    timePeriod,
+                    startYear,
+                    futureValue,
+                    powerLoss,
+                    currency: currentCurrency
+                };
+                
+                history.unshift(entry);
+                
+                // Keep only last 10 entries
+                if (history.length > 10) {
+                    history = history.slice(0, 10);
+                }
+                
+                localStorage.setItem('inflationCalculatorHistory', JSON.stringify(history));
+                loadHistory();
+            }
+            
+            // Load history function
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('inflationCalculatorHistory')) || [];
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; padding: 20px; color: #7f8c8d; font-size: 15px;">No calculations yet</p>';
+                    return;
+                }
+                
+                history.forEach(entry => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-details">
+                            <div class="history-amount">${formatCurrency(entry.initialAmount, entry.currency)}</div>
+                            <div class="history-date">${entry.date}</div>
+                        </div>
+                        <div class="history-meta">
+                            <div>${entry.inflationRate.toFixed(1)}% • ${entry.timePeriod} yrs</div>
+                            <div>Loss: ${formatCurrency(entry.powerLoss, entry.currency)}</div>
+                        </div>
+                        <button class="delete-btn" data-id="${entry.id}">Delete</button>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteHistoryEntry(id);
+                    });
+                });
+            }
+            
+            // Delete history entry
+            function deleteHistoryEntry(id) {
+                let history = JSON.parse(localStorage.getItem('inflationCalculatorHistory')) || [];
+                history = history.filter(entry => entry.id !== id);
+                localStorage.setItem('inflationCalculatorHistory', JSON.stringify(history));
+                loadHistory();
+                showNotification('Calculation deleted successfully!');
+            }
+            
+            // Show notification function
+            function showNotification(message, type = 'success') {
+                notificationText.textContent = message;
+                notification.style.background = type === 'error' ? 
+                    'linear-gradient(135deg, #e74c3c, #c0392b)' : 
+                    'linear-gradient(135deg, #27ae60, #2ecc71)';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 4000);
+            }
+            
+            // Export results function
+            function exportResults() {
+                const initialAmount = parseFloat(initialAmountInput.value);
+                const inflationRate = parseFloat(inflationRateInput.value);
+                const timePeriod = parseFloat(timePeriodInput.value);
+                const startYear = parseInt(startYearSelect.value);
+                
+                if (!initialAmount || !inflationRate || !timePeriod) {
+                    showNotification('Please calculate inflation first', 'error');
+                    return;
+                }
+                
+                // Generate CSV content
+                let csvContent = "Inflation Calculator Results\n\n";
+                csvContent += `Initial Amount: ${formatCurrency(initialAmount, currentCurrency)}\n`;
+                csvContent += `Inflation Rate: ${inflationRate}%\n`;
+                csvContent += `Time Period: ${timePeriod} years\n`;
+                csvContent += `Start Year: ${startYear}\n`;
+                csvContent += `Currency: ${currentCurrency}\n\n`;
+                csvContent += "Year,Value,Annual Change,Cumulative Change\n";
+                
+                // Generate yearly data
+                let currentValue = initialAmount;
+                let cumulativeLoss = 0;
+                
+                for (let year = 0; year <= timePeriod; year++) {
+                    const previousValue = year > 0 ? currentValue / (1 + (inflationRate/100)) : initialAmount;
+                    const annualLoss = currentValue - previousValue;
+                    cumulativeLoss += annualLoss;
+                    
+                    csvContent += `${startYear + year},${currentValue.toFixed(2)},${annualLoss.toFixed(2)},${cumulativeLoss.toFixed(2)}\n`;
+                    
+                    currentValue *= (1 + (inflationRate/100));
+                }
+                
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `inflation_calculation_${new Date().toISOString().slice(0,10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('Results exported successfully!');
+            }
+            
+            // Initial calculation
+            calculateInflation();
+        });
+    </script>
+</body>
+</html>
