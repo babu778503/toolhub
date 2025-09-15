@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<!-- Category: Health & Fitness -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pill Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb, #2575fc, #6a11cb);
+            color: #333;
+            min-height: 100vh;
+            padding-top: 50px;
+        }
+
+        /* Desktop Styles */
+        .desktop-view {
+            display: block;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .mobile-view {
+            display: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(to right, #3498db, #2ecc71, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .tracker-section {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #3498db;
+        }
+
+        h2 i {
+            color: #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #3498db;
+            border-color: #3498db;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #2196F3, #21CBF3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, #f44336, #e91e63);
+        }
+
+        .btn-warning {
+            background: linear-gradient(to right, #FF9800, #FF5722);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3498db, #2ecc71);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: #3498db;
+        }
+
+        .pill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pill-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #eee;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3498db, #2ecc71);
+        }
+
+        .pill-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .pill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .pill-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #3498db;
+        }
+
+        .pill-dosage {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .pill-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .pill-schedule {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .schedule-times {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .schedule-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .control-btn {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 5px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-date {
+            font-weight: 500;
+        }
+
+        .history-details {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .calendar-view {
+            margin-top: 30px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 5px;
+        }
+
+        .calendar-day {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+            font-size: 0.9rem;
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .calendar-day-number {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .calendar-day.pill-day {
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid #3498db;
+        }
+
+        .pill-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 1px;
+            border-radius: 2px;
+            background: rgba(52, 152, 219, 0.7);
+            color: white;
+        }
+
+        .reminder-settings {
+            margin-top: 30px;
+        }
+
+        .reminder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .reminder-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #eee;
+        }
+
+        .reminder-icon {
+            font-size: 2rem;
+            color: #3498db;
+        }
+
+        .reminder-content h4 {
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+
+        .reminder-content p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3498db;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .active-reminders {
+            margin-top: 30px;
+        }
+
+        .active-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .active-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .active-icon {
+            font-size: 2rem;
+            color: #3498db;
+        }
+
+        .active-content h4 {
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+
+        .active-content p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 3px 0;
+        }
+
+        .active-time {
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 0;
+            }
+
+            .desktop-view {
+                display: none;
+            }
+
+            .mobile-view {
+                display: block;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 20px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-card {
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            input, select, textarea {
+                padding: 10px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pill-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-list {
+                max-height: 250px;
+            }
+
+            .calendar-grid {
+                gap: 3px;
+            }
+
+            .calendar-day {
+                height: 60px;
+                font-size: 0.8rem;
+            }
+
+            .reminder-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .active-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn-group {
+                gap: 10px;
+            }
+
+            .calendar-day {
+                height: 50px;
+                padding: 3px;
+            }
+
+            .calendar-day-number {
+                font-size: 0.8rem;
+            }
+
+            .pill-indicator {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop View -->
+    <div class="desktop-view">
+        <header>
+            <h1><i class="fas fa-pills"></i> Pill Tracker</h1>
+            <p class="subtitle">Track your medications and never miss a dose</p>
+        </header>
+
+        <div class="container">
+            <section class="input-section">
+                <h2><i class="fas fa-plus-circle"></i> Add Pill</h2>
+                
+                <div class="form-group">
+                    <label for="pillName">Pill Name</label>
+                    <input type="text" id="pillName" placeholder="Enter pill name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dosage">Dosage</label>
+                    <input type="text" id="dosage" placeholder="e.g., 10mg, 1 tablet">
+                </div>
+                
+                <div class="form-group">
+                    <label for="frequency">Frequency</label>
+                    <select id="frequency">
+                        <option value="once_daily">Once Daily</option>
+                        <option value="twice_daily">Twice Daily</option>
+                        <option value="three_times_daily">Three Times Daily</option>
+                        <option value="four_times_daily">Four Times Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="as_needed">As Needed</option>
+                        <option value="custom">Custom Schedule</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="customScheduleGroup" style="display: none;">
+                    <label for="customSchedule">Custom Schedule</label>
+                    <input type="text" id="customSchedule" placeholder="e.g., Every 6 hours, Monday/Wed/Fri">
+                </div>
+                
+                <div class="form-group">
+                    <label for="times">Take at these times:</label>
+                    <div id="timeInputs">
+                        <input type="time" class="time-input" value="08:00">
+                    </div>
+                    <button id="addTimeBtn" style="margin-top: 10px; width: 100%;">
+                        <i class="fas fa-plus"></i> Add Time
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" value="">
+                </div>
+                
+                <div class="form-group">
+                    <label for="endDate">End Date (Optional)</label>
+                    <input type="date" id="endDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="instructions">Special Instructions</label>
+                    <textarea id="instructions" rows="3" placeholder="e.g., Take with food, avoid alcohol"></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="saveBtn">
+                        <i class="fas fa-save"></i> Save Pill
+                    </button>
+                    <button class="btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-prescription-bottle"></i>
+                        </div>
+                        <div class="stat-value" id="totalPills">0</div>
+                        <div class="stat-label">Total Pills</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="stat-value" id="activeReminders">0</div>
+                        <div class="stat-label">Active Reminders</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-value" id="takenToday">0</div>
+                        <div class="stat-label">Taken Today</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-value" id="missedToday">0</div>
+                        <div class="stat-label">Missed Today</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tracker-section">
+                <h2><i class="fas fa-list"></i> Pill List</h2>
+                
+                <div class="pill-list">
+                    <div class="pill-grid" id="pillList">
+                        <!-- Pills will be added here -->
+                    </div>
+                </div>
+                
+                <div class="active-reminders">
+                    <h2><i class="fas fa-bell"></i> Active Reminders</h2>
+                    
+                    <div class="active-grid" id="activeRemindersList">
+                        <!-- Active reminders will be added here -->
+                    </div>
+                </div>
+                
+                <div class="history-section">
+                    <h2><i class="fas fa-history"></i> Recent History</h2>
+                    
+                    <div class="history-list" id="pillHistory">
+                        <!-- History items will be added here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div class="container">
+            <section class="input-section">
+                <h2><i class="fas fa-calendar-alt"></i> Pill Calendar</h2>
+                
+                <div class="calendar-view">
+                    <div class="calendar-header">
+                        <h3 id="currentMonth">January 2023</h3>
+                        <div class="calendar-nav">
+                            <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                            <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar will be generated here -->
+                    </div>
+                </div>
+            </section>
+            
+            <section class="tracker-section">
+                <h2><i class="fas fa-cog"></i> Reminder Settings</h2>
+                
+                <div class="reminder-settings">
+                    <div class="reminder-grid">
+                        <div class="reminder-card">
+                            <div class="reminder-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="reminder-content">
+                                <h4>Push Notifications</h4>
+                                <p>Get reminders on your device</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="pushNotifications" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="reminder-card">
+                            <div class="reminder-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="reminder-content">
+                                <h4>Email Alerts</h4>
+                                <p>Receive email reminders</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="emailAlerts">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="reminder-card">
+                            <div class="reminder-icon">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                            <div class="reminder-content">
+                                <h4>Sound Alerts</h4>
+                                <p>Play sound for reminders</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="soundAlerts" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="reminder-card">
+                            <div class="reminder-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="reminder-content">
+                                <h4>Vibration</h4>
+                                <p>Device vibration alerts</p>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="vibrationAlerts" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-secondary" id="testReminderBtn">
+                        <i class="fas fa-bell"></i> Test Reminder
+                    </button>
+                    <button class="btn-warning" id="exportDataBtn">
+                        <i class="fas fa-file-export"></i> Export Data
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+        <h1>Pill Tracker</h1>
+        
+        <div class="mobile-card">
+            <h2><i class="fas fa-plus-circle"></i> Add Pill</h2>
+            
+            <div class="form-group">
+                <label for="pillNameMobile">Pill Name</label>
+                <input type="text" id="pillNameMobile" placeholder="Enter pill name">
+            </div>
+            
+            <div class="form-group">
+                <label for="dosageMobile">Dosage</label>
+                <input type="text" id="dosageMobile" placeholder="e.g., 10mg, 1 tablet">
+            </div>
+            
+            <div class="form-group">
+                <label for="frequencyMobile">Frequency</label>
+                <select id="frequencyMobile">
+                    <option value="once_daily">Once Daily</option>
+                    <option value="twice_daily">Twice Daily</option>
+                    <option value="three_times_daily">Three Times Daily</option>
+                    <option value="four_times_daily">Four Times Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="as_needed">As Needed</option>
+                    <option value="custom">Custom Schedule</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="customScheduleGroupMobile" style="display: none;">
+                <label for="customScheduleMobile">Custom Schedule</label>
+                <input type="text" id="customScheduleMobile" placeholder="e.g., Every 6 hours, Monday/Wed/Fri">
+            </div>
+            
+            <div class="form-group">
+                <label for="timesMobile">Take at these times:</label>
+                <div id="timeInputsMobile">
+                    <input type="time" class="time-input-mobile" value="08:00">
+                </div>
+                <button id="addTimeBtnMobile" style="margin-top: 10px; width: 100%;">
+                    <i class="fas fa-plus"></i> Add Time
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="startDateMobile">Start Date</label>
+                <input type="date" id="startDateMobile" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="endDateMobile">End Date (Optional)</label>
+                <input type="date" id="endDateMobile">
+            </div>
+            
+            <div class="form-group">
+                <label for="instructionsMobile">Special Instructions</label>
+                <textarea id="instructionsMobile" rows="3" placeholder="e.g., Take with food, avoid alcohol"></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button id="saveBtnMobile">
+                    <i class="fas fa-save"></i> Save Pill
+                </button>
+                <button class="btn-secondary" id="resetBtnMobile">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </div>
+        
+        <div class="mobile-card">
+            <h2><i class="fas fa-chart-bar"></i> Pill Stats</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-prescription-bottle"></i>
+                    </div>
+                    <div class="stat-value" id="totalPillsMobile">0</div>
+                    <div class="stat-label">Total Pills</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="stat-value" id="activeRemindersMobile">0</div>
+                    <div class="stat-label">Active Reminders</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="takenTodayMobile">0</div>
+                    <div class="stat-label">Taken Today</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-value" id="missedTodayMobile">0</div>
+                    <div class="stat-label">Missed Today</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mobile-card">
+            <h2><i class="fas fa-list"></i> My Pills</h2>
+            
+            <div class="pill-grid" id="pillListMobile">
+                <!-- Pills will be added here -->
+            </div>
+        </div>
+        
+        <div class="mobile-card">
+            <h2><i class="fas fa-bell"></i> Active Reminders</h2>
+            
+            <div class="active-grid" id="activeRemindersListMobile">
+                <!-- Active reminders will be added here -->
+            </div>
+        </div>
+        
+        <div class="mobile-card">
+            <h2> Pill Calendar</h2>
+            
+            <div class="calendar-view">
+                <div class="calendar-header">
+                    <h3 id="currentMonthMobile">January 2023</h3>
+                    <div class="calendar-nav">
+                        <button id="prevMonthMobile"><i class="fas fa-chevron-left"></i></button>
+                        <button id="nextMonthMobile"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                
+                <div class="calendar-grid" id="calendarGridMobile">
+                    <!-- Calendar will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="mobile-card">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            
+            <div class="reminder-grid">
+                <div class="reminder-card">
+                    <div class="reminder-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="reminder-content">
+                        <h4>Notifications</h4>
+                        <p>Push notifications</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="pushNotificationsMobile" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="reminder-card">
+                    <div class="reminder-icon">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="reminder-content">
+                        <h4>Sound</h4>
+                        <p>Sound alerts</p>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="soundAlertsMobile" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn-secondary" id="testReminderBtnMobile">
+                    <i class="fas fa-bell"></i> Test Reminder
+                </button>
+                <button class="btn-warning" id="exportDataBtnMobile">
+                    <i class="fas fa-file-export"></i> Export Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Pill saved successfully!
+    </div>
+
+    <script>
+        // DOM Elements
+        const pillName = document.getElementById('pillName');
+        const pillNameMobile = document.getElementById('pillNameMobile');
+        const dosage = document.getElementById('dosage');
+        const dosageMobile = document.getElementById('dosageMobile');
+        const frequency = document.getElementById('frequency');
+        const frequencyMobile = document.getElementById('frequencyMobile');
+        const customScheduleGroup = document.getElementById('customScheduleGroup');
+        const customScheduleGroupMobile = document.getElementById('customScheduleGroupMobile');
+        const customSchedule = document.getElementById('customSchedule');
+        const customScheduleMobile = document.getElementById('customScheduleMobile');
+        const timeInputs = document.getElementById('timeInputs');
+        const timeInputsMobile = document.getElementById('timeInputsMobile');
+        const addTimeBtn = document.getElementById('addTimeBtn');
+        const addTimeBtnMobile = document.getElementById('addTimeBtnMobile');
+        const startDate = document.getElementById('startDate');
+        const startDateMobile = document.getElementById('startDateMobile');
+        const endDate = document.getElementById('endDate');
+        const endDateMobile = document.getElementById('endDateMobile');
+        const instructions = document.getElementById('instructions');
+        const instructionsMobile = document.getElementById('instructionsMobile');
+        const saveBtn = document.getElementById('saveBtn');
+        const saveBtnMobile = document.getElementById('saveBtnMobile');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetBtnMobile = document.getElementById('resetBtnMobile');
+        const notification = document.getElementById('notification');
+        
+        // Stats elements
+        const totalPills = document.getElementById('totalPills');
+        const activeReminders = document.getElementById('activeReminders');
+        const takenToday = document.getElementById('takenToday');
+        const missedToday = document.getElementById('missedToday');
+        const totalPillsMobile = document.getElementById('totalPillsMobile');
+        const activeRemindersMobile = document.getElementById('activeRemindersMobile');
+        const takenTodayMobile = document.getElementById('takenTodayMobile');
+        const missedTodayMobile = document.getElementById('missedTodayMobile');
+        
+        // Pill list elements
+        const pillList = document.getElementById('pillList');
+        const pillListMobile = document.getElementById('pillListMobile');
+        const activeRemindersList = document.getElementById('activeRemindersList');
+        const activeRemindersListMobile = document.getElementById('activeRemindersListMobile');
+        const pillHistory = document.getElementById('pillHistory');
+        const pillHistoryMobile = document.getElementById('pillHistoryMobile');
+        
+        // Calendar elements
+        const currentMonth = document.getElementById('currentMonth');
+        const currentMonthMobile = document.getElementById('currentMonthMobile');
+        const prevMonth = document.getElementById('prevMonth');
+        const nextMonth = document.getElementById('nextMonth');
+        const prevMonthMobile = document.getElementById('prevMonthMobile');
+        const nextMonthMobile = document.getElementById('nextMonthMobile');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const calendarGridMobile = document.getElementById('calendarGridMobile');
+        
+        // Settings elements
+        const pushNotifications = document.getElementById('pushNotifications');
+        const pushNotificationsMobile = document.getElementById('pushNotificationsMobile');
+        const emailAlerts = document.getElementById('emailAlerts');
+        const soundAlerts = document.getElementById('soundAlerts');
+        const soundAlertsMobile = document.getElementById('soundAlertsMobile');
+        const vibrationAlerts = document.getElementById('vibrationAlerts');
+        const testReminderBtn = document.getElementById('testReminderBtn');
+        const testReminderBtnMobile = document.getElementById('testReminderBtnMobile');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const exportDataBtnMobile = document.getElementById('exportDataBtnMobile');
+        
+        // App data
+        let appData = JSON.parse(localStorage.getItem('pillTrackerData')) || {
+            pills: [],
+            history: [],
+            settings: {
+                pushNotifications: true,
+                emailAlerts: false,
+                soundAlerts: true,
+                vibrationAlerts: true
+            }
+        };
+        
+        let currentDate = new Date();
+        let reminderTimers = [];
+        
+        // Initialize the app
+        function init() {
+            loadAppData();
+            setupEventListeners();
+            updateStats();
+            updatePillList();
+            updateActiveReminders();
+            updateCalendar();
+            updateHistory();
+            setupNotificationPermissions();
+            startReminders();
+        }
+        
+        // Load app data from localStorage
+        function loadAppData() {
+            // Set today's date as default
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            startDate.value = formattedDate;
+            startDateMobile.value = formattedDate;
+            
+            // Load settings
+            pushNotifications.checked = appData.settings.pushNotifications;
+            pushNotificationsMobile.checked = appData.settings.pushNotifications;
+            emailAlerts.checked = appData.settings.emailAlerts;
+            soundAlerts.checked = appData.settings.soundAlerts;
+            soundAlertsMobile.checked = appData.settings.soundAlerts;
+            vibrationAlerts.checked = appData.settings.vibrationAlerts;
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            saveBtn.addEventListener('click', savePill);
+            saveBtnMobile.addEventListener('click', savePill);
+            resetBtn.addEventListener('click', resetForm);
+            resetBtnMobile.addEventListener('click', resetForm);
+            frequency.addEventListener('change', toggleCustomSchedule);
+            frequencyMobile.addEventListener('change', toggleCustomSchedule);
+            addTimeBtn.addEventListener('click', addTimeInput);
+            addTimeBtnMobile.addEventListener('click', addTimeInput);
+            prevMonth.addEventListener('click', () => changeMonth(-1));
+            nextMonth.addEventListener('click', () => changeMonth(1));
+            prevMonthMobile.addEventListener('click', () => changeMonth(-1));
+            nextMonthMobile.addEventListener('click', () => changeMonth(1));
+            pushNotifications.addEventListener('change', updateSettings);
+            pushNotificationsMobile.addEventListener('change', updateSettings);
+            emailAlerts.addEventListener('change', updateSettings);
+            soundAlerts.addEventListener('change', updateSettings);
+            soundAlertsMobile.addEventListener('change', updateSettings);
+            vibrationAlerts.addEventListener('change', updateSettings);
+            testReminderBtn.addEventListener('click', testReminder);
+            testReminderBtnMobile.addEventListener('click', testReminder);
+            exportDataBtn.addEventListener('click', exportData);
+            exportDataBtnMobile.addEventListener('click', exportData);
+        }
+        
+        // Toggle custom schedule input
+        function toggleCustomSchedule() {
+            const freq = frequency.value || frequencyMobile.value;
+            if (freq === 'custom') {
+                customScheduleGroup.style.display = 'block';
+                customScheduleGroupMobile.style.display = 'block';
+            } else {
+                customScheduleGroup.style.display = 'none';
+                customScheduleGroupMobile.style.display = 'none';
+            }
+        }
+        
+        // Add time input
+        function addTimeInput() {
+            const timeInput = document.createElement('input');
+            timeInput.type = 'time';
+            timeInput.className = 'time-input';
+            timeInput.value = '08:00';
+            
+            timeInputs.appendChild(timeInput.cloneNode(true));
+            timeInputsMobile.appendChild(timeInput);
+        }
+        
+        // Save pill
+        function savePill() {
+            const name = pillName.value || pillNameMobile.value;
+            const dose = dosage.value || dosageMobile.value;
+            const freq = frequency.value || frequencyMobile.value;
+            const custom = customSchedule.value || customScheduleMobile.value;
+            const start = startDate.value || startDateMobile.value;
+            const end = endDate.value || endDateMobile.value;
+            const instr = instructions.value || instructionsMobile.value;
+            
+            if (!name || !dose) {
+                showNotification('Please enter pill name and dosage', 'error');
+                return;
+            }
+            
+            // Get all time inputs
+            const timeElements = document.querySelectorAll('.time-input, .time-input-mobile');
+            const times = Array.from(timeElements).map(input => input.value).filter(time => time);
+            
+            if (times.length === 0) {
+                showNotification('Please add at least one time', 'error');
+                return;
+            }
+            
+            // Create pill object
+            const pill = {
+                id: Date.now(),
+                name: name,
+                dosage: dose,
+                frequency: freq,
+                customSchedule: custom,
+                times: times,
+                startDate: start,
+                endDate: end,
+                instructions: instr,
+                createdAt: new Date().toISOString(),
+                taken: [] // Track when taken
+            };
+            
+            appData.pills.push(pill);
+            
+            // Keep only last 100 pills
+            if (appData.pills.length > 100) {
+                appData.pills = appData.pills.slice(-100);
+            }
+            
+            localStorage.setItem('pillTrackerData', JSON.stringify(appData));
+            updateStats();
+            updatePillList();
+            updateActiveReminders();
+            updateCalendar();
+            resetForm();
+            showNotification('Pill saved successfully!');
+            scheduleReminders();
+        }
+        
+        // Reset form
+        function resetForm() {
+            pillName.value = '';
+            pillNameMobile.value = '';
+            dosage.value = '';
+            dosageMobile.value = '';
+            frequency.value = 'once_daily';
+            frequencyMobile.value = 'once_daily';
+            customScheduleGroup.style.display = 'none';
+            customScheduleGroupMobile.style.display = 'none';
+            customSchedule.value = '';
+            customScheduleMobile.value = '';
+            
+            // Reset time inputs (keep one)
+            timeInputs.innerHTML = '<input type="time" class="time-input" value="08:00">';
+            timeInputsMobile.innerHTML = '<input type="time" class="time-input-mobile" value="08:00">';
+            
+            startDate.value = new Date().toISOString().split('T')[0];
+            startDateMobile.value = startDate.value;
+            endDate.value = '';
+            endDateMobile.value = '';
+            instructions.value = '';
+            instructionsMobile.value = '';
+            
+            showNotification('Form reset successfully!');
+        }
+        
+        // Change month
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            updateCalendar();
+        }
+        
+        // Update stats
+        function updateStats() {
+            totalPills.textContent = appData.pills.length;
+            totalPillsMobile.textContent = appData.pills.length;
+            
+            // Count active reminders (pills without end date or with future end date)
+            const today = new Date();
+            const active = appData.pills.filter(pill => {
+                if (!pill.endDate) return true;
+                const endDate = new Date(pill.endDate);
+                return endDate >= today;
+            }).length;
+            
+            activeReminders.textContent = active;
+            activeRemindersMobile.textContent = active;
+            
+            // Count taken today
+            const todayStr = today.toISOString().split('T')[0];
+            const taken = appData.pills.reduce((count, pill) => {
+                return count + pill.taken.filter(t => t.startsWith(todayStr)).length;
+            }, 0);
+            
+            takenToday.textContent = taken;
+            takenTodayMobile.textContent = taken;
+            
+            // Count missed (should have taken but didn't)
+            const missed = appData.pills.reduce((count, pill) => {
+                const shouldHaveTaken = pill.times.length; // Simplified
+                const actuallyTaken = pill.taken.filter(t => t.startsWith(todayStr)).length;
+                return count + Math.max(0, shouldHaveTaken - actuallyTaken);
+            }, 0);
+            
+            missedToday.textContent = missed;
+            missedTodayMobile.textContent = missed;
+        }
+        
+        // Update pill list
+        function updatePillList() {
+            pillList.innerHTML = '';
+            pillListMobile.innerHTML = '';
+            
+            if (appData.pills.length === 0) {
+                const noPills = document.createElement('div');
+                noPills.className = 'pill-card';
+                noPills.innerHTML = `
+                    <div class="pill-header">
+                        <div class="pill-name">No Pills Added</div>
+                    </div>
+                    <div class="pill-details">Add your pills to start tracking</div>
+                `;
+                pillList.appendChild(noPills.cloneNode(true));
+                pillListMobile.appendChild(noPills);
+                return;
+            }
+            
+            // Show last 10 pills
+            const recentPills = appData.pills.slice(-10).reverse();
+            
+            recentPills.forEach(pill => {
+                const pillCard = document.createElement('div');
+                pillCard.className = 'pill-card';
+                pillCard.innerHTML = `
+                    <div class="pill-header">
+                        <div class="pill-name">${pill.name}</div>
+                        <div class="pill-dosage">${pill.dosage}</div>
+                    </div>
+                    <div class="pill-details">
+                        ${pill.instructions || 'No special instructions'}
+                    </div>
+                    <div class="pill-schedule">
+                        <div class="schedule-times">${pill.times.join(', ')}</div>
+                        <div class="schedule-controls">
+                            <button class="control-btn btn-secondary" onclick="markTaken(${pill.id})">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="control-btn btn-danger" onclick="deletePill(${pill.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                pillList.appendChild(pillCard.cloneNode(true));
+                pillListMobile.appendChild(pillCard);
+            });
+        }
+        
+        // Update active reminders
+        function updateActiveReminders() {
+            activeRemindersList.innerHTML = '';
+            activeRemindersListMobile.innerHTML = '';
+            
+            if (appData.pills.length === 0) {
+                const noReminders = document.createElement('div');
+                noReminders.className = 'active-card';
+                noReminders.innerHTML = `
+                    <div class="active-icon">
+                        <i class="fas fa-bell-slash"></i>
+                    </div>
+                    <div class="active-content">
+                        <h4>No Active Reminders</h4>
+                        <p>Add pills to set reminders</p>
+                    </div>
+                `;
+                activeRemindersList.appendChild(noReminders.cloneNode(true));
+                activeRemindersListMobile.appendChild(noReminders);
+                return;
+            }
+            
+            // Get pills that need reminders today
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const activePills = appData.pills.filter(pill => {
+                // Check if pill is active
+                if (pill.endDate) {
+                    const endDate = new Date(pill.endDate);
+                    if (endDate < today) return false;
+                }
+                
+                // Check if start date is in the past
+                const startDate = new Date(pill.startDate);
+                if (startDate > today) return false;
+                
+                return true;
+            });
+            
+            activePills.forEach(pill => {
+                pill.times.forEach(time => {
+                    const activeCard = document.createElement('div');
+                    activeCard.className = 'active-card';
+                    activeCard.innerHTML = `
+                        <div class="active-icon">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="active-content">
+                            <h4>${pill.name}</h4>
+                            <p class="active-time">${time}</p>
+                            <p>${pill.dosage}</p>
+                        </div>
+                    `;
+                    
+                    activeRemindersList.appendChild(activeCard.cloneNode(true));
+                    activeRemindersListMobile.appendChild(activeCard);
+                });
+            });
+        }
+        
+        // Update calendar
+        function updateCalendar() {
+            // Update month display
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+            const monthYear = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            currentMonth.textContent = monthYear;
+            currentMonthMobile.textContent = monthYear;
+            
+            // Clear calendar
+            calendarGrid.innerHTML = '';
+            calendarGridMobile.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendarGrid.appendChild(header.cloneNode(true));
+                calendarGridMobile.appendChild(header);
+            });
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            
+            // Add empty cells for days before the first day
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay.cloneNode(true));
+                calendarGridMobile.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            const today = new Date();
+            const pillDates = [];
+            
+            // Collect all pill dates
+            appData.pills.forEach(pill => {
+                const startDate = new Date(pill.startDate);
+                const endDate = pill.endDate ? new Date(pill.endDate) : null;
+                
+                // For simplicity, just mark days with any pill
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                    if (dayDate >= startDate && (!endDate || dayDate <= endDate)) {
+                        pillDates.push(day);
+                    }
+                }
+            });
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.innerHTML = `<div class="calendar-day-number">${day}</div>`;
+                
+                // Check if it's today
+                if (currentDate.getFullYear() === today.getFullYear() &&
+                    currentDate.getMonth() === today.getMonth() &&
+                    day === today.getDate()) {
+                    dayElement.style.fontWeight = 'bold';
+                    dayElement.style.border = '2px solid #3498db';
+                }
+                
+                // Check if there are pills on this day
+                if (pillDates.includes(day)) {
+                    dayElement.classList.add('pill-day');
+                    dayElement.innerHTML += `<div class="pill-indicator">Pill</div>`;
+                }
+                
+                calendarGrid.appendChild(dayElement.cloneNode(true));
+                calendarGridMobile.appendChild(dayElement);
+            }
+        }
+        
+        // Update history
+        function updateHistory() {
+            pillHistory.innerHTML = '';
+            pillHistoryMobile.innerHTML = '';
+            
+            if (appData.pills.length === 0) {
+                const noHistory = document.createElement('div');
+                noHistory.className = 'history-item';
+                noHistory.textContent = 'No pill history yet';
+                noHistory.style.textAlign = 'center';
+                noHistory.style.opacity = '0.7';
+                pillHistory.appendChild(noHistory.cloneNode(true));
+                pillHistoryMobile.appendChild(noHistory);
+                return;
+            }
+            
+            // Show last 10 taken pills
+            const takenItems = [];
+            appData.pills.forEach(pill => {
+                pill.taken.forEach(time => {
+                    takenItems.push({
+                        pill: pill.name,
+                        time: time,
+                        dosage: pill.dosage
+                    });
+                });
+            });
+            
+            const recentTaken = takenItems.slice(-10).reverse();
+            
+            recentTaken.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <span class="history-date">${item.time}</span>
+                    <span class="history-details">${item.pill} (${item.dosage})</span>
+                `;
+                
+                pillHistory.appendChild(historyItem.cloneNode(true));
+                pillHistoryMobile.appendChild(historyItem);
+            });
+        }
+        
+        // Mark pill as taken
+        function markTaken(pillId) {
+            const pill = appData.pills.find(p => p.id === pillId);
+            if (pill) {
+                const now = new Date().toISOString();
+                pill.taken.push(now);
+                localStorage.setItem('pillTrackerData', JSON.stringify(appData));
+                updateStats();
+                updateHistory();
+                showNotification(`${pill.name} marked as taken!`);
+            }
+        }
+        
+        // Delete pill
+        function deletePill(pillId) {
+            if (confirm('Are you sure you want to delete this pill?')) {
+                appData.pills = appData.pills.filter(pill => pill.id !== pillId);
+                localStorage.setItem('pillTrackerData', JSON.stringify(appData));
+                updateStats();
+                updatePillList();
+                updateActiveReminders();
+                updateCalendar();
+                showNotification('Pill deleted successfully!');
+            }
+        }
+        
+        // Update settings
+        function updateSettings() {
+            appData.settings.pushNotifications = pushNotifications.checked || pushNotificationsMobile.checked;
+            appData.settings.emailAlerts = emailAlerts.checked;
+            appData.settings.soundAlerts = soundAlerts.checked || soundAlertsMobile.checked;
+            appData.settings.vibrationAlerts = vibrationAlerts.checked;
+            
+            localStorage.setItem('pillTrackerData', JSON.stringify(appData));
+            showNotification('Settings updated successfully!');
+        }
+        
+        // Test reminder
+        function testReminder() {
+            showNotification('This is a test reminder!', 'success');
+            
+            // Play sound if enabled
+            if (appData.settings.soundAlerts) {
+                // In a real app, you would play a sound here
+                console.log('Playing reminder sound');
+            }
+            
+            // Vibrate if enabled
+            if (appData.settings.vibrationAlerts && navigator.vibrate) {
+                navigator.vibrate([500, 300, 500]);
+            }
+        }
+        
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataUri = 'application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'pill-tracker-data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Data exported successfully!');
+        }
+        
+        // Setup notification permissions
+        function setupNotificationPermissions() {
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Schedule reminders
+        function scheduleReminders() {
+            // Clear existing timers
+            reminderTimers.forEach(timer => clearTimeout(timer));
+            reminderTimers = [];
+            
+            if (!appData.settings.pushNotifications) return;
+            
+            appData.pills.forEach(pill => {
+                pill.times.forEach(time => {
+                    const [hours, minutes] = time.split(':').map(Number);
+                    const now = new Date();
+                    const reminderTime = new Date(now);
+                    reminderTime.setHours(hours, minutes, 0, 0);
+                    
+                    // If reminder time is in the past, set for tomorrow
+                    if (reminderTime <= now) {
+                        reminderTime.setDate(reminderTime.getDate() + 1);
+                    }
+                    
+                    const delay = reminderTime.getTime() - now.getTime();
+                    
+                    if (delay > 0) {
+                        const timer = setTimeout(() => {
+                            showPillReminder(pill, time);
+                        }, delay);
+                        
+                        reminderTimers.push(timer);
+                    }
+                });
+            });
+        }
+        
+        // Show pill reminder
+        function showPillReminder(pill, time) {
+            if (appData.settings.pushNotifications && 'Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification(`Time for ${pill.name}`, {
+                        body: `Take ${pill.dosage} now`,
+                        icon: '💊'
+                    });
+                }
+            }
+            
+            showNotification(`Time to take ${pill.name} (${pill.dosage})`, 'success');
+            
+            // Play sound if enabled
+            if (appData.settings.soundAlerts) {
+                // In a real app, you would play a sound here
+                console.log('Playing reminder sound');
+            }
+            
+            // Vibrate if enabled
+            if (appData.settings.vibrationAlerts && navigator.vibrate) {
+                navigator.vibrate([500, 300, 500]);
+            }
+        }
+        
+        // Start reminders
+        function startReminders() {
+            scheduleReminders();
+            
+            // Reschedule every day
+            setInterval(scheduleReminders, 24 * 60 * 60 * 1000);
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

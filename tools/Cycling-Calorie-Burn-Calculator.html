@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<!-- Category: Health & Fitness -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cycling Calorie Burn Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding-top: 50px;
+        }
+
+        /* Desktop Styles */
+        .desktop-view {
+            display: block;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .mobile-view {
+            display: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, #4CAF50, #8BC34A, #03DAC6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calculator-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .results-section {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: #8BC34A;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #4CAF50;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-inputs input {
+            flex: 1;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #2196F3, #03DAC6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, #f44336, #e91e63);
+        }
+
+        .btn-warning {
+            background: linear-gradient(to right, #FF9800, #FF5722);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #4CAF50, #8BC34A);
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8BC34A;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .result-icon {
+            font-size: 2rem;
+            color: #8BC34A;
+        }
+
+        .conversion-section {
+            margin-top: 30px;
+        }
+
+        .conversion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .conversion-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .conversion-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #03DAC6;
+            margin: 10px 0;
+        }
+
+        .conversion-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .examples-section {
+            margin-top: 30px;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+
+        .example-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .example-card h4 {
+            color: #8BC34A;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .example-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 5px 0;
+        }
+
+        .chart-container {
+            height: 250px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(to top, #4CAF50, #8BC34A);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .health-benefits {
+            margin-top: 30px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .benefit-icon {
+            font-size: 2rem;
+            color: #8BC34A;
+        }
+
+        .benefit-content h4 {
+            margin-bottom: 5px;
+        }
+
+        .benefit-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-date {
+            font-weight: 500;
+        }
+
+        .history-calories {
+            color: #8BC34A;
+            font-weight: bold;
+        }
+
+        .goal-section {
+            margin-top: 30px;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .achievement-section {
+            margin-top: 30px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .achievement-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s;
+        }
+
+        .achievement-card.unlocked {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            color: #FF9800;
+        }
+
+        .achievement-icon.unlocked {
+            color: #4CAF50;
+        }
+
+        .achievement-info h4 {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .achievement-info p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 0;
+            }
+
+            .desktop-view {
+                display: none;
+            }
+
+            .mobile-view {
+                display: block;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .tabs {
+                border-radius: 25px;
+                padding: 3px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                display: inline-block;
+            }
+
+            .mobile-card {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            input, select {
+                padding: 10px;
+            }
+
+            .time-inputs {
+                flex-direction: column;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .conversion-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 180px;
+            }
+
+            .chart-bar {
+                width: 20px;
+            }
+
+            .history-list {
+                max-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn-group {
+                gap: 10px;
+            }
+
+            .conversion-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop View -->
+    <div class="desktop-view">
+        <header>
+            <h1><i class="fas fa-bicycle"></i> Cycling Calorie Burn Calculator</h1>
+            <p class="subtitle">Calculate calories burned during cycling activities</p>
+            
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="calculator">Calculator</button>
+                <button class="tab-btn" data-tab="analytics">Analytics</button>
+                <button class="tab-btn" data-tab="achievements">Achievements</button>
+                <button class="tab-btn" data-tab="training">Training Plans</button>
+            </div>
+        </header>
+
+        <div class="tab-content active" id="calculator-tab">
+            <div class="container">
+                <section class="calculator-section">
+                    <h2><i class="fas fa-calculator"></i> Calorie Calculator</h2>
+                    
+                    <div class="form-group">
+                        <label for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" placeholder="Enter your weight" value="70" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cyclingType">Cycling Type</label>
+                        <select id="cyclingType">
+                            <option value="leisure">Leisure Cycling (10 km/h)</option>
+                            <option value="moderate">Moderate Cycling (15 km/h)</option>
+                            <option value="vigorous">Vigorous Cycling (20 km/h)</option>
+                            <option value="racing">Racing (25+ km/h)</option>
+                            <option value="mountain">Mountain Biking</option>
+                            <option value="stationary">Stationary Bike</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">Duration</label>
+                        <div class="time-inputs">
+                            <input type="number" id="hours" placeholder="Hours" min="0">
+                            <input type="number" id="minutes" placeholder="Minutes" min="0" max="59">
+                            <input type="number" id="seconds" placeholder="Seconds" min="0" max="59">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="terrain">Terrain</label>
+                        <select id="terrain">
+                            <option value="flat">Flat Terrain</option>
+                            <option value="hilly">Hilly Terrain</option>
+                            <option value="mountain">Mountainous</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="intensity">Intensity Level</label>
+                        <select id="intensity">
+                            <option value="light">Light Effort</option>
+                            <option value="moderate" selected>Moderate Effort</option>
+                            <option value="vigorous">Vigorous Effort</option>
+                            <option value="very_vigorous">Very Vigorous Effort</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weather">Weather Conditions</label>
+                        <select id="weather">
+                            <option value="normal">Normal Conditions</option>
+                            <option value="wind">Headwind</option>
+                            <option value="hot">Hot Weather</option>
+                            <option value="cold">Cold Weather</option>
+                        </select>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="calculateBtn">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                        <button class="btn-secondary" id="resetBtn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="btn-warning" id="saveBtn">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </section>
+
+                <section class="results-section">
+                    <h2><i class="fas fa-chart-bar"></i> Results</h2>
+                    
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="result-value" id="caloriesResult">0</div>
+                            <div class="result-label">Calories Burned</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="result-value" id="timeResult">0:00:00</div>
+                            <div class="result-label">Duration</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="result-value" id="speedResult">0.0</div>
+                            <div class="result-label">Avg Speed (km/h)</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="result-value" id="distanceResult">0.0</div>
+                            <div class="result-label">Distance (km)</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="result-value" id="heartRateResult">0</div>
+                            <div class="result-label">Avg Heart Rate</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="result-value" id="metResult">0.0</div>
+                            <div class="result-label">MET Value</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversion-section">
+                        <h2><i class="fas fa-exchange-alt"></i> Unit Conversions</h2>
+                        
+                        <div class="conversion-grid">
+                            <div class="conversion-card">
+                                <div class="conversion-value" id="calToKj">0</div>
+                                <div class="conversion-label">Calories to kJ</div>
+                            </div>
+                            
+                            <div class="conversion-card">
+                                <div class="conversion-value" id="kmToMiles">0.0</div>
+                                <div class="conversion-label">km to miles</div>
+                            </div>
+                            
+                            <div class="conversion-card">
+                                <div class="conversion-value" id="kmhToMph">0.0</div>
+                                <div class="conversion-label">km/h to mph</div>
+                            </div>
+                            
+                            <div class="conversion-card">
+                                <div class="conversion-value" id="kgToLbs">0.0</div>
+                                <div class="conversion-label">kg to lbs</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-section">
+                        <h2><i class="fas fa-bullseye"></i> Daily Goal Progress</h2>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="progressText">0 calories</span>
+                                <span>Daily Goal: <span id="dailyGoal">500</span> calories</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="setGoal">Set Daily Calorie Goal</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="setGoal" placeholder="Enter goal" value="500" min="1">
+                                <button id="updateGoalBtn" style="flex: 0 0 auto; padding: 12px 15px;">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="container">
+                <section class="calculator-section">
+                    <h2><i class="fas fa-history"></i> Cycling History</h2>
+                    
+                    <div class="history-section">
+                        <div class="history-list" id="historyList">
+                            <!-- History items will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-danger" id="clearHistoryBtn">
+                            <i class="fas fa-trash"></i> Clear History
+                        </button>
+                        <button class="btn-secondary" id="exportBtn">
+                            <i class="fas fa-file-export"></i> Export Data
+                        </button>
+                    </div>
+                </section>
+                
+                <section class="results-section">
+                    <h2><i class="fas fa-heartbeat"></i> Health Benefits</h2>
+                    
+                    <div class="benefits-grid">
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Cardiovascular Health</h4>
+                                <p>Cycling strengthens your heart and improves circulation.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-weight"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Weight Management</h4>
+                                <p>Burns 400-1000 calories per hour depending on intensity.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-muscle"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Muscle Strength</h4>
+                                <p>Strengthens legs, core, and improves overall muscle tone.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Mental Health</h4>
+                                <p>Reduces stress and improves mood through endorphin release.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="examples-section">
+                        <h2><i class="fas fa-lightbulb"></i> Cycling Intensity Guide</h2>
+                        
+                        <div class="examples-grid">
+                            <div class="example-card">
+                                <h4><i class="fas fa-bicycle"></i> Leisure Cycling</h4>
+                                <p>10-15 km/h | 200-300 cal/hour</p>
+                                <p>Relaxed pace for recreation</p>
+                            </div>
+                            
+                            <div class="example-card">
+                                <h4><i class="fas fa-bicycle"></i> Commuter Cycling</h4>
+                                <p>15-20 km/h | 300-450 cal/hour</p>
+                                <p>Moderate effort for transportation</p>
+                            </div>
+                            
+                            <div class="example-card">
+                                <h4><i class="fas fa-bicycle"></i> Mountain Biking</h4>
+                                <p>10-15 km/h | 400-600 cal/hour</p>
+                                <p>Varied terrain with challenges</p>
+                            </div>
+                            
+                            <div class="example-card">
+                                <h4><i class="fas fa-bicycle"></i> Racing</h4>
+                                <p>25+ km/h | 600-1000 cal/hour</p>
+                                <p>High intensity competitive cycling</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="tab-content" id="analytics-tab">
+            <div class="container">
+                <section class="calculator-section">
+                    <h2><i class="fas fa-chart-line"></i> Performance Analytics</h2>
+                    
+                    <div class="form-group">
+                        <label for="analyticsPeriod">Analytics Period</label>
+                        <select id="analyticsPeriod">
+                            <option value="week">Last 7 Days</option>
+                            <option value="month">Last 30 Days</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="generateReportBtn">
+                            <i class="fas fa-chart-bar"></i> Generate Report
+                        </button>
+                    </div>
+                </section>
+
+                <section class="results-section">
+                    <h2><i class="fas fa-chart-bar"></i> Activity Chart</h2>
+                    
+                    <div class="chart-container" id="activityChart">
+                        <!-- Chart will be generated here -->
+                    </div>
+                    
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="result-value" id="totalCalories">0</div>
+                            <div class="result-label">Total Calories</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="result-value" id="totalTime">0</div>
+                            <div class="result-label">Total Time</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="result-value" id="totalDistance">0</div>
+                            <div class="result-label">Total Distance</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="result-value" id="bestSession">0</div>
+                            <div class="result-label">Best Session</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="tab-content" id="achievements-tab">
+            <div class="container">
+                <section class="calculator-section">
+                    <h2><i class="fas fa-trophy"></i> Achievements</h2>
+                    
+                    <div class="achievement-section">
+                        <h3><i class="fas fa-star"></i> Milestone Achievements</h3>
+                        <div class="achievements-grid" id="milestoneAchievements">
+                            <!-- Milestone achievements will be added here -->
+                        </div>
+                    </div>
+                </section>
+
+                <section class="results-section">
+                    <h2><i class="fas fa-medal"></i> Special Achievements</h2>
+                    
+                    <div class="achievement-section">
+                        <div class="achievements-grid" id="specialAchievements">
+                            <!-- Special achievements will be added here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="tab-content" id="training-tab">
+            <div class="container">
+                <section class="calculator-section">
+                    <h2><i class="fas fa-dumbbell"></i> Training Plans</h2>
+                    
+                    <div class="form-group">
+                        <label for="trainingGoal">Training Goal</label>
+                        <select id="trainingGoal">
+                            <option value="fitness">General Fitness</option>
+                            <option value="weight_loss">Weight Loss</option>
+                            <option value="endurance">Endurance Building</option>
+                            <option value="strength">Strength Training</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingLevel">Fitness Level</label>
+                        <select id="trainingLevel">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trainingDays">Days Per Week</label>
+                        <input type="number" id="trainingDays" placeholder="Enter days" value="3" min="1" max="7">
+                    </div>
+                    
+                    <button id="generatePlanBtn" style="width: 100%; padding: 15px;">
+                        <i class="fas fa-clipboard-list"></i> Generate Training Plan
+                    </button>
+                </section>
+
+                <section class="results-section">
+                    <h2><i class="fas fa-clipboard-list"></i> Training Plan</h2>
+                    
+                    <div class="examples-grid" id="trainingPlan">
+                        <!-- Training plan will be generated here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+        <h1><i class="fas fa-bicycle"></i> Cycling Calorie Burn Calculator</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="calculator-mobile">Calculator</button>
+            <button class="tab-btn" data-tab="analytics-mobile">Analytics</button>
+            <button class="tab-btn" data-tab="achievements-mobile">Achievements</button>
+        </div>
+        
+        <div class="tab-content active" id="calculator-mobile-tab">
+            <div class="mobile-card">
+                <h2><i class="fas fa-calculator"></i> Calorie Calculator</h2>
+                
+                <div class="form-group">
+                    <label for="weightMobile">Weight (kg)</label>
+                    <input type="number" id="weightMobile" placeholder="Enter your weight" value="70" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cyclingTypeMobile">Cycling Type</label>
+                    <select id="cyclingTypeMobile">
+                        <option value="leisure">Leisure Cycling (10 km/h)</option>
+                        <option value="moderate">Moderate Cycling (15 km/h)</option>
+                        <option value="vigorous">Vigorous Cycling (20 km/h)</option>
+                        <option value="racing">Racing (25+ km/h)</option>
+                        <option value="mountain">Mountain Biking</option>
+                        <option value="stationary">Stationary Bike</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timeMobile">Duration</label>
+                    <div class="time-inputs">
+                        <input type="number" id="hoursMobile" placeholder="Hours" min="0">
+                        <input type="number" id="minutesMobile" placeholder="Minutes" min="0" max="59">
+                        <input type="number" id="secondsMobile" placeholder="Seconds" min="0" max="59">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="terrainMobile">Terrain</label>
+                    <select id="terrainMobile">
+                        <option value="flat">Flat Terrain</option>
+                        <option value="hilly">Hilly Terrain</option>
+                        <option value="mountain">Mountainous</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="intensityMobile">Intensity Level</label>
+                    <select id="intensityMobile">
+                        <option value="light">Light Effort</option>
+                        <option value="moderate" selected>Moderate Effort</option>
+                        <option value="vigorous">Vigorous Effort</option>
+                        <option value="very_vigorous">Very Vigorous Effort</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weatherMobile">Weather Conditions</label>
+                    <select id="weatherMobile">
+                        <option value="normal">Normal Conditions</option>
+                        <option value="wind">Headwind</option>
+                        <option value="hot">Hot Weather</option>
+                        <option value="cold">Cold Weather</option>
+                    </select>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="calculateBtnMobile">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                    <button class="btn-secondary" id="resetBtnMobile">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button class="btn-warning" id="saveBtnMobile">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mobile-card">
+                <h2><i class="fas fa-chart-bar"></i> Results</h2>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="result-value" id="caloriesResultMobile">0</div>
+                        <div class="result-label">Calories</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="result-value" id="timeResultMobile">0:00:00</div>
+                        <div class="result-label">Duration</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="result-value" id="speedResultMobile">0.0</div>
+                        <div class="result-label">Speed</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="result-value" id="distanceResultMobile">0.0</div>
+                        <div class="result-label">Distance</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mobile-card">
+                <h2><i class="fas fa-bullseye"></i> Goal Progress</h2>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="goalProgressMobile" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressTextMobile">0 calories</span>
+                        <span>Goal: <span id="dailyGoalMobile">500</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mobile-card">
+                <h2><i class="fas fa-history"></i> Recent Activities</h2>
+                
+                <div class="history-list" id="historyListMobile">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+            
+            <div class="mobile-card">
+                <h2><i class="fas fa-heartbeat"></i> Health Benefits</h2>
+                
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="benefit-content">
+                            <h4>Cardiovascular</h4>
+                            <p>Strengthens heart and improves circulation.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="benefit-content">
+                            <h4>Weight Loss</h4>
+                            <p>Burns 400-1000 calories per hour.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="analytics-mobile-tab">
+            <div class="mobile-card">
+                <h2><i class="fas fa-chart-line"></i> Performance Chart</h2>
+                
+                <div class="chart-container" id="activityChartMobile">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="result-value" id="totalCaloriesMobile">0</div>
+                        <div class="result-label">Total Calories</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="result-value" id="totalTimeMobile">0</div>
+                        <div class="result-label">Total Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="achievements-mobile-tab">
+            <div class="mobile-card">
+                <h2><i class="fas fa-trophy"></i> All Achievements</h2>
+                <div class="achievements-grid" id="allMobileAchievements">
+                    <!-- All achievements will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Calculation completed successfully!
+    </div>
+
+    <script>
+        // DOM Elements
+        const weight = document.getElementById('weight');
+        const weightMobile = document.getElementById('weightMobile');
+        const cyclingType = document.getElementById('cyclingType');
+        const cyclingTypeMobile = document.getElementById('cyclingTypeMobile');
+        const hours = document.getElementById('hours');
+        const hoursMobile = document.getElementById('hoursMobile');
+        const minutes = document.getElementById('minutes');
+        const minutesMobile = document.getElementById('minutesMobile');
+        const seconds = document.getElementById('seconds');
+        const secondsMobile = document.getElementById('secondsMobile');
+        const terrain = document.getElementById('terrain');
+        const terrainMobile = document.getElementById('terrainMobile');
+        const intensity = document.getElementById('intensity');
+        const intensityMobile = document.getElementById('intensityMobile');
+        const weather = document.getElementById('weather');
+        const weatherMobile = document.getElementById('weatherMobile');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const calculateBtnMobile = document.getElementById('calculateBtnMobile');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetBtnMobile = document.getElementById('resetBtnMobile');
+        const saveBtn = document.getElementById('saveBtn');
+        const saveBtnMobile = document.getElementById('saveBtnMobile');
+        const notification = document.getElementById('notification');
+        
+        // Result elements
+        const caloriesResult = document.getElementById('caloriesResult');
+        const timeResult = document.getElementById('timeResult');
+        const speedResult = document.getElementById('speedResult');
+        const distanceResult = document.getElementById('distanceResult');
+        const heartRateResult = document.getElementById('heartRateResult');
+        const metResult = document.getElementById('metResult');
+        const caloriesResultMobile = document.getElementById('caloriesResultMobile');
+        const timeResultMobile = document.getElementById('timeResultMobile');
+        const speedResultMobile = document.getElementById('speedResultMobile');
+        const distanceResultMobile = document.getElementById('distanceResultMobile');
+        
+        // Conversion elements
+        const calToKj = document.getElementById('calToKj');
+        const kmToMiles = document.getElementById('kmToMiles');
+        const kmhToMph = document.getElementById('kmhToMph');
+        const kgToLbs = document.getElementById('kgToLbs');
+        const calToKjMobile = document.getElementById('calToKjMobile');
+        const kmToMilesMobile = document.getElementById('kmToMilesMobile');
+        const kmhToMphMobile = document.getElementById('kmhToMphMobile');
+        const kgToLbsMobile = document.getElementById('kgToLbsMobile');
+        
+        // Goal elements
+        const goalProgress = document.getElementById('goalProgress');
+        const progressText = document.getElementById('progressText');
+        const dailyGoal = document.getElementById('dailyGoal');
+        const setGoal = document.getElementById('setGoal');
+        const updateGoalBtn = document.getElementById('updateGoalBtn');
+        const goalProgressMobile = document.getElementById('goalProgressMobile');
+        const progressTextMobile = document.getElementById('progressTextMobile');
+        const dailyGoalMobile = document.getElementById('dailyGoalMobile');
+        
+        // History elements
+        const historyList = document.getElementById('historyList');
+        const historyListMobile = document.getElementById('historyListMobile');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        
+        // Analytics elements
+        const analyticsPeriod = document.getElementById('analyticsPeriod');
+        const generateReportBtn = document.getElementById('generateReportBtn');
+        const activityChart = document.getElementById('activityChart');
+        const activityChartMobile = document.getElementById('activityChartMobile');
+        const totalCalories = document.getElementById('totalCalories');
+        const totalTime = document.getElementById('totalTime');
+        const totalDistance = document.getElementById('totalDistance');
+        const bestSession = document.getElementById('bestSession');
+        const totalCaloriesMobile = document.getElementById('totalCaloriesMobile');
+        const totalTimeMobile = document.getElementById('totalTimeMobile');
+        
+        // Training elements
+        const trainingGoal = document.getElementById('trainingGoal');
+        const trainingLevel = document.getElementById('trainingLevel');
+        const trainingDays = document.getElementById('trainingDays');
+        const generatePlanBtn = document.getElementById('generatePlanBtn');
+        const trainingPlan = document.getElementById('trainingPlan');
+        
+        // Achievement elements
+        const milestoneAchievements = document.getElementById('milestoneAchievements');
+        const specialAchievements = document.getElementById('specialAchievements');
+        const allMobileAchievements = document.getElementById('allMobileAchievements');
+        
+        // Saved data
+        let cyclingHistory = JSON.parse(localStorage.getItem('cyclingHistory')) || [];
+        let dailyCalorieGoal = parseInt(localStorage.getItem('dailyCalorieGoal')) || 500;
+        let achievements = JSON.parse(localStorage.getItem('cyclingAchievements')) || [];
+        
+        // Define achievements
+        const achievementList = [
+            { id: 'first_ride', name: 'First Ride', description: 'Complete your first cycling session', icon: 'fas fa-bicycle', condition: (history) => history.length >= 1 },
+            { id: 'hundred_calories', name: 'Calorie Crusher', description: 'Burn 100 calories in one session', icon: 'fas fa-fire', condition: (history) => history.some(session => session.calories >= 100) },
+            { id: 'five_hundred_calories', name: 'Energy Burner', description: 'Burn 500 calories in one session', icon: 'fas fa-fire-alt', condition: (history) => history.some(session => session.calories >= 500) },
+            { id: 'thousand_calories', name: 'Calorie Champion', description: 'Burn 1000 calories in one session', icon: 'fas fa-crown', condition: (history) => history.some(session => session.calories >= 1000) },
+            { id: 'ten_sessions', name: 'Dedicated Cyclist', description: 'Complete 10 cycling sessions', icon: 'fas fa-medal', condition: (history) => history.length >= 10 },
+            { id: 'fifty_sessions', name: 'Cycling Enthusiast', description: 'Complete 50 cycling sessions', icon: 'fas fa-trophy', condition: (history) => history.length >= 50 },
+            { id: 'hour_ride', name: 'Endurance Rider', description: 'Complete a 1-hour ride', icon: 'fas fa-clock', condition: (history) => history.some(session => {
+                const [hours, minutes] = session.duration.split(':').map(Number);
+                return hours >= 1 || (hours === 0 && minutes >= 60);
+            }) },
+            { id: 'mountain_biker', name: 'Mountain Master', description: 'Complete 5 mountain biking sessions', icon: 'fas fa-mountain', condition: (history) => history.filter(session => session.type === 'mountain').length >= 5 }
+        ];
+        
+        // Initialize the app
+        function init() {
+            setupTabs();
+            updateGoalDisplay();
+            updateHistoryDisplay();
+            setupEventListeners();
+            updateAchievements();
+        }
+        
+        // Setup tab switching
+        function setupTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons and content
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabName = btn.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                });
+            });
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Calculator tab
+            calculateBtn.addEventListener('click', calculate);
+            calculateBtnMobile.addEventListener('click', calculate);
+            resetBtn.addEventListener('click', resetForm);
+            resetBtnMobile.addEventListener('click', resetForm);
+            saveBtn.addEventListener('click', saveResult);
+            saveBtnMobile.addEventListener('click', saveResult);
+            updateGoalBtn.addEventListener('click', updateGoal);
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            exportBtn.addEventListener('click', exportData);
+            
+            // Analytics tab
+            generateReportBtn.addEventListener('click', generateReport);
+            
+            // Training tab
+            generatePlanBtn.addEventListener('click', generateTrainingPlan);
+        }
+        
+        // Calculate calories burned
+        function calculate() {
+            const userWeight = parseFloat(weight.value || weightMobile.value) || 70;
+            const cycleType = cyclingType.value || cyclingTypeMobile.value;
+            const hrs = parseInt(hours.value || hoursMobile.value) || 0;
+            const mins = parseInt(minutes.value || minutesMobile.value) || 0;
+            const secs = parseInt(seconds.value || secondsMobile.value) || 0;
+            const terrainType = terrain.value || terrainMobile.value;
+            const intensityLevel = intensity.value || intensityMobile.value;
+            const weatherCondition = weather.value || weatherMobile.value;
+            
+            // Convert time to hours
+            const totalTimeHours = hrs + (mins / 60) + (secs / 3600);
+            const totalTimeMinutes = hrs * 60 + mins + (secs / 60);
+            
+            // Base MET values for different cycling types
+            let baseMET;
+            switch(cycleType) {
+                case 'leisure':
+                    baseMET = 4.0;
+                    break;
+                case 'moderate':
+                    baseMET = 6.0;
+                    break;
+                case 'vigorous':
+                    baseMET = 8.0;
+                    break;
+                case 'racing':
+                    baseMET = 12.0;
+                    break;
+                case 'mountain':
+                    ba

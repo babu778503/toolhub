@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<!-- Category: Health & Fitness -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding-top: 50px;
+        }
+
+        /* Desktop Styles */
+        .desktop-view {
+            display: block;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .mobile-view {
+            display: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, #4CAF50, #8BC34A, #03DAC6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .workout-display {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: #8BC34A;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #4CAF50;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, #f44336, #e91e63);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #2196F3, #03DAC6);
+        }
+
+        .workout-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .workout-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workout-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .workout-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #4CAF50, #8BC34A);
+        }
+
+        .workout-card.hiit::before {
+            background: linear-gradient(to bottom, #FF5722, #FF9800);
+        }
+
+        .workout-card.strength::before {
+            background: linear-gradient(to bottom, #2196F3, #03DAC6);
+        }
+
+        .workout-card.flexibility::before {
+            background: linear-gradient(to bottom, #9C27B0, #E91E63);
+        }
+
+        .workout-card.yoga::before {
+            background: linear-gradient(to bottom, #607D8B, #9E9E9E);
+        }
+
+        .workout-card h3 {
+            color: #8BC34A;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .workout-details {
+            margin: 15px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .detail-label {
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #8BC34A;
+        }
+
+        .workout-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #8BC34A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-select {
+            flex: 1;
+        }
+
+        .search-box {
+            flex: 2;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-box input {
+            padding-left: 35px;
+        }
+
+        .calendar-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .calendar-day.has-workout {
+            background: rgba(76, 175, 80, 0.3);
+            position: relative;
+        }
+
+        .calendar-day.has-workout::after {
+            content: '•';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #8BC34A;
+        }
+
+        .workout-timer {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #8BC34A;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 0;
+            }
+
+            .desktop-view {
+                display: none;
+            }
+
+            .mobile-view {
+                display: block;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .tabs {
+                border-radius: 25px;
+                padding: 3px;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .mobile-card {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            input, select, textarea {
+                padding: 10px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .workout-list {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .workout-card {
+                padding: 15px;
+            }
+
+            .workout-actions {
+                flex-direction: column;
+            }
+
+            .filter-section {
+                flex-direction: column;
+            }
+
+            .calendar-view {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .timer-display {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-view {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop View -->
+    <div class="desktop-view">
+        <header>
+            <h1><i class="fas fa-dumbbell"></i> Workout Planner</h1>
+            <p class="subtitle">Plan, track, and achieve your fitness goals</p>
+            
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="planner">Planner</button>
+                <button class="tab-btn" data-tab="calendar">Calendar</button>
+                <button class="tab-btn" data-tab="progress">Progress</button>
+                <button class="tab-btn" data-tab="timer">Timer</button>
+            </div>
+        </header>
+
+        <div class="tab-content active" id="planner-tab">
+            <div class="container">
+                <section class="input-section">
+                    <h2><i class="fas fa-plus-circle"></i> Create Workout</h2>
+                    <form id="workoutForm">
+                        <div class="form-group">
+                            <label for="workoutName">Workout Name</label>
+                            <input type="text" id="workoutName" placeholder="e.g., Morning Cardio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="workoutType">Workout Type</label>
+                            <select id="workoutType" required>
+                                <option value="">Select Type</option>
+                                <option value="Cardio">Cardio</option>
+                                <option value="Strength">Strength Training</option>
+                                <option value="Flexibility">Flexibility</option>
+                                <option value="HIIT">HIIT</option>
+                                <option value="Yoga">Yoga</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Duration (minutes)</label>
+                            <input type="number" id="duration" min="1" placeholder="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="difficulty">Difficulty</label>
+                            <select id="difficulty" required>
+                                <option value="">Select Difficulty</option>
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="calories">Calories Burned (approx)</label>
+                            <input type="number" id="calories" min="0" placeholder="200">
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="3" placeholder="Additional details..."></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit"><i class="fas fa-save"></i> Add Workout</button>
+                            <button type="button" class="btn-secondary" id="clearBtn"><i class="fas fa-broom"></i> Clear</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="workout-display">
+                    <h2><i class="fas fa-list"></i> Your Workouts</h2>
+                    
+                    <div class="filter-section">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search workouts...">
+                        </div>
+                        <div class="filter-select">
+                            <select id="typeFilter">
+                                <option value="">All Types</option>
+                                <option value="Cardio">Cardio</option>
+                                <option value="Strength">Strength</option>
+                                <option value="Flexibility">Flexibility</option>
+                                <option value="HIIT">HIIT</option>
+                                <option value="Yoga">Yoga</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="workout-list" id="workoutList">
+                        <!-- Workout cards will be added here dynamically -->
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalWorkouts">0</div>
+                            <div class="stat-label">Total Workouts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalMinutes">0</div>
+                            <div class="stat-label">Total Minutes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalCalories">0</div>
+                            <div class="stat-label">Calories Burned</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="favoriteType">-</div>
+                            <div class="stat-label">Most Common</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="tab-content" id="calendar-tab">
+            <div class="container">
+                <section class="input-section">
+                    <h2><i class="fas fa-calendar-alt"></i> Monthly Overview</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="monthlyProgress" style="width: 65%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Monthly Goal: 20 Workouts</span>
+                            <span>Completed: <span id="completedWorkouts">13</span>/20</span>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-view" id="calendarView">
+                        <!-- Calendar days will be generated here -->
+                    </div>
+                </section>
+                
+                <section class="workout-display">
+                    <h2><i class="fas fa-chart-line"></i> Progress Summary</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">85%</div>
+                            <div class="stat-label">Goal Achievement</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Week Streak</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">245</div>
+                            <div class="stat-label">Avg. Calories/Day</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="tab-content" id="progress-tab">
+            <div class="container">
+                <section class="input-section">
+                    <h2><i class="fas fa-trophy"></i> Achievements</h2>
+                    <div class="workout-list">
+                        <div class="workout-card">
+                            <h3><i class="fas fa-medal"></i> First Workout</h3>
+                            <p>Completed your first workout</p>
+                            <div class="detail-item">
+                                <span class="detail-label">Date:</span>
+                                <span class="detail-value">2023-06-15</span>
+                            </div>
+                        </div>
+                        <div class="workout-card">
+                            <h3><i class="fas fa-fire"></i> 7-Day Streak</h3>
+                            <p>Worked out for 7 consecutive days</p>
+                            <div class="detail-item">
+                                <span class="detail-label">Date:</span>
+                                <span class="detail-value">2023-06-22</span>
+                            </div>
+                        </div>
+                        <div class="workout-card">
+                            <h3><i class="fas fa-clock"></i> 1000 Minutes</h3>
+                            <p>Reached 1000 minutes of exercise</p>
+                            <div class="detail-item">
+                                <span class="detail-label">Date:</span>
+                                <span class="detail-value">2023-07-05</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="workout-display">
+                    <h2><i class="fas fa-chart-bar"></i> Activity Chart</h2>
+                    <div style="height: 300px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px;">
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 60%;"></div>
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 80%;"></div>
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 40%;"></div>
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 90%;"></div>
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 70%;"></div>
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 85%;"></div>
+                        <div style="width: 30px; background: linear-gradient(to top, #4CAF50, #8BC34A); border-radius: 5px 5px 0 0; height: 65%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 0.8rem;">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="tab-content" id="timer-tab">
+            <div class="container">
+                <section class="input-section">
+                    <h2><i class="fas fa-stopwatch"></i> Workout Timer</h2>
+                    <div class="workout-timer">
+                        <div class="timer-display" id="timerDisplay">00:00:00</div>
+                        <div class="timer-controls">
+                            <button class="btn-secondary" id="startTimer"><i class="fas fa-play"></i> Start</button>
+                            <button class="btn-danger" id="stopTimer"><i class="fas fa-stop"></i> Stop</button>
+                            <button id="resetTimer"><i class="fas fa-redo"></i> Reset</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label for="presetTimer">Preset Timers</label>
+                        <select id="presetTimer">
+                            <option value="">Select a preset</option>
+                            <option value="300">5 Minutes (Warm-up)</option>
+                            <option value="600">10 Minutes (Cardio)</option>
+                            <option value="1200">20 Minutes (Strength)</option>
+                            <option value="1800">30 Minutes (Full Workout)</option>
+                        </select>
+                    </div>
+                </section>
+                
+                <section class="workout-display">
+                    <h2><i class="fas fa-bell"></i> Upcoming Workouts</h2>
+                    <div class="workout-list">
+                        <div class="workout-card">
+                            <h3><i class="fas fa-running"></i> Morning Run</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Time:</span>
+                                <span class="detail-value">Tomorrow 7:00 AM</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Duration:</span>
+                                <span class="detail-value">30 minutes</span>
+                            </div>
+                        </div>
+                        <div class="workout-card">
+                            <h3><i class="fas fa-dumbbell"></i> Strength Training</h3>
+                            <div class="detail-item">
+                                <span class="detail-label">Time:</span>
+                                <span class="detail-value">Wed 6:00 PM</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Duration:</span>
+                                <span class="detail-value">45 minutes</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+        <h1><i class="fas fa-dumbbell"></i> Workout Planner</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="planner-mobile">Planner</button>
+            <button class="tab-btn" data-tab="progress-mobile">Progress</button>
+            <button class="tab-btn" data-tab="timer-mobile">Timer</button>
+        </div>
+        
+        <div class="tab-content active" id="planner-mobile-tab">
+            <div class="mobile-card">
+                <h2><i class="fas fa-plus-circle"></i> Create Workout</h2>
+                <form id="workoutFormMobile">
+                    <div class="form-group">
+                        <label for="workoutNameMobile">Workout Name</label>
+                        <input type="text" id="workoutNameMobile" placeholder="e.g., Morning Cardio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workoutTypeMobile">Workout Type</label>
+                        <select id="workoutTypeMobile" required>
+                            <option value="">Select Type</option>
+                            <option value="Cardio">Cardio</option>
+                            <option value="Strength">Strength Training</option>
+                            <option value="Flexibility">Flexibility</option>
+                            <option value="HIIT">HIIT</option>
+                            <option value="Yoga">Yoga</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="durationMobile">Duration (minutes)</label>
+                        <input type="number" id="durationMobile" min="1" placeholder="30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="difficultyMobile">Difficulty</label>
+                        <select id="difficultyMobile" required>
+                            <option value="">Select Difficulty</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="caloriesMobile">Calories Burned (approx)</label>
+                        <input type="number" id="caloriesMobile" min="0" placeholder="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="notesMobile">Notes</label>
+                        <textarea id="notesMobile" rows="2" placeholder="Additional details..."></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit"><i class="fas fa-save"></i> Add Workout</button>
+                        <button type="button" class="btn-secondary" id="clearBtnMobile"><i class="fas fa-broom"></i> Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="mobile-card">
+                <h2><i class="fas fa-list"></i> Your Workouts</h2>
+                
+                <div class="filter-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInputMobile" placeholder="Search workouts...">
+                    </div>
+                    <div class="filter-select">
+                        <select id="typeFilterMobile">
+                            <option value="">All Types</option>
+                            <option value="Cardio">Cardio</option>
+                            <option value="Strength">Strength</option>
+                            <option value="Flexibility">Flexibility</option>
+                            <option value="HIIT">HIIT</option>
+                            <option value="Yoga">Yoga</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="workout-list" id="workoutListMobile">
+                    <!-- Workout cards will be added here dynamically -->
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalWorkoutsMobile">0</div>
+                        <div class="stat-label">Total Workouts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalMinutesMobile">0</div>
+                        <div class="stat-label">Total Minutes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCaloriesMobile">0</div>
+                        <div class="stat-label">Calories Burned</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="progress-mobile-tab">
+            <div class="mobile-card">
+                <h2><i class="fas fa-chart-line"></i> Progress Summary</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label">Goal Achievement</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Week Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">245</div>
+                        <div class="stat-label">Avg. Calories/Day</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span>Monthly Goal: 20 Workouts</span>
+                        <span>13/20</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mobile-card">
+                <h2><i class="fas fa-trophy"></i> Achievements</h2>
+                <div class="workout-list">
+                    <div class="workout-card">
+                        <h3><i class="fas fa-medal"></i> First Workout</h3>
+                        <p>Completed your first workout</p>
+                    </div>
+                    <div class="workout-card">
+                        <h3><i class="fas fa-fire"></i> 7-Day Streak</h3>
+                        <p>Worked out for 7 consecutive days</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="timer-mobile-tab">
+            <div class="mobile-card">
+                <h2><i class="fas fa-stopwatch"></i> Workout Timer</h2>
+                <div class="workout-timer">
+                    <div class="timer-display" id="timerDisplayMobile">00:00:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-secondary" id="startTimerMobile"><i class="fas fa-play"></i> Start</button>
+                        <button class="btn-danger" id="stopTimerMobile"><i class="fas fa-stop"></i> Stop</button>
+                        <button id="resetTimerMobile"><i class="fas fa-redo"></i> Reset</button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="presetTimerMobile">Preset Timers</label>
+                    <select id="presetTimerMobile">
+                        <option value="">Select a preset</option>
+                        <option value="300">5 Minutes (Warm-up)</option>
+                        <option value="600">10 Minutes (Cardio)</option>
+                        <option value="1200">20 Minutes (Strength)</option>
+                        <option value="1800">30 Minutes (Full Workout)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mobile-card">
+                <h2><i class="fas fa-bell"></i> Upcoming Workouts</h2>
+                <div class="workout-list">
+                    <div class="workout-card">
+                        <h3><i class="fas fa-running"></i> Morning Run</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Time:</span>
+                            <span class="detail-value">Tomorrow 7:00 AM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Workout data storage
+        let workouts = JSON.parse(localStorage.getItem('workouts')) || [];
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isTimerRunning = false;
+        
+        // DOM Elements
+        const workoutForm = document.getElementById('workoutForm');
+        const workoutFormMobile = document.getElementById('workoutFormMobile');
+        const workoutList = document.getElementById('workoutList');
+        const workoutListMobile = document.getElementById('workoutListMobile');
+        const clearBtn = document.getElementById('clearBtn');
+        const clearBtnMobile = document.getElementById('clearBtnMobile');
+        const searchInput = document.getElementById('searchInput');
+        const searchInputMobile = document.getElementById('searchInputMobile');
+        const typeFilter = document.getElementById('typeFilter');
+        const typeFilterMobile = document.getElementById('typeFilterMobile');
+        
+        // Timer elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerDisplayMobile = document.getElementById('timerDisplayMobile');
+        const startTimer = document.getElementById('startTimer');
+        const stopTimer = document.getElementById('stopTimer');
+        const resetTimer = document.getElementById('resetTimer');
+        const startTimerMobile = document.getElementById('startTimerMobile');
+        const stopTimerMobile = document.getElementById('stopTimerMobile');
+        const resetTimerMobile = document.getElementById('resetTimerMobile');
+        const presetTimer = document.getElementById('presetTimer');
+        const presetTimerMobile = document.getElementById('presetTimerMobile');
+        
+        // Stats elements
+        const totalWorkoutsEl = document.getElementById('totalWorkouts');
+        const totalMinutesEl = document.getElementById('totalMinutes');
+        const totalCaloriesEl = document.getElementById('totalCalories');
+        const favoriteTypeEl = document.getElementById('favoriteType');
+        const totalWorkoutsMobileEl = document.getElementById('totalWorkoutsMobile');
+        const totalMinutesMobileEl = document.getElementById('totalMinutesMobile');
+        const totalCaloriesMobileEl = document.getElementById('totalCaloriesMobile');
+        
+        // Tab switching
+        function setupTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons and content
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabName = btn.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                });
+            });
+        }
+        
+        // Initialize the app
+        function init() {
+            setupTabs();
+            renderWorkouts();
+            updateStats();
+            setupCalendar();
+            setupEventListeners();
+            setupTimer();
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Form submissions
+            workoutForm.addEventListener('submit', handleFormSubmit);
+            workoutFormMobile.addEventListener('submit', handleFormSubmit);
+            
+            // Clear buttons
+            clearBtn.addEventListener('click', clearForm);
+            clearBtnMobile.addEventListener('click', clearForm);
+            
+            // Search and filter
+            searchInput.addEventListener('input', filterWorkouts);
+            searchInputMobile.addEventListener('input', filterWorkouts);
+            typeFilter.addEventListener('change', filterWorkouts);
+            typeFilterMobile.addEventListener('change', filterWorkouts);
+            
+            // Preset timers
+            presetTimer.addEventListener('change', setPresetTimer);
+            presetTimerMobile.addEventListener('change', setPresetTimer);
+        }
+        
+        // Handle form submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Determine which form was submitted
+            const isMobile = e.target === workoutFormMobile;
+            
+            // Get form values
+            const workoutName = isMobile ? document.getElementById('workoutNameMobile').value : document.getElementById('workoutName').value;
+            const workoutType = isMobile ? document.getElementById('workoutTypeMobile').value : document.getElementById('workoutType').value;
+            const duration = isMobile ? document.getElementById('durationMobile').value : document.getElementById('duration').value;
+            const difficulty = isMobile ? document.getElementById('difficultyMobile').value : document.getElementById('difficulty').value;
+            const calories = isMobile ? document.getElementById('caloriesMobile').value : document.getElementById('calories').value;
+            const notes = isMobile ? document.getElementById('notesMobile').value : document.getElementById('notes').value;
+            
+            // Create workout object
+            const workout = {
+                id: Date.now(),
+                name: workoutName,
+                type: workoutType,
+                duration: parseInt(duration),
+                difficulty: difficulty,
+                calories: calories ? parseInt(calories) : 0,
+                notes: notes,
+                date: new Date().toISOString()
+            };
+            
+            // Add to workouts array
+            workouts.push(workout);
+            
+            // Save to localStorage
+            localStorage.setItem('workouts', JSON.stringify(workouts));
+            
+            // Reset form
+            e.target.reset();
+            
+            // Update UI
+            renderWorkouts();
+            updateStats();
+            setupCalendar();
+        }
+        
+        // Clear form
+        function clearForm() {
+            workoutForm.reset();
+            workoutFormMobile.reset();
+        }
+        
+        // Filter workouts
+        function filterWorkouts() {
+            const searchTerm = (searchInput.value || searchInputMobile.value).toLowerCase();
+            const filterType = typeFilter.value || typeFilterMobile.value;
+            
+            renderWorkouts(searchTerm, filterType);
+        }
+        
+        // Render workouts
+        function renderWorkouts(searchTerm = '', filterType = '') {
+            // Clear existing workouts
+            workoutList.innerHTML = '';
+            workoutListMobile.innerHTML = '';
+            
+            // Filter workouts
+            let filteredWorkouts = workouts;
+            
+            if (searchTerm) {
+                filteredWorkouts = filteredWorkouts.filter(workout => 
+                    workout.name.toLowerCase().includes(searchTerm) || 
+                    workout.notes.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (filterType) {
+                filteredWorkouts = filteredWorkouts.filter(workout => 
+                    workout.type === filterType
+                );
+            }
+            
+            // Sort by date (newest first)
+            filteredWorkouts.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Render each workout
+            filteredWorkouts.forEach(workout => {
+                const workoutCard = createWorkoutCard(workout);
+                workoutList.appendChild(workoutCard.cloneNode(true));
+                workoutListMobile.appendChild(workoutCard);
+            });
+            
+            // Show message if no workouts
+            if (filteredWorkouts.length === 0) {
+                const noWorkoutsMsg = document.createElement('p');
+                noWorkoutsMsg.textContent = 'No workouts found. Create your first workout!';
+                noWorkoutsMsg.style.textAlign = 'center';
+                noWorkoutsMsg.style.opacity = '0.7';
+                noWorkoutsMsg.style.gridColumn = '1 / -1';
+                
+                workoutList.appendChild(noWorkoutsMsg.cloneNode(true));
+                workoutListMobile.appendChild(noWorkoutsMsg);
+            }
+        }
+        
+        // Create workout card element
+        function createWorkoutCard(workout) {
+            const card = document.createElement('div');
+            card.className = `workout-card ${workout.type.toLowerCase()}`;
+            card.innerHTML = `
+                <h3>
+                    ${getWorkoutIcon(workout.type)} ${workout.name}
+                </h3>
+                <div class="workout-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Type:</span>
+                        <span class="detail-value">${workout.type}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Duration:</span>
+                        <span class="detail-value">${workout.duration} minutes</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Difficulty:</span>
+                        <span class="detail-value">${workout.difficulty}</span>
+                    </div>
+                    ${workout.calories ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Calories:</span>
+                        <span class="detail-value">${workout.calories}</span>
+                    </div>
+                    ` : ''}
+                    ${workout.notes ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Notes:</span>
+                        <span class="detail-value">${workout.notes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="workout-actions">
+                    <button class="action-btn btn-secondary" onclick="editWorkout(${workout.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn btn-danger" onclick="deleteWorkout(${workout.id})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Get icon for workout type
+        function getWorkoutIcon(type) {
+            switch(type) {
+                case 'Cardio': return '<i class="fas fa-heartbeat"></i>';
+                case 'Strength': return '<i class="fas fa-dumbbell"></i>';
+                case 'Flexibility': return '<i class="fas fa-spa"></i>';
+                case 'HIIT': return '<i class="fas fa-fire"></i>';
+                case 'Yoga': return '<i class="fas fa-pray"></i>';
+                default: return '<i class="fas fa-running"></i>';
+            }
+        }
+        
+        // Edit workout (placeholder)
+        function editWorkout(id) {
+            alert('Edit functionality would be implemented here');
+        }
+        
+        // Delete workout
+        function deleteWorkout(id) {
+            if (confirm('Are you sure you want to delete this workout?')) {
+                workouts = workouts.filter(workout => workout.id !== id);
+                localStorage.setItem('workouts', JSON.stringify(workouts));
+                renderWorkouts();
+                updateStats();
+                setupCalendar();
+            }
+        }
+        
+        // Update statistics
+        function updateStats() {
+            // Total workouts
+            const totalWorkouts = workouts.length;
+            totalWorkoutsEl.textContent = totalWorkouts;
+            totalWorkoutsMobileEl.textContent = totalWorkouts;
+            
+            // Total minutes
+            const totalMinutes = workouts.reduce((sum, workout) => sum + workout.duration, 0);
+            totalMinutesEl.textContent = totalMinutes;
+            totalMinutesMobileEl.textContent = totalMinutes;
+            
+            // Total calories
+            const totalCalories = workouts.reduce((sum, workout) => sum + (workout.calories || 0), 0);
+            totalCaloriesEl.textContent = totalCalories;
+            totalCaloriesMobileEl.textContent = totalCalories;
+            
+            // Most common workout type
+            if (workouts.length > 0) {
+                const typeCount = {};
+                workouts.forEach(workout => {
+                    typeCount[workout.type] = (typeCount[workout.type] || 0) + 1;
+                });
+                
+                const favoriteType = Object.keys(typeCount).reduce((a, b) => 
+                    typeCount[a] > typeCount[b] ? a : b
+                );
+                
+                favoriteTypeEl.textContent = favoriteType;
+            } else {
+                favoriteTypeEl.textContent = '-';
+            }
+        }
+        
+        // Setup calendar view
+        function setupCalendar() {
+            const calendarView = document.getElementById('calendarView');
+            calendarView.innerHTML = '';
+            
+            // Generate days for current month
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Create day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.innerHTML = `<strong>${day}</strong>`;
+                calendarView.appendChild(dayEl);
+            });
+            
+            // Add empty cells for days before the first day
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarView.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.textContent = day;
+                
+                // Check if there are workouts on this day
+                const workoutsOnDay = workouts.filter(workout => {
+                    const workoutDate = new Date(workout.date);
+                    return workoutDate.getDate() === day && 
+                           workoutDate.getMonth() === month && 
+                           workoutDate.getFullYear() === year;
+                });
+                
+                if (workoutsOnDay.length > 0) {
+                    dayEl.classList.add('has-workout');
+                }
+                
+                calendarView.appendChild(dayEl);
+            }
+        }
+        
+        // Setup timer functionality
+        function setupTimer() {
+            startTimer.addEventListener('click', startTimerFunction);
+            stopTimer.addEventListener('click', stopTimerFunction);
+            resetTimer.addEventListener('click', resetTimerFunction);
+            
+            startTimerMobile.addEventListener('click', startTimerFunction);
+            stopTimerMobile.addEventListener('click', stopTimerFunction);
+            resetTimerMobile.addEventListener('click', resetTimerFunction);
+        }
+        
+        // Start timer
+        function startTimerFunction() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+        
+        // Stop timer
+        function stopTimerFunction() {
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+            }
+        }
+        
+        // Reset timer
+        function resetTimerFunction() {
+            stopTimerFunction();
+            timerSeconds = 0;
+            updateTimerDisplay();
+        }
+        
+        // Set preset timer
+        function setPresetTimer(e) {
+            const seconds = parseInt(e.target.value);
+            if (!isNaN(seconds)) {
+                timerSeconds = seconds;
+                updateTimerDisplay();
+            }
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
+            const seconds = timerSeconds % 60;
+            
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            timerDisplay.textContent = timeString;
+            timerDisplayMobile.textContent = timeString;
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

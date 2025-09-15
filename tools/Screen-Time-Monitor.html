@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<!-- Category: Productivity & Time Management -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Time Monitor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f4c75, #3282b8, #0f4c75);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Desktop Styles */
+        .desktop-view {
+            display: block;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mobile-view {
+            display: none;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: #0f4c75;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        h1 i {
+            color: #3282b8;
+        }
+
+        .subtitle {
+            color: #3282b8;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .history-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        h2 {
+            color: #0f4c75;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3282b8;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0f4c75;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #0f4c75;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 76, 117, 0.2);
+        }
+
+        button {
+            background: linear-gradient(to right, #0f4c75, #3282b8);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #495057);
+            margin-top: 10px;
+        }
+
+        .btn-warning {
+            background: linear-gradient(to right, #ffc107, #e0a800);
+        }
+
+        .btn-danger {
+            background: linear-gradient(to right, #dc3545, #bd2130);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #0f4c75, #1b6ca8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-left: 4px solid #0f4c75;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .history-time {
+            color: #3282b8;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            width: auto;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #bd2130;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .daily-limit {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .limit-progress {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #FF5722);
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        .limit-text {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .limit-indicator {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .screen-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0f4c75;
+        }
+
+        .info-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            background: linear-gradient(to top, #0f4c75, #1b6ca8);
+            border-radius: 5px 5px 0 0;
+            text-align: center;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 30px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal h3 {
+            color: #0f4c75;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(200%);
+            transition: transform 0.3s;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(to right, #28a745, #218838);
+        }
+
+        .notification.warning {
+            background: linear-gradient(to right, #ffc107, #e0a800);
+        }
+
+        .notification.error {
+            background: linear-gradient(to right, #dc3545, #c82333);
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            text-align: center;
+            font-weight: 700;
+            color: #0f4c75;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .timer-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+
+        .btn-stop {
+            background: linear-gradient(to right, #dc3545, #bd2130);
+        }
+
+        .btn-pause {
+            background: linear-gradient(to right, #ffc107, #e0a800);
+        }
+
+        .goal-section {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .goal-progress {
+            height: 15px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        .goal-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #0f4c75;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background: #0f4c75;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .export-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+
+        .active-filter {
+            background: #0f4c75;
+            color: white;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .desktop-view {
+                display: none;
+            }
+
+            .mobile-view {
+                display: block;
+            }
+
+            body {
+                padding: 0;
+                background: linear-gradient(135deg, #0f4c75, #3282b8);
+            }
+
+            header {
+                height: 50px;
+                border-radius: 0;
+                padding: 10px;
+                margin-bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+                margin: 0;
+            }
+
+            h1 i {
+                font-size: 1rem;
+            }
+
+            .subtitle {
+                display: none;
+            }
+
+            .container {
+                display: block;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .input-section, .history-section {
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+                margin: 5px 0;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .history-item {
+                padding: 12px;
+            }
+
+            .history-header {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            input, select {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .daily-limit {
+                height: 15px;
+            }
+
+            .limit-text {
+                font-size: 0.8rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .timer-display {
+                font-size: 2rem;
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .timer-controls {
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .timer-btn {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .goal-section {
+                padding: 10px;
+            }
+
+            .goal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .export-section {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop View -->
+    <div class="desktop-view">
+        <header>
+            <h1><i class="fas fa-desktop"></i> Screen Time Monitor</h1>
+            <div class="subtitle">Track and manage your screen time for better digital wellness</div>
+        </header>
+
+        <div class="container">
+            <section class="input-section">
+                <div class="tabs">
+                    <button class="tab active" data-tab="manual">Manual Entry</button>
+                    <button class="tab" data-tab="timer">Timer</button>
+                    <button class="tab" data-tab="goals">Goals</button>
+                </div>
+
+                <div class="tab-content active" id="manual-tab">
+                    <h2><i class="fas fa-plus-circle"></i> Add Screen Time</h2>
+                    <form id="screen-form">
+                        <div class="form-group">
+                            <label for="activity-type">Activity Type</label>
+                            <select id="activity-type" required>
+                                <option value="">Select an activity</option>
+                                <option value="work">Work/Study</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="social">Social Media</option>
+                                <option value="gaming">Gaming</option>
+                                <option value="browsing">Web Browsing</option>
+                                <option value="video">Video Calls</option>
+                                <option value="reading">Reading</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hours">Hours</label>
+                                <input type="number" id="hours" min="0" max="24" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="minutes">Minutes</label>
+                                <input type="number" id="minutes" min="0" max="59" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="seconds">Seconds</label>
+                                <input type="number" id="seconds" min="0" max="59" placeholder="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-name">Activity Name (Optional)</label>
+                            <input type="text" id="activity-name" placeholder="e.g., Project Work, Netflix">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Notes (Optional)</label>
+                            <textarea id="notes" rows="2" placeholder="What did you do? How did you feel?"></textarea>
+                        </div>
+
+                        <button type="submit"><i class="fas fa-plus"></i> Add to Log</button>
+                    </form>
+                </div>
+
+                <div class="tab-content" id="timer-tab">
+                    <h2><i class="fas fa-clock"></i> Screen Time Timer</h2>
+                    <div class="timer-display" id="timer-display">00:00:00</div>
+                    <div class="timer-controls">
+                        <button type="button" class="timer-btn" id="start-timer-btn"><i class="fas fa-play"></i> Start</button>
+                        <button type="button" class="timer-btn btn-pause" id="pause-timer-btn"><i class="fas fa-pause"></i> Pause</button>
+                        <button type="button" class="timer-btn btn-stop" id="stop-timer-btn"><i class="fas fa-stop"></i> Stop</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="timer-activity">Activity Type</label>
+                        <select id="timer-activity">
+                            <option value="work">Work/Study</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="social">Social Media</option>
+                            <option value="gaming">Gaming</option>
+                            <option value="browsing">Web Browsing</option>
+                            <option value="video">Video Calls</option>
+                            <option value="reading">Reading</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="timer-notes">Notes (Optional)</label>
+                        <textarea id="timer-notes" rows="2" placeholder="What are you doing?"></textarea>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="goals-tab">
+                    <h2><i class="fas fa-bullseye"></i> Set Screen Time Goals</h2>
+                    <div class="form-group">
+                        <label for="daily-goal">Daily Goal (hours)</label>
+                        <input type="number" id="daily-goal" min="1" max="24" value="4" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="weekly-goal">Weekly Goal (hours)</label>
+                        <input type="number" id="weekly-goal" min="1" max="168" value="28" step="1">
+                    </div>
+                    <button type="button" id="save-goals-btn"><i class="fas fa-save"></i> Save Goals</button>
+                    
+                    <div class="goal-section">
+                        <div class="goal-header">
+                            <h3>Daily Progress</h3>
+                            <span id="daily-goal-value">4h</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-bar" id="daily-goal-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="goal-info">
+                            <span id="daily-current">0h 0m</span>
+                            <span id="daily-remaining">4h remaining</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screen-info">
+                    <div class="info-title">Screen Time Information</div>
+                    <div class="info-content">
+                        <p><strong>Recommended Daily Limit:</strong> 2-4 hours for recreational screen time</p>
+                        <p><strong>Health Tips:</strong> Take breaks every 30-60 minutes, follow the 20-20-20 rule</p>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Today's Total</div>
+                        <div class="stat-value" id="total-time">0h 0m</div>
+                        <div class="stat-label">Screen Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Daily Goal</div>
+                        <div class="stat-value" id="daily-goal-display">4h</div>
+                        <div class="stat-label">Recommended</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Entries</div>
+                        <div class="stat-value" id="entry-count">0</div>
+                        <div class="stat-label">Activities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Most Used</div>
+                        <div class="stat-value" id="most-used">-</div>
+                        <div class="stat-label">Activity</div>
+                    </div>
+                </div>
+
+                <div class="daily-limit">
+                    <div class="limit-progress" id="limit-progress" style="width: 0%"></div>
+                </div>
+                <div class="limit-text" id="limit-text">0% of daily recommended limit</div>
+                <div class="limit-indicator">
+                    <span>0h</span>
+                    <span>2h</span>
+                    <span>4h</span>
+                </div>
+
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+            </section>
+
+            <section class="history-section">
+                <h2><i class="fas fa-history"></i> Activity History</h2>
+                <div class="filter-section">
+                    <button class="filter-btn active-filter" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="work">Work</button>
+                    <button class="filter-btn" data-filter="entertainment">Entertainment</button>
+                    <button class="filter-btn" data-filter="social">Social</button>
+                </div>
+                <div class="form-group">
+                    <label for="date-filter">Filter by Date</label>
+                    <input type="date" id="date-filter">
+                </div>
+                <div class="export-section">
+                    <button type="button" class="export-btn btn-warning" id="export-csv-btn"><i class="fas fa-file-csv"></i> Export CSV</button>
+                    <button type="button" class="export-btn btn-danger" id="clear-data-btn"><i class="fas fa-trash"></i> Clear Data</button>
+                </div>
+                <div id="history-list">
+                    <div class="empty-history">No screen time activities recorded yet</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+        <header>
+            <h1><i class="fas fa-desktop"></i> Screen Time Monitor</h1>
+        </header>
+
+        <div class="container">
+            <section class="input-section">
+                <div class="tabs">
+                    <button class="tab active" data-tab="manual-mobile">Manual</button>
+                    <button class="tab" data-tab="timer-mobile">Timer</button>
+                </div>
+
+                <div class="tab-content active" id="manual-mobile-tab">
+                    <h2><i class="fas fa-plus-circle"></i> Add Time</h2>
+                    <form id="screen-form-mobile">
+                        <div class="form-group">
+                            <label for="activity-type-mobile">Activity Type</label>
+                            <select id="activity-type-mobile" required>
+                                <option value="">Select</option>
+                                <option value="work">Work/Study</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="social">Social Media</option>
+                                <option value="gaming">Gaming</option>
+                                <option value="browsing">Web Browsing</option>
+                                <option value="video">Video Calls</option>
+                                <option value="reading">Reading</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hours-mobile">Hours</label>
+                                <input type="number" id="hours-mobile" min="0" max="24" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="minutes-mobile">Minutes</label>
+                                <input type="number" id="minutes-mobile" min="0" max="59" placeholder="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-name-mobile">Name (Optional)</label>
+                            <input type="text" id="activity-name-mobile" placeholder="e.g., Project Work">
+                        </div>
+
+                        <button type="submit"><i class="fas fa-plus"></i> Add Time</button>
+                    </form>
+                </div>
+
+                <div class="tab-content" id="timer-mobile-tab">
+                    <h2><i class="fas fa-clock"></i> Timer</h2>
+                    <div class="timer-display" id="timer-display-mobile">00:00:00</div>
+                    <div class="timer-controls">
+                        <button type="button" class="timer-btn" id="start-timer-btn-mobile"><i class="fas fa-play"></i> Start</button>
+                        <button type="button" class="timer-btn btn-pause" id="pause-timer-btn-mobile"><i class="fas fa-pause"></i> Pause</button>
+                        <button type="button" class="timer-btn btn-stop" id="stop-timer-btn-mobile"><i class="fas fa-stop"></i> Stop</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="timer-activity-mobile">Activity</label>
+                        <select id="timer-activity-mobile">
+                            <option value="work">Work/Study</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="social">Social Media</option>
+                            <option value="gaming">Gaming</option>
+                            <option value="browsing">Web Browsing</option>
+                            <option value="video">Video Calls</option>
+                            <option value="reading">Reading</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Today</div>
+                        <div class="stat-value" id="total-time-mobile">0h 0m</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Entries</div>
+                        <div class="stat-value" id="entry-count-mobile">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Goal</div>
+                        <div class="stat-value" id="daily-goal-mobile">4h</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Most Used</div>
+                        <div class="stat-value" id="most-used-mobile">-</div>
+                    </div>
+                </div>
+
+                <div class="daily-limit">
+                    <div class="limit-progress" id="limit-progress-mobile" style="width: 0%"></div>
+                </div>
+                <div class="limit-text" id="limit-text-mobile">0% of daily limit</div>
+            </section>
+
+            <section class="history-section">
+                <h2><i class="fas fa-history"></i> History</h2>
+                <div class="filter-section">
+                    <button class="filter-btn active-filter" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="work">Work</button>
+                    <button class="filter-btn" data-filter="entertainment">Entertainment</button>
+                </div>
+                <div id="history-list-mobile">
+                    <div class="empty-history">No activities yet</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Timer Modal -->
+    <div class="modal" id="timer-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-timer-modal">&times;</span>
+            <h3><i class="fas fa-clock"></i> Save Timer Session</h3>
+            <div class="timer-display" id="modal-timer-display">00:00:00</div>
+            <div class="form-group">
+                <label for="modal-timer-activity">Activity Type</label>
+                <select id="modal-timer-activity">
+                    <option value="work">Work/Study</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="social">Social Media</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="browsing">Web Browsing</option>
+                    <option value="video">Video Calls</option>
+                    <option value="reading">Reading</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="modal-timer-notes">Notes (Optional)</label>
+                <textarea id="modal-timer-notes" rows="2" placeholder="What did you do?"></textarea>
+            </div>
+            <button type="button" id="save-timer-btn"><i class="fas fa-save"></i> Save Time</button>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Activity type data
+        const activityData = {
+            'work': { color: '#0f4c75', icon: 'briefcase' },
+            'entertainment': { color: '#3282b8', icon: 'film' },
+            'social': { color: '#00bcd4', icon: 'comments' },
+            'gaming': { color: '#ff5722', icon: 'gamepad' },
+            'browsing': { color: '#4caf50', icon: 'globe' },
+            'video': { color: '#9c27b0', icon: 'video' },
+            'reading': { color: '#ff9800', icon: 'book' },
+            'other': { color: '#9e9e9e', icon: 'ellipsis-h' }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data from localStorage
+            loadScreenTimeData();
+            loadGoals();
+            
+            // Set up form submissions
+            document.getElementById('screen-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('screen-form-mobile').addEventListener('submit', handleFormSubmit);
+            
+            // Set up tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    const isMobile = tabName.includes('mobile');
+                    
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                });
+            });
+            
+            // Set up timer functionality
+            document.getElementById('start-timer-btn').addEventListener('click', startTimer);
+            document.getElementById('start-timer-btn-mobile').addEventListener('click', startTimer);
+            
+            document.getElementById('stop-timer-btn').addEventListener('click', stopTimer);
+            document.getElementById('stop-timer-btn-mobile').addEventListener('click', stopTimer);
+            
+            document.getElementById('pause-timer-btn').addEventListener('click', pauseTimer);
+            document.getElementById('pause-timer-btn-mobile').addEventListener('click', pauseTimer);
+            
+            // Set up timer modal
+            document.getElementById('close-timer-modal').addEventListener('click', function() {
+                document.getElementById('timer-modal').style.display = 'none';
+            });
+            
+            document.getElementById('save-timer-btn').addEventListener('click', saveTimerTime);
+            
+            // Set up goals
+            document.getElementById('save-goals-btn').addEventListener('click', saveGoals);
+            
+            // Set up date filter
+            document.getElementById('date-filter').addEventListener('change', updateDisplay);
+            
+            // Set up filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+                    this.classList.add('active-filter');
+                    updateDisplay();
+                });
+            });
+            
+            // Set up export and clear buttons
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+            document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date-filter').value = today;
+        });
+
+        let screenTimeData = [];
+        let dailyGoal = 4;
+        let weeklyGoal = 28;
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let timerRunning = false;
+        let timerPaused = false;
+        let activeFilter = 'all';
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Determine if mobile or desktop form
+            const isMobile = e.target.id.includes('mobile');
+            const activityType = document.getElementById(isMobile ? 'activity-type-mobile' : 'activity-type').value;
+            const hours = parseInt(document.getElementById(isMobile ? 'hours-mobile' : 'hours').value) || 0;
+            const minutes = parseInt(document.getElementById(isMobile ? 'minutes-mobile' : 'minutes').value) || 0;
+            const seconds = parseInt(document.getElementById(isMobile ? 'seconds-mobile' : 'seconds').value) || 0;
+            const activityName = document.getElementById(isMobile ? 'activity-name-mobile' : 'activity-name')?.value || '';
+            const notes = document.getElementById(isMobile ? 'notes' : 'notes')?.value || '';
+            
+            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+            
+            if (totalSeconds <= 0) {
+                showNotification('Please enter a valid time duration', 'error');
+                return;
+            }
+            
+            // Add to data
+            const entry = {
+                id: Date.now(),
+                activityType,
+                activityName,
+                hours,
+                minutes,
+                seconds,
+                totalSeconds,
+                notes,
+                timestamp: new Date()
+            };
+            
+            screenTimeData.push(entry);
+            saveScreenTimeData();
+            updateDisplay();
+            
+            // Reset form
+            e.target.reset();
+            
+            // Show notification
+            showNotification(`Added ${hours}h ${minutes}m of screen time`, 'success');
+        }
+
+        function startTimer() {
+            if (timerRunning && !timerPaused) {
+                showNotification('Timer is already running', 'warning');
+                return;
+            }
+            
+            if (timerPaused) {
+                timerPaused = false;
+                timerRunning = true;
+                startTimerInterval();
+                showNotification('Timer resumed', 'success');
+                return;
+            }
+            
+            timerSeconds = 0;
+            timerRunning = true;
+            timerPaused = false;
+            startTimerInterval();
+            
+            showNotification('Timer started', 'success');
+        }
+
+        function startTimerInterval() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const display = document.getElementById('timer-display') || document.getElementById('timer-display-mobile');
+                if (display) display.textContent = formatTime(timerSeconds);
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!timerRunning) {
+                showNotification('Timer is not running', 'warning');
+                return;
+            }
+            
+            if (timerPaused) {
+                timerPaused = false;
+                startTimerInterval();
+                showNotification('Timer resumed', 'success');
+            } else {
+                timerPaused = true;
+                clearInterval(timerInterval);
+                showNotification('Timer paused', 'success');
+            }
+        }
+
+        function stopTimer() {
+            if (!timerRunning) {
+                showNotification('Timer is not running', 'warning');
+                return;
+            }
+            
+            clearInterval(timerInterval);
+            timerRunning = false;
+            timerPaused = false;
+            
+            // Show modal to save time
+            document.getElementById('timer-modal').style.display = 'flex';
+            document.getElementById('modal-timer-display').textContent = formatTime(timerSeconds);
+            document.getElementById('modal-timer-activity').value = document.getElementById('timer-activity')?.value || 
+                document.getElementById('timer-activity-mobile')?.value || 'other';
+            
+            showNotification('Timer stopped', 'success');
+        }
+
+        function saveTimerTime() {
+            const activityType = document.getElementById('modal-timer-activity').value;
+            const notes = document.getElementById('modal-timer-notes').value || '';
+            const activityName = activityType.charAt(0).toUpperCase() + activityType.slice(1) + ' Timer';
+            
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
+            const seconds = timerSeconds % 60;
+            
+            const entry = {
+                id: Date.now(),
+                activityType,
+                activityName,
+                hours,
+                minutes,
+                seconds,
+                totalSeconds: timerSeconds,
+                notes,
+                timestamp: new Date()
+            };
+            
+            screenTimeData.push(entry);
+            saveScreenTimeData();
+            updateDisplay();
+            
+            // Reset timer
+            timerSeconds = 0;
+            const display = document.getElementById('timer-display') || document.getElementById('timer-display-mobile');
+            if (display) display.textContent = '00:00:00';
+            document.getElementById('timer-modal').style.display = 'none';
+            document.getElementById('modal-timer-notes').value = '';
+            
+            showNotification(`Saved ${hours}h ${minutes}m of screen time`, 'success');
+        }
+
+        function deleteEntry(id) {
+            screenTimeData = screenTimeData.filter(entry => entry.id !== id);
+            saveScreenTimeData();
+            updateDisplay();
+            showNotification('Entry deleted', 'success');
+        }
+
+        function saveScreenTimeData() {
+            localStorage.setItem('screenTimeData', JSON.stringify(screenTimeData));
+        }
+
+        function loadScreenTimeData() {
+            const data = localStorage.getItem('screenTimeData');
+            if (data) {
+                screenTimeData = JSON.parse(data);
+                // Convert timestamp strings back to Date objects
+                screenTimeData.forEach(entry => {
+                    entry.timestamp = new Date(entry.timestamp);
+                });
+            }
+            updateDisplay();
+        }
+
+        function saveGoals() {
+            dailyGoal = parseFloat(document.getElementById('daily-goal').value) || 4;
+            weeklyGoal = parseFloat(document.getElementById('weekly-goal').value) || 28;
+            
+            localStorage.setItem('screenTimeGoals', JSON.stringify({
+                dailyGoal,
+                weeklyGoal
+            }));
+            
+            updateDisplay();
+            showNotification('Goals saved successfully', 'success');
+        }
+
+        function loadGoals() {
+            const goals = localStorage.getItem('screenTimeGoals');
+            if (goals) {
+                const parsed = JSON.parse(goals);
+                dailyGoal = parsed.dailyGoal || 4;
+                weeklyGoal = parsed.weeklyGoal || 28;
+            }
+            document.getElementById('daily-goal').value = dailyGoal;
+            document.getElementById('weekly-goal').value = weeklyGoal;
+        }
+
+        function updateDisplay() {
+            // Get selected date or use today
+            const selectedDate = document.getElementById('date-filter')?.value;
+            const filterDate = selectedDate ? new Date(selectedDate) : new Date();
+            filterDate.setHours(0, 0, 0, 0);
+            
+            // Get active filter
+            activeFilter = document.querySelector('.filter-btn.active-filter')?.getAttribute('data-filter') || 'all';
+            
+            // Filter entries for the selected date and filter
+            let filteredEntries = screenTimeData.filter(entry => {
+                const entryDate = new Date(entry.timestamp);
+                entryDate.setHours(0, 0, 0, 0);
+                const dateMatch = entryDate.getTime() === filterDate.getTime();
+                const filterMatch = activeFilter === 'all' || entry.activityType === activeFilter;
+                return dateMatch && filterMatch;
+            });
+            
+            // Calculate total time
+            const totalSeconds = filteredEntries.reduce((sum, entry) => sum + entry.totalSeconds, 0);
+            const totalHours = Math.floor(totalSeconds / 3600);
+            const totalMinutes = Math.floor((totalSeconds % 3600) / 60);
+            const entryCount = filteredEntries.length;
+            
+            // Find most used activity
+            const activityCounts = {};
+            filteredEntries.forEach(entry => {
+                const type = entry.activityType;
+                if (!activityCounts[type]) activityCounts[type] = 0;
+                activityCounts[type] += entry.totalSeconds;
+            });
+            
+            let mostUsedActivity = '-';
+            if (Object.keys(activityCounts).length > 0) {
+                mostUsedActivity = Object.keys(activityCounts).reduce((a, b) => 
+                    activityCounts[a] > activityCounts[b] ? a : b
+                );
+                mostUsedActivity = mostUsedActivity.charAt(0).toUpperCase() + mostUsedActivity.slice(1);
+            }
+            
+            // Update desktop stats
+            document.getElementById('total-time').textContent = `${totalHours}h ${totalMinutes}m`;
+            document.getElementById('entry-count').textContent = entryCount;
+            document.getElementById('most-used').textContent = mostUsedActivity;
+            document.getElementById('daily-goal-display').textContent = `${dailyGoal}h`;
+            
+            // Update mobile stats
+            document.getElementById('total-time-mobile').textContent = `${totalHours}h ${totalMinutes}m`;
+            document.getElementById('entry-count-mobile').textContent = entryCount;
+            document.getElementById('most-used-mobile').textContent = mostUsedActivity;
+            document.getElementById('daily-goal-mobile').textContent = `${dailyGoal}h`;
+            
+            // Update progress bar
+            const percentage = Math.min(100, (totalHours / dailyGoal) * 100);
+            document.getElementById('limit-progress').style.width = `${percentage}%`;
+            document.getElementById('limit-progress-mobile').style.width = `${percentage}%`;
+            
+            document.getElementById('limit-text').textContent = `${Math.round(percentage)}% of daily recommended limit`;
+            document.getElementById('limit-text-mobile').textContent = `${Math.round(percentage)}% of daily limit`;
+            
+            // Update goal section
+            const remainingHours = Math.max(0, dailyGoal - totalHours);
+            const remainingMinutes = Math.max(0, Math.floor((dailyGoal * 3600 - totalSeconds) / 60));
+            document.getElementById('daily-goal-value').textContent = `${dailyGoal}h`;
+            document.getElementById('daily-goal-progress').style.width = `${percentage}%`;
+            document.getElementById('daily-current').textContent = `${totalHours}h ${totalMinutes}m`;
+            document.getElementById('daily-remaining').textContent = `${remainingHours}h ${remainingMinutes % 60}m remaining`;
+            
+            // Update history for desktop
+            const historyList = document.getElementById('history-list');
+            if (filteredEntries.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">No screen time activities recorded for this date</div>';
+            } else {
+                // Sort by timestamp descending
+                const sortedEntries = [...filteredEntries].sort((a, b) => b.timestamp - a.timestamp);
+                historyList.innerHTML = sortedEntries.map(entry => `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <span>
+                                <i class="fas fa-${activityData[entry.activityType]?.icon || 'question-circle'}"></i>
+                                ${entry.activityName || entry.activityType.charAt(0).toUpperCase() + entry.activityType.slice(1)}
+                            </span>
+                            <button class="delete-btn" onclick="deleteEntry(${entry.id})"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                        <div><strong>${entry.hours}h ${entry.minutes}m ${entry.seconds}s</strong></div>
+                        ${entry.notes ? `<div><i class="fas fa-comment"></i> ${entry.notes}</div>` : ''}
+                        <div class="history-time"><i class="far fa-clock"></i> ${formatTimeOnly(entry.timestamp)}</div>
+                    </div>
+                `).join('');
+            }
+            
+            // Update history for mobile
+            const historyListMobile = document.getElementById('history-list-mobile');
+            if (filteredEntries.length === 0) {
+                historyListMobile.innerHTML = '<div class="empty-history">No activities for this date</div>';
+            } else {
+                // Sort by timestamp descending
+                const sortedEntries = [...filteredEntries].sort((a, b) => b.timestamp - a.timestamp);
+                historyListMobile.innerHTML = sortedEntries.map(entry => `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <span>
+                                <i class="fas fa-${activityData[entry.activityType]?.icon || 'question-circle'}"></i>
+                                ${entry.activityName || entry.activityType.charAt(0).toUpperCase() + entry.activityType.slice(1)}
+                            </span>
+                            <button class="delete-btn" onclick="deleteEntry(${entry.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div><strong>${entry.hours}h ${entry.minutes}m</strong></div>
+                        <div class="history-time">${formatTimeOnly(entry.timestamp)}</div>
+                    </div>
+                `).join('');
+            }
+            
+            // Update chart
+            updateChart(filteredEntries);
+        }
+
+        function updateChart(entries) {
+            const chartContainer = document.getElementById('chart-container');
+            if (!chartContainer) return;
+            
+            if (entries.length === 0) {
+                chartContainer.innerHTML = '<div class="empty-history">No data to display</div>';
+                return;
+            }
+            
+            // Group by activity type
+            const activityTypes = {};
+            entries.forEach(entry => {
+                const type = entry.activityName || entry.activityType;
+                if (!activityTypes[type]) {
+                    activityTypes[type] = 0;
+                }
+                activityTypes[type] += entry.totalSeconds;
+            });
+            
+            // Create chart
+            const types = Object.keys(activityTypes);
+            const maxSeconds = Math.max(...Object.values(activityTypes));
+            const chartWidth = types.length * 40;
+            chartContainer.style.width = `${Math.max(300, chartWidth)}px`;
+            
+            chartContainer.innerHTML = types.map((type, index) => {
+                const seconds = activityTypes[type];
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const height = (seconds / maxSeconds) * 150;
+                const left = index * 40;
+                
+                return `
+                    <div class="chart-bar" style="height: ${height}px; left: ${left}px;">
+                        ${hours > 0 ? `${hours}h` : ''}${minutes}m
+                    </div>
+                    <div class="chart-label" style="left: ${left}px;">
+                        ${type.length > 8 ? type.substring(0, 8) + '...' : type}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatTimeOnly(date) {
+            return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString([], {month: 'short', day: 'numeric'});
+        }
+
+        function exportToCSV() {
+            if (screenTimeData.length === 0) {
+                showNotification('No data to export', 'warning');
+                return;
+            }
+            
+            let csv = 'Date,Activity Type,Activity Name,Hours,Minutes,Seconds,Total Seconds,Notes\n';
+            
+            screenTimeData.forEach(entry => {
+                const date = entry.timestamp.toLocaleDateString();
+                const activityType = entry.activityType;
+                const activityName = entry.activityName || '';
+                const hours = entry.hours;
+                const minutes = entry.minutes;
+                const seconds = entry.seconds;
+                const totalSeconds = entry.totalSeconds;
+                const notes = entry.notes ? `"${entry.notes.replace(/"/g, '""')}"` : '';
+                
+                csv += `${date},${activityType},"${activityName}",${hours},${minutes},${seconds},${totalSeconds},${notes}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'screen_time_data.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showNotification('Data exported successfully', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all screen time data? This cannot be undone.')) {
+                screenTimeData = [];
+                localStorage.removeItem('screenTimeData');
+                updateDisplay();
+                showNotification('All data cleared', 'success');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Make functions available globally
+        window.deleteEntry = deleteEntry;
+    </script>
+</body>
+</html>
