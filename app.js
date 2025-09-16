@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let toolsData = [];
     
+    // The large toolsData_fallback array has been removed from here for faster initial load.
+    
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const mainHeader = document.querySelector('.main-header');
     const hamburgerMenu = document.getElementById('hamburger-menu');
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const RECENTLY_USED_LIMIT = 100;
     let lastScrollTop = 0;
 
+    // Variables for profile and sign-in
     const profileLink = document.getElementById('profile-link');
     const profileSignInModal = document.getElementById('profileSignInModal');
     const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
@@ -51,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveRecentlyUsed = () => localStorage.setItem('toolHubRecent', JSON.stringify(recentlyUsed));
     const saveAlarms = () => localStorage.setItem('toolHubAlarms', JSON.stringify(activeAlarms));
 
+    // --- Authentication Functions ---
+    
     function decodeJwtResponse(token) {
         try {
             const base64Url = token.split('.')[1];
@@ -183,21 +188,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderYourWorkView = () => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
         const startOfView = new Date(calendarDisplayDate);
         startOfView.setDate(calendarDisplayDate.getDate() - 2); 
         startOfView.setHours(0, 0, 0, 0);
+
         const endOfView = new Date(startOfView);
         endOfView.setDate(startOfView.getDate() + 5);
         endOfView.setSeconds(endOfView.getSeconds() - 1);
+        
         const endRangeDate = new Date(startOfView);
         endRangeDate.setDate(startOfView.getDate() + 4);
+
         const formatRange = (start, end) => { const options = { month: 'short', day: 'numeric' }; return `${start.toLocaleDateString(undefined, options)} - ${end.toLocaleDateString(undefined, {...options, year: 'numeric'})}`; }
+        
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
             if (alarm.triggered && alarm.frequency === 'one-time') return;
             let occurrence = new Date(alarm.startTime);
             const searchStart = new Date(startOfView.getTime() - 31 * 24*60*60*1000);
             if (occurrence > endOfView) return;
+
             if (occurrence < searchStart && alarm.frequency !== 'one-time') {
                  while(occurrence < searchStart) {
                     const nextOccurrence = getNextOccurrence(occurrence, alarm.frequency, alarm.startTime);
@@ -205,9 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     occurrence = nextOccurrence;
                 }
             }
+
             while (occurrence <= endOfView) {
                 if (occurrence >= startOfView) { allEvents.push({ alarmId, date: new Date(occurrence), name: alarm.toolName, toolId: alarm.toolId, isCompleted: occurrence.getTime() < now.getTime() }); }
                 if (alarm.frequency === 'one-time') break;
+                
                 const nextOccurrence = getNextOccurrence(occurrence, alarm.frequency, alarm.startTime);
                 if (!nextOccurrence || nextOccurrence <= occurrence) break; 
                 occurrence = nextOccurrence;
@@ -282,77 +295,56 @@ document.addEventListener('DOMContentLoaded', () => {
         if (alarmsChanged) { saveAlarms(); }
     };
 
-    const showTool = async (toolId, toolName, saveHistory = true) => {
-        if (!preFetchPromises.has(toolId)) {
-            preFetchToolOnDemand(toolId);
-        }
-        try {
-            await preFetchPromises.get(toolId);
-        } catch (e) {
-            alert('Sorry, this tool could not be loaded.');
-            return;
-        }
-        const toolContent = document.getElementById(`cache-${toolId}`);
-        if (!toolContent) {
-            alert('An unexpected error occurred while loading the tool.');
-            return;
-        }
-        toolViewerContainer.innerHTML = `
-            <div class="container">
-                <div class="sub-view-header">
-                    <button id="back-to-tools-btn" class="btn-back" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
-                    <div class="reminder-controls-desktop">
-                         <input type="datetime-local" id="reminderInput">
-                         <select id="reminderFrequencyDesktop">
-                            <option value="one-time">One time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option>
-                         </select>
-                         <button id="setReminderBtn">My Work & Set Reminder</button>
-                    </div>
-                    <button class="add-event-mobile-btn" title="Add Event" aria-label="Add event or reminder"><i class="fas fa-calendar-plus"></i></button>
+    const createToolViewerHTML = (toolId, toolName) => {
+        const saneToolName = sanitizeHTML(toolName);
+        return `<div class="container">
+            <div class="sub-view-header">
+                <button id="back-to-tools-btn" class="btn-back" aria-label="Go back"><i class="fas fa-arrow-left"></i></button>
+                <div class="reminder-controls-desktop">
+                     <input type="datetime-local" id="reminderInput">
+                     <select id="reminderFrequencyDesktop">
+                        <option value="one-time">One time</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                     </select>
+                     <button id="setReminderBtn">My Work & Set Reminder</button>
                 </div>
-                <div class="tool-viewer-content" id="tool-viewer-content-area"></div>
-            </div>`;
-        const contentArea = document.getElementById('tool-viewer-content-area');
-        contentArea.appendChild(toolContent);
-        document.body.classList.add('tool-view-active');
-        mainContentWrapper.style.display = 'none';
-        toolViewerContainer.style.display = 'block';
+                <button class="add-event-mobile-btn" title="Add Event" aria-label="Add event or reminder"><i class="fas fa-calendar-plus"></i></button>
+            </div>
+            <div class="tool-viewer-content">
+                <iframe id="tool-iframe" src="/tools/${toolId}.html" title="${saneToolName}" frameborder="0"></iframe>
+            </div>
+        </div>`;
+    };
+    const showTool = (toolId, toolName, saveHistory = true) => {
+        document.body.classList.add('tool-view-active'); mainContentWrapper.style.display = 'none'; toolViewerContainer.innerHTML = createToolViewerHTML(toolId, toolName); toolViewerContainer.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
         if (saveHistory) {
             history.pushState({ toolId: toolId }, toolName, `/tool/${toolId}`);
         }
-        const reminderInput = document.getElementById('reminderInput');
-        const setReminderBtn = document.getElementById('setReminderBtn');
-        const frequencySelect = document.getElementById('reminderFrequencyDesktop');
-        const addEventMobileBtn = document.querySelector('.add-event-mobile-btn');
+        const reminderInput = document.getElementById('reminderInput'); const setReminderBtn = document.getElementById('setReminderBtn'); const frequencySelect = document.getElementById('reminderFrequencyDesktop'); const addEventMobileBtn = document.querySelector('.add-event-mobile-btn');
         const handleReminderSet = () => {
             if (!reminderInput.value) { if (window.getComputedStyle(setReminderBtn).display !== 'none') { alert('Pick a date & time first'); } return; }
             const when = new Date(reminderInput.value); if (isNaN(when.getTime()) || when <= new Date()) { alert('Choose a future date/time'); reminderInput.value = ''; return; }
             setAlarmWithDate(toolId, toolName, when, frequencySelect.value); alert('Reminder set for ' + when.toLocaleString()); reminderInput.value = '';
         };
-        if(setReminderBtn) setReminderBtn.addEventListener('click', handleReminderSet);
-        if (addEventMobileBtn) addEventMobileBtn.addEventListener('click', () => { showDatePickerModal(toolId, toolName); });
+        setReminderBtn.addEventListener('click', handleReminderSet);
+        if(addEventMobileBtn) { addEventMobileBtn.addEventListener('click', () => { showDatePickerModal(toolId, toolName); }); }
         if (saveHistory) addRecentTool(toolId);
     };
-    
-    const hideTool = (updateHistory = true) => {
-        if (toolViewerContainer.style.display !== 'none') {
-            const contentArea = document.getElementById('tool-viewer-content-area');
-            if (contentArea && contentArea.firstChild) {
-                const toolContent = contentArea.firstChild;
-                const toolCacheContainer = document.getElementById('tool-content-cache');
-                toolCacheContainer.appendChild(toolContent);
-            }
-            document.body.classList.remove('tool-view-active');
-            toolViewerContainer.style.display = 'none';
-            toolViewerContainer.innerHTML = '';
-            mainContentWrapper.style.display = 'block';
+    const hideTool = (updateHistory = true) => { 
+        if (toolViewerContainer.style.display !== 'none') { 
+            document.body.classList.remove('tool-view-active'); 
+            toolViewerContainer.style.display = 'none'; 
+            toolViewerContainer.innerHTML = ''; 
+            mainContentWrapper.style.display = 'block'; 
             if (updateHistory) {
                 history.pushState({ view: currentView }, '', '/');
             }
-        }
+        } 
     };
-    
     const showCategoryTools = (categoryName) => { renderCategoryToolsView(categoryName); mainContentWrapper.style.display = 'none'; categoryToolsView.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); };
     const hideCategoryTools = () => { if (categoryToolsView.style.display !== 'none') { categoryToolsView.style.display = 'none'; categoryToolsView.innerHTML = ''; mainContentWrapper.style.display = 'block'; } };
     
@@ -494,38 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const { toolId, toolTitle } = button.dataset; const url = `${window.location.origin}/tool/${toolId}`; const shareData = { title: `Check out: ${toolTitle}`, text: `I found a great free tool on ToolHub: ${toolTitle}`, url };
         try { await navigator.share(shareData); } catch (err) { try { await navigator.clipboard.writeText(url); const originalIcon = button.innerHTML; button.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => { button.innerHTML = originalIcon; }, 2000); } catch (err) { alert('Could not copy URL. Please copy it manually: ' + url); } }
     };
-
-    const preFetchPromises = new Map();
-    const preFetchToolOnDemand = (toolId) => {
-        if (preFetchPromises.has(toolId)) return;
-        const toolCacheContainer = document.getElementById('tool-content-cache');
-        const promise = fetch(`/tools/${toolId}.html`)
-            .then(response => {
-                if (!response.ok) throw new Error('Tool not found');
-                return response.text();
-            })
-            .then(content => {
-                const toolContentWrapper = document.createElement('div');
-                toolContentWrapper.id = `cache-${toolId}`;
-                toolContentWrapper.innerHTML = content;
-                toolCacheContainer.appendChild(toolContentWrapper);
-            })
-            .catch(error => {
-                console.warn(`Could not pre-fetch tool: ${toolId}`, error);
-                preFetchPromises.delete(toolId);
-            });
-        preFetchPromises.set(toolId, promise);
-    };
-
-    document.body.addEventListener('mouseover', (e) => {
-        const toolCard = e.target.closest('.tool-card');
-        if (toolCard) preFetchToolOnDemand(toolCard.dataset.toolId);
-    });
-    document.body.addEventListener('touchstart', (e) => {
-        const toolCard = e.target.closest('.tool-card');
-        if (toolCard) preFetchToolOnDemand(toolCard.dataset.toolId);
-    }, { passive: true });
-
     document.body.addEventListener('click', (e) => {
         const openBtn = e.target.closest('.btn-open'); const bookmarkBtn = e.target.closest('.btn-bookmark'); const shareBtn = e.target.closest('.btn-share'); const backBtn = e.target.closest('#back-to-tools-btn'); const categoryCard = e.target.closest('.category-card'); const backToCategoriesBtn = e.target.closest('#back-to-categories-btn');
         if (openBtn) { 
@@ -577,11 +537,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initializeApp(data) {
         toolsData = data;
+        
         const storedProfile = localStorage.getItem('toolHubUserProfile');
         if (storedProfile) {
             userProfile = JSON.parse(storedProfile);
             updateUIForLogin();
         }
+
         loadAndScheduleAlarms();
         updateYourWorkBadge();
         const shuffledTools = [...data].sort(() => 0.5 - Math.random());
@@ -613,6 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // ✅ OPTIMIZED: Error handling for the fetch request
     async function loadData() { 
         try { 
             const response = await fetch(`/tools.json`);
@@ -620,9 +583,10 @@ document.addEventListener('DOMContentLoaded', () => {
             initializeApp(await response.json()); 
         } catch (error) { 
             console.error("Failed to load tools data:", error);
+            // Display a user-friendly error message on the page
             document.getElementById('popular-tools-grid').innerHTML = 
                 `<p style="text-align: center; padding: 2rem;">Could not load tools. Please try again later.</p>`;
-            document.getElementById('new-tools-grid').innerHTML = '';
+            document.getElementById('new-tools-grid').innerHTML = ''; // Clear the other grid
         } 
     }
     loadData();
