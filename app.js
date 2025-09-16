@@ -1,11 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Your Google Client ID has been inserted here.
     const GOOGLE_CLIENT_ID = '208793911052-4eeuooehop93nmjdbc672vlk0am737bf.apps.googleusercontent.com';
-
     let toolsData = [];
-    
-    // The large toolsData_fallback array has been removed from here for faster initial load.
-    
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const mainHeader = document.querySelector('.main-header');
     const hamburgerMenu = document.getElementById('hamburger-menu');
@@ -15,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoLink = document.querySelector('.logo');
     const signInModal = document.getElementById('signInModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
-    
     const popularGrid = document.getElementById('popular-tools-grid');
     const newGrid = document.getElementById('new-tools-grid');
     const toolViewerContainer = document.getElementById('tool-viewer-container');
@@ -40,13 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUEST_BOOKMARK_LIMIT = 20;
     const RECENTLY_USED_LIMIT = 100;
     let lastScrollTop = 0;
-
-    // Variables for profile and sign-in
     const profileLink = document.getElementById('profile-link');
     const profileSignInModal = document.getElementById('profileSignInModal');
     const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
     let userProfile = null;
-
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
     const unlockAudio = () => { alarmSound.play().catch(() => {}); alarmSound.pause(); alarmSound.currentTime = 0; };
     document.body.addEventListener('click', unlockAudio, { once: true });
@@ -54,8 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveRecentlyUsed = () => localStorage.setItem('toolHubRecent', JSON.stringify(recentlyUsed));
     const saveAlarms = () => localStorage.setItem('toolHubAlarms', JSON.stringify(activeAlarms));
 
-    // --- Authentication Functions ---
-    
     function decodeJwtResponse(token) {
         try {
             const base64Url = token.split('.')[1];
@@ -174,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const renderTools = (container, tools, injectAds = false, emptyMessage = "", isYourToolsView = false) => {
+        if (!container) return;
         if (tools.length === 0) {
             if (emptyMessage) container.innerHTML = `<div class="empty-state-message">${emptyMessage}</div>`;
             return;
@@ -188,27 +178,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderYourWorkView = () => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
         const startOfView = new Date(calendarDisplayDate);
         startOfView.setDate(calendarDisplayDate.getDate() - 2); 
         startOfView.setHours(0, 0, 0, 0);
-
         const endOfView = new Date(startOfView);
         endOfView.setDate(startOfView.getDate() + 5);
         endOfView.setSeconds(endOfView.getSeconds() - 1);
-        
         const endRangeDate = new Date(startOfView);
         endRangeDate.setDate(startOfView.getDate() + 4);
-
         const formatRange = (start, end) => { const options = { month: 'short', day: 'numeric' }; return `${start.toLocaleDateString(undefined, options)} - ${end.toLocaleDateString(undefined, {...options, year: 'numeric'})}`; }
-        
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
             if (alarm.triggered && alarm.frequency === 'one-time') return;
             let occurrence = new Date(alarm.startTime);
             const searchStart = new Date(startOfView.getTime() - 31 * 24*60*60*1000);
             if (occurrence > endOfView) return;
-
             if (occurrence < searchStart && alarm.frequency !== 'one-time') {
                  while(occurrence < searchStart) {
                     const nextOccurrence = getNextOccurrence(occurrence, alarm.frequency, alarm.startTime);
@@ -216,11 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     occurrence = nextOccurrence;
                 }
             }
-
             while (occurrence <= endOfView) {
                 if (occurrence >= startOfView) { allEvents.push({ alarmId, date: new Date(occurrence), name: alarm.toolName, toolId: alarm.toolId, isCompleted: occurrence.getTime() < now.getTime() }); }
                 if (alarm.frequency === 'one-time') break;
-                
                 const nextOccurrence = getNextOccurrence(occurrence, alarm.frequency, alarm.startTime);
                 if (!nextOccurrence || nextOccurrence <= occurrence) break; 
                 occurrence = nextOccurrence;
@@ -295,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (alarmsChanged) { saveAlarms(); }
     };
 
+    // ✅ NEW: Function updated to include a loading spinner
     const createToolViewerHTML = (toolId, toolName) => {
         const saneToolName = sanitizeHTML(toolName);
         return `<div class="container">
@@ -314,10 +297,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="add-event-mobile-btn" title="Add Event" aria-label="Add event or reminder"><i class="fas fa-calendar-plus"></i></button>
             </div>
             <div class="tool-viewer-content">
-                <iframe id="tool-iframe" src="/tools/${toolId}.html" title="${saneToolName}" frameborder="0"></iframe>
+                <div id="loader" class="iframe-loader"></div>
+                <iframe id="tool-iframe" src="/tools/${toolId}.html" title="${saneToolName}" frameborder="0" style="display:none;" onload="document.getElementById('loader').style.display='none'; this.style.display='block';"></iframe>
             </div>
         </div>`;
     };
+
     const showTool = (toolId, toolName, saveHistory = true) => {
         document.body.classList.add('tool-view-active'); mainContentWrapper.style.display = 'none'; toolViewerContainer.innerHTML = createToolViewerHTML(toolId, toolName); toolViewerContainer.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -330,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const when = new Date(reminderInput.value); if (isNaN(when.getTime()) || when <= new Date()) { alert('Choose a future date/time'); reminderInput.value = ''; return; }
             setAlarmWithDate(toolId, toolName, when, frequencySelect.value); alert('Reminder set for ' + when.toLocaleString()); reminderInput.value = '';
         };
-        setReminderBtn.addEventListener('click', handleReminderSet);
+        if(setReminderBtn) setReminderBtn.addEventListener('click', handleReminderSet);
         if(addEventMobileBtn) { addEventMobileBtn.addEventListener('click', () => { showDatePickerModal(toolId, toolName); }); }
         if (saveHistory) addRecentTool(toolId);
     };
@@ -385,7 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleRouteChange = () => {
         const path = window.location.pathname;
         const toolMatch = path.match(/^\/tool\/([a-zA-Z0-9-]+)/);
-
         if (toolMatch) {
             const toolId = toolMatch[1];
             const tool = toolsData.find(t => t.id === toolId);
@@ -479,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleBookmarkClick = (button) => {
         const toolId = button.dataset.toolId; if (!toolId) return;
-        if (isBookmarked(toolId)) { bookmarks = bookmarks.filter(id => id !== toolId); button.classList.remove('bookmarked'); } else { if (bookmarks.length >= GUEST_BOOKMARK_LIMIT) { showModal(); return; } bookmarks.push(toolId); button.classList.add('bookmarked'); }
+        if (isBookmarked(toolId)) { bookmarks = bookmarks.filter(id => id !== toolId); button.classList.remove('bookmarked'); } else { if (bookmarks.length >= GUEST_BOOKMARK_LIMIT && !userProfile) { showModal(); return; } bookmarks.push(toolId); button.classList.add('bookmarked'); }
         saveBookmarks(); if (currentView === 'your-tools') renderYourToolsView();
     };
     const handleShareClick = async (button) => {
@@ -496,8 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bookmarkBtn) handleBookmarkClick(bookmarkBtn); 
         if (shareBtn) handleShareClick(shareBtn);
         if (backBtn) { 
-            hideTool(); 
-            if (currentView === 'your-work') renderYourWorkView(); 
+            history.back();
         }
         if (categoryCard) showCategoryTools(categoryCard.dataset.categoryName); 
         if (backToCategoriesBtn) hideCategoryTools();
@@ -505,29 +488,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentView === 'your-work') {
             const deleteEventBtn = e.target.closest('.delete-event-btn'); 
             const calendarEvent = e.target.closest('.calendar-event');
-            if (e.target.closest('#calendar-today-btn')) { 
-                calendarDisplayDate = new Date(); 
-                renderYourWorkView(); 
-            }
-            if (e.target.closest('#calendar-prev-btn')) { 
-                calendarDisplayDate.setDate(calendarDisplayDate.getDate() - 1); 
-                renderYourWorkView(); 
-            }
-            if (e.target.closest('#calendar-next-btn')) { 
-                calendarDisplayDate.setDate(calendarDisplayDate.getDate() + 1);
-                renderYourWorkView(); 
-            }
+            if (e.target.closest('#calendar-today-btn')) { calendarDisplayDate = new Date(); renderYourWorkView(); }
+            if (e.target.closest('#calendar-prev-btn')) { calendarDisplayDate.setDate(calendarDisplayDate.getDate() - 1); renderYourWorkView(); }
+            if (e.target.closest('#calendar-next-btn')) { calendarDisplayDate.setDate(calendarDisplayDate.getDate() + 1); renderYourWorkView(); }
             if (deleteEventBtn) {
                 e.stopPropagation(); 
                 const alarmId = deleteEventBtn.dataset.alarmId; 
                 const alarm = activeAlarms[alarmId]; 
                 const message = (alarm && alarm.frequency !== 'one-time') ? 'Are you sure you want to delete this recurring reminder and all its future occurrences?' : 'Are you sure you want to delete this reminder?';
-                if (alarmId && confirm(message)) { 
-                    delete activeAlarms[alarmId]; 
-                    saveAlarms(); 
-                    updateYourWorkBadge(); 
-                    renderYourWorkView(); 
-                }
+                if (alarmId && confirm(message)) { delete activeAlarms[alarmId]; saveAlarms(); updateYourWorkBadge(); renderYourWorkView(); }
             } else if (calendarEvent && !calendarEvent.classList.contains('is-completed')) { 
                 const { toolId, toolName } = calendarEvent.dataset; 
                 if (toolId && toolName) showTool(toolId, toolName, true); 
@@ -535,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ✅ NEW: Prefetching logic added for popular tools
     function initializeApp(data) {
         toolsData = data;
         
@@ -558,6 +528,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mobileBanner && mainHeader && window.getComputedStyle(mobileBanner).display !== 'none') {
             mainHeader.style.top = '0px';
         }
+        
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(() => {
+            popularTools.slice(0, 10).forEach(tool => {
+              const link = document.createElement('link');
+              link.rel = 'prefetch';
+              link.href = `/tools/${tool.id}.html`;
+              document.head.appendChild(link);
+            });
+          });
+        }
         handleRouteChange();
     }
     
@@ -575,7 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // ✅ OPTIMIZED: Error handling for the fetch request
     async function loadData() { 
         try { 
             const response = await fetch(`/tools.json`);
@@ -583,10 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initializeApp(await response.json()); 
         } catch (error) { 
             console.error("Failed to load tools data:", error);
-            // Display a user-friendly error message on the page
-            document.getElementById('popular-tools-grid').innerHTML = 
-                `<p style="text-align: center; padding: 2rem;">Could not load tools. Please try again later.</p>`;
-            document.getElementById('new-tools-grid').innerHTML = ''; // Clear the other grid
+            if(popularGrid) popularGrid.innerHTML = `<p style="text-align: center; padding: 2rem;">Could not load tools. Please try again later.</p>`;
+            if(newGrid) newGrid.innerHTML = '';
         } 
     }
     loadData();
