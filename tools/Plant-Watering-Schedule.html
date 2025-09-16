@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<!-- Category: Gardening -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Watering Schedule</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #4caf50, #8bc34a);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #4caf50, #8bc34a);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .plant-form {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: #4caf50;
+        }
+        
+        .search-box {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .plant-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .plant-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .plant-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #28a745;
+        }
+        
+        .plant-item.watered::before {
+            background: #28a745;
+        }
+        
+        .plant-item.due::before {
+            background: #dc3545;
+        }
+        
+        .plant-item.warning::before {
+            background: #ffc107;
+        }
+        
+        .plant-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .plant-info {
+            flex: 1;
+        }
+        
+        .plant-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .plant-details {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .next-water {
+            font-weight: 500;
+        }
+        
+        .next-water.watered {
+            color: #28a745;
+        }
+        
+        .next-water.due {
+            color: #dc3545;
+        }
+        
+        .next-water.warning {
+            color: #ffc107;
+        }
+        
+        .plant-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .water-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stat-box {
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4caf50;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .reminder-settings {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .reminder-settings h3 {
+            margin-bottom: 10px;
+            color: #4caf50;
+        }
+        
+        .reminder-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .reminder-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reminder-option input {
+            margin: 0;
+        }
+        
+        .quick-add {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .quick-add-btn {
+            padding: 6px 12px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-add-btn:hover {
+            background: #43a047;
+        }
+        
+        .plant-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .plant-icon {
+            font-size: 60px;
+            color: #4caf50;
+            margin: 10px 0;
+            animation: plantGrow 3s infinite;
+        }
+        
+        @keyframes plantGrow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .plant-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #4caf50;
+        }
+        
+        .water-droplet {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #2196f3;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            margin: 0 2px;
+        }
+        
+        .water-droplet::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: #2196f3;
+            border-radius: 50%;
+        }
+        
+        .water-droplet::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 10px;
+            height: 10px;
+            background: #bbdefb;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-controls {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .plant-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .plant-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                flex: 1 0 40%;
+            }
+            
+            .reminder-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Plant Watering Schedule
+        </div>
+        
+        <div class="plant-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="plantName"><i class="fas fa-seedling"></i> Plant Name</label>
+                    <input type="text" id="plantName" placeholder="e.g., Spider Plant, Rose Bush">
+                </div>
+                <div class="form-group">
+                    <label for="plantType"><i class="fas fa-tags"></i> Plant Type</label>
+                    <select id="plantType">
+                        <option value="houseplant">Houseplant</option>
+                        <option value="outdoor">Outdoor Plant</option>
+                        <option value="succulent">Succulent</option>
+                        <option value="herb">Herb</option>
+                        <option value="vegetable">Vegetable</option>
+                        <option value="flower">Flower</option>
+                        <option value="tree">Tree</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lastWatered"><i class="fas fa-calendar-check"></i> Last Watered Date</label>
+                    <input type="date" id="lastWatered">
+                </div>
+                <div class="form-group">
+                    <label for="wateringInterval"><i class="fas fa-sync-alt"></i> Watering Interval (Days)</label>
+                    <input type="number" id="wateringInterval" min="1" max="365" value="7">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="plantLocation"><i class="fas fa-map-marker-alt"></i> Location</label>
+                    <select id="plantLocation">
+                        <option value="livingroom">Living Room</option>
+                        <option value="kitchen">Kitchen</option>
+                        <option value="bedroom">Bedroom</option>
+                        <option value="bathroom">Bathroom</option>
+                        <option value="patio">Patio/Balcony</option>
+                        <option value="garden">Garden</option>
+                        <option value="greenhouse">Greenhouse</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sunlight"><i class="fas fa-sun"></i> Sunlight Exposure</label>
+                    <select id="sunlight">
+                        <option value="full">Full Sun</option>
+                        <option value="partial">Partial Shade</option>
+                        <option value="shade">Full Shade</option>
+                        <option value="indirect">Indirect Light</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="specialCare"><i class="fas fa-sticky-note"></i> Special Care Instructions</label>
+                    <textarea id="specialCare" placeholder="Special watering tips or care instructions..."></textarea>
+                </div>
+            </div>
+            <button class="add-btn" id="addPlantBtn">
+                <i class="fas fa-plus-circle"></i> Add Plant
+            </button>
+        </div>
+        
+        <div class="quick-add">
+            <button class="quick-add-btn" data-interval="3">Every 3 Days</button>
+            <button class="quick-add-btn" data-interval="7">Weekly</button>
+            <button class="quick-add-btn" data-interval="14">Bi-Weekly</button>
+            <button class="quick-add-btn" data-interval="30">Monthly</button>
+            <button class="quick-add-btn" data-interval="90">Seasonal</button>
+        </div>
+        
+        <div class="plant-visualization">
+            <div class="plant-icon">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <div class="plant-status" id="plantStatus">Ready to schedule plant watering</div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search plants...">
+        </div>
+        
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Plants</button>
+            <button class="filter-btn" data-filter="safe">Well Watered</button>
+            <button class="filter-btn" data-filter="warning">Needs Water Soon</button>
+            <button class="filter-btn" data-filter="due">Needs Water Now</button>
+            <button class="filter-btn" data-filter="houseplant">Houseplants</button>
+            <button class="filter-btn" data-filter="outdoor">Outdoor</button>
+        </div>
+        
+        <div class="plant-list" id="plantList">
+            <div class="empty-state">
+                <i class="fas fa-seedling"></i>
+                <p>No plants added yet</p>
+                <p>Add your first plant above</p>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-value" id="totalPlants">0</div>
+                <div class="stat-label">Total Plants</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="wellWatered">0</div>
+                <div class="stat-label">Well Watered</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="needsWater">0</div>
+                <div class="stat-label">Needs Water</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="overdue">0</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+        
+        <div class="reminder-settings">
+            <h3><i class="fas fa-bell"></i> Reminder Settings</h3>
+            <div class="reminder-options">
+                <div class="reminder-option">
+                    <input type="checkbox" id="dailyReminder" checked>
+                    <label for="dailyReminder">Daily Check</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="needsWaterAlert" checked>
+                    <label for="needsWaterAlert">Needs Water Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="overdueAlert" checked>
+                    <label for="overdueAlert">Overdue Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="browserNotifications" checked>
+                    <label for="browserNotifications">Browser Notifications</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Plant data array
+        let plants = [];
+        let currentFilter = 'all';
+        let editIndex = -1;
+        
+        // DOM elements
+        const plantName = document.getElementById('plantName');
+        const plantType = document.getElementById('plantType');
+        const lastWatered = document.getElementById('lastWatered');
+        const wateringInterval = document.getElementById('wateringInterval');
+        const plantLocation = document.getElementById('plantLocation');
+        const sunlight = document.getElementById('sunlight');
+        const specialCare = document.getElementById('specialCare');
+        const addPlantBtn = document.getElementById('addPlantBtn');
+        const plantList = document.getElementById('plantList');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const totalPlants = document.getElementById('totalPlants');
+        const wellWatered = document.getElementById('wellWatered');
+        const needsWater = document.getElementById('needsWater');
+        const overdue = document.getElementById('overdue');
+        const notification = document.getElementById('notification');
+        const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+        const dailyReminder = document.getElementById('dailyReminder');
+        const needsWaterAlert = document.getElementById('needsWaterAlert');
+        const overdueAlert = document.getElementById('overdueAlert');
+        const browserNotifications = document.getElementById('browserNotifications');
+        const plantStatus = document.getElementById('plantStatus');
+        
+        // Set default date
+        const today = new Date();
+        lastWatered.valueAsDate = today;
+        
+        // Request notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission();
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+            
+            // Browser notification
+            if (browserNotifications.checked && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('Plant Watering Schedule', {
+                    body: message,
+                    icon: '🌱'
+                });
+            }
+        }
+        
+        // Get days until next watering
+        function getDaysUntilNextWatering(lastWateredDate, interval) {
+            const lastWatered = new Date(lastWateredDate);
+            const nextWatering = new Date(lastWatered);
+            nextWatering.setDate(nextWatering.getDate() + parseInt(interval));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffTime = nextWatering - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        // Get watering status
+        function getWateringStatus(lastWateredDate, interval) {
+            const days = getDaysUntilNextWatering(lastWateredDate, interval);
+            if (days < 0) return 'due';
+            if (days <= 2) return 'warning';
+            return 'safe';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Add or update plant
+        function addPlant() {
+            const name = plantName.value.trim();
+            const type = plantType.value;
+            const last = lastWatered.value;
+            const interval = parseInt(wateringInterval.value) || 7;
+            const location = plantLocation.value;
+            const sun = sunlight.value;
+            const care = specialCare.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter a plant name', 'error');
+                return;
+            }
+            
+            if (!last) {
+                showNotification('Please select last watered date', 'error');
+                return;
+            }
+            
+            const newPlant = {
+                id: Date.now(),
+                name: name,
+                type: type,
+                lastWateredDate: last,
+                wateringInterval: interval,
+                location: location,
+                sunlight: sun,
+                specialCare: care,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editIndex === -1) {
+                plants.push(newPlant);
+                showNotification('Plant added successfully!', 'success');
+            } else {
+                plants[editIndex] = newPlant;
+                showNotification('Plant updated successfully!', 'success');
+                editIndex = -1;
+                addPlantBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Plant';
+            }
+            
+            // Reset form
+            plantName.value = '';
+            plantType.value = 'houseplant';
+            lastWatered.valueAsDate = today;
+            wateringInterval.value = '7';
+            plantLocation.value = 'livingroom';
+            sunlight.value = 'indirect';
+            specialCare.value = '';
+            
+            saveToLocalStorage();
+            renderPlantList();
+            updateStats();
+        }
+        
+        // Quick add plant with interval
+        function quickAddPlant(interval) {
+            wateringInterval.value = interval;
+            showNotification(`Watering interval set to ${interval} days`, 'success');
+        }
+        
+        // Edit plant
+        function editPlant(index) {
+            const plant = plants[index];
+            plantName.value = plant.name;
+            plantType.value = plant.type;
+            lastWatered.value = plant.lastWateredDate;
+            wateringInterval.value = plant.wateringInterval;
+            plantLocation.value = plant.location;
+            sunlight.value = plant.sunlight;
+            specialCare.value = plant.specialCare || '';
+            
+            editIndex = index;
+            addPlantBtn.innerHTML = '<i class="fas fa-save"></i> Update Plant';
+            
+            // Scroll to form
+            document.querySelector('.plant-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete plant
+        function deletePlant(index) {
+            if (confirm('Are you sure you want to delete this plant?')) {
+                plants.splice(index, 1);
+                saveToLocalStorage();
+                renderPlantList();
+                updateStats();
+                showNotification('Plant deleted!', 'success');
+            }
+        }
+        
+        // Mark as watered
+        function markAsWatered(index) {
+            const plant = plants[index];
+            plant.lastWateredDate = new Date().toISOString().split('T')[0];
+            saveToLocalStorage();
+            renderPlantList();
+            updateStats();
+            showNotification(`${plant.name} marked as watered!`, 'success');
+            
+            // Show watering animation
+            plantStatus.textContent = 'Watering in progress...';
+            setTimeout(() => {
+                plantStatus.textContent = 'Ready to schedule plant watering';
+            }, 2000);
+        }
+        
+        // Render plant list
+        function renderPlantList(filter = 'all', search = '') {
+            // Filter plants
+            let filteredPlants = [...plants];
+            
+            // Apply search filter
+            if (search) {
+                filteredPlants = filteredPlants.filter(plant => 
+                    plant.name.toLowerCase().includes(search.toLowerCase()) ||
+                    (plant.specialCare && plant.specialCare.toLowerCase().includes(search.toLowerCase())) ||
+                    plant.type.toLowerCase().includes(search.toLowerCase()) ||
+                    plant.location.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // Apply status filter
+            if (filter === 'safe') {
+                filteredPlants = filteredPlants.filter(plant => getWateringStatus(plant.lastWateredDate, plant.wateringInterval) === 'safe');
+            } else if (filter === 'warning') {
+                filteredPlants = filteredPlants.filter(plant => getWateringStatus(plant.lastWateredDate, plant.wateringInterval) === 'warning');
+            } else if (filter === 'due') {
+                filteredPlants = filteredPlants.filter(plant => getWateringStatus(plant.lastWateredDate, plant.wateringInterval) === 'due');
+            } else if (filter === 'houseplant') {
+                filteredPlants = filteredPlants.filter(plant => plant.type === 'houseplant');
+            } else if (filter === 'outdoor') {
+                filteredPlants = filteredPlants.filter(plant => plant.type === 'outdoor' || plant.type === 'flower' || plant.type === 'vegetable' || plant.type === 'tree');
+            }
+            
+            // Sort by next watering date (closest first)
+            filteredPlants.sort((a, b) => {
+                const daysA = getDaysUntilNextWatering(a.lastWateredDate, a.wateringInterval);
+                const daysB = getDaysUntilNextWatering(b.lastWateredDate, b.wateringInterval);
+                return daysA - daysB;
+            });
+            
+            if (filteredPlants.length === 0) {
+                plantList.innerHTML = '<div class="empty-state"><i class="fas fa-seedling"></i><p>No plants found</p></div>';
+                return;
+            }
+            
+            let html = '';
+            filteredPlants.forEach((plant, index) => {
+                const plantIndex = plants.indexOf(plant);
+                html += generatePlantItemHTML(plant, plantIndex);
+            });
+            
+            plantList.innerHTML = html;
+            attachEventListeners();
+        }
+        
+        // Generate HTML for plant item
+        function generatePlantItemHTML(plant, index) {
+            const days = getDaysUntilNextWatering(plant.lastWateredDate, plant.wateringInterval);
+            const status = getWateringStatus(plant.lastWateredDate, plant.wateringInterval);
+            const statusClass = status;
+            const statusText = days < 0 ? `${Math.abs(days)} days ago` : 
+                              days === 0 ? 'Today' : 
+                              days === 1 ? '1 day' : 
+                              `${days} days`;
+            
+            // Plant type icons
+            const typeIcons = {
+                houseplant: '<i class="fas fa-home"></i>',
+                outdoor: '<i class="fas fa-tree"></i>',
+                succulent: '<i class="fas fa-leaf"></i>',
+                herb: '<i class="fas fa-pepper-hot"></i>',
+                vegetable: '<i class="fas fa-carrot"></i>',
+                flower: '<i class="fas fa-flower-tulip"></i>',
+                tree: '<i class="fas fa-tree-alt"></i>'
+            };
+            
+            // Location icons
+            const locationIcons = {
+                livingroom: '<i class="fas fa-couch"></i>',
+                kitchen: '<i class="fas fa-utensils"></i>',
+                bedroom: '<i class="fas fa-bed"></i>',
+                bathroom: '<i class="fas fa-bath"></i>',
+                patio: '<i class="fas fa-umbrella-beach"></i>',
+                garden: '<i class="fas fa-seedling"></i>',
+                greenhouse: '<i class="fas fa-house-user"></i>'
+            };
+            
+            // Sunlight icons
+            const sunIcons = {
+                full: '<i class="fas fa-sun"></i>',
+                partial: '<i class="fas fa-cloud-sun"></i>',
+                shade: '<i class="fas fa-cloud"></i>',
+                indirect: '<i class="fas fa-cloud-sun-rain"></i>'
+            };
+            
+            return `
+                <div class="plant-item ${status}">
+                    <div class="plant-info">
+                        <div class="plant-name">${typeIcons[plant.type] || ''} ${plant.name}</div>
+                        <div class="plant-details">
+                            <span>Type: ${plant.type.charAt(0).toUpperCase() + plant.type.slice(1)}</span>
+                            <span>Last Watered: ${formatDate(plant.lastWateredDate)}</span>
+                            <span class="next-water ${statusClass}">Next Watering: ${formatDate(new Date(plant.lastWateredDate).setDate(new Date(plant.lastWateredDate).getDate() + plant.wateringInterval))} (${statusText})</span>
+                            <span>Interval: ${plant.wateringInterval} days</span>
+                            <span>Location: ${locationIcons[plant.location] || ''} ${plant.location.charAt(0).toUpperCase() + plant.location.slice(1)}</span>
+                            <span>Sunlight: ${sunIcons[plant.sunlight] || ''} ${plant.sunlight.charAt(0).toUpperCase() + plant.sunlight.slice(1)}</span>
+                            ${plant.specialCare ? `<span>Care: ${plant.specialCare}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="plant-actions">
+                        <button class="action-btn water-btn" data-index="${index}" title="Mark as Watered">
+                            <i class="fas fa-tint"></i>
+                        </button>
+                        <button class="action-btn edit-btn" data-index="${index}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Attach event listeners to action buttons
+        function attachEventListeners() {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    editPlant(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    deletePlant(index);
+                });
+            });
+            
+            document.querySelectorAll('.water-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    markAsWatered(index);
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalPlants.textContent = plants.length;
+            
+            let safe = 0, warning = 0, due = 0;
+            plants.forEach(plant => {
+                const status = getWateringStatus(plant.lastWateredDate, plant.wateringInterval);
+                if (status === 'safe') safe++;
+                else if (status === 'warning') warning++;
+                else if (status === 'due') due++;
+            });
+            
+            wellWatered.textContent = safe;
+            needsWater.textContent = warning;
+            overdue.textContent = due;
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('plantWateringPlants', JSON.stringify(plants));
+            localStorage.setItem('plantWateringSettings', JSON.stringify({
+                dailyReminder: dailyReminder.checked,
+                needsWaterAlert: needsWaterAlert.checked,
+                overdueAlert: overdueAlert.checked,
+                browserNotifications: browserNotifications.checked
+            }));
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('plantWateringPlants');
+            const settings = localStorage.getItem('plantWateringSettings');
+            if (saved) {
+                plants = JSON.parse(saved);
+            }
+            if (settings) {
+                const parsedSettings = JSON.parse(settings);
+                dailyReminder.checked = parsedSettings.dailyReminder;
+                needsWaterAlert.checked = parsedSettings.needsWaterAlert;
+                overdueAlert.checked = parsedSettings.overdueAlert;
+                browserNotifications.checked = parsedSettings.browserNotifications;
+            }
+            renderPlantList();
+            updateStats();
+        }
+        
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderPlantList(filter, searchInput.value.toLowerCase());
+        }
+        
+        // Check for plants needing water
+        function checkPlantsNeedingWater() {
+            const needsWaterSoon = plants.filter(plant => {
+                const days = getDaysUntilNextWatering(plant.lastWateredDate, plant.wateringInterval);
+                return days >= 0 && days <= 3;
+            });
+            
+            const overduePlants = plants.filter(plant => {
+                const days = getDaysUntilNextWatering(plant.lastWateredDate, plant.wateringInterval);
+                return days < 0;
+            });
+            
+            if (needsWaterSoon.length > 0 && needsWaterAlert.checked) {
+                const plantNames = needsWaterSoon.map(plant => plant.name).join(', ');
+                showNotification(`Plants need water soon: ${plantNames}`, 'warning');
+            }
+            
+            if (overduePlants.length > 0 && overdueAlert.checked) {
+                const plantNames = overduePlants.map(plant => plant.name).join(', ');
+                showNotification(`Overdue watering: ${plantNames}`, 'error');
+            }
+        }
+        
+        // Event listeners
+        addPlantBtn.addEventListener('click', addPlant);
+        
+        searchInput.addEventListener('input', (e) => {
+            renderPlantList(currentFilter, e.target.value.toLowerCase());
+        });
+        
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFilter(btn.getAttribute('data-filter'));
+            });
+        });
+        
+        quickAddButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const interval = parseInt(btn.getAttribute('data-interval'));
+                quickAddPlant(interval);
+            });
+        });
+        
+        // Initialize
+        loadFromLocalStorage();
+        
+        // Check for plants needing water on load
+        setTimeout(checkPlantsNeedingWater, 1000);
+        
+        // Daily check (simulate with 30 second intervals for demo)
+        setInterval(checkPlantsNeedingWater, 30000);
+    </script>
+</body>
+</html>

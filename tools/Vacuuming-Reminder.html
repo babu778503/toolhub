@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<!-- Category: Household -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacuuming Reminder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e9eab 0%, #eef2f3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .room-form {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: #4b6cb7;
+        }
+        
+        .search-box {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .room-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .room-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .room-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #28a745;
+        }
+        
+        .room-item.vacuumed::before {
+            background: #28a745;
+        }
+        
+        .room-item.due::before {
+            background: #dc3545;
+        }
+        
+        .room-item.warning::before {
+            background: #ffc107;
+        }
+        
+        .room-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .room-info {
+            flex: 1;
+        }
+        
+        .room-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .room-details {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .next-vacuum {
+            font-weight: 500;
+        }
+        
+        .next-vacuum.vacuumed {
+            color: #28a745;
+        }
+        
+        .next-vacuum.due {
+            color: #dc3545;
+        }
+        
+        .next-vacuum.warning {
+            color: #ffc107;
+        }
+        
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .vacuum-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stat-box {
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4b6cb7;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .reminder-settings {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .reminder-settings h3 {
+            margin-bottom: 10px;
+            color: #4b6cb7;
+        }
+        
+        .reminder-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .reminder-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reminder-option input {
+            margin: 0;
+        }
+        
+        .quick-add {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .quick-add-btn {
+            padding: 6px 12px;
+            background: #182848;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-add-btn:hover {
+            background: #2a3a5a;
+        }
+        
+        .vacuum-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .vacuum-cleaner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .vacuum-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #e0e0e0;
+            border-radius: 40px 40px 10px 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .vacuum-hose {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 40px;
+            background: #bdbdbd;
+            border-radius: 5px;
+        }
+        
+        .vacuum-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 20px;
+            background: #9e9e9e;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .dust {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background: #ffd54f;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .dust.active {
+            opacity: 1;
+        }
+        
+        .vacuum-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #4b6cb7;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-controls {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .room-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .room-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                flex: 1 0 40%;
+            }
+            
+            .reminder-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Vacuuming Reminder
+        </div>
+        
+        <div class="room-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="roomName"><i class="fas fa-door-open"></i> Room Name</label>
+                    <input type="text" id="roomName" placeholder="e.g., Living Room, Bedroom">
+                </div>
+                <div class="form-group">
+                    <label for="floorType"><i class="fas fa-th"></i> Floor Type</label>
+                    <select id="floorType">
+                        <option value="carpet">Carpet</option>
+                        <option value="hardwood">Hardwood</option>
+                        <option value="tile">Tile</option>
+                        <option value="laminate">Laminate</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lastVacuum"><i class="fas fa-calendar-check"></i> Last Vacuum Date</label>
+                    <input type="date" id="lastVacuum">
+                </div>
+                <div class="form-group">
+                    <label for="vacuumInterval"><i class="fas fa-sync-alt"></i> Vacuum Interval (Days)</label>
+                    <input type="number" id="vacuumInterval" min="1" max="365" value="7">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="roomNotes"><i class="fas fa-sticky-note"></i> Notes</label>
+                    <textarea id="roomNotes" placeholder="Special instructions or areas to focus on..."></textarea>
+                </div>
+            </div>
+            <button class="add-btn" id="addRoomBtn">
+                <i class="fas fa-plus-circle"></i> Add Room
+            </button>
+        </div>
+        
+        <div class="quick-add">
+            <button class="quick-add-btn" data-interval="3">Every 3 Days</button>
+            <button class="quick-add-btn" data-interval="7">Weekly</button>
+            <button class="quick-add-btn" data-interval="14">Bi-Weekly</button>
+            <button class="quick-add-btn" data-interval="30">Monthly</button>
+        </div>
+        
+        <div class="vacuum-visualization">
+            <div class="vacuum-cleaner">
+                <div class="dust" id="dust"></div>
+                <div class="vacuum-body">
+                    <div class="vacuum-hose"></div>
+                    <div class="vacuum-head"></div>
+                </div>
+            </div>
+            <div class="vacuum-status" id="vacuumStatus">Ready to vacuum</div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search rooms...">
+        </div>
+        
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Rooms</button>
+            <button class="filter-btn" data-filter="safe">Up to Date</button>
+            <button class="filter-btn" data-filter="warning">Due Soon</button>
+            <button class="filter-btn" data-filter="due">Overdue</button>
+        </div>
+        
+        <div class="room-list" id="roomList">
+            <div class="empty-state">
+                <i class="fas fa-home"></i>
+                <p>No rooms added yet</p>
+                <p>Add your first room above</p>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-value" id="totalRooms">0</div>
+                <div class="stat-label">Total Rooms</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="upToDate">0</div>
+                <div class="stat-label">Up to Date</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="dueSoon">0</div>
+                <div class="stat-label">Due Soon</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="overdue">0</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+        
+        <div class="reminder-settings">
+            <h3><i class="fas fa-bell"></i> Reminder Settings</h3>
+            <div class="reminder-options">
+                <div class="reminder-option">
+                    <input type="checkbox" id="dailyReminder" checked>
+                    <label for="dailyReminder">Daily Check</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="dueSoonAlert" checked>
+                    <label for="dueSoonAlert">Due Soon Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="overdueAlert" checked>
+                    <label for="overdueAlert">Overdue Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="browserNotifications" checked>
+                    <label for="browserNotifications">Browser Notifications</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Room data array
+        let rooms = [];
+        let currentFilter = 'all';
+        let editIndex = -1;
+        
+        // DOM elements
+        const roomName = document.getElementById('roomName');
+        const floorType = document.getElementById('floorType');
+        const lastVacuum = document.getElementById('lastVacuum');
+        const vacuumInterval = document.getElementById('vacuumInterval');
+        const roomNotes = document.getElementById('roomNotes');
+        const addRoomBtn = document.getElementById('addRoomBtn');
+        const roomList = document.getElementById('roomList');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const totalRooms = document.getElementById('totalRooms');
+        const upToDate = document.getElementById('upToDate');
+        const dueSoon = document.getElementById('dueSoon');
+        const overdue = document.getElementById('overdue');
+        const notification = document.getElementById('notification');
+        const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+        const dailyReminder = document.getElementById('dailyReminder');
+        const dueSoonAlert = document.getElementById('dueSoonAlert');
+        const overdueAlert = document.getElementById('overdueAlert');
+        const browserNotifications = document.getElementById('browserNotifications');
+        const dust = document.getElementById('dust');
+        const vacuumStatus = document.getElementById('vacuumStatus');
+        
+        // Set default date
+        const today = new Date();
+        lastVacuum.valueAsDate = today;
+        
+        // Request notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission();
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+            
+            // Browser notification
+            if (browserNotifications.checked && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('Vacuuming Reminder', {
+                    body: message,
+                    icon: '🧹'
+                });
+            }
+        }
+        
+        // Get days until next vacuum
+        function getDaysUntilNextVacuum(lastVacuumDate, interval) {
+            const lastVacuum = new Date(lastVacuumDate);
+            const nextVacuum = new Date(lastVacuum);
+            nextVacuum.setDate(nextVacuum.getDate() + parseInt(interval));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffTime = nextVacuum - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        // Get vacuum status
+        function getVacuumStatus(lastVacuumDate, interval) {
+            const days = getDaysUntilNextVacuum(lastVacuumDate, interval);
+            if (days < 0) return 'due';
+            if (days <= 2) return 'warning';
+            return 'safe';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Add or update room
+        function addRoom() {
+            const name = roomName.value.trim();
+            const floor = floorType.value;
+            const last = lastVacuum.value;
+            const interval = parseInt(vacuumInterval.value) || 7;
+            const notes = roomNotes.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter a room name', 'error');
+                return;
+            }
+            
+            if (!last) {
+                showNotification('Please select last vacuum date', 'error');
+                return;
+            }
+            
+            const newRoom = {
+                id: Date.now(),
+                name: name,
+                floorType: floor,
+                lastVacuumDate: last,
+                vacuumInterval: interval,
+                notes: notes,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editIndex === -1) {
+                rooms.push(newRoom);
+                showNotification('Room added successfully!', 'success');
+            } else {
+                rooms[editIndex] = newRoom;
+                showNotification('Room updated successfully!', 'success');
+                editIndex = -1;
+                addRoomBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Room';
+            }
+            
+            // Reset form
+            roomName.value = '';
+            floorType.value = 'carpet';
+            lastVacuum.valueAsDate = today;
+            vacuumInterval.value = '7';
+            roomNotes.value = '';
+            
+            saveToLocalStorage();
+            renderRoomList();
+            updateStats();
+        }
+        
+        // Quick add room with interval
+        function quickAddRoom(interval) {
+            vacuumInterval.value = interval;
+            showNotification(`Vacuum interval set to ${interval} days`, 'success');
+        }
+        
+        // Edit room
+        function editRoom(index) {
+            const room = rooms[index];
+            roomName.value = room.name;
+            floorType.value = room.floorType;
+            lastVacuum.value = room.lastVacuumDate;
+            vacuumInterval.value = room.vacuumInterval;
+            roomNotes.value = room.notes || '';
+            
+            editIndex = index;
+            addRoomBtn.innerHTML = '<i class="fas fa-save"></i> Update Room';
+            
+            // Scroll to form
+            document.querySelector('.room-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete room
+        function deleteRoom(index) {
+            if (confirm('Are you sure you want to delete this room?')) {
+                rooms.splice(index, 1);
+                saveToLocalStorage();
+                renderRoomList();
+                updateStats();
+                showNotification('Room deleted!', 'success');
+            }
+        }
+        
+        // Mark as vacuumed
+        function markAsVacuumed(index) {
+            const room = rooms[index];
+            room.lastVacuumDate = new Date().toISOString().split('T')[0];
+            saveToLocalStorage();
+            renderRoomList();
+            updateStats();
+            showNotification(`${room.name} marked as vacuumed!`, 'success');
+            
+            // Show vacuum animation
+            dust.classList.add('active');
+            vacuumStatus.textContent = 'Vacuuming in progress...';
+            setTimeout(() => {
+                dust.classList.remove('active');
+                vacuumStatus.textContent = 'Ready to vacuum';
+            }, 2000);
+        }
+        
+        // Render room list
+        function renderRoomList(filter = 'all', search = '') {
+            // Filter rooms
+            let filteredRooms = [...rooms];
+            
+            // Apply search filter
+            if (search) {
+                filteredRooms = filteredRooms.filter(room => 
+                    room.name.toLowerCase().includes(search.toLowerCase()) ||
+                    (room.notes && room.notes.toLowerCase().includes(search.toLowerCase())) ||
+                    room.floorType.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // Apply status filter
+            if (filter === 'safe') {
+                filteredRooms = filteredRooms.filter(room => getVacuumStatus(room.lastVacuumDate, room.vacuumInterval) === 'safe');
+            } else if (filter === 'warning') {
+                filteredRooms = filteredRooms.filter(room => getVacuumStatus(room.lastVacuumDate, room.vacuumInterval) === 'warning');
+            } else if (filter === 'due') {
+                filteredRooms = filteredRooms.filter(room => getVacuumStatus(room.lastVacuumDate, room.vacuumInterval) === 'due');
+            }
+            
+            // Sort by next vacuum date (closest first)
+            filteredRooms.sort((a, b) => {
+                const daysA = getDaysUntilNextVacuum(a.lastVacuumDate, a.vacuumInterval);
+                const daysB = getDaysUntilNextVacuum(b.lastVacuumDate, b.vacuumInterval);
+                return daysA - daysB;
+            });
+            
+            if (filteredRooms.length === 0) {
+                roomList.innerHTML = '<div class="empty-state"><i class="fas fa-home"></i><p>No rooms found</p></div>';
+                return;
+            }
+            
+            let html = '';
+            filteredRooms.forEach((room, index) => {
+                const roomIndex = rooms.indexOf(room);
+                html += generateRoomItemHTML(room, roomIndex);
+            });
+            
+            roomList.innerHTML = html;
+            attachEventListeners();
+        }
+        
+        // Generate HTML for room item
+        function generateRoomItemHTML(room, index) {
+            const days = getDaysUntilNextVacuum(room.lastVacuumDate, room.vacuumInterval);
+            const status = getVacuumStatus(room.lastVacuumDate, room.vacuumInterval);
+            const statusClass = status;
+            const statusText = days < 0 ? `${Math.abs(days)} days ago` : 
+                              days === 0 ? 'Today' : 
+                              days === 1 ? '1 day' : 
+                              `${days} days`;
+            
+            // Floor type icons
+            const floorIcons = {
+                carpet: '<i class="fas fa-border-all"></i>',
+                hardwood: '<i class="fas fa-border-style"></i>',
+                tile: '<i class="fas fa-th-large"></i>',
+                laminate: '<i class="fas fa-border-none"></i>',
+                mixed: '<i class="fas fa-th"></i>'
+            };
+            
+            return `
+                <div class="room-item ${status}">
+                    <div class="room-info">
+                        <div class="room-name">${room.name} ${floorIcons[room.floorType] || ''}</div>
+                        <div class="room-details">
+                            <span>Last Vacuum: ${formatDate(room.lastVacuumDate)}</span>
+                            <span class="next-vacuum ${statusClass}">Next Vacuum: ${formatDate(new Date(room.lastVacuumDate).setDate(new Date(room.lastVacuumDate).getDate() + room.vacuumInterval))} (${statusText})</span>
+                            <span>Interval: ${room.vacuumInterval} days</span>
+                            <span>Floor: ${room.floorType.charAt(0).toUpperCase() + room.floorType.slice(1)}</span>
+                            ${room.notes ? `<span>Notes: ${room.notes}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="action-btn vacuum-btn" data-index="${index}" title="Mark as Vacuumed">
+                            <i class="fas fa-broom"></i>
+                        </button>
+                        <button class="action-btn edit-btn" data-index="${index}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Attach event listeners to action buttons
+        function attachEventListeners() {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    editRoom(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    deleteRoom(index);
+                });
+            });
+            
+            document.querySelectorAll('.vacuum-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    markAsVacuumed(index);
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalRooms.textContent = rooms.length;
+            
+            let safe = 0, warning = 0, due = 0;
+            rooms.forEach(room => {
+                const status = getVacuumStatus(room.lastVacuumDate, room.vacuumInterval);
+                if (status === 'safe') safe++;
+                else if (status === 'warning') warning++;
+                else if (status === 'due') due++;
+            });
+            
+            upToDate.textContent = safe;
+            dueSoon.textContent = warning;
+            overdue.textContent = due;
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('vacuumingRooms', JSON.stringify(rooms));
+            localStorage.setItem('vacuumingSettings', JSON.stringify({
+                dailyReminder: dailyReminder.checked,
+                dueSoonAlert: dueSoonAlert.checked,
+                overdueAlert: overdueAlert.checked,
+                browserNotifications: browserNotifications.checked
+            }));
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('vacuumingRooms');
+            const settings = localStorage.getItem('vacuumingSettings');
+            if (saved) {
+                rooms = JSON.parse(saved);
+            }
+            if (settings) {
+                const parsedSettings = JSON.parse(settings);
+                dailyReminder.checked = parsedSettings.dailyReminder;
+                dueSoonAlert.checked = parsedSettings.dueSoonAlert;
+                overdueAlert.checked = parsedSettings.overdueAlert;
+                browserNotifications.checked = parsedSettings.browserNotifications;
+            }
+            renderRoomList();
+            updateStats();
+        }
+        
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderRoomList(filter, searchInput.value.toLowerCase());
+        }
+        
+        // Check for due vacuuming
+        function checkDueVacuuming() {
+            const dueSoonRooms = rooms.filter(room => {
+                const days = getDaysUntilNextVacuum(room.lastVacuumDate, room.vacuumInterval);
+                return days >= 0 && days <= 3;
+            });
+            
+            const overdueRooms = rooms.filter(room => {
+                const days = getDaysUntilNextVacuum(room.lastVacuumDate, room.vacuumInterval);
+                return days < 0;
+            });
+            
+            if (dueSoonRooms.length > 0 && dueSoonAlert.checked) {
+                const roomNames = dueSoonRooms.map(room => room.name).join(', ');
+                showNotification(`Vacuum due soon: ${roomNames}`, 'warning');
+            }
+            
+            if (overdueRooms.length > 0 && overdueAlert.checked) {
+                const roomNames = overdueRooms.map(room => room.name).join(', ');
+                showNotification(`Overdue vacuuming: ${roomNames}`, 'error');
+            }
+        }
+        
+        // Event listeners
+        addRoomBtn.addEventListener('click', addRoom);
+        
+        searchInput.addEventListener('input', (e) => {
+            renderRoomList(currentFilter, e.target.value.toLowerCase());
+        });
+        
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFilter(btn.getAttribute('data-filter'));
+            });
+        });
+        
+        quickAddButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const interval = parseInt(btn.getAttribute('data-interval'));
+                quickAddRoom(interval);
+            });
+        });
+        
+        // Initialize
+        loadFromLocalStorage();
+        
+        // Check for due vacuuming on load
+        setTimeout(checkDueVacuuming, 1000);
+        
+        // Daily check (simulate with 30 second intervals for demo)
+        setInterval(checkDueVacuuming, 30000);
+    </script>
+</body>
+</html>

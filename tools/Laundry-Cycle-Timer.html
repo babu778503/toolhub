@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<!-- Category: Household -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laundry Cycle Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #667eea, #764ba2);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #667eea, #764ba2);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            text-align: center;
+            padding: 40px 20px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f8f8;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            flex: 1;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #FFC107, #FF9800);
+            color: #333;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #F44336, #D32F2F);
+            color: white;
+            flex: 1;
+        }
+        
+        .cycle-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .cycle-btn {
+            padding: 15px 5px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cycle-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #ffd700, #ff9800);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .cycle-btn:hover {
+            background: linear-gradient(to bottom, #7b8acc, #8a5fc4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cycle-btn:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .time-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .time-input input {
+            width: 80px;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .time-input input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+        }
+        
+        .time-input label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .set-time-btn {
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: flex-end;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .set-time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-container {
+            padding: 0 20px 20px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer-state {
+            text-align: center;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #555;
+            font-size: 18px;
+        }
+        
+        .timer-state.running {
+            color: #4CAF50;
+        }
+        
+        .timer-state.paused {
+            color: #FFC107;
+        }
+        
+        .timer-state.stopped {
+            color: #F44336;
+        }
+        
+        .laundry-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .washing-machine {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        
+        .machine-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .machine-window {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 40px;
+            background: #b3e5fc;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .clothes {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6);
+            animation: rotate 4s linear infinite;
+            opacity: 0.7;
+        }
+        
+        .clothes-item {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #f44336;
+            border-radius: 50% 50% 0 50%;
+            transform: rotate(45deg);
+        }
+        
+        .clothes-item:nth-child(1) { top: 10px; left: 10px; background: #f44336; }
+        .clothes-item:nth-child(2) { top: 10px; right: 10px; background: #4caf50; }
+        .clothes-item:nth-child(3) { bottom: 10px; left: 10px; background: #ff9800; }
+        .clothes-item:nth-child(4) { bottom: 10px; right: 10px; background: #9c27b0; }
+        
+        @keyframes rotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .bubbles.active {
+            opacity: 1;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: bubble-rise 3s infinite;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-60px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        .machine-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #667eea;
+            margin-top: 10px;
+        }
+        
+        .sound-toggle {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px 20px;
+        }
+        
+        .sound-btn {
+            background: #607D8B;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-btn.active {
+            background: #2196F3;
+        }
+        
+        .laundry-info {
+            padding: 0 20px 20px;
+            background: #fff8e1;
+            margin: 0 20px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .laundry-info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .laundry-info ul {
+            padding-left: 20px;
+        }
+        
+        .laundry-info li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .timer-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 0 20px 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 50px;
+                padding: 30px 15px;
+            }
+            
+            .btn {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            
+            .cycle-types {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 15px 20px;
+            }
+            
+            .cycle-btn {
+                padding: 12px 5px;
+                font-size: 14px;
+            }
+            
+            .time-input {
+                gap: 5px;
+                padding: 0 15px 15px;
+            }
+            
+            .time-input input {
+                width: 60px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .washing-machine {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .machine-body {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .timer-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Laundry Cycle Timer
+        </div>
+        
+        <div class="timer-state" id="timerState">Ready to start laundry</div>
+        
+        <div class="timer-display" id="display">00:00:00</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="timer-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="cycleTypeStat">Normal</div>
+                <div class="stat-label">Cycle Type</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="loadSizeStat">Medium</div>
+                <div class="stat-label">Load Size</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="timeStat">0 min</div>
+                <div class="stat-label">Cycle Time</div>
+            </div>
+        </div>
+        
+        <div class="laundry-visualization">
+            <div class="washing-machine">
+                <div class="bubbles" id="bubbles"></div>
+                <div class="machine-body">
+                    <div class="machine-window">
+                        <div class="clothes" id="clothes">
+                            <div class="clothes-item"></div>
+                            <div class="clothes-item"></div>
+                            <div class="clothes-item"></div>
+                            <div class="clothes-item"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="machine-status" id="machineStatus">Washing machine ready</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn" id="startBtn">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button class="btn pause-btn" id="pauseBtn">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="sound-toggle">
+            <button class="sound-btn" id="soundBtn">
+                <i class="fas fa-volume-up"></i> Sound
+            </button>
+        </div>
+        
+        <div class="time-input">
+            <label>
+                Minutes
+                <input type="number" id="minutes" min="0" max="120" value="0">
+            </label>
+            <label>
+                Seconds
+                <input type="number" id="seconds" min="0" max="59" value="0">
+            </label>
+            <button class="set-time-btn" id="setTimeBtn">
+                <i class="fas fa-clock"></i> Set
+            </button>
+        </div>
+        
+        <div class="cycle-types">
+            <button class="cycle-btn" data-time="1800" data-type="Normal" data-size="Medium">
+                <i class="fas fa-tshirt"></i>
+                <span>Normal</span>
+                <small>30 min</small>
+            </button>
+            <button class="cycle-btn" data-time="1200" data-type="Quick" data-size="Small">
+                <i class="fas fa-bolt"></i>
+                <span>Quick Wash</span>
+                <small>20 min</small>
+            </button>
+            <button class="cycle-btn" data-time="2400" data-type="Heavy" data-size="Large">
+                <i class="fas fa-weight-hanging"></i>
+                <span>Heavy Duty</span>
+                <small>40 min</small>
+            </button>
+            <button class="cycle-btn" data-time="900" data-type="Delicate" data-size="Small">
+                <i class="fas fa-feather-alt"></i>
+                <span>Delicate</span>
+                <small>15 min</small>
+            </button>
+            <button class="cycle-btn" data-time="3600" data-type="Bedding" data-size="Large">
+                <i class="fas fa-bed"></i>
+                <span>Bedding</span>
+                <small>60 min</small>
+            </button>
+            <button class="cycle-btn" data-time="600" data-type="Rinse" data-size="Medium">
+                <i class="fas fa-tint"></i>
+                <span>Rinse & Spin</span>
+                <small>10 min</small>
+            </button>
+        </div>
+        
+        <div class="laundry-info">
+            <h3><i class="fas fa-lightbulb"></i> Laundry Tips</h3>
+            <ul>
+                <li>Sort clothes by color and fabric type before washing</li>
+                <li>Don't overload the washing machine for best results</li>
+                <li>Use cold water for dark colors to prevent bleeding</li>
+                <li>Pre-treat stains before washing for better removal</li>
+                <li>Leave space for clothes to move freely in the drum</li>
+                <li>Check pockets for items before washing</li>
+                <li>Use the appropriate amount of detergent for load size</li>
+            </ul>
+        </div>
+    </div>
+
+    <audio id="alarmSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Timer variables
+        let timer;
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let initialSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let soundEnabled = true;
+        let currentCycleType = 'Normal';
+        let currentLoadSize = 'Medium';
+        
+        // DOM elements
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const setTimeBtn = document.getElementById('setTimeBtn');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+        const cycleButtons = document.querySelectorAll('.cycle-btn');
+        const timerState = document.getElementById('timerState');
+        const progressFill = document.getElementById('progressFill');
+        const soundBtn = document.getElementById('soundBtn');
+        const alarmSound = document.getElementById('alarmSound');
+        const bubbles = document.getElementById('bubbles');
+        const clothes = document.getElementById('clothes');
+        const machineStatus = document.getElementById('machineStatus');
+        const cycleTypeStat = document.getElementById('cycleTypeStat');
+        const loadSizeStat = document.getElementById('loadSizeStat');
+        const timeStat = document.getElementById('timeStat');
+        
+        // Format time to HH:MM:SS
+        function formatTime(total) {
+            const hrs = Math.floor(total / 3600);
+            const mins = Math.floor((total % 3600) / 60);
+            const secs = total % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update display
+        function updateDisplay() {
+            display.textContent = formatTime(totalSeconds);
+            
+            // Update progress bar
+            if (initialSeconds > 0) {
+                const progress = ((initialSeconds - totalSeconds) / initialSeconds) * 100;
+                progressFill.style.width = `${progress}%`;
+            } else {
+                progressFill.style.width = '0%';
+            }
+        }
+        
+        // Update timer state display
+        function updateTimerState(state) {
+            timerState.textContent = state;
+            timerState.className = 'timer-state ' + (isRunning ? 'running' : isPaused ? 'paused' : 'stopped');
+        }
+        
+        // Update machine status
+        function updateMachineStatus(status) {
+            machineStatus.textContent = status;
+            if (status.includes('Washing') || status.includes('Ready')) {
+                machineStatus.style.color = '#4CAF50';
+                bubbles.classList.add('active');
+                createBubbles();
+                clothes.style.animationPlayState = 'running';
+            } else if (status.includes('Paused')) {
+                machineStatus.style.color = '#FFC107';
+                bubbles.classList.remove('active');
+                clothes.style.animationPlayState = 'paused';
+            } else {
+                machineStatus.style.color = '#667eea';
+                bubbles.classList.remove('active');
+                clothes.style.animationPlayState = 'paused';
+            }
+        }
+        
+        // Update stats
+        function updateStats() {
+            cycleTypeStat.textContent = currentCycleType;
+            loadSizeStat.textContent = currentLoadSize;
+            timeStat.textContent = Math.ceil(initialSeconds / 60) + ' min';
+        }
+        
+        // Create bubbles animation
+        function createBubbles() {
+            bubbles.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = (Math.random() * 6 + 2) + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = (Math.random() * 2) + 's';
+                bubbles.appendChild(bubble);
+            }
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (totalSeconds > 0) {
+                if (!isRunning) {
+                    isRunning = true;
+                    isPaused = false;
+                    updateTimerState("Laundry cycle running...");
+                    updateMachineStatus("Washing in progress...");
+                    
+                    timer = setInterval(() => {
+                        totalSeconds--;
+                        updateDisplay();
+                        
+                        // Update machine status based on time remaining
+                        const progress = (initialSeconds - totalSeconds) / initialSeconds;
+                        if (progress < 0.2) {
+                            updateMachineStatus("Cycle starting...");
+                        } else if (progress < 0.8) {
+                            updateMachineStatus("Washing in progress...");
+                        } else if (progress < 0.95) {
+                            updateMachineStatus("Cycle almost complete...");
+                        }
+                        
+                        if (totalSeconds <= 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            isPaused = false;
+                            updateTimerState("Laundry cycle complete!");
+                            updateMachineStatus("Cycle finished! Remove clothes.");
+                            display.textContent = "00:00:00";
+                            progressFill.style.width = '100%';
+                            
+                            if (soundEnabled) {
+                                alarmSound.play();
+                            }
+                            
+                            // Flash effect
+                            display.style.color = '#4CAF50';
+                            setTimeout(() => {
+                                display.style.color = '#333';
+                            }, 500);
+                            
+                            setTimeout(() => {
+                                if (soundEnabled) {
+                                    alarmSound.play();
+                                }
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                updateTimerState("Cycle paused");
+                updateMachineStatus("Cycle paused");
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            totalSeconds = 0;
+            initialSeconds = 0;
+            updateDisplay();
+            updateTimerState("Ready to start laundry");
+            updateMachineStatus("Washing machine ready");
+            progressFill.style.width = '0%';
+        }
+        
+        // Set custom time
+        function setCustomTime() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            totalSeconds = mins * 60 + secs;
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Cycle time set");
+            updateMachineStatus("Ready to start cycle");
+            updateStats();
+        }
+        
+        // Set cycle type and time
+        function setCycleType(time, type, size) {
+            totalSeconds = parseInt(time);
+            initialSeconds = totalSeconds;
+            currentCycleType = type;
+            currentLoadSize = size;
+            updateDisplay();
+            updateTimerState(`${type} cycle time set`);
+            updateMachineStatus(`Ready for ${type} cycle`);
+            updateStats();
+        }
+        
+        // Toggle sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundBtn.classList.toggle('active', soundEnabled);
+            soundBtn.innerHTML = soundEnabled ? 
+                '<i class="fas fa-volume-up"></i> Sound On' : 
+                '<i class="fas fa-volume-mute"></i> Sound Off';
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        setTimeBtn.addEventListener('click', setCustomTime);
+        soundBtn.addEventListener('click', toggleSound);
+        
+        cycleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const time = button.getAttribute('data-time');
+                const type = button.getAttribute('data-type');
+                const size = button.getAttribute('data-size');
+                setCycleType(time, type, size);
+            });
+        });
+        
+        // Initialize
+        updateDisplay();
+        updateTimerState("Ready to start laundry");
+        soundBtn.classList.add('active');
+        updateMachineStatus("Washing machine ready");
+        updateStats();
+        createBubbles();
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.code === 'Escape') {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>

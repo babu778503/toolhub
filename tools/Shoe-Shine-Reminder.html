@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<!-- Category: Personal Care -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shoe Shine Reminder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e9eab 0%, #eef2f3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .shoe-form {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: #4b6cb7;
+        }
+        
+        .search-box {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .shoe-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .shoe-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shoe-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #28a745;
+        }
+        
+        .shoe-item.shined::before {
+            background: #28a745;
+        }
+        
+        .shoe-item.due::before {
+            background: #dc3545;
+        }
+        
+        .shoe-item.warning::before {
+            background: #ffc107;
+        }
+        
+        .shoe-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .shoe-info {
+            flex: 1;
+        }
+        
+        .shoe-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .shoe-details {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .next-shine {
+            font-weight: 500;
+        }
+        
+        .next-shine.shined {
+            color: #28a745;
+        }
+        
+        .next-shine.due {
+            color: #dc3545;
+        }
+        
+        .next-shine.warning {
+            color: #ffc107;
+        }
+        
+        .shoe-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .shine-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stat-box {
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4b6cb7;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .reminder-settings {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .reminder-settings h3 {
+            margin-bottom: 10px;
+            color: #4b6cb7;
+        }
+        
+        .reminder-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .reminder-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reminder-option input {
+            margin: 0;
+        }
+        
+        .quick-add {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .quick-add-btn {
+            padding: 6px 12px;
+            background: #182848;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-add-btn:hover {
+            background: #2a3a5a;
+        }
+        
+        .shine-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .shoe-icon {
+            font-size: 60px;
+            color: #4b6cb7;
+            margin: 10px 0;
+            animation: shineRotate 3s infinite;
+        }
+        
+        @keyframes shineRotate {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        .shine-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #4b6cb7;
+        }
+        
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-controls {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .shoe-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .shoe-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                flex: 1 0 40%;
+            }
+            
+            .reminder-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Shoe Shine Reminder
+        </div>
+        
+        <div class="shoe-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="shoeName"><i class="fas fa-shoe-prints"></i> Shoe Name</label>
+                    <input type="text" id="shoeName" placeholder="e.g., Dress Shoes, Sneakers">
+                </div>
+                <div class="form-group">
+                    <label for="shoeType"><i class="fas fa-tags"></i> Shoe Type</label>
+                    <select id="shoeType">
+                        <option value="dress">Dress Shoes</option>
+                        <option value="sneakers">Sneakers</option>
+                        <option value="boots">Boots</option>
+                        <option value="sandals">Sandals</option>
+                        <option value="casual">Casual Shoes</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lastShine"><i class="fas fa-calendar-check"></i> Last Shine Date</label>
+                    <input type="date" id="lastShine">
+                </div>
+                <div class="form-group">
+                    <label for="shineInterval"><i class="fas fa-sync-alt"></i> Shine Interval (Days)</label>
+                    <input type="number" id="shineInterval" min="1" max="365" value="30">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="shoeMaterial"><i class="fas fa-th"></i> Material</label>
+                    <select id="shoeMaterial">
+                        <option value="leather">Leather</option>
+                        <option value="suede">Suede</option>
+                        <option value="canvas">Canvas</option>
+                        <option value="synthetic">Synthetic</option>
+                        <option value="rubber">Rubber</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shoeColor"><i class="fas fa-palette"></i> Color</label>
+                    <select id="shoeColor">
+                        <option value="black">Black</option>
+                        <option value="brown">Brown</option>
+                        <option value="tan">Tan</option>
+                        <option value="white">White</option>
+                        <option value="red">Red</option>
+                        <option value="blue">Blue</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="specialNotes"><i class="fas fa-sticky-note"></i> Special Notes</label>
+                    <textarea id="specialNotes" placeholder="Special care instructions..."></textarea>
+                </div>
+            </div>
+            <button class="add-btn" id="addShoeBtn">
+                <i class="fas fa-plus-circle"></i> Add Shoe
+            </button>
+        </div>
+        
+        <div class="quick-add">
+            <button class="quick-add-btn" data-interval="7">Weekly</button>
+            <button class="quick-add-btn" data-interval="14">Bi-Weekly</button>
+            <button class="quick-add-btn" data-interval="30">Monthly</button>
+            <button class="quick-add-btn" data-interval="60">Bi-Monthly</button>
+            <button class="quick-add-btn" data-interval="90">Quarterly</button>
+        </div>
+        
+        <div class="shine-visualization">
+            <div class="shoe-icon">
+                <i class="fas fa-shoe-prints"></i>
+            </div>
+            <div class="shine-status" id="shineStatus">Ready to shine shoes</div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search shoes...">
+        </div>
+        
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Shoes</button>
+            <button class="filter-btn" data-filter="safe">Up to Date</button>
+            <button class="filter-btn" data-filter="warning">Due Soon</button>
+            <button class="filter-btn" data-filter="due">Overdue</button>
+            <button class="filter-btn" data-filter="leather">Leather</button>
+        </div>
+        
+        <div class="shoe-list" id="shoeList">
+            <div class="empty-state">
+                <i class="fas fa-shoe-prints"></i>
+                <p>No shoes added yet</p>
+                <p>Add your first shoe above</p>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-value" id="totalShoes">0</div>
+                <div class="stat-label">Total Shoes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="upToDate">0</div>
+                <div class="stat-label">Up to Date</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="dueSoon">0</div>
+                <div class="stat-label">Due Soon</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="overdue">0</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+        
+        <div class="reminder-settings">
+            <h3><i class="fas fa-bell"></i> Reminder Settings</h3>
+            <div class="reminder-options">
+                <div class="reminder-option">
+                    <input type="checkbox" id="dailyReminder" checked>
+                    <label for="dailyReminder">Daily Check</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="dueSoonAlert" checked>
+                    <label for="dueSoonAlert">Due Soon Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="overdueAlert" checked>
+                    <label for="overdueAlert">Overdue Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="browserNotifications" checked>
+                    <label for="browserNotifications">Browser Notifications</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Shoe data array
+        let shoes = [];
+        let currentFilter = 'all';
+        let editIndex = -1;
+        
+        // DOM elements
+        const shoeName = document.getElementById('shoeName');
+        const shoeType = document.getElementById('shoeType');
+        const lastShine = document.getElementById('lastShine');
+        const shineInterval = document.getElementById('shineInterval');
+        const shoeMaterial = document.getElementById('shoeMaterial');
+        const shoeColor = document.getElementById('shoeColor');
+        const specialNotes = document.getElementById('specialNotes');
+        const addShoeBtn = document.getElementById('addShoeBtn');
+        const shoeList = document.getElementById('shoeList');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const totalShoes = document.getElementById('totalShoes');
+        const upToDate = document.getElementById('upToDate');
+        const dueSoon = document.getElementById('dueSoon');
+        const overdue = document.getElementById('overdue');
+        const notification = document.getElementById('notification');
+        const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+        const dailyReminder = document.getElementById('dailyReminder');
+        const dueSoonAlert = document.getElementById('dueSoonAlert');
+        const overdueAlert = document.getElementById('overdueAlert');
+        const browserNotifications = document.getElementById('browserNotifications');
+        const shineStatus = document.getElementById('shineStatus');
+        
+        // Set default date
+        const today = new Date();
+        lastShine.valueAsDate = today;
+        
+        // Request notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission();
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+            
+            // Browser notification
+            if (browserNotifications.checked && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('Shoe Shine Reminder', {
+                    body: message,
+                    icon: '👞'
+                });
+            }
+        }
+        
+        // Get days until next shine
+        function getDaysUntilNextShine(lastShineDate, interval) {
+            const lastShine = new Date(lastShineDate);
+            const nextShine = new Date(lastShine);
+            nextShine.setDate(nextShine.getDate() + parseInt(interval));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffTime = nextShine - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        // Get shine status
+        function getShineStatus(lastShineDate, interval) {
+            const days = getDaysUntilNextShine(lastShineDate, interval);
+            if (days < 0) return 'due';
+            if (days <= 7) return 'warning';
+            return 'safe';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Add or update shoe
+        function addShoe() {
+            const name = shoeName.value.trim();
+            const type = shoeType.value;
+            const last = lastShine.value;
+            const interval = parseInt(shineInterval.value) || 30;
+            const material = shoeMaterial.value;
+            const color = shoeColor.value;
+            const notes = specialNotes.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter a shoe name', 'error');
+                return;
+            }
+            
+            if (!last) {
+                showNotification('Please select last shine date', 'error');
+                return;
+            }
+            
+            const newShoe = {
+                id: Date.now(),
+                name: name,
+                type: type,
+                lastShineDate: last,
+                shineInterval: interval,
+                material: material,
+                color: color,
+                specialNotes: notes,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editIndex === -1) {
+                shoes.push(newShoe);
+                showNotification('Shoe added successfully!', 'success');
+            } else {
+                shoes[editIndex] = newShoe;
+                showNotification('Shoe updated successfully!', 'success');
+                editIndex = -1;
+                addShoeBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Shoe';
+            }
+            
+            // Reset form
+            shoeName.value = '';
+            shoeType.value = 'dress';
+            lastShine.valueAsDate = today;
+            shineInterval.value = '30';
+            shoeMaterial.value = 'leather';
+            shoeColor.value = 'black';
+            specialNotes.value = '';
+            
+            saveToLocalStorage();
+            renderShoeList();
+            updateStats();
+        }
+        
+        // Quick add shoe with interval
+        function quickAddShoe(interval) {
+            shineInterval.value = interval;
+            showNotification(`Shine interval set to ${interval} days`, 'success');
+        }
+        
+        // Edit shoe
+        function editShoe(index) {
+            const shoe = shoes[index];
+            shoeName.value = shoe.name;
+            shoeType.value = shoe.type;
+            lastShine.value = shoe.lastShineDate;
+            shineInterval.value = shoe.shineInterval;
+            shoeMaterial.value = shoe.material;
+            shoeColor.value = shoe.color;
+            specialNotes.value = shoe.specialNotes || '';
+            
+            editIndex = index;
+            addShoeBtn.innerHTML = '<i class="fas fa-save"></i> Update Shoe';
+            
+            // Scroll to form
+            document.querySelector('.shoe-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete shoe
+        function deleteShoe(index) {
+            if (confirm('Are you sure you want to delete this shoe?')) {
+                shoes.splice(index, 1);
+                saveToLocalStorage();
+                renderShoeList();
+                updateStats();
+                showNotification('Shoe deleted!', 'success');
+            }
+        }
+        
+        // Mark as shined
+        function markAsShined(index) {
+            const shoe = shoes[index];
+            shoe.lastShineDate = new Date().toISOString().split('T')[0];
+            saveToLocalStorage();
+            renderShoeList();
+            updateStats();
+            showNotification(`${shoe.name} marked as shined!`, 'success');
+            
+            // Show shine animation
+            shineStatus.textContent = 'Shining in progress...';
+            setTimeout(() => {
+                shineStatus.textContent = 'Ready to shine shoes';
+            }, 2000);
+        }
+        
+        // Render shoe list
+        function renderShoeList(filter = 'all', search = '') {
+            // Filter shoes
+            let filteredShoes = [...shoes];
+            
+            // Apply search filter
+            if (search) {
+                filteredShoes = filteredShoes.filter(shoe => 
+                    shoe.name.toLowerCase().includes(search.toLowerCase()) ||
+                    (shoe.specialNotes && shoe.specialNotes.toLowerCase().includes(search.toLowerCase())) ||
+                    shoe.type.toLowerCase().includes(search.toLowerCase()) ||
+                    shoe.material.toLowerCase().includes(search.toLowerCase()) ||
+                    shoe.color.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // Apply status filter
+            if (filter === 'safe') {
+                filteredShoes = filteredShoes.filter(shoe => getShineStatus(shoe.lastShineDate, shoe.shineInterval) === 'safe');
+            } else if (filter === 'warning') {
+                filteredShoes = filteredShoes.filter(shoe => getShineStatus(shoe.lastShineDate, shoe.shineInterval) === 'warning');
+            } else if (filter === 'due') {
+                filteredShoes = filteredShoes.filter(shoe => getShineStatus(shoe.lastShineDate, shoe.shineInterval) === 'due');
+            } else if (filter === 'leather') {
+                filteredShoes = filteredShoes.filter(shoe => shoe.material === 'leather');
+            }
+            
+            // Sort by next shine date (closest first)
+            filteredShoes.sort((a, b) => {
+                const daysA = getDaysUntilNextShine(a.lastShineDate, a.shineInterval);
+                const daysB = getDaysUntilNextShine(b.lastShineDate, b.shineInterval);
+                return daysA - daysB;
+            });
+            
+            if (filteredShoes.length === 0) {
+                shoeList.innerHTML = '<div class="empty-state"><i class="fas fa-shoe-prints"></i><p>No shoes found</p></div>';
+                return;
+            }
+            
+            let html = '';
+            filteredShoes.forEach((shoe, index) => {
+                const shoeIndex = shoes.indexOf(shoe);
+                html += generateShoeItemHTML(shoe, shoeIndex);
+            });
+            
+            shoeList.innerHTML = html;
+            attachEventListeners();
+        }
+        
+        // Generate HTML for shoe item
+        function generateShoeItemHTML(shoe, index) {
+            const days = getDaysUntilNextShine(shoe.lastShineDate, shoe.shineInterval);
+            const status = getShineStatus(shoe.lastShineDate, shoe.shineInterval);
+            const statusClass = status;
+            const statusText = days < 0 ? `${Math.abs(days)} days ago` : 
+                              days === 0 ? 'Today' : 
+                              days === 1 ? '1 day' : 
+                              `${days} days`;
+            
+            // Shoe type icons
+            const typeIcons = {
+                dress: '<i class="fas fa-user-tie"></i>',
+                sneakers: '<i class="fas fa-running"></i>',
+                boots: '<i class="fas fa-boot-heeled"></i>',
+                sandals: '<i class="fas fa-sandals"></i>',
+                casual: '<i class="fas fa-shoe-prints"></i>',
+                other: '<i class="fas fa-question"></i>'
+            };
+            
+            // Material indicators
+            const materialIndicators = {
+                leather: '#8B4513',
+                suede: '#A0522D',
+                canvas: '#F5F5DC',
+                synthetic: '#C0C0C0',
+                rubber: '#000000'
+            };
+            
+            return `
+                <div class="shoe-item ${status}">
+                    <div class="shoe-info">
+                        <div class="shoe-name">${typeIcons[shoe.type] || ''} ${shoe.name}</div>
+                        <div class="shoe-details">
+                            <span>Type: ${shoe.type.charAt(0).toUpperCase() + shoe.type.slice(1)}</span>
+                            <span>Last Shine: ${formatDate(shoe.lastShineDate)}</span>
+                            <span class="next-shine ${statusClass}">Next Shine: ${formatDate(new Date(shoe.lastShineDate).setDate(new Date(shoe.lastShineDate).getDate() + shoe.shineInterval))} (${statusText})</span>
+                            <span>Interval: ${shoe.shineInterval} days</span>
+                            <span>Material: <span style="background: ${materialIndicators[shoe.material]}; padding: 2px 6px; border-radius: 3px;">${shoe.material.charAt(0).toUpperCase() + shoe.material.slice(1)}</span></span>
+                            <span>Color: ${shoe.color.charAt(0).toUpperCase() + shoe.color.slice(1)}</span>
+                            ${shoe.specialNotes ? `<span>Notes: ${shoe.specialNotes}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="shoe-actions">
+                        <button class="action-btn shine-btn" data-index="${index}" title="Mark as Shined">
+                            <i class="fas fa-spray-can"></i>
+                        </button>
+                        <button class="action-btn edit-btn" data-index="${index}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Attach event listeners to action buttons
+        function attachEventListeners() {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    editShoe(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    deleteShoe(index);
+                });
+            });
+            
+            document.querySelectorAll('.shine-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    markAsShined(index);
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalShoes.textContent = shoes.length;
+            
+            let safe = 0, warning = 0, due = 0;
+            shoes.forEach(shoe => {
+                const status = getShineStatus(shoe.lastShineDate, shoe.shineInterval);
+                if (status === 'safe') safe++;
+                else if (status === 'warning') warning++;
+                else if (status === 'due') due++;
+            });
+            
+            upToDate.textContent = safe;
+            dueSoon.textContent = warning;
+            overdue.textContent = due;
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('shoeShineItems', JSON.stringify(shoes));
+            localStorage.setItem('shoeShineSettings', JSON.stringify({
+                dailyReminder: dailyReminder.checked,
+                dueSoonAlert: dueSoonAlert.checked,
+                overdueAlert: overdueAlert.checked,
+                browserNotifications: browserNotifications.checked
+            }));
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('shoeShineItems');
+            const settings = localStorage.getItem('shoeShineSettings');
+            if (saved) {
+                shoes = JSON.parse(saved);
+            }
+            if (settings) {
+                const parsedSettings = JSON.parse(settings);
+                dailyReminder.checked = parsedSettings.dailyReminder;
+                dueSoonAlert.checked = parsedSettings.dueSoonAlert;
+                overdueAlert.checked = parsedSettings.overdueAlert;
+                browserNotifications.checked = parsedSettings.browserNotifications;
+            }
+            renderShoeList();
+            updateStats();
+        }
+        
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderShoeList(filter, searchInput.value.toLowerCase());
+        }
+        
+        // Check for due shining
+        function checkDueShining() {
+            const dueSoonShoes = shoes.filter(shoe => {
+                const days = getDaysUntilNextShine(shoe.lastShineDate, shoe.shineInterval);
+                return days >= 0 && days <= 14;
+            });
+            
+            const overdueShoes = shoes.filter(shoe => {
+                const days = getDaysUntilNextShine(shoe.lastShineDate, shoe.shineInterval);
+                return days < 0;
+            });
+            
+            if (dueSoonShoes.length > 0 && dueSoonAlert.checked) {
+                const shoeNames = dueSoonShoes.map(shoe => shoe.name).join(', ');
+                showNotification(`Shine due soon: ${shoeNames}`, 'warning');
+            }
+            
+            if (overdueShoes.length > 0 && overdueAlert.checked) {
+                const shoeNames = overdueShoes.map(shoe => shoe.name).join(', ');
+                showNotification(`Overdue shining: ${shoeNames}`, 'error');
+            }
+        }
+        
+        // Event listeners
+        addShoeBtn.addEventListener('click', addShoe);
+        
+        searchInput.addEventListener('input', (e) => {
+            renderShoeList(currentFilter, e.target.value.toLowerCase());
+        });
+        
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFilter(btn.getAttribute('data-filter'));
+            });
+        });
+        
+        quickAddButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const interval = parseInt(btn.getAttribute('data-interval'));
+                quickAddShoe(interval);
+            });
+        });
+        
+        // Initialize
+        loadFromLocalStorage();
+        
+        // Check for due shining on load
+        setTimeout(checkDueShining, 1000);
+        
+        // Daily check (simulate with 30 second intervals for demo)
+        setInterval(checkDueShining, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<!-- Category: Household -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dry Cleaning Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e9eab 0%, #eef2f3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .item-form {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: #4b6cb7;
+        }
+        
+        .search-box {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .item-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .item-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .item-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #28a745;
+        }
+        
+        .item-item.cleaned::before {
+            background: #28a745;
+        }
+        
+        .item-item.due::before {
+            background: #dc3545;
+        }
+        
+        .item-item.warning::before {
+            background: #ffc107;
+        }
+        
+        .item-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .item-details {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .next-clean {
+            font-weight: 500;
+        }
+        
+        .next-clean.cleaned {
+            color: #28a745;
+        }
+        
+        .next-clean.due {
+            color: #dc3545;
+        }
+        
+        .next-clean.warning {
+            color: #ffc107;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .clean-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stat-box {
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4b6cb7;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .reminder-settings {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .reminder-settings h3 {
+            margin-bottom: 10px;
+            color: #4b6cb7;
+        }
+        
+        .reminder-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .reminder-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reminder-option input {
+            margin: 0;
+        }
+        
+        .quick-add {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .quick-add-btn {
+            padding: 6px 12px;
+            background: #182848;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-add-btn:hover {
+            background: #2a3a5a;
+        }
+        
+        .dry-clean-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .dry-clean-icon {
+            font-size: 60px;
+            color: #4b6cb7;
+            margin: 10px 0;
+            animation: cleanSpin 4s infinite linear;
+        }
+        
+        @keyframes cleanSpin {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        .dry-clean-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #4b6cb7;
+        }
+        
+        .priority-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .priority-high {
+            background: #dc3545;
+        }
+        
+        .priority-medium {
+            background: #ffc107;
+        }
+        
+        .priority-low {
+            background: #28a745;
+        }
+        
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-controls {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .item-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .item-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                flex: 1 0 40%;
+            }
+            
+            .reminder-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Dry Cleaning Tracker
+        </div>
+        
+        <div class="item-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="itemName"><i class="fas fa-tshirt"></i> Item Name</label>
+                    <input type="text" id="itemName" placeholder="e.g., Suit Jacket, Silk Blouse">
+                </div>
+                <div class="form-group">
+                    <label for="itemType"><i class="fas fa-tags"></i> Item Type</label>
+                    <select id="itemType">
+                        <option value="suit">Suit</option>
+                        <option value="dress">Dress</option>
+                        <option value="coat">Coat</option>
+                        <option value="blouse">Blouse</option>
+                        <option value="pants">Pants</option>
+                        <option value="skirt">Skirt</option>
+                        <option value="jacket">Jacket</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lastClean"><i class="fas fa-calendar-check"></i> Last Clean Date</label>
+                    <input type="date" id="lastClean">
+                </div>
+                <div class="form-group">
+                    <label for="cleanInterval"><i class="fas fa-sync-alt"></i> Clean Interval (Days)</label>
+                    <input type="number" id="cleanInterval" min="1" max="365" value="90">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="priority"><i class="fas fa-exclamation-circle"></i> Priority</label>
+                    <select id="priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="color"><i class="fas fa-palette"></i> Color</label>
+                    <select id="color">
+                        <option value="white">White</option>
+                        <option value="light">Light Colors</option>
+                        <option value="dark">Dark Colors</option>
+                        <option value="bright">Bright Colors</option>
+                        <option value="pattern">Patterned</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="specialCare"><i class="fas fa-sticky-note"></i> Special Care Instructions</label>
+                    <textarea id="specialCare" placeholder="Special cleaning instructions..."></textarea>
+                </div>
+            </div>
+            <button class="add-btn" id="addItemBtn">
+                <i class="fas fa-plus-circle"></i> Add Item
+            </button>
+        </div>
+        
+        <div class="quick-add">
+            <button class="quick-add-btn" data-interval="30">Monthly</button>
+            <button class="quick-add-btn" data-interval="60">Bi-Monthly</button>
+            <button class="quick-add-btn" data-interval="90">Quarterly</button>
+            <button class="quick-add-btn" data-interval="180">Semi-Annual</button>
+            <button class="quick-add-btn" data-interval="365">Annual</button>
+        </div>
+        
+        <div class="dry-clean-visualization">
+            <div class="dry-clean-icon">
+                <i class="fas fa-tshirt"></i>
+            </div>
+            <div class="dry-clean-status" id="dryCleanStatus">Ready to track dry cleaning</div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search items...">
+        </div>
+        
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Items</button>
+            <button class="filter-btn" data-filter="safe">Up to Date</button>
+            <button class="filter-btn" data-filter="warning">Due Soon</button>
+            <button class="filter-btn" data-filter="due">Overdue</button>
+            <button class="filter-btn" data-filter="high">High Priority</button>
+        </div>
+        
+        <div class="item-list" id="itemList">
+            <div class="empty-state">
+                <i class="fas fa-tshirt"></i>
+                <p>No items added yet</p>
+                <p>Add your first dry cleaning item above</p>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-value" id="totalItems">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="upToDate">0</div>
+                <div class="stat-label">Up to Date</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="dueSoon">0</div>
+                <div class="stat-label">Due Soon</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="overdue">0</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+        
+        <div class="reminder-settings">
+            <h3><i class="fas fa-bell"></i> Reminder Settings</h3>
+            <div class="reminder-options">
+                <div class="reminder-option">
+                    <input type="checkbox" id="dailyReminder" checked>
+                    <label for="dailyReminder">Daily Check</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="dueSoonAlert" checked>
+                    <label for="dueSoonAlert">Due Soon Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="overdueAlert" checked>
+                    <label for="overdueAlert">Overdue Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="browserNotifications" checked>
+                    <label for="browserNotifications">Browser Notifications</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Item data array
+        let items = [];
+        let currentFilter = 'all';
+        let editIndex = -1;
+        
+        // DOM elements
+        const itemName = document.getElementById('itemName');
+        const itemType = document.getElementById('itemType');
+        const lastClean = document.getElementById('lastClean');
+        const cleanInterval = document.getElementById('cleanInterval');
+        const priority = document.getElementById('priority');
+        const color = document.getElementById('color');
+        const specialCare = document.getElementById('specialCare');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const itemList = document.getElementById('itemList');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const totalItems = document.getElementById('totalItems');
+        const upToDate = document.getElementById('upToDate');
+        const dueSoon = document.getElementById('dueSoon');
+        const overdue = document.getElementById('overdue');
+        const notification = document.getElementById('notification');
+        const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+        const dailyReminder = document.getElementById('dailyReminder');
+        const dueSoonAlert = document.getElementById('dueSoonAlert');
+        const overdueAlert = document.getElementById('overdueAlert');
+        const browserNotifications = document.getElementById('browserNotifications');
+        const dryCleanStatus = document.getElementById('dryCleanStatus');
+        
+        // Set default date
+        const today = new Date();
+        lastClean.valueAsDate = today;
+        
+        // Request notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission();
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+            
+            // Browser notification
+            if (browserNotifications.checked && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('Dry Cleaning Tracker', {
+                    body: message,
+                    icon: '👔'
+                });
+            }
+        }
+        
+        // Get days until next clean
+        function getDaysUntilNextClean(lastCleanDate, interval) {
+            const lastClean = new Date(lastCleanDate);
+            const nextClean = new Date(lastClean);
+            nextClean.setDate(nextClean.getDate() + parseInt(interval));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffTime = nextClean - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        // Get clean status
+        function getCleanStatus(lastCleanDate, interval) {
+            const days = getDaysUntilNextClean(lastCleanDate, interval);
+            if (days < 0) return 'due';
+            if (days <= 14) return 'warning';
+            return 'safe';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Add or update item
+        function addItem() {
+            const name = itemName.value.trim();
+            const type = itemType.value;
+            const last = lastClean.value;
+            const interval = parseInt(cleanInterval.value) || 90;
+            const prio = priority.value;
+            const clr = color.value;
+            const care = specialCare.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter an item name', 'error');
+                return;
+            }
+            
+            if (!last) {
+                showNotification('Please select last clean date', 'error');
+                return;
+            }
+            
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                type: type,
+                lastCleanDate: last,
+                cleanInterval: interval,
+                priority: prio,
+                color: clr,
+                specialCare: care,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editIndex === -1) {
+                items.push(newItem);
+                showNotification('Item added successfully!', 'success');
+            } else {
+                items[editIndex] = newItem;
+                showNotification('Item updated successfully!', 'success');
+                editIndex = -1;
+                addItemBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Item';
+            }
+            
+            // Reset form
+            itemName.value = '';
+            itemType.value = 'suit';
+            lastClean.valueAsDate = today;
+            cleanInterval.value = '90';
+            priority.value = 'medium';
+            color.value = 'white';
+            specialCare.value = '';
+            
+            saveToLocalStorage();
+            renderItemList();
+            updateStats();
+        }
+        
+        // Quick add item with interval
+        function quickAddItem(interval) {
+            cleanInterval.value = interval;
+            showNotification(`Clean interval set to ${interval} days`, 'success');
+        }
+        
+        // Edit item
+        function editItem(index) {
+            const item = items[index];
+            itemName.value = item.name;
+            itemType.value = item.type;
+            lastClean.value = item.lastCleanDate;
+            cleanInterval.value = item.cleanInterval;
+            priority.value = item.priority;
+            color.value = item.color;
+            specialCare.value = item.specialCare || '';
+            
+            editIndex = index;
+            addItemBtn.innerHTML = '<i class="fas fa-save"></i> Update Item';
+            
+            // Scroll to form
+            document.querySelector('.item-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete item
+        function deleteItem(index) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                items.splice(index, 1);
+                saveToLocalStorage();
+                renderItemList();
+                updateStats();
+                showNotification('Item deleted!', 'success');
+            }
+        }
+        
+        // Mark as cleaned
+        function markAsCleaned(index) {
+            const item = items[index];
+            item.lastCleanDate = new Date().toISOString().split('T')[0];
+            saveToLocalStorage();
+            renderItemList();
+            updateStats();
+            showNotification(`${item.name} marked as cleaned!`, 'success');
+            
+            // Show clean animation
+            dryCleanStatus.textContent = 'Item cleaned!';
+            setTimeout(() => {
+                dryCleanStatus.textContent = 'Ready to track dry cleaning';
+            }, 2000);
+        }
+        
+        // Render item list
+        function renderItemList(filter = 'all', search = '') {
+            // Filter items
+            let filteredItems = [...items];
+            
+            // Apply search filter
+            if (search) {
+                filteredItems = filteredItems.filter(item => 
+                    item.name.toLowerCase().includes(search.toLowerCase()) ||
+                    (item.specialCare && item.specialCare.toLowerCase().includes(search.toLowerCase())) ||
+                    item.type.toLowerCase().includes(search.toLowerCase()) ||
+                    item.color.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // Apply status filter
+            if (filter === 'safe') {
+                filteredItems = filteredItems.filter(item => getCleanStatus(item.lastCleanDate, item.cleanInterval) === 'safe');
+            } else if (filter === 'warning') {
+                filteredItems = filteredItems.filter(item => getCleanStatus(item.lastCleanDate, item.cleanInterval) === 'warning');
+            } else if (filter === 'due') {
+                filteredItems = filteredItems.filter(item => getCleanStatus(item.lastCleanDate, item.cleanInterval) === 'due');
+            } else if (filter === 'high') {
+                filteredItems = filteredItems.filter(item => item.priority === 'high');
+            }
+            
+            // Sort by priority and next clean date
+            filteredItems.sort((a, b) => {
+                // Sort by priority
+                const priorityOrder = { high: 3, medium: 2, low: 1 };
+                if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                }
+                
+                // Sort by next clean date
+                const daysA = getDaysUntilNextClean(a.lastCleanDate, a.cleanInterval);
+                const daysB = getDaysUntilNextClean(b.lastCleanDate, b.cleanInterval);
+                return daysA - daysB;
+            });
+            
+            if (filteredItems.length === 0) {
+                itemList.innerHTML = '<div class="empty-state"><i class="fas fa-tshirt"></i><p>No items found</p></div>';
+                return;
+            }
+            
+            let html = '';
+            filteredItems.forEach((item, index) => {
+                const itemIndex = items.indexOf(item);
+                html += generateItemHTML(item, itemIndex);
+            });
+            
+            itemList.innerHTML = html;
+            attachEventListeners();
+        }
+        
+        // Generate HTML for item
+        function generateItemHTML(item, index) {
+            const days = getDaysUntilNextClean(item.lastCleanDate, item.cleanInterval);
+            const status = getCleanStatus(item.lastCleanDate, item.cleanInterval);
+            const statusClass = status;
+            const statusText = days < 0 ? `${Math.abs(days)} days ago` : 
+                              days === 0 ? 'Today' : 
+                              days === 1 ? '1 day' : 
+                              `${days} days`;
+            
+            // Priority indicator
+            const priorityIndicator = {
+                high: '<span class="priority-indicator priority-high"></span>',
+                medium: '<span class="priority-indicator priority-medium"></span>',
+                low: '<span class="priority-indicator priority-low"></span>'
+            };
+            
+            // Item type icons
+            const typeIcons = {
+                suit: '<i class="fas fa-user-tie"></i>',
+                dress: '<i class="fas fa-female"></i>',
+                coat: '<i class="fas fa-vest"></i>',
+                blouse: '<i class="fas fa-tshirt"></i>',
+                pants: '<i class="fas fa-socks"></i>',
+                skirt: '<i class="fas fa-vest-pants"></i>',
+                jacket: '<i class="fas fa-vest"></i>',
+                other: '<i class="fas fa-question"></i>'
+            };
+            
+            return `
+                <div class="item-item ${status}">
+                    <div class="item-info">
+                        <div class="item-name">
+                            ${priorityIndicator[item.priority]} ${typeIcons[item.type] || ''} ${item.name}
+                        </div>
+                        <div class="item-details">
+                            <span>Type: ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</span>
+                            <span>Last Clean: ${formatDate(item.lastCleanDate)}</span>
+                            <span class="next-clean ${statusClass}">Next Clean: ${formatDate(new Date(item.lastCleanDate).setDate(new Date(item.lastCleanDate).getDate() + item.cleanInterval))} (${statusText})</span>
+                            <span>Interval: ${item.cleanInterval} days</span>
+                            <span>Priority: ${item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}</span>
+                            <span>Color: ${item.color.charAt(0).toUpperCase() + item.color.slice(1)}</span>
+                            ${item.specialCare ? `<span>Care: ${item.specialCare}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn clean-btn" data-index="${index}" title="Mark as Cleaned">
+                            <i class="fas fa-bath"></i>
+                        </button>
+                        <button class="action-btn edit-btn" data-index="${index}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Attach event listeners to action buttons
+        function attachEventListeners() {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    editItem(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    deleteItem(index);
+                });
+            });
+            
+            document.querySelectorAll('.clean-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    markAsCleaned(index);
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalItems.textContent = items.length;
+            
+            let safe = 0, warning = 0, due = 0;
+            items.forEach(item => {
+                const status = getCleanStatus(item.lastCleanDate, item.cleanInterval);
+                if (status === 'safe') safe++;
+                else if (status === 'warning') warning++;
+                else if (status === 'due') due++;
+            });
+            
+            upToDate.textContent = safe;
+            dueSoon.textContent = warning;
+            overdue.textContent = due;
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('dryCleaningItems', JSON.stringify(items));
+            localStorage.setItem('dryCleaningSettings', JSON.stringify({
+                dailyReminder: dailyReminder.checked,
+                dueSoonAlert: dueSoonAlert.checked,
+                overdueAlert: overdueAlert.checked,
+                browserNotifications: browserNotifications.checked
+            }));
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('dryCleaningItems');
+            const settings = localStorage.getItem('dryCleaningSettings');
+            if (saved) {
+                items = JSON.parse(saved);
+            }
+            if (settings) {
+                const parsedSettings = JSON.parse(settings);
+                dailyReminder.checked = parsedSettings.dailyReminder;
+                dueSoonAlert.checked = parsedSettings.dueSoonAlert;
+                overdueAlert.checked = parsedSettings.overdueAlert;
+                browserNotifications.checked = parsedSettings.browserNotifications;
+            }
+            renderItemList();
+            updateStats();
+        }
+        
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderItemList(filter, searchInput.value.toLowerCase());
+        }
+        
+        // Check for due cleaning
+        function checkDueCleaning() {
+            const dueSoonItems = items.filter(item => {
+                const days = getDaysUntilNextClean(item.lastCleanDate, item.cleanInterval);
+                return days >= 0 && days <= 30;
+            });
+            
+            const overdueItems = items.filter(item => {
+                const days = getDaysUntilNextClean(item.lastCleanDate, item.cleanInterval);
+                return days < 0;
+            });
+            
+            if (dueSoonItems.length > 0 && dueSoonAlert.checked) {
+                const itemNames = dueSoonItems.map(item => item.name).join(', ');
+                showNotification(`Dry cleaning due soon: ${itemNames}`, 'warning');
+            }
+            
+            if (overdueItems.length > 0 && overdueAlert.checked) {
+                const itemNames = overdueItems.map(item => item.name).join(', ');
+                showNotification(`Overdue dry cleaning: ${itemNames}`, 'error');
+            }
+        }
+        
+        // Event listeners
+        addItemBtn.addEventListener('click', addItem);
+        
+        searchInput.addEventListener('input', (e) => {
+            renderItemList(currentFilter, e.target.value.toLowerCase());
+        });
+        
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFilter(btn.getAttribute('data-filter'));
+            });
+        });
+        
+        quickAddButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const interval = parseInt(btn.getAttribute('data-interval'));
+                quickAddItem(interval);
+            });
+        });
+        
+        // Initialize
+        loadFromLocalStorage();
+        
+        // Check for due cleaning on load
+        setTimeout(checkDueCleaning, 1000);
+        
+        // Daily check (simulate with 30 second intervals for demo)
+        setInterval(checkDueCleaning, 30000);
+    </script>
+</body>
+</html>
