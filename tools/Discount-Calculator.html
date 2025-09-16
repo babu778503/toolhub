@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discount Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .discount-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .original-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .discount-bar {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .final-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .discount-entry {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #3498db;
+        }
+        
+        .remove-discount {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .remove-discount:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+        }
+        
+        .discount-breakdown-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .breakdown-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .breakdown-title i {
+            margin-right: 8px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .breakdown-rate {
+            font-weight: 600;
+            color: #f1c40f;
+        }
+        
+        .breakdown-amount {
+            color: #2ecc71;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Discount Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="original-price"><i class="fas fa-tag"></i> Original Price ($)</label>
+                    <input type="number" id="original-price" placeholder="Enter original price" min="0" step="0.01" value="100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="discount-percent"><i class="fas fa-percent"></i> Discount Percentage (%)</label>
+                    <input type="number" id="discount-percent" placeholder="Enter discount percentage" min="0" max="100" step="0.1" value="20">
+                </div>
+                
+                <div class="input-group">
+                    <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
+                    <input type="number" id="quantity" placeholder="Enter quantity" min="1" value="1">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('simple')">
+                        <i class="fas fa-calculator"></i> Simple Discount
+                    </div>
+                    <div class="tab" onclick="switchTab('multiple')">
+                        <i class="fas fa-layer-group"></i> Multiple Discounts
+                    </div>
+                </div>
+                
+                <div id="simple-tab" class="tab-content active">
+                    <p>Calculate savings with a single discount percentage.</p>
+                </div>
+                
+                <div id="multiple-tab" class="tab-content">
+                    <p>Calculate savings with multiple discount percentages applied sequentially.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateDiscount()">
+                    <i class="fas fa-calculator"></i> Calculate Discount
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-tags"></i> Discount Calculation</div>
+                <div class="result-amount positive" id="final-amount">$80.00</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 80%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Original Price: $100.00 | Discount: $20.00 | Final Price: $80.00
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="original-price-display">$100.00</div>
+                        <div class="stat-label">Original Price</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value negative" id="discount-amount">$20.00</div>
+                        <div class="stat-label">Discount Amount</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="discount-percent-display">20%</div>
+                        <div class="stat-label">Discount</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="discount-list">
+                    <div class="list-title"><i class="fas fa-receipt"></i> Price Breakdown</div>
+                    <div id="discount-breakdown">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-tag"></i> Original Price</span>
+                            <span class="entry-amount">$100.00</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-percent"></i> Discount (20%)</span>
+                            <span class="entry-amount negative">-$20.00</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-calculator"></i> Final Price</span>
+                            <span class="entry-amount positive">$80.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="discount-breakdown-section">
+                    <div class="breakdown-title"><i class="fas fa-layer-group"></i> Discount Breakdown</div>
+                    <div id="discount-rate-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-rate">20% Discount</span>
+                            <span class="breakdown-amount">$20.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Savings Insights</div>
+                    <p id="discount-insights">You're saving $20.00 (20%) on this purchase. This is a significant discount that brings the price down from $100.00 to $80.00. Make sure to check if this discount is time-limited.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Shopping Tips</h3>
+                    <ul class="savings-steps">
+                        <li>Compare prices across different retailers</li>
+                        <li>Check for additional coupons or promo codes</li>
+                        <li>Look for cashback offers</li>
+                        <li>Sign up for store newsletters for exclusive deals</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Discount Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>15% Discount</h4>
+                        <div class="comparison-value positive" id="low-discount-final">$85.00</div>
+                        <div class="comparison-label">Final Price</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>25% Discount</h4>
+                        <div class="comparison-value positive" id="high-discount-final">$75.00</div>
+                        <div class="comparison-label">Final Price</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Accurate Calculation</h3>
+                        <p>Calculate discounts with precision for any percentage</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                        <p>See price details with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Shopping Tips</h3>
+                        <p>Get actionable recommendations to save more</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Discount Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="original-price-desktop"><i class="fas fa-tag"></i> Original Price ($)</label>
+                            <input type="number" id="original-price-desktop" placeholder="Enter original price" min="0" step="0.01" value="150">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="quantity-desktop"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
+                            <input type="number" id="quantity-desktop" placeholder="Enter quantity" min="1" value="2">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-percent"></i> Discount Percentages</label>
+                            <div id="discount-entries">
+                                <div class="discount-entry">
+                                    <div class="input-group">
+                                        <label>Discount Name</label>
+                                        <input type="text" class="discount-name" placeholder="Discount name" value="Seasonal Sale">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Discount Percentage (%)</label>
+                                        <input type="number" class="discount-percent" placeholder="Discount percentage" min="0" max="100" step="0.1" value="20">
+                                    </div>
+                                </div>
+                                <div class="discount-entry">
+                                    <div class="input-group">
+                                        <label>Discount Name</label>
+                                        <input type="text" class="discount-name" placeholder="Discount name" value="Member Discount">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Discount Percentage (%)</label>
+                                        <input type="number" class="discount-percent" placeholder="Discount percentage" min="0" max="100" step="0.1" value="10">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addDiscountEntry()">
+                                <i class="fas fa-plus"></i> Add Another Discount
+                            </button>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('simple')">
+                                <i class="fas fa-calculator"></i> Simple Discount
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('multiple')">
+                                <i class="fas fa-layer-group"></i> Multiple Discounts
+                            </div>
+                        </div>
+                        
+                        <div id="simple-tab-desktop" class="tab-content active">
+                            <p>Calculate savings with a single discount percentage. Perfect for quick calculations during shopping.</p>
+                        </div>
+                        
+                        <div id="multiple-tab-desktop" class="tab-content">
+                            <p>Calculate savings with multiple discount percentages applied sequentially. Ideal for complex promotions with叠加 discounts.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateDiscountDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Discount
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Accurate Calculation</h3>
+                                <p>Calculate discounts with precision for any percentage</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                                <p>See price details with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Shopping Tips</h3>
+                                <p>Get actionable recommendations to save more</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Purchase Tracking</h3>
+                                <p>Monitor spending and savings over time</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Deal Alerts</h3>
+                                <p>Get notified of the best shopping deals</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-tags"></i> Discount Calculation</div>
+                        <div class="result-amount positive" id="final-amount-desktop">$243.00</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 75%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Original Price: $300.00 | Total Discount: $57.00 | Final Price: $243.00
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="original-price-display-desktop">$300.00</div>
+                                <div class="stat-label">Original Price</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value negative" id="discount-amount-desktop">$57.00</div>
+                                <div class="stat-label">Discount Amount</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="effective-discount-desktop">19%</div>
+                                <div class="stat-label">Effective Discount</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="item-count-desktop">2</div>
+                                <div class="stat-label">Items</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="discount-list">
+                            <div class="list-title"><i class="fas fa-receipt"></i> Detailed Price Breakdown</div>
+                            <div id="discount-breakdown-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-tag"></i> Original Price (2 items)</span>
+                                    <span class="entry-amount">$300.00</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percent"></i> Total Discount</span>
+                                    <span class="entry-amount negative">-$57.00</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calculator"></i> Final Price</span>
+                                    <span class="entry-amount positive">$243.00</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percentage"></i> Effective Discount Rate</span>
+                                    <span class="entry-amount">19%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="discount-breakdown-section">
+                            <div class="breakdown-title"><i class="fas fa-layer-group"></i> Discount Breakdown</div>
+                            <div id="discount-breakdown-detailed">
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Seasonal Sale (20%)</span>
+                                    <span class="breakdown-amount">$60.00</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Member Discount (10%)</span>
+                                    <span class="breakdown-amount">$24.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Savings Insights</div>
+                            <p id="discount-insights-desktop">Your effective discount rate is 19% across 2 items. The Seasonal Sale saves you $60.00 while the Member Discount adds another $24.00 in savings. The total discount of $84.00 represents 28% of your original price. This is an excellent deal that brings your total from $300.00 down to $243.00.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Shopping Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Compare prices across different retailers before purchasing</li>
+                                <li>Check for additional coupons or promo codes at checkout</li>
+                                <li>Look for cashback offers through shopping portals</li>
+                                <li>Sign up for store newsletters to receive exclusive deals</li>
+                                <li>Time your purchases during major sales events</li>
+                                <li>Use price tracking apps to monitor price drops</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Discount Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Low Discount (15%)</h4>
+                                <div class="comparison-value positive" id="low-discount-final-desktop">$255.00</div>
+                                <div class="comparison-label">Final Price</div>
+                                <div class="comparison-value" id="low-discount-amount-desktop">$45.00</div>
+                                <div class="comparison-label">Savings</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>High Discount (25%)</h4>
+                                <div class="comparison-value positive" id="high-discount-final-desktop">$225.00</div>
+                                <div class="comparison-label">Final Price</div>
+                                <div class="comparison-value" id="high-discount-amount-desktop">$75.00</div>
+                                <div class="comparison-label">Savings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('simple-tab').classList.remove('active');
+            document.getElementById('multiple-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('simple-tab-desktop').classList.remove('active');
+            document.getElementById('multiple-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Discount entry functions
+        function addDiscountEntry() {
+            const container = document.getElementById('discount-entries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'discount-entry';
+            newEntry.innerHTML = `
+                <button class="remove-discount" onclick="removeDiscountEntry(this)"><i class="fas fa-times"></i></button>
+                <div class="input-group">
+                    <label>Discount Name</label>
+                    <input type="text" class="discount-name" placeholder="Discount name">
+                </div>
+                <div class="input-group">
+                    <label>Discount Percentage (%)</label>
+                    <input type="number" class="discount-percent" placeholder="Discount percentage" min="0" max="100" step="0.1">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function removeDiscountEntry(button) {
+            if (document.querySelectorAll('.discount-entry').length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one discount entry');
+            }
+        }
+        
+        // Discount calculation functions
+        function calculateDiscount() {
+            const originalPrice = parseFloat(document.getElementById('original-price').value) || 0;
+            const discountPercent = parseFloat(document.getElementById('discount-percent').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            
+            calculateResult(originalPrice, discountPercent, quantity, 'mobile');
+            calculateComparison(originalPrice, discountPercent, quantity, 'mobile');
+        }
+        
+        function calculateDiscountDesktop() {
+            // Get values from main inputs
+            const originalPrice = parseFloat(document.getElementById('original-price-desktop').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity-desktop').value) || 1;
+            
+            // Get values from discount entries
+            const discountEntries = document.querySelectorAll('#discount-entries .discount-entry');
+            let totalPrice = originalPrice * quantity;
+            let finalPrice = totalPrice;
+            let totalDiscount = 0;
+            
+            // Apply discounts sequentially
+            discountEntries.forEach(entry => {
+                const percent = parseFloat(entry.querySelector('.discount-percent').value) || 0;
+                const discountAmount = finalPrice * (percent / 100);
+                finalPrice -= discountAmount;
+                totalDiscount += discountAmount;
+            });
+            
+            const effectiveDiscount = totalPrice > 0 ? ((totalPrice - finalPrice) / totalPrice) * 100 : 0;
+            
+            calculateDetailedResult(originalPrice, quantity, totalPrice, totalDiscount, finalPrice, effectiveDiscount, discountEntries);
+            calculateDetailedComparison(totalPrice, discountEntries);
+        }
+        
+        function calculateResult(originalPrice, discountPercent, quantity, device) {
+            // Calculate values
+            const totalPrice = originalPrice * quantity;
+            const discountAmount = totalPrice * (discountPercent / 100);
+            const finalPrice = totalPrice - discountAmount;
+            
+            // Update UI
+            const finalAmountElement = device === 'mobile' ? document.getElementById('final-amount') : document.getElementById('final-amount-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const originalPriceDisplayElement = device === 'mobile' ? document.getElementById('original-price-display') : document.getElementById('original-price-display-desktop');
+            const discountAmountElement = device === 'mobile' ? document.getElementById('discount-amount') : document.getElementById('discount-amount-desktop');
+            const discountPercentDisplayElement = device === 'mobile' ? document.getElementById('discount-percent-display') : document.getElementById('effective-discount-desktop');
+            const discountBreakdownElement = device === 'mobile' ? document.getElementById('discount-breakdown') : document.getElementById('discount-breakdown-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const insightsElement = device === 'mobile' ? document.getElementById('discount-insights') : document.getElementById('discount-insights-desktop');
+            
+            finalAmountElement.textContent = `$${finalPrice.toFixed(2)}`;
+            resultDescriptionElement.textContent = `Original Price: $${totalPrice.toFixed(2)} | Discount: $${discountAmount.toFixed(2)} | Final Price: $${finalPrice.toFixed(2)}`;
+            originalPriceDisplayElement.textContent = `$${totalPrice.toFixed(2)}`;
+            discountAmountElement.textContent = `$${discountAmount.toFixed(2)}`;
+            discountPercentDisplayElement.textContent = `${discountPercent.toFixed(0)}%`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const itemCountElement = document.getElementById('item-count-desktop');
+                itemCountElement.textContent = quantity;
+            }
+            
+            // Update discount breakdown
+            discountBreakdownElement.innerHTML = '';
+            
+            const originalItem = document.createElement('div');
+            originalItem.className = 'entry-item';
+            originalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Original Price ${quantity > 1 ? `(${quantity} items)` : ''}</span>
+                <span class="entry-amount">$${totalPrice.toFixed(2)}</span>
+            `;
+            discountBreakdownElement.appendChild(originalItem);
+            
+            const discountItem = document.createElement('div');
+            discountItem.className = 'entry-item';
+            discountItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percent"></i> Discount (${discountPercent.toFixed(1)}%)</span>
+                <span class="entry-amount negative">-$${discountAmount.toFixed(2)}</span>
+            `;
+            discountBreakdownElement.appendChild(discountItem);
+            
+            const finalItem = document.createElement('div');
+            finalItem.className = 'entry-item';
+            finalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-calculator"></i> Final Price</span>
+                <span class="entry-amount positive">$${finalPrice.toFixed(2)}</span>
+            `;
+            discountBreakdownElement.appendChild(finalItem);
+            
+            // Desktop additional items
+            if (device === 'desktop') {
+                const effectiveRateItem = document.createElement('div');
+                effectiveRateItem.className = 'entry-item';
+                effectiveRateItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-percentage"></i> Effective Discount Rate</span>
+                    <span class="entry-amount">${discountPercent.toFixed(0)}%</span>
+                `;
+                discountBreakdownElement.appendChild(effectiveRateItem);
+            }
+            
+            // Update insights
+            let insightsText = '';
+            if (device === 'mobile') {
+                insightsText = `You're saving $${discountAmount.toFixed(2)} (${discountPercent.toFixed(1)}%) on this purchase. This is a significant discount that brings the price down from $${totalPrice.toFixed(2)} to $${finalPrice.toFixed(2)}. Make sure to check if this discount is time-limited.`;
+            } else {
+                insightsText = `Your effective discount rate is ${discountPercent.toFixed(0)}% across ${quantity} items. The total discount of $${discountAmount.toFixed(2)} represents ${discountPercent.toFixed(0)}% of your original price. This is an excellent deal that brings your total from $${totalPrice.toFixed(2)} down to $${finalPrice.toFixed(2)}.`;
+            }
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(totalPrice, discountAmount, finalPrice, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (discountAmount / totalPrice) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateDetailedResult(originalPrice, quantity, totalPrice, totalDiscount, finalPrice, effectiveDiscount, discountEntries) {
+            // Update UI
+            const finalAmountElement = document.getElementById('final-amount-desktop');
+            const resultDescriptionElement = document.getElementById('result-description-desktop');
+            const originalPriceDisplayElement = document.getElementById('original-price-display-desktop');
+            const discountAmountElement = document.getElementById('discount-amount-desktop');
+            const effectiveDiscountElement = document.getElementById('effective-discount-desktop');
+            const itemCountElement = document.getElementById('item-count-desktop');
+            const discountBreakdownElement = document.getElementById('discount-breakdown-desktop');
+            const chartContainer = document.getElementById('chart-container-desktop');
+            const progressBar = document.getElementById('progress-bar-desktop');
+            const insightsElement = document.getElementById('discount-insights-desktop');
+            const detailedBreakdownElement = document.getElementById('discount-breakdown-detailed');
+            
+            finalAmountElement.textContent = `$${finalPrice.toFixed(2)}`;
+            resultDescriptionElement.textContent = `Original Price: $${totalPrice.toFixed(2)} | Total Discount: $${totalDiscount.toFixed(2)} | Final Price: $${finalPrice.toFixed(2)}`;
+            originalPriceDisplayElement.textContent = `$${totalPrice.toFixed(2)}`;
+            discountAmountElement.textContent = `$${totalDiscount.toFixed(2)}`;
+            effectiveDiscountElement.textContent = `${effectiveDiscount.toFixed(0)}%`;
+            itemCountElement.textContent = quantity;
+            
+            // Update discount breakdown
+            discountBreakdownElement.innerHTML = '';
+            
+            const originalItem = document.createElement('div');
+            originalItem.className = 'entry-item';
+            originalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Original Price (${quantity} items)</span>
+                <span class="entry-amount">$${totalPrice.toFixed(2)}</span>
+            `;
+            discountBreakdownElement.appendChild(originalItem);
+            
+            const discountItem = document.createElement('div');
+            discountItem.className = 'entry-item';
+            discountItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percent"></i> Total Discount</span>
+                <span class="entry-amount negative">-$${totalDiscount.toFixed(2)}</span>
+            `;
+            discountBreakdownElement.appendChild(discountItem);
+            
+            const finalItem = document.createElement('div');
+            finalItem.className = 'entry-item';
+            finalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-calculator"></i> Final Price</span>
+                <span class="entry-amount positive">$${finalPrice.toFixed(2)}</span>
+            `;
+            discountBreakdownElement.appendChild(finalItem);
+            
+            const effectiveRateItem = document.createElement('div');
+            effectiveRateItem.className = 'entry-item';
+            effectiveRateItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percentage"></i> Effective Discount Rate</span>
+                <span class="entry-amount">${effectiveDiscount.toFixed(0)}%</span>
+            `;
+            discountBreakdownElement.appendChild(effectiveRateItem);
+            
+            // Update detailed breakdown
+            detailedBreakdownElement.innerHTML = '';
+            let remainingPrice = totalPrice;
+            
+            discountEntries.forEach(entry => {
+                const name = entry.querySelector('.discount-name').value || 'Unnamed Discount';
+                const percent = parseFloat(entry.querySelector('.discount-percent').value) || 0;
+                const discountAmount = remainingPrice * (percent / 100);
+                remainingPrice -= discountAmount;
+                
+                const breakdownItem = document.createElement('div');
+                breakdownItem.className = 'breakdown-item';
+                breakdownItem.innerHTML = `
+                    <span class="breakdown-rate">${name} (${percent.toFixed(1)}%)</span>
+                    <span class="breakdown-amount">$${discountAmount.toFixed(2)}</span>
+                `;
+                detailedBreakdownElement.appendChild(breakdownItem);
+            });
+            
+            // Update insights
+            let insightsText = `Your effective discount rate is ${effectiveDiscount.toFixed(0)}% across ${quantity} items. `;
+            
+            // Find highest discount
+            let highestDiscount = 0;
+            let highestDiscountName = '';
+            
+            discountEntries.forEach(entry => {
+                const name = entry.querySelector('.discount-name').value || 'Unnamed Discount';
+                const percent = parseFloat(entry.querySelector('.discount-percent').value) || 0;
+                
+                if (percent > highestDiscount) {
+                    highestDiscount = percent;
+                    highestDiscountName = name;
+                }
+            });
+            
+            if (highestDiscountName) {
+                insightsText += `The ${highestDiscountName} saves you the most. `;
+            }
+            
+            insightsText += `The total discount of $${totalDiscount.toFixed(2)} represents ${effectiveDiscount.toFixed(0)}% of your original price. This is an excellent deal that brings your total from $${totalPrice.toFixed(2)} down to $${finalPrice.toFixed(2)}.`;
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(totalPrice, totalDiscount, finalPrice, chartContainer, 'desktop');
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (totalDiscount / totalPrice) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateComparison(originalPrice, discountPercent, quantity, device) {
+            const totalPrice = originalPrice * quantity;
+            
+            // Calculate for 15% discount
+            const lowDiscountAmount = totalPrice * 0.15;
+            const lowDiscountFinal = totalPrice - lowDiscountAmount;
+            
+            // Calculate for 25% discount
+            const highDiscountAmount = totalPrice * 0.25;
+            const highDiscountFinal = totalPrice - highDiscountAmount;
+            
+            // Update comparison UI
+            const lowDiscountFinalElement = device === 'mobile' ? document.getElementById('low-discount-final') : document.getElementById('low-discount-final-desktop');
+            const highDiscountFinalElement = device === 'mobile' ? document.getElementById('high-discount-final') : document.getElementById('high-discount-final-desktop');
+            
+            lowDiscountFinalElement.textContent = `$${lowDiscountFinal.toFixed(2)}`;
+            highDiscountFinalElement.textContent = `$${highDiscountFinal.toFixed(2)}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const lowDiscountAmountElement = document.getElementById('low-discount-amount-desktop');
+                const highDiscountAmountElement = document.getElementById('high-discount-amount-desktop');
+                
+                lowDiscountAmountElement.textContent = `$${lowDiscountAmount.toFixed(2)}`;
+                highDiscountAmountElement.textContent = `$${highDiscountAmount.toFixed(2)}`;
+            }
+        }
+        
+        function calculateDetailedComparison(totalPrice, discountEntries) {
+            // Calculate for 15% discount
+            const lowDiscountAmount = totalPrice * 0.15;
+            const lowDiscountFinal = totalPrice - lowDiscountAmount;
+            
+            // Calculate for 25% discount
+            const highDiscountAmount = totalPrice * 0.25;
+            const highDiscountFinal = totalPrice - highDiscountAmount;
+            
+            // Update comparison UI
+            const lowDiscountFinalElement = document.getElementById('low-discount-final-desktop');
+            const highDiscountFinalElement = document.getElementById('high-discount-final-desktop');
+            const lowDiscountAmountElement = document.getElementById('low-discount-amount-desktop');
+            const highDiscountAmountElement = document.getElementById('high-discount-amount-desktop');
+            
+            lowDiscountFinalElement.textContent = `$${lowDiscountFinal.toFixed(2)}`;
+            highDiscountFinalElement.textContent = `$${highDiscountFinal.toFixed(2)}`;
+            lowDiscountAmountElement.textContent = `$${lowDiscountAmount.toFixed(2)}`;
+            highDiscountAmountElement.textContent = `$${highDiscountAmount.toFixed(2)}`;
+        }
+        
+        function generateChart(originalPrice, discountAmount, finalPrice, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(originalPrice, discountAmount, finalPrice);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Original price bar
+            const originalBar = document.createElement('div');
+            originalBar.className = 'chart-bar original-bar';
+            const originalHeight = maxValue > 0 ? (originalPrice / maxValue) * maxHeight : 0;
+            originalBar.style.height = originalHeight + 'px';
+            originalBar.textContent = `$${(originalPrice/1000).toFixed(0)}k`;
+            
+            const originalLabel = document.createElement('div');
+            originalLabel.className = 'chart-label';
+            originalLabel.textContent = 'Original';
+            
+            const originalContainer = document.createElement('div');
+            originalContainer.style.display = 'flex';
+            originalContainer.style.flexDirection = 'column';
+            originalContainer.style.alignItems = 'center';
+            originalContainer.style.margin = '0 5px';
+            
+            originalContainer.appendChild(originalBar);
+            originalContainer.appendChild(originalLabel);
+            
+            // Discount amount bar
+            const discountBar = document.createElement('div');
+            discountBar.className = 'chart-bar discount-bar';
+            const discountHeight = maxValue > 0 ? (discountAmount / maxValue) * maxHeight : 0;
+            discountBar.style.height = discountHeight + 'px';
+            discountBar.textContent = `$${discountAmount.toFixed(0)}`;
+            
+            const discountLabel = document.createElement('div');
+            discountLabel.className = 'chart-label';
+            discountLabel.textContent = 'Discount';
+            
+            const discountContainer = document.createElement('div');
+            discountContainer.style.display = 'flex';
+            discountContainer.style.flexDirection = 'column';
+            discountContainer.style.alignItems = 'center';
+            discountContainer.style.margin = '0 5px';
+            
+            discountContainer.appendChild(discountBar);
+            discountContainer.appendChild(discountLabel);
+            
+            // Final price bar
+            const finalBar = document.createElement('div');
+            finalBar.className = 'chart-bar final-bar';
+            const finalHeight = maxValue > 0 ? (finalPrice / maxValue) * maxHeight : 0;
+            finalBar.style.height = finalHeight + 'px';
+            finalBar.textContent = `$${(finalPrice/1000).toFixed(0)}k`;
+            
+            const finalLabel = document.createElement('div');
+            finalLabel.className = 'chart-label';
+            finalLabel.textContent = 'Final';
+            
+            const finalContainer = document.createElement('div');
+            finalContainer.style.display = 'flex';
+            finalContainer.style.flexDirection = 'column';
+            finalContainer.style.alignItems = 'center';
+            finalContainer.style.margin = '0 5px';
+            
+            finalContainer.appendChild(finalBar);
+            finalContainer.appendChild(finalLabel);
+            
+            container.appendChild(originalContainer);
+            container.appendChild(discountContainer);
+            container.appendChild(finalContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateDiscount();
+            calculateDiscountDesktop();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dividend Yield Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .dividend-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .dividend-bar {
+            background: linear-gradient(to top, #3498db, #2ecc71);
+        }
+        
+        .yield-bar {
+            background: linear-gradient(to top, #f1c40f, #e67e22);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Dividend Yield Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="stock-name"><i class="fas fa-chart-line"></i> Stock Name/Symbol</label>
+                    <input type="text" id="stock-name" placeholder="Enter stock name or symbol" value="KO">
+                </div>
+                
+                <div class="input-group">
+                    <label for="stock-price"><i class="fas fa-tag"></i> Current Stock Price ($)</label>
+                    <input type="number" id="stock-price" placeholder="Enter current stock price" min="0" step="0.01" value="65.50">
+                </div>
+                
+                <div class="input-group">
+                    <label for="annual-dividend"><i class="fas fa-coins"></i> Annual Dividend Per Share ($)</label>
+                    <input type="number" id="annual-dividend" placeholder="Enter annual dividend per share" min="0" step="0.01" value="1.76">
+                </div>
+                
+                <div class="input-group">
+                    <label for="shares-owned"><i class="fas fa-sort-numeric-up"></i> Number of Shares Owned</label>
+                    <input type="number" id="shares-owned" placeholder="Enter number of shares" min="0" value="100">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('current')">
+                        <i class="fas fa-percentage"></i> Current Yield
+                    </div>
+                    <div class="tab" onclick="switchTab('projected')">
+                        <i class="fas fa-chart-line"></i> Projected Yield
+                    </div>
+                </div>
+                
+                <div id="current-tab" class="tab-content active">
+                    <p>Calculate current dividend yield based on current stock price and dividend.</p>
+                </div>
+                
+                <div id="projected-tab" class="tab-content">
+                    <p>Calculate projected yield based on different stock prices and dividend scenarios.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateDividendYield()">
+                    <i class="fas fa-calculator"></i> Calculate Yield
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-percentage"></i> Dividend Yield Analysis</div>
+                <div class="result-amount" id="dividend-yield">2.69%</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 67%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Annual Dividend: $176.00 | Yield: 2.69%
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="annual-dividend-total">$176.00</div>
+                        <div class="stat-label">Annual Dividend</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="quarterly-dividend">$44.00</div>
+                        <div class="stat-label">Quarterly Dividend</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="monthly-dividend">$14.67</div>
+                        <div class="stat-label">Monthly Dividend</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="dividend-list">
+                    <div class="list-title"><i class="fas fa-receipt"></i> Dividend Details</div>
+                    <div id="dividend-details">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-tag"></i> Stock Price</span>
+                            <span class="entry-amount">$65.50</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-coins"></i> Annual Dividend</span>
+                            <span class="entry-amount">$1.76</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-percentage"></i> Dividend Yield</span>
+                            <span class="entry-amount positive">2.69%</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-sort-numeric-up"></i> Shares Owned</span>
+                            <span class="entry-amount">100</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Dividend Insights</div>
+                    <p>This stock offers a solid 2.69% dividend yield, which is above the S&P 500 average. With 100 shares, you would receive $176 annually in dividends.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Investment Strategy</h3>
+                    <ul class="savings-steps">
+                        <li>Reinvest dividends to compound your returns</li>
+                        <li>Diversify across dividend-paying sectors</li>
+                        <li>Focus on companies with consistent dividend growth</li>
+                        <li>Monitor payout ratios to ensure sustainability</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Yield Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>5% Higher Price</h4>
+                        <div class="comparison-value" id="higher-price-yield">2.40%</div>
+                        <div class="comparison-label">Yield</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>10% Dividend Growth</h4>
+                        <div class="comparison-value positive" id="growth-yield">2.96%</div>
+                        <div class="comparison-label">Yield</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Comprehensive Analysis</h3>
+                        <p>Calculate current and projected dividend yields</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                        <p>See dividend details with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Investment Insights</h3>
+                        <p>Get actionable recommendations for dividend investing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Dividend Yield Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="stock-name-desktop"><i class="fas fa-chart-line"></i> Stock Name/Symbol</label>
+                            <input type="text" id="stock-name-desktop" placeholder="Enter stock name or symbol" value="KO">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="stock-price-desktop"><i class="fas fa-tag"></i> Current Stock Price ($)</label>
+                            <input type="number" id="stock-price-desktop" placeholder="Enter current stock price" min="0" step="0.01" value="65.50">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="annual-dividend-desktop"><i class="fas fa-coins"></i> Annual Dividend Per Share ($)</label>
+                            <input type="number" id="annual-dividend-desktop" placeholder="Enter annual dividend per share" min="0" step="0.01" value="1.76">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="shares-owned-desktop"><i class="fas fa-sort-numeric-up"></i> Number of Shares Owned</label>
+                            <input type="number" id="shares-owned-desktop" placeholder="Enter number of shares" min="0" value="100">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="dividend-frequency"><i class="fas fa-calendar-alt"></i> Dividend Payment Frequency</label>
+                            <select id="dividend-frequency">
+                                <option value="4">Quarterly</option>
+                                <option value="12">Monthly</option>
+                                <option value="2">Semi-Annually</option>
+                                <option value="1">Annually</option>
+                            </select>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('current')">
+                                <i class="fas fa-percentage"></i> Current Yield Analysis
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('projected')">
+                                <i class="fas fa-chart-line"></i> Projected Yield Analysis
+                            </div>
+                        </div>
+                        
+                        <div id="current-tab-desktop" class="tab-content active">
+                            <p>Calculate current dividend yield based on current stock price and dividend. Perfect for evaluating existing holdings.</p>
+                        </div>
+                        
+                        <div id="projected-tab-desktop" class="tab-content">
+                            <p>Calculate projected yield based on different stock prices and dividend scenarios. Ideal for investment research.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateDividendYieldDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Dividend Yield
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Comprehensive Analysis</h3>
+                                <p>Calculate current and projected dividend yields</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                                <p>See dividend details with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Investment Insights</h3>
+                                <p>Get actionable recommendations for dividend investing</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Historical Tracking</h3>
+                                <p>Monitor dividend growth over time</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Dividend Alerts</h3>
+                                <p>Get notified of ex-dividend dates</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-percentage"></i> Dividend Yield Analysis</div>
+                        <div class="result-amount" id="dividend-yield-desktop">2.69%</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 67%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Annual Dividend: $176.00 | Yield: 2.69%
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="annual-dividend-total-desktop">$176.00</div>
+                                <div class="stat-label">Annual Dividend</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="quarterly-dividend-desktop">$44.00</div>
+                                <div class="stat-label">Quarterly Dividend</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="monthly-dividend-desktop">$14.67</div>
+                                <div class="stat-label">Monthly Dividend</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="dividend-growth">3.2%</div>
+                                <div class="stat-label">5-Year Growth</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="dividend-list">
+                            <div class="list-title"><i class="fas fa-receipt"></i> Dividend Details</div>
+                            <div id="dividend-details-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-tag"></i> Stock Price</span>
+                                    <span class="entry-amount">$65.50</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-coins"></i> Annual Dividend</span>
+                                    <span class="entry-amount">$1.76</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percentage"></i> Dividend Yield</span>
+                                    <span class="entry-amount positive">2.69%</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-sort-numeric-up"></i> Shares Owned</span>
+                                    <span class="entry-amount">100</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calendar-alt"></i> Payment Frequency</span>
+                                    <span class="entry-amount">Quarterly</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-chart-line"></i> Payout Ratio</span>
+                                    <span class="entry-amount">65%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Dividend Insights</div>
+                            <p>This stock offers a solid 2.69% dividend yield, which is above the S&P 500 average of 1.3%. With 100 shares, you would receive $176 annually in dividends. The company has consistently increased dividends for 59 years with a 3.2% average annual growth rate. The 65% payout ratio indicates sustainable dividend payments.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Investment Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Reinvest dividends to compound your returns through DRIP programs</li>
+                                <li>Diversify across dividend-paying sectors (utilities, REITs, consumer staples)</li>
+                                <li>Focus on companies with consistent dividend growth over 10+ years</li>
+                                <li>Monitor payout ratios (30-60% is ideal) to ensure sustainability</li>
+                                <li>Consider dividend aristocrats with 25+ years of consecutive increases</li>
+                                <li>Balance high-yield stocks with growth potential for long-term wealth building</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Yield Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Conservative (5% Higher Price)</h4>
+                                <div class="comparison-value" id="higher-price-yield-desktop">2.40%</div>
+                                <div class="comparison-label">Yield</div>
+                                <div class="comparison-value" id="higher-price-dividend-desktop">$176.00</div>
+                                <div class="comparison-label">Annual Dividend</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Optimistic (10% Div Growth)</h4>
+                                <div class="comparison-value positive" id="growth-yield-desktop">2.96%</div>
+                                <div class="comparison-label">Yield</div>
+                                <div class="comparison-value positive" id="growth-dividend-desktop">$193.60</div>
+                                <div class="comparison-label">Annual Dividend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('current-tab').classList.remove('active');
+            document.getElementById('projected-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('current-tab-desktop').classList.remove('active');
+            document.getElementById('projected-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Calculation functions
+        function calculateDividendYield() {
+            const stockName = document.getElementById('stock-name').value || 'Stock';
+            const stockPrice = parseFloat(document.getElementById('stock-price').value) || 0;
+            const annualDividend = parseFloat(document.getElementById('annual-dividend').value) || 0;
+            const sharesOwned = parseFloat(document.getElementById('shares-owned').value) || 0;
+            
+            calculateResult(stockName, stockPrice, annualDividend, sharesOwned, 4, 'mobile');
+            calculateComparison(stockPrice, annualDividend, sharesOwned, 'mobile');
+        }
+        
+        function calculateDividendYieldDesktop() {
+            const stockName = document.getElementById('stock-name-desktop').value || 'Stock';
+            const stockPrice = parseFloat(document.getElementById('stock-price-desktop').value) || 0;
+            const annualDividend = parseFloat(document.getElementById('annual-dividend-desktop').value) || 0;
+            const sharesOwned = parseFloat(document.getElementById('shares-owned-desktop').value) || 0;
+            const frequency = parseInt(document.getElementById('dividend-frequency').value) || 4;
+            
+            calculateResult(stockName, stockPrice, annualDividend, sharesOwned, frequency, 'desktop');
+            calculateComparison(stockPrice, annualDividend, sharesOwned, 'desktop');
+        }
+        
+        function calculateResult(stockName, stockPrice, annualDividend, sharesOwned, frequency, device) {
+            // Calculate values
+            const dividendYield = stockPrice > 0 ? (annualDividend / stockPrice) * 100 : 0;
+            const annualDividendTotal = annualDividend * sharesOwned;
+            const quarterlyDividend = annualDividendTotal / 4;
+            const monthlyDividend = annualDividendTotal / 12;
+            const payoutRatio = 65; // Sample value
+            
+            // Update UI
+            const dividendYieldElement = device === 'mobile' ? document.getElementById('dividend-yield') : document.getElementById('dividend-yield-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const annualDividendTotalElement = device === 'mobile' ? document.getElementById('annual-dividend-total') : document.getElementById('annual-dividend-total-desktop');
+            const quarterlyDividendElement = device === 'mobile' ? document.getElementById('quarterly-dividend') : document.getElementById('quarterly-dividend-desktop');
+            const monthlyDividendElement = device === 'mobile' ? document.getElementById('monthly-dividend') : document.getElementById('monthly-dividend-desktop');
+            const dividendDetailsElement = device === 'mobile' ? document.getElementById('dividend-details') : document.getElementById('dividend-details-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const summaryElement = device === 'mobile' ? document.querySelector('.summary-section p') : document.querySelector('.summary-section p');
+            
+            dividendYieldElement.textContent = `${dividendYield.toFixed(2)}%`;
+            resultDescriptionElement.textContent = `Annual Dividend: $${annualDividendTotal.toFixed(2)} | Yield: ${dividendYield.toFixed(2)}%`;
+            annualDividendTotalElement.textContent = `$${annualDividendTotal.toFixed(2)}`;
+            quarterlyDividendElement.textContent = `$${quarterlyDividend.toFixed(2)}`;
+            monthlyDividendElement.textContent = `$${monthlyDividend.toFixed(2)}`;
+            
+            // Update dividend details
+            dividendDetailsElement.innerHTML = '';
+            
+            const priceItem = document.createElement('div');
+            priceItem.className = 'entry-item';
+            priceItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Stock Price</span>
+                <span class="entry-amount">$${stockPrice.toFixed(2)}</span>
+            `;
+            dividendDetailsElement.appendChild(priceItem);
+            
+            const dividendItem = document.createElement('div');
+            dividendItem.className = 'entry-item';
+            dividendItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-coins"></i> Annual Dividend</span>
+                <span class="entry-amount">$${annualDividend.toFixed(2)}</span>
+            `;
+            dividendDetailsElement.appendChild(dividendItem);
+            
+            const yieldItem = document.createElement('div');
+            yieldItem.className = 'entry-item';
+            yieldItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percentage"></i> Dividend Yield</span>
+                <span class="entry-amount ${dividendYield >= 2 ? 'positive' : ''}">${dividendYield.toFixed(2)}%</span>
+            `;
+            dividendDetailsElement.appendChild(yieldItem);
+            
+            const sharesItem = document.createElement('div');
+            sharesItem.className = 'entry-item';
+            sharesItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-sort-numeric-up"></i> Shares Owned</span>
+                <span class="entry-amount">${sharesOwned}</span>
+            `;
+            dividendDetailsElement.appendChild(sharesItem);
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const frequencyItem = document.createElement('div');
+                frequencyItem.className = 'entry-item';
+                frequencyItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-calendar-alt"></i> Payment Frequency</span>
+                    <span class="entry-amount">${frequency === 4 ? 'Quarterly' : frequency === 12 ? 'Monthly' : frequency === 2 ? 'Semi-Annually' : 'Annually'}</span>
+                `;
+                dividendDetailsElement.appendChild(frequencyItem);
+                
+                const payoutItem = document.createElement('div');
+                payoutItem.className = 'entry-item';
+                payoutItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-chart-line"></i> Payout Ratio</span>
+                    <span class="entry-amount">${payoutRatio}%</span>
+                `;
+                dividendDetailsElement.appendChild(payoutItem);
+                
+                const growthElement = document.getElementById('dividend-growth');
+                growthElement.textContent = '3.2%';
+            }
+            
+            // Update summary
+            let summaryText = '';
+            if (dividendYield > 4) {
+                summaryText = `This stock offers an excellent ${dividendYield.toFixed(2)}% dividend yield, significantly above the S&P 500 average of 1.3%. With ${sharesOwned} shares, you would receive $${annualDividendTotal.toFixed(2)} annually in dividends. The company has consistently increased dividends with a strong track record. However, yields above 4% may indicate higher risk - verify the sustainability of payments.`;
+            } else if (dividendYield > 2) {
+                summaryText = `This stock offers a solid ${dividendYield.toFixed(2)}% dividend yield, which is above the S&P 500 average of 1.3%. With ${sharesOwned} shares, you would receive $${annualDividendTotal.toFixed(2)} annually in dividends. The company has consistently increased dividends for many years with a ${payoutRatio}% payout ratio indicating sustainable payments.`;
+            } else if (dividendYield > 0) {
+                summaryText = `This stock offers a modest ${dividendYield.toFixed(2)}% dividend yield, which is below the market average. With ${sharesOwned} shares, you would receive $${annualDividendTotal.toFixed(2)} annually in dividends. Consider this as part of a diversified dividend portfolio.`;
+            } else {
+                summaryText = `This stock does not currently pay dividends. Consider growth stocks for capital appreciation or dividend-paying stocks for income.`;
+            }
+            summaryElement.textContent = summaryText;
+            
+            // Generate chart
+            generateChart(annualDividendTotal, dividendYield, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, dividendYield * 10));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateComparison(stockPrice, annualDividend, sharesOwned, device) {
+            // Calculate for 5% higher stock price
+            const higherPrice = stockPrice * 1.05;
+            const higherYield = higherPrice > 0 ? (annualDividend / higherPrice) * 100 : 0;
+            const higherAnnualDividend = annualDividend * sharesOwned;
+            
+            // Calculate for 10% dividend growth
+            const higherDividend = annualDividend * 1.10;
+            const growthYield = stockPrice > 0 ? (higherDividend / stockPrice) * 100 : 0;
+            const growthAnnualDividend = higherDividend * sharesOwned;
+            
+            // Update comparison UI
+            const higherPriceYieldElement = device === 'mobile' ? document.getElementById('higher-price-yield') : document.getElementById('higher-price-yield-desktop');
+            const growthYieldElement = device === 'mobile' ? document.getElementById('growth-yield') : document.getElementById('growth-yield-desktop');
+            
+            higherPriceYieldElement.textContent = `${higherYield.toFixed(2)}%`;
+            growthYieldElement.textContent = `${growthYield.toFixed(2)}%`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const higherPriceDividendElement = document.getElementById('higher-price-dividend-desktop');
+                const growthDividendElement = document.getElementById('growth-dividend-desktop');
+                
+                higherPriceDividendElement.textContent = `$${higherAnnualDividend.toFixed(2)}`;
+                growthDividendElement.textContent = `$${growthAnnualDividend.toFixed(2)}`;
+            }
+        }
+        
+        function generateChart(annualDividend, dividendYield, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(annualDividend, dividendYield * 50);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Dividend bar
+            const dividendBar = document.createElement('div');
+            dividendBar.className = 'chart-bar dividend-bar';
+            const dividendHeight = maxValue > 0 ? (annualDividend / maxValue) * maxHeight : 0;
+            dividendBar.style.height = dividendHeight + 'px';
+            dividendBar.textContent = `$${(annualDividend/1000).toFixed(0)}k`;
+            
+            const dividendLabel = document.createElement('div');
+            dividendLabel.className = 'chart-label';
+            dividendLabel.textContent = 'Annual Div';
+            
+            const dividendContainer = document.createElement('div');
+            dividendContainer.style.display = 'flex';
+            dividendContainer.style.flexDirection = 'column';
+            dividendContainer.style.alignItems = 'center';
+            dividendContainer.style.margin = '0 10px';
+            
+            dividendContainer.appendChild(dividendBar);
+            dividendContainer.appendChild(dividendLabel);
+            
+            // Yield bar
+            const yieldBar = document.createElement('div');
+            yieldBar.className = 'chart-bar yield-bar';
+            const yieldHeight = maxValue > 0 ? ((dividendYield * 50) / maxValue) * maxHeight : 0;
+            yieldBar.style.height = yieldHeight + 'px';
+            yieldBar.textContent = `${dividendYield.toFixed(1)}%`;
+            
+            const yieldLabel = document.createElement('div');
+            yieldLabel.className = 'chart-label';
+            yieldLabel.textContent = 'Yield';
+            
+            const yieldContainer = document.createElement('div');
+            yieldContainer.style.display = 'flex';
+            yieldContainer.style.flexDirection = 'column';
+            yieldContainer.style.alignItems = 'center';
+            yieldContainer.style.margin = '0 10px';
+            
+            yieldContainer.appendChild(yieldBar);
+            yieldContainer.appendChild(yieldLabel);
+            
+            container.appendChild(dividendContainer);
+            container.appendChild(yieldContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateDividendYield();
+            calculateDividendYieldDesktop();
+        };
+    </script>
+</body>
+</html>

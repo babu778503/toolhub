@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Return Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .investment-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+            color: #2ecc71;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(to top, #3498db, #2ecc71);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .positive {
+            color: #2ecc71 !important;
+        }
+        
+        .negative {
+            color: #e74c3c !important;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Investment Return Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="initial-investment"><i class="fas fa-coins"></i> Initial Investment ($)</label>
+                    <input type="number" id="initial-investment" placeholder="Enter initial investment" min="0" value="10000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="monthly-contribution"><i class="fas fa-money-bill-wave"></i> Monthly Contribution ($)</label>
+                    <input type="number" id="monthly-contribution" placeholder="Enter monthly contribution" min="0" value="500">
+                </div>
+                
+                <div class="input-group">
+                    <label for="investment-period"><i class="fas fa-calendar-alt"></i> Investment Period (Years)</label>
+                    <input type="number" id="investment-period" placeholder="Enter investment period" min="1" max="50" value="10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="annual-return"><i class="fas fa-percentage"></i> Annual Return Rate (%)</label>
+                    <input type="number" id="annual-return" placeholder="Enter annual return rate" min="0" step="0.1" value="7">
+                </div>
+                
+                <div class="input-group">
+                    <label for="compounding"><i class="fas fa-sync-alt"></i> Compounding Frequency</label>
+                    <select id="compounding">
+                        <option value="1">Annually</option>
+                        <option value="2">Semi-Annually</option>
+                        <option value="4">Quarterly</option>
+                        <option value="12" selected>Monthly</option>
+                        <option value="365">Daily</option>
+                    </select>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('lumpsum')">
+                        <i class="fas fa-piggy-bank"></i> Lump Sum
+                    </div>
+                    <div class="tab" onclick="switchTab('sip')">
+                        <i class="fas fa-exchange-alt"></i> SIP
+                    </div>
+                </div>
+                
+                <div id="lumpsum-tab" class="tab-content active">
+                    <p>Calculate returns on a one-time investment with regular compounding.</p>
+                </div>
+                
+                <div id="sip-tab" class="tab-content">
+                    <p>Calculate returns on systematic investment plans with regular contributions.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateInvestmentReturn()">
+                    <i class="fas fa-calculator"></i> Calculate Returns
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-chart-line"></i> Investment Projection</div>
+                <div class="result-amount" id="future-value">$32,457</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 65%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Initial: $10,000 | Contributions: $60,000 | Returns: $22,457
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-invested">$70,000</div>
+                        <div class="stat-label">Total Invested</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="total-returns">$22,457</div>
+                        <div class="stat-label">Total Returns</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="roi">32.1%</div>
+                        <div class="stat-label">ROI</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="investment-list">
+                    <div class="list-title"><i class="fas fa-chart-bar"></i> Yearly Breakdown</div>
+                    <div id="yearly-breakdown">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-calendar"></i> Year 1</span>
+                            <span class="entry-amount">$17,200</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-calendar"></i> Year 5</span>
+                            <span class="entry-amount">$49,800</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-calendar"></i> Year 10</span>
+                            <span class="entry-amount">$92,457</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Investment Insights</div>
+                    <p>Your investment is projected to grow significantly over 10 years. The power of compounding adds $22,457 in returns to your initial investment and contributions.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Investment Strategy</h3>
+                    <ul class="savings-steps">
+                        <li>Consider diversifying across asset classes</li>
+                        <li>Review and rebalance your portfolio annually</li>
+                        <li>Maximize tax-advantaged accounts</li>
+                        <li>Stay consistent with your investment plan</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Return Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>5% Return</h4>
+                        <div class="comparison-value" id="five-percent">$24,500</div>
+                        <div class="comparison-label">Future Value</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>10% Return</h4>
+                        <div class="comparison-value" id="ten-percent">$47,800</div>
+                        <div class="comparison-label">Future Value</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Dual Investment Models</h3>
+                        <p>Calculate returns for lump sum and SIP investments</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Projections</h3>
+                        <p>See your investment growth with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Investment Insights</h3>
+                        <p>Get actionable recommendations to optimize returns</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Investment Return Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="initial-investment-desktop"><i class="fas fa-coins"></i> Initial Investment ($)</label>
+                            <input type="number" id="initial-investment-desktop" placeholder="Enter initial investment" min="0" value="10000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="monthly-contribution-desktop"><i class="fas fa-money-bill-wave"></i> Monthly Contribution ($)</label>
+                            <input type="number" id="monthly-contribution-desktop" placeholder="Enter monthly contribution" min="0" value="500">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="investment-period-desktop"><i class="fas fa-calendar-alt"></i> Investment Period (Years)</label>
+                            <input type="number" id="investment-period-desktop" placeholder="Enter investment period" min="1" max="50" value="10">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="annual-return-desktop"><i class="fas fa-percentage"></i> Annual Return Rate (%)</label>
+                            <input type="number" id="annual-return-desktop" placeholder="Enter annual return rate" min="0" step="0.1" value="7">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="compounding-desktop"><i class="fas fa-sync-alt"></i> Compounding Frequency</label>
+                            <select id="compounding-desktop">
+                                <option value="1">Annually</option>
+                                <option value="2">Semi-Annually</option>
+                                <option value="4">Quarterly</option>
+                                <option value="12" selected>Monthly</option>
+                                <option value="365">Daily</option>
+                            </select>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('lumpsum')">
+                                <i class="fas fa-piggy-bank"></i> Lump Sum Investment
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('sip')">
+                                <i class="fas fa-exchange-alt"></i> Systematic Investment Plan
+                            </div>
+                        </div>
+                        
+                        <div id="lumpsum-tab-desktop" class="tab-content active">
+                            <p>Calculate returns on a one-time investment with regular compounding. Perfect for lump sum investments or windfalls.</p>
+                        </div>
+                        
+                        <div id="sip-tab-desktop" class="tab-content">
+                            <p>Calculate returns on systematic investment plans with regular contributions. Ideal for consistent monthly investing.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateInvestmentReturnDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Investment Returns
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Dual Investment Models</h3>
+                                <p>Calculate returns for lump sum and SIP investments</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Projections</h3>
+                                <p>See your investment growth with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Investment Insights</h3>
+                                <p>Get actionable recommendations to optimize returns</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Historical Analysis</h3>
+                                <p>Compare performance against historical market returns</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Milestone Alerts</h3>
+                                <p>Get notified when you reach investment milestones</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-chart-line"></i> Investment Projection</div>
+                        <div class="result-amount" id="future-value-desktop">$32,457</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 65%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Initial: $10,000 | Contributions: $60,000 | Returns: $22,457
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="total-invested-desktop">$70,000</div>
+                                <div class="stat-label">Total Invested</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="total-returns-desktop">$22,457</div>
+                                <div class="stat-label">Total Returns</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="roi-desktop">32.1%</div>
+                                <div class="stat-label">ROI</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="investment-list">
+                            <div class="list-title"><i class="fas fa-chart-bar"></i> Yearly Breakdown</div>
+                            <div id="yearly-breakdown-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calendar"></i> Year 1</span>
+                                    <span class="entry-amount">$17,200</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calendar"></i> Year 3</span>
+                                    <span class="entry-amount">$32,500</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calendar"></i> Year 5</span>
+                                    <span class="entry-amount">$49,800</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calendar"></i> Year 7</span>
+                                    <span class="entry-amount">$69,200</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calendar"></i> Year 10</span>
+                                    <span class="entry-amount">$92,457</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Investment Insights</div>
+                            <p>Your investment is projected to grow significantly over 10 years. The power of compounding adds $22,457 in returns to your initial investment and contributions. Increasing your monthly contribution by just $100 would add over $18,000 to your final value.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Investment Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Consider diversifying across asset classes (stocks, bonds, REITs)</li>
+                                <li>Review and rebalance your portfolio annually</li>
+                                <li>Maximize tax-advantaged accounts (401k, IRA)</li>
+                                <li>Stay consistent with your investment plan through market cycles</li>
+                                <li>Consider dollar-cost averaging to reduce timing risk</li>
+                                <li>Reinvest dividends to maximize compounding effects</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Return Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Conservative (5%)</h4>
+                                <div class="comparison-value" id="five-percent-desktop">$24,500</div>
+                                <div class="comparison-label">Future Value</div>
+                                <div class="comparison-value" id="five-returns-desktop">$5,500</div>
+                                <div class="comparison-label">Total Returns</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Aggressive (10%)</h4>
+                                <div class="comparison-value" id="ten-percent-desktop">$47,800</div>
+                                <div class="comparison-label">Future Value</div>
+                                <div class="comparison-value" id="ten-returns-desktop">$28,800</div>
+                                <div class="comparison-label">Total Returns</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('lumpsum-tab').classList.remove('active');
+            document.getElementById('sip-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('lumpsum-tab-desktop').classList.remove('active');
+            document.getElementById('sip-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Calculation functions
+        function calculateInvestmentReturn() {
+            const initialInvestment = parseFloat(document.getElementById('initial-investment').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('monthly-contribution').value) || 0;
+            const investmentPeriod = parseFloat(document.getElementById('investment-period').value) || 1;
+            const annualReturn = parseFloat(document.getElementById('annual-return').value) || 0;
+            const compounding = parseFloat(document.getElementById('compounding').value) || 12;
+            
+            calculateResult(initialInvestment, monthlyContribution, investmentPeriod, annualReturn, compounding, 'mobile');
+            calculateComparison(initialInvestment, monthlyContribution, investmentPeriod, compounding, 'mobile');
+        }
+        
+        function calculateInvestmentReturnDesktop() {
+            const initialInvestment = parseFloat(document.getElementById('initial-investment-desktop').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('monthly-contribution-desktop').value) || 0;
+            const investmentPeriod = parseFloat(document.getElementById('investment-period-desktop').value) || 1;
+            const annualReturn = parseFloat(document.getElementById('annual-return-desktop').value) || 0;
+            const compounding = parseFloat(document.getElementById('compounding-desktop').value) || 12;
+            
+            calculateResult(initialInvestment, monthlyContribution, investmentPeriod, annualReturn, compounding, 'desktop');
+            calculateComparison(initialInvestment, monthlyContribution, investmentPeriod, compounding, 'desktop');
+        }
+        
+        function calculateResult(initialInvestment, monthlyContribution, investmentPeriod, annualReturn, compounding, device) {
+            // Convert annual return to decimal
+            const rate = annualReturn / 100;
+            
+            // Calculate future value of initial investment
+            const initialFutureValue = initialInvestment * Math.pow(1 + rate / compounding, compounding * investmentPeriod);
+            
+            // Calculate future value of monthly contributions
+            let contributionsFutureValue = 0;
+            if (rate > 0) {
+                contributionsFutureValue = monthlyContribution * 
+                    (Math.pow(1 + rate / compounding, compounding * investmentPeriod) - 1) / 
+                    (rate / compounding) * 
+                    (1 + rate / compounding);
+            } else {
+                contributionsFutureValue = monthlyContribution * 12 * investmentPeriod;
+            }
+            
+            // Total future value
+            const futureValue = initialFutureValue + contributionsFutureValue;
+            
+            // Total invested
+            const totalInvested = initialInvestment + (monthlyContribution * 12 * investmentPeriod);
+            
+            // Total returns
+            const totalReturns = futureValue - totalInvested;
+            
+            // ROI percentage
+            const roi = totalInvested > 0 ? (totalReturns / totalInvested) * 100 : 0;
+            
+            // Yearly breakdown
+            const yearlyData = [];
+            const intervals = investmentPeriod >= 10 ? [1, 3, 5, 7, 10] : 
+                             investmentPeriod >= 5 ? [1, 3, 5] : [1];
+            
+            intervals.forEach(year => {
+                if (year <= investmentPeriod) {
+                    const yearRate = annualReturn / 100;
+                    const yearInitial = initialInvestment * Math.pow(1 + yearRate / compounding, compounding * year);
+                    let yearContributions = 0;
+                    if (yearRate > 0) {
+                        yearContributions = monthlyContribution * 
+                            (Math.pow(1 + yearRate / compounding, compounding * year) - 1) / 
+                            (yearRate / compounding) * 
+                            (1 + yearRate / compounding);
+                    } else {
+                        yearContributions = monthlyContribution * 12 * year;
+                    }
+                    yearlyData.push({
+                        year: year,
+                        value: yearInitial + yearContributions
+                    });
+                }
+            });
+            
+            // Update UI
+            const futureValueElement = device === 'mobile' ? document.getElementById('future-value') : document.getElementById('future-value-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const totalInvestedElement = device === 'mobile' ? document.getElementById('total-invested') : document.getElementById('total-invested-desktop');
+            const totalReturnsElement = device === 'mobile' ? document.getElementById('total-returns') : document.getElementById('total-returns-desktop');
+            const roiElement = device === 'mobile' ? document.getElementById('roi') : document.getElementById('roi-desktop');
+            const yearlyBreakdownElement = device === 'mobile' ? document.getElementById('yearly-breakdown') : document.getElementById('yearly-breakdown-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const summaryElement = device === 'mobile' ? document.querySelector('.summary-section p') : document.querySelector('.summary-section p');
+            
+            futureValueElement.textContent = `$${futureValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            resultDescriptionElement.textContent = `Initial: $${initialInvestment.toLocaleString()} | Contributions: $${(monthlyContribution * 12 * investmentPeriod).toLocaleString()} | Returns: $${totalReturns.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            totalInvestedElement.textContent = `$${totalInvested.toLocaleString()}`;
+            totalReturnsElement.textContent = `$${totalReturns.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            roiElement.textContent = `${roi.toFixed(1)}%`;
+            
+            // Update yearly breakdown
+            yearlyBreakdownElement.innerHTML = '';
+            yearlyData.forEach(data => {
+                const yearItem = document.createElement('div');
+                yearItem.className = 'entry-item';
+                yearItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-calendar"></i> Year ${data.year}</span>
+                    <span class="entry-amount">$${data.value.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                `;
+                yearlyBreakdownElement.appendChild(yearItem);
+            });
+            
+            // Update summary
+            let summaryText = '';
+            if (roi > 10) {
+                summaryText = `Your investment is projected to grow significantly over ${investmentPeriod} years. The power of compounding adds $${totalReturns.toLocaleString(undefined, {maximumFractionDigits: 0})} in returns. Increasing your monthly contribution by just $100 would add over $${(totalReturns * 0.2).toLocaleString(undefined, {maximumFractionDigits: 0})} to your final value.`;
+            } else if (roi > 5) {
+                summaryText = `Your investment will grow steadily over ${investmentPeriod} years. The power of compounding adds $${totalReturns.toLocaleString(undefined, {maximumFractionDigits: 0})} in returns to your initial investment and contributions.`;
+            } else {
+                summaryText = `Your investment will grow conservatively over ${investmentPeriod} years. Consider exploring higher-return investment options to maximize your growth potential.`;
+            }
+            summaryElement.textContent = summaryText;
+            
+            // Generate chart
+            generateChart(yearlyData, futureValue, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (totalReturns / futureValue) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateComparison(initialInvestment, monthlyContribution, investmentPeriod, compounding, device) {
+            // Calculate for 5% return
+            const fivePercentRate = 0.05;
+            const fivePercentInitial = initialInvestment * Math.pow(1 + fivePercentRate / compounding, compounding * investmentPeriod);
+            let fivePercentContributions = 0;
+            if (fivePercentRate > 0) {
+                fivePercentContributions = monthlyContribution * 
+                    (Math.pow(1 + fivePercentRate / compounding, compounding * investmentPeriod) - 1) / 
+                    (fivePercentRate / compounding) * 
+                    (1 + fivePercentRate / compounding);
+            } else {
+                fivePercentContributions = monthlyContribution * 12 * investmentPeriod;
+            }
+            const fivePercentValue = fivePercentInitial + fivePercentContributions;
+            const fivePercentReturns = fivePercentValue - (initialInvestment + (monthlyContribution * 12 * investmentPeriod));
+            
+            // Calculate for 10% return
+            const tenPercentRate = 0.10;
+            const tenPercentInitial = initialInvestment * Math.pow(1 + tenPercentRate / compounding, compounding * investmentPeriod);
+            let tenPercentContributions = 0;
+            if (tenPercentRate > 0) {
+                tenPercentContributions = monthlyContribution * 
+                    (Math.pow(1 + tenPercentRate / compounding, compounding * investmentPeriod) - 1) / 
+                    (tenPercentRate / compounding) * 
+                    (1 + tenPercentRate / compounding);
+            } else {
+                tenPercentContributions = monthlyContribution * 12 * investmentPeriod;
+            }
+            const tenPercentValue = tenPercentInitial + tenPercentContributions;
+            const tenPercentReturns = tenPercentValue - (initialInvestment + (monthlyContribution * 12 * investmentPeriod));
+            
+            // Update comparison UI
+            const fivePercentElement = device === 'mobile' ? document.getElementById('five-percent') : document.getElementById('five-percent-desktop');
+            const tenPercentElement = device === 'mobile' ? document.getElementById('ten-percent') : document.getElementById('ten-percent-desktop');
+            
+            fivePercentElement.textContent = `$${fivePercentValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            tenPercentElement.textContent = `$${tenPercentValue.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const fiveReturnsElement = document.getElementById('five-returns-desktop');
+                const tenReturnsElement = document.getElementById('ten-returns-desktop');
+                
+                fiveReturnsElement.textContent = `$${fivePercentReturns.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+                tenReturnsElement.textContent = `$${tenPercentReturns.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            }
+        }
+        
+        function generateChart(yearlyData, maxValue, container, device) {
+            container.innerHTML = '';
+            
+            if (yearlyData.length === 0) return;
+            
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            yearlyData.forEach((data, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                const height = maxValue > 0 ? (data.value / maxValue) * maxHeight : 0;
+                bar.style.height = height + 'px';
+                bar.textContent = `$${(data.value/1000).toFixed(0)}k`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = `Y${data.year}`;
+                
+                const barContainer = document.createElement('div');
+                barContainer.style.display = 'flex';
+                barContainer.style.flexDirection = 'column';
+                barContainer.style.alignItems = 'center';
+                barContainer.style.margin = '0 5px';
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(label);
+                container.appendChild(barContainer);
+            });
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateInvestmentReturn();
+            calculateInvestmentReturnDesktop();
+        };
+    </script>
+</body>
+</html>

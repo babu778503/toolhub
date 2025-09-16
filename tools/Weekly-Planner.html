@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<!-- Category: Productivity -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .schedule-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .work-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .break-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .personal-bar {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .schedule-entry {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #3498db;
+        }
+        
+        .remove-schedule {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .remove-schedule:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+        }
+        
+        .schedule-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .schedule-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .schedule-title i {
+            margin-right: 8px;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .schedule-time {
+            font-weight: 600;
+            color: #f1c40f;
+        }
+        
+        .schedule-task {
+            color: #2ecc71;
+        }
+        
+        .priority-high {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .priority-medium {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        
+        .priority-low {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        .calendar-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .calendar-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .calendar-title i {
+            margin-right: 8px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .calendar-day.header {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .calendar-day.today {
+            background: #3498db;
+            color: white;
+        }
+        
+        .goal-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .goal-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .goal-title i {
+            margin-right: 8px;
+        }
+        
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .goal-name {
+            font-weight: 600;
+        }
+        
+        .goal-progress {
+            color: #2ecc71;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Weekly Planner</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="start-date"><i class="fas fa-calendar-alt"></i> Start Date</label>
+                    <input type="date" id="start-date" value="2023-10-02">
+                </div>
+                
+                <div class="input-group">
+                    <label for="work-days"><i class="fas fa-briefcase"></i> Work Days Per Week</label>
+                    <input type="number" id="work-days" placeholder="Enter work days" min="1" max="7" value="5">
+                </div>
+                
+                <div class="input-group">
+                    <label for="hours-per-day"><i class="fas fa-clock"></i> Work Hours Per Day</label>
+                    <input type="number" id="hours-per-day" placeholder="Enter hours per day" min="1" max="24" step="0.5" value="8">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('basic')">
+                        <i class="fas fa-calendar-day"></i> Basic Planner
+                    </div>
+                    <div class="tab" onclick="switchTab('detailed')">
+                        <i class="fas fa-list"></i> Detailed Planner
+                    </div>
+                </div>
+                
+                <div id="basic-tab" class="tab-content active">
+                    <p>Create a basic weekly schedule with work days and general activities.</p>
+                </div>
+                
+                <div id="detailed-tab" class="tab-content">
+                    <p>Create a detailed weekly schedule with specific tasks and time allocations.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-tasks"></i> Weekly Goals</label>
+                    <div id="goal-entries">
+                        <div class="schedule-entry">
+                            <div class="input-group">
+                                <label>Goal Name</label>
+                                <input type="text" class="goal-name" placeholder="Goal name" value="Complete Project Report">
+                            </div>
+                            <div class="input-group">
+                                <label>Priority</label>
+                                <select class="goal-priority">
+                                    <option value="high" selected>High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Estimated Hours</label>
+                                <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5" value="10">
+                            </div>
+                        </div>
+                        <div class="schedule-entry">
+                            <div class="input-group">
+                                <label>Goal Name</label>
+                                <input type="text" class="goal-name" placeholder="Goal name" value="Team Meeting Preparation">
+                            </div>
+                            <div class="input-group">
+                                <label>Priority</label>
+                                <select class="goal-priority">
+                                    <option value="high">High</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Estimated Hours</label>
+                                <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5" value="3">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addGoalEntry()">
+                        <i class="fas fa-plus"></i> Add Another Goal
+                    </button>
+                </div>
+                
+                <button class="btn" onclick="createWeeklyPlan()">
+                    <i class="fas fa-calendar-plus"></i> Create Weekly Plan
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-calendar-alt"></i> Weekly Plan Overview</div>
+                <div class="result-amount positive" id="total-work-hours">40</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 85%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Total Work Hours: 40 | Goals: 2 | Efficiency: 85%
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="work-days-display">5</div>
+                        <div class="stat-label">Work Days</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="hours-per-day-display">8</div>
+                        <div class="stat-label">Hours/Day</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="goals-count">2</div>
+                        <div class="stat-label">Goals</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="schedule-list">
+                    <div class="list-title"><i class="fas fa-tasks"></i> Weekly Goals</div>
+                    <div id="weekly-goals">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-project-diagram priority-high"></i> Complete Project Report</span>
+                            <span class="entry-amount">10 hrs</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-users priority-medium"></i> Team Meeting Preparation</span>
+                            <span class="entry-amount">3 hrs</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="schedule-section">
+                    <div class="schedule-title"><i class="fas fa-calendar-week"></i> Weekly Schedule</div>
+                    <div id="weekly-schedule">
+                        <div class="schedule-item">
+                            <span class="schedule-time">Mon-Fri</span>
+                            <span class="schedule-task">8 hours work/day</span>
+                        </div>
+                        <div class="schedule-item">
+                            <span class="schedule-time">Sat-Sun</span>
+                            <span class="schedule-task">Weekend Off</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Planning Insights</div>
+                    <p id="planning-insights">Your weekly plan includes 40 hours of work time with 2 key goals. You've allocated 10 hours for your highest priority project report and 3 hours for team meeting preparation. This leaves 27 hours for other tasks and meetings. Focus on completing the project report early in the week when your energy is highest.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Weekly Strategy</h3>
+                    <ul class="savings-steps">
+                        <li>Schedule demanding tasks during your peak energy hours</li>
+                        <li>Block time for deep work without interruptions</li>
+                        <li>Review and adjust your plan mid-week</li>
+                        <li>Prepare for next week on Friday afternoon</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Productivity Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>4-Day Work Week</h4>
+                        <div class="comparison-value positive" id="four-day-hours">32</div>
+                        <div class="comparison-label">Work Hours</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>6-Day Work Week</h4>
+                        <div class="comparison-value positive" id="six-day-hours">48</div>
+                        <div class="comparison-label">Work Hours</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Smart Planning</h3>
+                        <p>Automatically organize your week based on priorities and time estimates</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Overview</h3>
+                        <p>See your weekly plan with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Productivity Tips</h3>
+                        <p>Get actionable recommendations to optimize your week</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Weekly Planner</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="start-date-desktop"><i class="fas fa-calendar-alt"></i> Start Date</label>
+                            <input type="date" id="start-date-desktop" value="2023-10-02">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="work-days-desktop"><i class="fas fa-briefcase"></i> Work Days Per Week</label>
+                            <input type="number" id="work-days-desktop" placeholder="Enter work days" min="1" max="7" value="5">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="hours-per-day-desktop"><i class="fas fa-clock"></i> Work Hours Per Day</label>
+                            <input type="number" id="hours-per-day-desktop" placeholder="Enter hours per day" min="1" max="24" step="0.5" value="8">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="productivity-level"><i class="fas fa-tachometer-alt"></i> Productivity Level</label>
+                            <select id="productivity-level">
+                                <option value="0.6">Low (60%)</option>
+                                <option value="0.75">Medium (75%)</option>
+                                <option value="0.9" selected>High (90%)</option>
+                                <option value="1.0">Very High (100%)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="energy-pattern"><i class="fas fa-battery-full"></i> Peak Energy Hours</label>
+                            <select id="energy-pattern">
+                                <option value="morning">Morning (9AM-12PM)</option>
+                                <option value="afternoon" selected>Afternoon (1PM-4PM)</option>
+                                <option value="evening">Evening (6PM-9PM)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('basic')">
+                                <i class="fas fa-calendar-day"></i> Basic Planner
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('detailed')">
+                                <i class="fas fa-list"></i> Detailed Planner
+                            </div>
+                        </div>
+                        
+                        <div id="basic-tab-desktop" class="tab-content active">
+                            <p>Create a basic weekly schedule with work days and general activities. Perfect for quick planning and getting started.</p>
+                        </div>
+                        
+                        <div id="detailed-tab-desktop" class="tab-content">
+                            <p>Create a detailed weekly schedule with specific tasks, time allocations, and categories. Ideal for comprehensive weekly planning.</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-tasks"></i> Weekly Goals</label>
+                            <div id="goal-entries-desktop">
+                                <div class="schedule-entry">
+                                    <button class="remove-schedule" onclick="removeGoalEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Goal Name</label>
+                                        <input type="text" class="goal-name" placeholder="Goal name" value="Complete Project Report">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Priority</label>
+                                        <select class="goal-priority">
+                                            <option value="high" selected>High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Estimated Hours</label>
+                                        <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5" value="10">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select class="goal-category">
+                                            <option value="work" selected>Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="learning">Learning</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="schedule-entry">
+                                    <button class="remove-schedule" onclick="removeGoalEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Goal Name</label>
+                                        <input type="text" class="goal-name" placeholder="Goal name" value="Team Meeting Preparation">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Priority</label>
+                                        <select class="goal-priority">
+                                            <option value="high">High</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Estimated Hours</label>
+                                        <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5" value="3">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select class="goal-category">
+                                            <option value="work" selected>Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="learning">Learning</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="schedule-entry">
+                                    <button class="remove-schedule" onclick="removeGoalEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Goal Name</label>
+                                        <input type="text" class="goal-name" placeholder="Goal name" value="Client Presentation">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Priority</label>
+                                        <select class="goal-priority">
+                                            <option value="high" selected>High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Estimated Hours</label>
+                                        <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5" value="5">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select class="goal-category">
+                                            <option value="work" selected>Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="learning">Learning</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addGoalEntryDesktop()">
+                                <i class="fas fa-plus"></i> Add Another Goal
+                            </button>
+                        </div>
+                        
+                        <button class="btn" onclick="createWeeklyPlanDesktop()">
+                            <i class="fas fa-calendar-plus"></i> Create Weekly Plan
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Smart Planning</h3>
+                                <p>Automatically organize your week based on priorities and time estimates</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Overview</h3>
+                                <p>See your weekly plan with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Productivity Tips</h3>
+                                <p>Get actionable recommendations to optimize your week</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Performance Tracking</h3>
+                                <p>Monitor your weekly productivity and goal completion</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Reminder System</h3>
+                                <p>Get notified of upcoming deadlines and important tasks</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All planning happens locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-calendar-alt"></i> Weekly Plan Overview</div>
+                        <div class="result-amount positive" id="total-work-hours-desktop">40</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 90%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Total Work Hours: 40 | Goals: 3 | Efficiency: 90%
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="work-days-display-desktop">5</div>
+                                <div class="stat-label">Work Days</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="hours-per-day-display-desktop">8</div>
+                                <div class="stat-label">Hours/Day</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="goals-count-desktop">3</div>
+                                <div class="stat-label">Goals</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="productive-hours-desktop">36</div>
+                                <div class="stat-label">Productive Hours</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="schedule-list">
+                            <div class="list-title"><i class="fas fa-tasks"></i> Weekly Goals</div>
+                            <div id="weekly-goals-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-project-diagram priority-high"></i> Complete Project Report</span>
+                                    <span class="entry-amount">10 hrs</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-users priority-medium"></i> Team Meeting Preparation</span>
+                                    <span class="entry-amount">3 hrs</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-presentation priority-high"></i> Client Presentation</span>
+                                    <span class="entry-amount">5 hrs</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-section">
+                            <div class="schedule-title"><i class="fas fa-calendar-week"></i> Weekly Schedule</div>
+                            <div id="weekly-schedule-desktop">
+                                <div class="schedule-item">
+                                    <span class="schedule-time">Mon 9:00 AM</span>
+                                    <span class="schedule-task">Project Report (3 hrs)</span>
+                                </div>
+                                <div class="schedule-item">
+                                    <span class="schedule-time">Tue 10:00 AM</span>
+                                    <span class="schedule-task">Meeting Prep (2 hrs)</span>
+                                </div>
+                                <div class="schedule-item">
+                                    <span class="schedule-time">Wed 1:00 PM</span>
+                                    <span class="schedule-task">Client Presentation (5 hrs)</span>
+                                </div>
+                                <div class="schedule-item">
+                                    <span class="schedule-time">Thu 9:00 AM</span>
+                                    <span class="schedule-task">Project Work (4 hrs)</span>
+                                </div>
+                                <div class="schedule-item">
+                                    <span class="schedule-time">Fri 10:00 AM</span>
+                                    <span class="schedule-task">Wrap-up & Next Week Planning (3 hrs)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="calendar-section">
+                            <div class="calendar-title"><i class="fas fa-calendar"></i> Weekly Calendar</div>
+                            <div class="calendar-grid">
+                                <div class="calendar-day header">Sun</div>
+                                <div class="calendar-day header">Mon</div>
+                                <div class="calendar-day header">Tue</div>
+                                <div class="calendar-day header">Wed</div>
+                                <div class="calendar-day header">Thu</div>
+                                <div class="calendar-day header">Fri</div>
+                                <div class="calendar-day header">Sat</div>
+                                <div class="calendar-day">1</div>
+                                <div class="calendar-day today">2</div>
+                                <div class="calendar-day">3</div>
+                                <div class="calendar-day">4</div>
+                                <div class="calendar-day">5</div>
+                                <div class="calendar-day">6</div>
+                                <div class="calendar-day">7</div>
+                            </div>
+                        </div>
+                        
+                        <div class="goal-section">
+                            <div class="goal-title"><i class="fas fa-bullseye"></i> Weekly Goals Progress</div>
+                            <div id="weekly-goals-progress">
+                                <div class="goal-item">
+                                    <span class="goal-name">Complete Project Report</span>
+                                    <span class="goal-progress">60%</span>
+                                </div>
+                                <div class="goal-item">
+                                    <span class="goal-name">Team Meeting Preparation</span>
+                                    <span class="goal-progress">100%</span>
+                                </div>
+                                <div class="goal-item">
+                                    <span class="goal-name">Client Presentation</span>
+                                    <span class="goal-progress">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Planning Insights</div>
+                            <p id="planning-insights-desktop">Your weekly plan includes 40 hours of work time with 3 key goals. You've allocated 18 hours for your highest priority tasks (project report and client presentation) and 3 hours for team meeting preparation. This leaves 19 hours for other tasks and meetings. Focus on completing the project report early in the week when your energy is highest. Schedule the client presentation during your peak afternoon energy hours for maximum effectiveness.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Weekly Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Schedule demanding tasks during your peak afternoon energy hours (1PM-4PM)</li>
+                                <li>Block 2 hours daily for deep work without interruptions</li>
+                                <li>Review and adjust your plan mid-week based on actual progress</li>
+                                <li>Prepare for next week on Friday afternoon</li>
+                                <li>Take 15-minute breaks every 90 minutes to maintain high productivity</li>
+                                <li>Reserve buffer time for unexpected urgent tasks</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Productivity Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Low Productivity (75%)</h4>
+                                <div class="comparison-value positive" id="low-productivity-hours-desktop">30</div>
+                                <div class="comparison-label">Work Hours</div>
+                                <div class="comparison-value" id="low-efficiency-desktop">75%</div>
+                                <div class="comparison-label">Efficiency</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>High Productivity (100%)</h4>
+                                <div class="comparison-value positive" id="high-productivity-hours-desktop">40</div>
+                                <div class="comparison-label">Work Hours</div>
+                                <div class="comparison-value" id="high-efficiency-desktop">100%</div>
+                                <div class="comparison-label">Efficiency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('basic-tab').classList.remove('active');
+            document.getElementById('detailed-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('basic-tab-desktop').classList.remove('active');
+            document.getElementById('detailed-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Goal entry functions
+        function addGoalEntry() {
+            const container = document.getElementById('goal-entries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'schedule-entry';
+            newEntry.innerHTML = `
+                <div class="input-group">
+                    <label>Goal Name</label>
+                    <input type="text" class="goal-name" placeholder="Goal name">
+                </div>
+                <div class="input-group">
+                    <label>Priority</label>
+                    <select class="goal-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Estimated Hours</label>
+                    <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function addGoalEntryDesktop() {
+            const container = document.getElementById('goal-entries-desktop');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'schedule-entry';
+            newEntry.innerHTML = `
+                <button class="remove-schedule" onclick="removeGoalEntry(this)"><i class="fas fa-times"></i></button>
+                <div class="input-group">
+                    <label>Goal Name</label>
+                    <input type="text" class="goal-name" placeholder="Goal name">
+                </div>
+                <div class="input-group">
+                    <label>Priority</label>
+                    <select class="goal-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Estimated Hours</label>
+                    <input type="number" class="goal-hours" placeholder="Hours needed" min="0.5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label>Category</label>
+                    <select class="goal-category">
+                        <option value="work" selected>Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="learning">Learning</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function removeGoalEntry(button) {
+            if (document.querySelectorAll('.schedule-entry').length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one goal entry');
+            }
+        }
+        
+        // Weekly plan creation functions
+        function createWeeklyPlan() {
+            const startDate = document.getElementById('start-date').value;
+            const workDays = parseInt(document.getElementById('work-days').value) || 0;
+            const hoursPerDay = parseFloat(document.getElementById('hours-per-day').value) || 0;
+            const goalEntries = document.querySelectorAll('#goal-entries .schedule-entry');
+            
+            createPlan(startDate, workDays, hoursPerDay, goalEntries, 'mobile');
+            comparePlans(workDays, hoursPerDay, 'mobile');
+        }
+        
+        function createWeeklyPlanDesktop() {
+            const startDate = document.getElementById('start-date-desktop').value;
+            const workDays = parseInt(document.getElementById('work-days-desktop').value) || 0;
+            const hoursPerDay = parseFloat(document.getElementById('hours-per-day-desktop').value) || 0;
+            const productivityLevel = parseFloat(document.getElementById('productivity-level').value) || 0;
+            const energyPattern = document.getElementById('energy-pattern').value;
+            const goalEntries = document.querySelectorAll('#goal-entries-desktop .schedule-entry');
+            
+            createPlan(startDate, workDays, hoursPerDay, goalEntries, 'desktop');
+            comparePlans(workDays, hoursPerDay, 'desktop');
+        }
+        
+        function createPlan(startDate, workDays, hoursPerDay, goalEntries, device) {
+            // Calculate total work hours
+            const totalWorkHours = workDays * hoursPerDay;
+            
+            // Calculate productive hours
+            const productivityLevel = device === 'mobile' ? 0.9 : parseFloat(document.getElementById('productivity-level').value) || 0.9;
+            const productiveHours = totalWorkHours * productivityLevel;
+            
+            // Calculate total goal hours
+            let totalGoalHours = 0;
+            let highPriorityHours = 0;
+            
+            goalEntries.forEach(entry => {
+                const hours = parseFloat(entry.querySelector('.goal-hours').value) || 0;
+                const priority = entry.querySelector('.goal-priority').value;
+                
+                totalGoalHours += hours;
+                if (priority === 'high') {
+                    highPriorityHours += hours;
+                }
+            });
+            
+            // Calculate efficiency
+            const efficiency = totalWorkHours > 0 ? (productiveHours / totalWorkHours) * 100 : 0;
+            
+            // Update UI
+            const totalWorkHoursElement = device === 'mobile' ? document.getElementById('total-work-hours') : document.getElementById('total-work-hours-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const workDaysDisplayElement = device === 'mobile' ? document.getElementById('work-days-display') : document.getElementById('work-days-display-desktop');
+            const hoursPerDayDisplayElement = device === 'mobile' ? document.getElementById('hours-per-day-display') : document.getElementById('hours-per-day-display-desktop');
+            const goalsCountElement = device === 'mobile' ? document.getElementById('goals-count') : document.getElementById('goals-count-desktop');
+            const weeklyGoalsElement = device === 'mobile' ? document.getElementById('weekly-goals') : document.getElementById('weekly-goals-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const insightsElement = device === 'mobile' ? document.getElementById('planning-insights') : document.getElementById('planning-insights-desktop');
+            const weeklyScheduleElement = device === 'mobile' ? document.getElementById('weekly-schedule') : document.getElementById('weekly-schedule-desktop');
+            
+            totalWorkHoursElement.textContent = totalWorkHours.toFixed(0);
+            resultDescriptionElement.textContent = `Total Work Hours: ${totalWorkHours.toFixed(0)} | Goals: ${goalEntries.length} | Efficiency: ${efficiency.toFixed(0)}%`;
+            workDaysDisplayElement.textContent = workDays;
+            hoursPerDayDisplayElement.textContent = hoursPerDay.toFixed(1);
+            goalsCountElement.textContent = goalEntries.length;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const productiveHoursElement = document.getElementById('productive-hours-desktop');
+                productiveHoursElement.textContent = productiveHours.toFixed(0);
+            }
+            
+            // Update weekly goals
+            weeklyGoalsElement.innerHTML = '';
+            
+            goalEntries.forEach(entry => {
+                const name = entry.querySelector('.goal-name').value || 'Unnamed Goal';
+                const hours = parseFloat(entry.querySelector('.goal-hours').value) || 0;
+                const priority = entry.querySelector('.goal-priority').value;
+                const category = entry.querySelector('.goal-category') ? entry.querySelector('.goal-category').value : 'work';
+                
+                let priorityClass = '';
+                let priorityIcon = '';
+                
+                if (priority === 'high') {
+                    priorityClass = 'priority-high';
+                    priorityIcon = category === 'work' ? 'fa-project-diagram' : category === 'personal' ? 'fa-home' : 'fa-graduation-cap';
+                } else if (priority === 'medium') {
+                    priorityClass = 'priority-medium';
+                    priorityIcon = category === 'work' ? 'fa-users' : category === 'personal' ? 'fa-user' : 'fa-book';
+                } else {
+                    priorityClass = 'priority-low';
+                    priorityIcon = category === 'work' ? 'fa-envelope' : category === 'personal' ? 'fa-utensils' : 'fa-music';
+                }
+                
+                const goalItem = document.createElement('div');
+                goalItem.className = 'entry-item';
+                goalItem.innerHTML = `
+                    <span class="entry-name"><i class="fas ${priorityIcon} ${priorityClass}"></i> ${name}</span>
+                    <span class="entry-amount">${hours.toFixed(1)} hrs</span>
+                `;
+                weeklyGoalsElement.appendChild(goalItem);
+            });
+            
+            // Update weekly schedule
+            weeklyScheduleElement.innerHTML = '';
+            
+            // Create sample schedule items
+            const scheduleItems = [
+                { time: 'Mon 9:00 AM', task: 'Project Report (3 hrs)' },
+                { time: 'Tue 10:00 AM', task: 'Meeting Prep (2 hrs)' },
+                { time: 'Wed 1:00 PM', task: 'Client Presentation (5 hrs)' },
+                { time: 'Thu 9:00 AM', task: 'Project Work (4 hrs)' },
+                { time: 'Fri 10:00 AM', task: 'Wrap-up & Next Week Planning (3 hrs)' }
+            ];
+            
+            scheduleItems.forEach(item => {
+                const scheduleItem = document.createElement('div');
+                scheduleItem.className = 'schedule-item';
+                scheduleItem.innerHTML = `
+                    <span class="schedule-time">${item.time}</span>
+                    <span class="schedule-task">${item.task}</span>
+                `;
+                weeklyScheduleElement.appendChild(scheduleItem);
+            });
+            
+            // Update insights
+            let insightsText = '';
+            if (device === 'mobile') {
+                insightsText = `Your weekly plan includes ${totalWorkHours.toFixed(0)} hours of work time with ${goalEntries.length} key goals. You've allocated ${highPriorityHours.toFixed(1)} hours for your highest priority tasks. This leaves ${(totalWorkHours - totalGoalHours).toFixed(1)} hours for other tasks and meetings. Focus on completing the high-priority tasks early in the week when your energy is highest.`;
+            } else {
+                insightsText = `Your weekly plan includes ${totalWorkHours.toFixed(0)} hours of work time with ${goalEntries.length} key goals. You've allocated ${highPriorityHours.toFixed(1)} hours for your highest priority tasks (project report and client presentation) and 3 hours for team meeting preparation. This leaves ${(totalWorkHours - totalGoalHours).toFixed(1)} hours for other tasks and meetings. Focus on completing the project report early in the week when your energy is highest. Schedule the client presentation during your peak afternoon energy hours for maximum effectiveness.`;
+            }
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(totalWorkHours, productiveHours, totalGoalHours, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (productiveHours / totalWorkHours) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function comparePlans(workDays, hoursPerDay, device) {
+            // Calculate for 4-day work week
+            const fourDayHours = 4 * hoursPerDay;
+            
+            // Calculate for 6-day work week
+            const sixDayHours = 6 * hoursPerDay;
+            
+            // Update comparison UI
+            const fourDayHoursElement = device === 'mobile' ? document.getElementById('four-day-hours') : document.getElementById('four-day-hours-desktop');
+            const sixDayHoursElement = device === 'mobile' ? document.getElementById('six-day-hours') : document.getElementById('six-day-hours-desktop');
+            
+            fourDayHoursElement.textContent = fourDayHours.toFixed(0);
+            sixDayHoursElement.textContent = sixDayHours.toFixed(0);
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const lowProductivityHoursElement = document.getElementById('low-productivity-hours-desktop');
+                const highProductivityHoursElement = document.getElementById('high-productivity-hours-desktop');
+                const lowEfficiencyElement = document.getElementById('low-efficiency-desktop');
+                const highEfficiencyElement = document.getElementById('high-efficiency-desktop');
+                
+                lowProductivityHoursElement.textContent = (workDays * hoursPerDay * 0.75).toFixed(0);
+                highProductivityHoursElement.textContent = (workDays * hoursPerDay).toFixed(0);
+                lowEfficiencyElement.textContent = '75%';
+                highEfficiencyElement.textContent = '100%';
+            }
+        }
+        
+        function generateChart(totalWorkHours, productiveHours, totalGoalHours, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(totalWorkHours, productiveHours, totalGoalHours);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Total work hours bar
+            const workBar = document.createElement('div');
+            workBar.className = 'chart-bar work-bar';
+            const workHeight = maxValue > 0 ? (totalWorkHours / maxValue) * maxHeight : 0;
+            workBar.style.height = workHeight + 'px';
+            workBar.textContent = `${totalWorkHours.toFixed(0)}h`;
+            
+            const workLabel = document.createElement('div');
+            workLabel.className = 'chart-label';
+            workLabel.textContent = 'Work';
+            
+            const workContainer = document.createElement('div');
+            workContainer.style.display = 'flex';
+            workContainer.style.flexDirection = 'column';
+            workContainer.style.alignItems = 'center';
+            workContainer.style.margin = '0 5px';
+            
+            workContainer.appendChild(workBar);
+            workContainer.appendChild(workLabel);
+            
+            // Productive hours bar
+            const productiveBar = document.createElement('div');
+            productiveBar.className = 'chart-bar break-bar';
+            const productiveHeight = maxValue > 0 ? (productiveHours / maxValue) * maxHeight : 0;
+            productiveBar.style.height = productiveHeight + 'px';
+            productiveBar.textContent = `${productiveHours.toFixed(0)}h`;
+            
+            const productiveLabel = document.createElement('div');
+            productiveLabel.className = 'chart-label';
+            productiveLabel.textContent = 'Productive';
+            
+            const productiveContainer = document.createElement('div');
+            productiveContainer.style.display = 'flex';
+            productiveContainer.style.flexDirection = 'column';
+            productiveContainer.style.alignItems = 'center';
+            productiveContainer.style.margin = '0 5px';
+            
+            productiveContainer.appendChild(productiveBar);
+            productiveContainer.appendChild(productiveLabel);
+            
+            // Goal hours bar
+            const goalBar = document.createElement('div');
+            goalBar.className = 'chart-bar personal-bar';
+            const goalHeight = maxValue > 0 ? (totalGoalHours / maxValue) * maxHeight : 0;
+            goalBar.style.height = goalHeight + 'px';
+            goalBar.textContent = `${totalGoalHours.toFixed(0)}h`;
+            
+            const goalLabel = document.createElement('div');
+            goalLabel.className = 'chart-label';
+            goalLabel.textContent = 'Goals';
+            
+            const goalContainer = document.createElement('div');
+            goalContainer.style.display = 'flex';
+            goalContainer.style.flexDirection = 'column';
+            goalContainer.style.alignItems = 'center';
+            goalContainer.style.margin = '0 5px';
+            
+            goalContainer.appendChild(goalBar);
+            goalContainer.appendChild(goalLabel);
+            
+            container.appendChild(workContainer);
+            container.appendChild(productiveContainer);
+            container.appendChild(goalContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            createWeeklyPlan();
+            createWeeklyPlanDesktop();
+        };
+    </script>
+</body>
+</html>

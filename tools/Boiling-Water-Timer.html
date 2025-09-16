@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<!-- Category: Cooking -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boiling Water Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #00c6ff, #0072ff);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #00c6ff, #0072ff);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            text-align: center;
+            padding: 40px 20px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f8f8;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            flex: 1;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #FFC107, #FF9800);
+            color: #333;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #F44336, #D32F2F);
+            color: white;
+            flex: 1;
+        }
+        
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .preset-btn {
+            padding: 15px 5px;
+            background: linear-gradient(to bottom, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preset-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #ffd700, #ff9800);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .preset-btn:hover {
+            background: linear-gradient(to bottom, #4facfe, #00f2fe);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .preset-btn:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .time-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .time-input input {
+            width: 80px;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .time-input input:focus {
+            border-color: #00c6ff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 198, 255, 0.5);
+        }
+        
+        .time-input label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .set-time-btn {
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: flex-end;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .set-time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-container {
+            padding: 0 20px 20px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer-state {
+            text-align: center;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #555;
+            font-size: 18px;
+        }
+        
+        .timer-state.running {
+            color: #4CAF50;
+        }
+        
+        .timer-state.paused {
+            color: #FFC107;
+        }
+        
+        .timer-state.stopped {
+            color: #F44336;
+        }
+        
+        .water-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .water-container {
+            position: relative;
+            height: 150px;
+            background: #e0f7fa;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 2px solid #b2ebf2;
+        }
+        
+        .water-level {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70%;
+            background: linear-gradient(to top, #00c6ff, #0072ff);
+            transition: height 0.5s ease;
+        }
+        
+        .bubbles {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .bubbles.active {
+            opacity: 1;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            bottom: 0;
+            animation: bubble-rise 3s infinite;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-150px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        .water-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #0072ff;
+            margin-top: 10px;
+        }
+        
+        .sound-toggle {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px 20px;
+        }
+        
+        .sound-btn {
+            background: #607D8B;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-btn.active {
+            background: #2196F3;
+        }
+        
+        .boiling-tips {
+            padding: 0 20px 20px;
+            background: #fff8e1;
+            margin: 0 20px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .boiling-tips h3 {
+            color: #0072ff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .boiling-tips ul {
+            padding-left: 20px;
+        }
+        
+        .boiling-tips li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .altitude-adjustment {
+            padding: 0 20px 20px;
+        }
+        
+        .altitude-adjustment h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #0072ff;
+            font-size: 20px;
+        }
+        
+        .altitude-controls {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .altitude-input {
+            flex: 1;
+        }
+        
+        .altitude-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .altitude-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .adjust-btn {
+            background: #00c6ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .timer-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 0 20px 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0072ff;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .use-cases {
+            padding: 0 20px 20px;
+        }
+        
+        .use-cases h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #0072ff;
+            font-size: 20px;
+        }
+        
+        .use-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .use-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #ddd;
+        }
+        
+        .use-item:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .use-item strong {
+            display: block;
+            font-size: 16px;
+            color: #0072ff;
+        }
+        
+        .conversion-history {
+            padding: 0 20px 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 0 20px 20px;
+        }
+        
+        .conversion-history h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #0072ff;
+        }
+        
+        .history-list {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .clear-history {
+            display: block;
+            width: 100%;
+            padding: 5px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 50px;
+                padding: 30px 15px;
+            }
+            
+            .btn {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            
+            .presets {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 15px 20px;
+            }
+            
+            .preset-btn {
+                padding: 12px 5px;
+                font-size: 14px;
+            }
+            
+            .time-input {
+                gap: 5px;
+                padding: 0 15px 15px;
+            }
+            
+            .time-input input {
+                width: 60px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .water-container {
+                height: 120px;
+            }
+            
+            .altitude-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .timer-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .use-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Boiling Water Timer
+        </div>
+        
+        <div class="timer-state" id="timerState">Ready to boil water</div>
+        
+        <div class="timer-display" id="display">00:00:00</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="timer-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="altitudeStat">0m</div>
+                <div class="stat-label">Altitude</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="boilTempStat">100°C</div>
+                <div class="stat-label">Boil Temp</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="timeStat">0 min</div>
+                <div class="stat-label">Boil Time</div>
+            </div>
+        </div>
+        
+        <div class="water-visualization">
+            <div class="water-container">
+                <div class="water-level" id="waterLevel"></div>
+                <div class="bubbles" id="bubbles"></div>
+            </div>
+            <div class="water-status" id="waterStatus">Water at room temperature</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn" id="startBtn">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button class="btn pause-btn" id="pauseBtn">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="sound-toggle">
+            <button class="sound-btn" id="soundBtn">
+                <i class="fas fa-volume-up"></i> Sound
+            </button>
+        </div>
+        
+        <div class="time-input">
+            <label>
+                Minutes
+                <input type="number" id="minutes" min="0" max="59" value="0">
+            </label>
+            <label>
+                Seconds
+                <input type="number" id="seconds" min="0" max="59" value="0">
+            </label>
+            <button class="set-time-btn" id="setTimeBtn">
+                <i class="fas fa-clock"></i> Set
+            </button>
+        </div>
+        
+        <div class="presets">
+            <button class="preset-btn" data-time="120">
+                <i class="fas fa-fire"></i>
+                <span>2 Min</span>
+            </button>
+            <button class="preset-btn" data-time="180">
+                <i class="fas fa-fire-alt"></i>
+                <span>3 Min</span>
+            </button>
+            <button class="preset-btn" data-time="240">
+                <i class="fas fa-burn"></i>
+                <span>4 Min</span>
+            </button>
+            <button class="preset-btn" data-time="300">
+                <i class="fas fa-temperature-high"></i>
+                <span>5 Min</span>
+            </button>
+            <button class="preset-btn" data-time="360">
+                <i class="fas fa-water"></i>
+                <span>6 Min</span>
+            </button>
+            <button class="preset-btn" data-time="420">
+                <i class="fas fa-hot-tub"></i>
+                <span>7 Min</span>
+            </button>
+        </div>
+        
+        <div class="use-cases">
+            <h3><i class="fas fa-utensils"></i> Common Uses</h3>
+            <div class="use-grid">
+                <div class="use-item" data-time="180">
+                    <strong>Pasta</strong>
+                    3 min boil
+                </div>
+                <div class="use-item" data-time="300">
+                    <strong>Eggs</strong>
+                    5 min boil
+                </div>
+                <div class="use-item" data-time="240">
+                    <strong>Rice</strong>
+                    4 min boil
+                </div>
+                <div class="use-item" data-time="120">
+                    <strong>Tea</strong>
+                    2 min boil
+                </div>
+            </div>
+        </div>
+        
+        <div class="altitude-adjustment">
+            <h3><i class="fas fa-mountain"></i> Altitude Adjustment</h3>
+            <div class="altitude-controls">
+                <div class="altitude-input">
+                    <label for="altitude">Altitude (meters)</label>
+                    <input type="number" id="altitude" min="0" max="5000" value="0">
+                </div>
+                <button class="adjust-btn" id="adjustBtn">Adjust Time</button>
+            </div>
+        </div>
+        
+        <div class="conversion-history">
+            <h3><i class="fas fa-history"></i> Recent Boils</h3>
+            <div class="history-list" id="historyList">
+                <div class="history-item">No boiling sessions yet</div>
+            </div>
+            <button class="clear-history" id="clearHistory">Clear History</button>
+        </div>
+        
+        <div class="boiling-tips">
+            <h3><i class="fas fa-lightbulb"></i> Boiling Tips</h3>
+            <ul>
+                <li>Water boils at 100°C (212°F) at sea level</li>
+                <li>Boiling point decreases ~1°C every 300m of elevation</li>
+                <li>Use a lid to reduce boiling time by up to 50%</li>
+                <li>Add salt after water starts boiling for better flavor</li>
+                <li>Start timing once you see steady bubbling</li>
+                <li>Electric kettles boil water faster than stovetop</li>
+            </ul>
+        </div>
+    </div>
+
+    <audio id="alarmSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Timer variables
+        let timer;
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let initialSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let soundEnabled = true;
+        let altitude = 0;
+        let boilHistory = [];
+        
+        // DOM elements
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const setTimeBtn = document.getElementById('setTimeBtn');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        const timerState = document.getElementById('timerState');
+        const progressFill = document.getElementById('progressFill');
+        const soundBtn = document.getElementById('soundBtn');
+        const alarmSound = document.getElementById('alarmSound');
+        const waterLevel = document.getElementById('waterLevel');
+        const bubbles = document.getElementById('bubbles');
+        const waterStatus = document.getElementById('waterStatus');
+        const altitudeInput = document.getElementById('altitude');
+        const adjustBtn = document.getElementById('adjustBtn');
+        const altitudeStat = document.getElementById('altitudeStat');
+        const boilTempStat = document.getElementById('boilTempStat');
+        const timeStat = document.getElementById('timeStat');
+        const useItems = document.querySelectorAll('.use-item');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        
+        // Format time to HH:MM:SS
+        function formatTime(total) {
+            const hrs = Math.floor(total / 3600);
+            const mins = Math.floor((total % 3600) / 60);
+            const secs = total % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update display
+        function updateDisplay() {
+            display.textContent = formatTime(totalSeconds);
+            
+            // Update progress bar
+            if (initialSeconds > 0) {
+                const progress = ((initialSeconds - totalSeconds) / initialSeconds) * 100;
+                progressFill.style.width = `${progress}%`;
+                
+                // Update water visualization
+                const waterHeight = 70 + (30 * (initialSeconds - totalSeconds) / initialSeconds);
+                waterLevel.style.height = `${waterHeight}%`;
+            } else {
+                progressFill.style.width = '0%';
+                waterLevel.style.height = '70%';
+            }
+        }
+        
+        // Update timer state display
+        function updateTimerState(state) {
+            timerState.textContent = state;
+            timerState.className = 'timer-state ' + (isRunning ? 'running' : isPaused ? 'paused' : 'stopped');
+        }
+        
+        // Update water status
+        function updateWaterStatus(status) {
+            waterStatus.textContent = status;
+            if (status.includes('Boiling') || status.includes('Ready')) {
+                waterStatus.style.color = '#4CAF50';
+                bubbles.classList.add('active');
+                createBubbles();
+            } else if (status.includes('Heating')) {
+                waterStatus.style.color = '#FFC107';
+                bubbles.classList.add('active');
+                createBubbles();
+            } else {
+                waterStatus.style.color = '#0072ff';
+                bubbles.classList.remove('active');
+            }
+        }
+        
+        // Update stats
+        function updateStats() {
+            altitudeStat.textContent = altitude + 'm';
+            const boilingTemp = Math.max(80, 100 - Math.floor(altitude / 300));
+            boilTempStat.textContent = boilingTemp + '°C';
+            timeStat.textContent = Math.ceil(initialSeconds / 60) + ' min';
+        }
+        
+        // Create bubbles animation
+        function createBubbles() {
+            bubbles.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = (Math.random() * 10 + 5) + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = (Math.random() * 2) + 's';
+                bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                bubbles.appendChild(bubble);
+            }
+        }
+        
+        // Add to history
+        function addToHistory(altitude, time) {
+            const historyItem = {
+                altitude: altitude,
+                time: time,
+                timestamp: new Date()
+            };
+            
+            boilHistory.unshift(historyItem);
+            
+            // Keep only last 5 items
+            if (boilHistory.length > 5) {
+                boilHistory = boilHistory.slice(0, 5);
+            }
+            
+            updateHistoryDisplay();
+        }
+        
+        // Update history display
+        function updateHistoryDisplay() {
+            if (boilHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No boiling sessions yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            boilHistory.forEach(item => {
+                const time = item.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.innerHTML = `${item.altitude}m alt, ${Math.ceil(item.time/60)}min boil ${time}`;
+                historyList.appendChild(historyElement);
+            });
+        }
+        
+        // Clear history
+        function clearHistory() {
+            boilHistory = [];
+            updateHistoryDisplay();
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (totalSeconds > 0) {
+                if (!isRunning) {
+                    isRunning = true;
+                    isPaused = false;
+                    updateTimerState("Water heating...");
+                    updateWaterStatus("Water heating up...");
+                    
+                    timer = setInterval(() => {
+                        totalSeconds--;
+                        updateDisplay();
+                        
+                        // Update water status based on time remaining
+                        const progress = (initialSeconds - totalSeconds) / initialSeconds;
+                        if (progress < 0.3) {
+                            updateWaterStatus("Water heating up...");
+                        } else if (progress < 0.7) {
+                            updateWaterStatus("Water getting hot...");
+                        } else if (progress < 0.95) {
+                            updateWaterStatus("Water almost boiling...");
+                        }
+                        
+                        if (totalSeconds <= 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            isPaused = false;
+                            updateTimerState("Water is boiling!");
+                            updateWaterStatus("Water is boiling! Ready to use.");
+                            display.textContent = "00:00:00";
+                            progressFill.style.width = '100%';
+                            waterLevel.style.height = '100%';
+                            
+                            // Add to history
+                            addToHistory(altitude, initialSeconds);
+                            
+                            if (soundEnabled) {
+                                alarmSound.play();
+                            }
+                            
+                            // Flash effect
+                            display.style.color = '#4CAF50';
+                            setTimeout(() => {
+                                display.style.color = '#333';
+                            }, 500);
+                            
+                            setTimeout(() => {
+                                if (soundEnabled) {
+                                    alarmSound.play();
+                                }
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                updateTimerState("Boiling paused");
+                updateWaterStatus("Heating paused");
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            totalSeconds = 0;
+            initialSeconds = 0;
+            updateDisplay();
+            updateTimerState("Ready to boil water");
+            updateWaterStatus("Water at room temperature");
+            progressFill.style.width = '0%';
+            waterLevel.style.height = '70%';
+        }
+        
+        // Set custom time
+        function setCustomTime() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            totalSeconds = mins * 60 + secs;
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Boiling time set");
+            updateWaterStatus("Ready to heat water");
+            updateStats();
+        }
+        
+        // Set preset time
+        function setPresetTime(time) {
+            totalSeconds = parseInt(time);
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Boiling time set");
+            updateWaterStatus("Ready to heat water");
+            updateStats();
+        }
+        
+        // Set use case
+        function setUseCase(time) {
+            totalSeconds = time;
+            initialSeconds = time;
+            updateDisplay();
+            updateTimerState("Use case time set");
+            updateWaterStatus("Ready for your task");
+            updateStats();
+        }
+        
+        // Toggle sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundBtn.classList.toggle('active', soundEnabled);
+            soundBtn.innerHTML = soundEnabled ? 
+                '<i class="fas fa-volume-up"></i> Sound On' : 
+                '<i class="fas fa-volume-mute"></i> Sound Off';
+        }
+        
+        // Adjust time based on altitude
+        function adjustForAltitude() {
+            altitude = parseInt(altitudeInput.value) || 0;
+            
+            // Boiling point decreases ~1°C every 300m
+            const boilingPointDecrease = Math.floor(altitude / 300);
+            const adjustedTime = Math.max(120, 300 + (boilingPointDecrease * 30)); // Base 5 min, adjust
+            
+            totalSeconds = adjustedTime;
+            initialSeconds = adjustedTime;
+            updateDisplay();
+            updateTimerState(`Adjusted for ${altitude}m altitude`);
+            updateWaterStatus(`Time adjusted for altitude`);
+            updateStats();
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        setTimeBtn.addEventListener('click', setCustomTime);
+        soundBtn.addEventListener('click', toggleSound);
+        adjustBtn.addEventListener('click', adjustForAltitude);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+        
+        presetButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                setPresetTime(button.getAttribute('data-time'));
+            });
+        });
+        
+        useItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const time = parseInt(item.getAttribute('data-time'));
+                setUseCase(time);
+            });
+        });
+        
+        // Initialize
+        updateDisplay();
+        updateTimerState("Ready to boil water");
+        soundBtn.classList.add('active');
+        updateWaterStatus("Water at room temperature");
+        updateStats();
+        createBubbles();
+        updateHistoryDisplay();
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.code === 'Escape') {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>

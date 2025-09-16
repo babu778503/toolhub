@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<!-- Category: Productivity -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .todo-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .urgent-bar {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .important-bar {
+            background: linear-gradient(to top, #f39c12, #d35400);
+        }
+        
+        .normal-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .completed-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .todo-entry {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #3498db;
+        }
+        
+        .remove-todo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .remove-todo:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+        }
+        
+        .priority-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .priority-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .priority-title i {
+            margin-right: 8px;
+        }
+        
+        .priority-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .priority-name {
+            font-weight: 600;
+        }
+        
+        .priority-count {
+            color: #2ecc71;
+        }
+        
+        .priority-high {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .priority-medium {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        
+        .priority-low {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        .category-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .category-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .category-title i {
+            margin-right: 8px;
+        }
+        
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .category-name {
+            font-weight: 600;
+        }
+        
+        .category-count {
+            color: #3498db;
+        }
+        
+        .export-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .export-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-title i {
+            margin-right: 8px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .export-btn i {
+            margin-right: 5px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.4);
+        }
+        
+        .task-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #f39c12, #d35400);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.4);
+        }
+        
+        .completed-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .completed-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .completed-title i {
+            margin-right: 8px;
+        }
+        
+        .completed-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .completed-name {
+            font-weight: 600;
+            text-decoration: line-through;
+        }
+        
+        .completed-date {
+            color: #2ecc71;
+            font-size: 0.8rem;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>To-Do List Generator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="list-name"><i class="fas fa-list"></i> List Name</label>
+                    <input type="text" id="list-name" placeholder="Enter list name" value="Weekly Tasks">
+                </div>
+                
+                <div class="input-group">
+                    <label for="priority-level"><i class="fas fa-exclamation-circle"></i> Priority Level</label>
+                    <select id="priority-level">
+                        <option value="all" selected>All Priorities</option>
+                        <option value="high">High Priority Only</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('simple')">
+                        <i class="fas fa-list"></i> Simple List
+                    </div>
+                    <div class="tab" onclick="switchTab('detailed')">
+                        <i class="fas fa-list-check"></i> Detailed List
+                    </div>
+                </div>
+                
+                <div id="simple-tab" class="tab-content active">
+                    <p>Create a simple to-do list with basic tasks and priorities.</p>
+                </div>
+                
+                <div id="detailed-tab" class="tab-content">
+                    <p>Create a detailed to-do list with descriptions, due dates, and categories.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-tasks"></i> Tasks</label>
+                    <div id="todo-entries">
+                        <div class="todo-entry">
+                            <div class="input-group">
+                                <label>Task Name</label>
+                                <input type="text" class="task-name" placeholder="Task name" value="Complete Project Report">
+                            </div>
+                            <div class="input-group">
+                                <label>Priority</label>
+                                <select class="task-priority">
+                                    <option value="high" selected>High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="todo-entry">
+                            <div class="input-group">
+                                <label>Task Name</label>
+                                <input type="text" class="task-name" placeholder="Task name" value="Team Meeting Preparation">
+                            </div>
+                            <div class="input-group">
+                                <label>Priority</label>
+                                <select class="task-priority">
+                                    <option value="high">High</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addTodoEntry()">
+                        <i class="fas fa-plus"></i> Add Another Task
+                    </button>
+                </div>
+                
+                <button class="btn" onclick="generateTodoList()">
+                    <i class="fas fa-list-check"></i> Generate To-Do List
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-clipboard-list"></i> To-Do List Generated</div>
+                <div class="result-amount positive" id="total-tasks">5</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 60%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Total Tasks: 5 | Completed: 0 | Pending: 5
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="high-priority-count">2</div>
+                        <div class="stat-label">High Priority</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="medium-priority-count">2</div>
+                        <div class="stat-label">Medium Priority</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="low-priority-count">1</div>
+                        <div class="stat-label">Low Priority</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="todo-list">
+                    <div class="list-title"><i class="fas fa-list-check"></i> Generated To-Do List</div>
+                    <div id="generated-todo-list">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-exclamation-circle priority-high"></i> Complete Project Report</span>
+                            <span class="entry-amount">High Priority</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-users priority-medium"></i> Team Meeting Preparation</span>
+                            <span class="entry-amount">Medium Priority</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-envelope priority-medium"></i> Respond to Emails</span>
+                            <span class="entry-amount">Medium Priority</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-coffee priority-low"></i> Coffee Break</span>
+                            <span class="entry-amount">Low Priority</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-book priority-high"></i> Read Industry Article</span>
+                            <span class="entry-amount">High Priority</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="priority-section">
+                    <div class="priority-title"><i class="fas fa-layer-group"></i> Priority Distribution</div>
+                    <div id="priority-distribution">
+                        <div class="priority-item">
+                            <span class="priority-name">High Priority</span>
+                            <span class="priority-count">2 tasks</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="priority-name">Medium Priority</span>
+                            <span class="priority-count">2 tasks</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="priority-name">Low Priority</span>
+                            <span class="priority-count">1 task</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-section">
+                    <div class="category-title"><i class="fas fa-folder"></i> Category Distribution</div>
+                    <div id="category-distribution">
+                        <div class="category-item">
+                            <span class="category-name">Work</span>
+                            <span class="category-count">3 tasks</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Personal</span>
+                            <span class="category-count">2 tasks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> List Insights</div>
+                    <p id="list-insights">Your to-do list contains 5 tasks with a balanced priority distribution. You have 2 high-priority tasks that should be completed first. Focus on tackling high-priority items during your peak energy hours for maximum efficiency. Consider breaking down larger tasks into smaller subtasks for better progress tracking.</p>
+                </div>
+                
+                <div class="export-section">
+                    <div class="export-title"><i class="fas fa-download"></i> Export Options</div>
+                    <div class="export-buttons">
+                        <button class="export-btn" onclick="exportList('pdf')">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button class="export-btn" onclick="exportList('excel')">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                        <button class="export-btn" onclick="exportList('print')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="task-actions">
+                    <button class="action-btn" onclick="sortTasks('priority')">
+                        <i class="fas fa-sort-amount-down"></i> Sort by Priority
+                    </button>
+                    <button class="action-btn" onclick="clearAllTasks()">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
+                
+                <div class="completed-section">
+                    <div class="completed-title"><i class="fas fa-check-circle"></i> Recently Completed</div>
+                    <div id="recently-completed">
+                        <div class="completed-item">
+                            <span class="completed-name">Morning Exercise</span>
+                            <span class="completed-date">Today, 8:30 AM</span>
+                        </div>
+                        <div class="completed-item">
+                            <span class="completed-name">Breakfast</span>
+                            <span class="completed-date">Today, 7:15 AM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Productivity Tips</h3>
+                    <ul class="savings-steps">
+                        <li>Complete high-priority tasks during your peak energy hours</li>
+                        <li>Break large tasks into smaller, manageable subtasks</li>
+                        <li>Review and update your to-do list daily</li>
+                        <li>Use the "two-minute rule" for quick tasks</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Priority Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>High Priority Focus</h4>
+                        <div class="comparison-value positive" id="high-focus-tasks">2</div>
+                        <div class="comparison-label">High Priority Tasks</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>Balanced Approach</h4>
+                        <div class="comparison-value positive" id="balanced-tasks">5</div>
+                        <div class="comparison-label">Total Tasks</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-list"></i> Smart Organization</h3>
+                        <p>Automatically organize tasks by priority and category</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Tracking</h3>
+                        <p>See your progress with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Productivity Tips</h3>
+                        <p>Get actionable recommendations to boost efficiency</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>To-Do List Generator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="list-name-desktop"><i class="fas fa-list"></i> List Name</label>
+                            <input type="text" id="list-name-desktop" placeholder="Enter list name" value="Monthly Project Tasks">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="priority-level-desktop"><i class="fas fa-exclamation-circle"></i> Priority Level</label>
+                            <select id="priority-level-desktop">
+                                <option value="all" selected>All Priorities</option>
+                                <option value="high">High Priority Only</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="low">Low Priority</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="category-filter"><i class="fas fa-folder"></i> Category Filter</label>
+                            <select id="category-filter">
+                                <option value="all" selected>All Categories</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="health">Health</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="sort-order"><i class="fas fa-sort"></i> Sort Order</label>
+                            <select id="sort-order">
+                                <option value="priority" selected>By Priority</option>
+                                <option value="alphabetical">Alphabetically</option>
+                                <option value="due-date">By Due Date</option>
+                            </select>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('simple')">
+                                <i class="fas fa-list"></i> Simple List
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('detailed')">
+                                <i class="fas fa-list-check"></i> Detailed List
+                            </div>
+                        </div>
+                        
+                        <div id="simple-tab-desktop" class="tab-content active">
+                            <p>Create a simple to-do list with basic tasks and priorities. Perfect for quick task organization and getting started.</p>
+                        </div>
+                        
+                        <div id="detailed-tab-desktop" class="tab-content">
+                            <p>Create a detailed to-do list with descriptions, due dates, categories, and time estimates. Ideal for comprehensive task management.</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-tasks"></i> Tasks</label>
+                            <div id="todo-entries-desktop">
+                                <div class="todo-entry">
+                                    <button class="remove-todo" onclick="removeTodoEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Task Name</label>
+                                        <input type="text" class="task-name" placeholder="Task name" value="Complete Project Report">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Priority</label>
+                                        <select class="task-priority">
+                                            <option value="high" selected>High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select class="task-category">
+                                            <option value="work" selected>Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="shopping">Shopping</option>
+                                            <option value="health">Health</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Estimated Hours</label>
+                                        <input type="number" class="task-hours" placeholder="Hours needed" min="0.5" step="0.5" value="3">
+                                    </div>
+                                </div>
+                                <div class="todo-entry">
+                                    <button class="remove-todo" onclick="removeTodoEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Task Name</label>
+                                        <input type="text" class="task-name" placeholder="Task name" value="Team Meeting Preparation">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Priority</label>
+                                        <select class="task-priority">
+                                            <option value="high">High</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select class="task-category">
+                                            <option value="work" selected>Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="shopping">Shopping</option>
+                                            <option value="health">Health</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Estimated Hours</label>
+                                        <input type="number" class="task-hours" placeholder="Hours needed" min="0.5" step="0.5" value="1.5">
+                                    </div>
+                                </div>
+                                <div class="todo-entry">
+                                    <button class="remove-todo" onclick="removeTodoEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Task Name</label>
+                                        <input type="text" class="task-name" placeholder="Task name" value="Grocery Shopping">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Priority</label>
+                                        <select class="task-priority">
+                                            <option value="high">High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low" selected>Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Category</label>
+                                        <select class="task-category">
+                                            <option value="work">Work</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="shopping" selected>Shopping</option>
+                                            <option value="health">Health</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Estimated Hours</label>
+                                        <input type="number" class="task-hours" placeholder="Hours needed" min="0.5" step="0.5" value="1">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addTodoEntryDesktop()">
+                                <i class="fas fa-plus"></i> Add Another Task
+                            </button>
+                        </div>
+                        
+                        <button class="btn" onclick="generateTodoListDesktop()">
+                            <i class="fas fa-list-check"></i> Generate To-Do List
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-list"></i> Smart Organization</h3>
+                                <p>Automatically organize tasks by priority and category</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Tracking</h3>
+                                <p>See your progress with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Productivity Tips</h3>
+                                <p>Get actionable recommendations to boost efficiency</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Progress Tracking</h3>
+                                <p>Monitor task completion and time allocation</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Reminder System</h3>
+                                <p>Get notified of upcoming deadlines</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All lists are stored locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-clipboard-list"></i> To-Do List Generated</div>
+                        <div class="result-amount positive" id="total-tasks-desktop">8</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 75%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Total Tasks: 8 | Completed: 0 | Pending: 8
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="high-priority-count-desktop">3</div>
+                                <div class="stat-label">High Priority</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="medium-priority-count-desktop">3</div>
+                                <div class="stat-label">Medium Priority</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="low-priority-count-desktop">2</div>
+                                <div class="stat-label">Low Priority</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="estimated-hours-desktop">12</div>
+                                <div class="stat-label">Hours Needed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="todo-list">
+                            <div class="list-title"><i class="fas fa-list-check"></i> Generated To-Do List</div>
+                            <div id="generated-todo-list-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-project-diagram priority-high"></i> Complete Project Report</span>
+                                    <span class="entry-amount">3 hrs | High Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-users priority-high"></i> Team Meeting Preparation</span>
+                                    <span class="entry-amount">1.5 hrs | High Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-envelope priority-medium"></i> Respond to Important Emails</span>
+                                    <span class="entry-amount">1 hr | Medium Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-shopping-cart priority-low"></i> Grocery Shopping</span>
+                                    <span class="entry-amount">1 hr | Low Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-book priority-medium"></i> Read Industry Article</span>
+                                    <span class="entry-amount">0.5 hrs | Medium Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-laptop priority-medium"></i> Software Updates</span>
+                                    <span class="entry-amount">2 hrs | Medium Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-dumbbell priority-low"></i> Gym Workout</span>
+                                    <span class="entry-amount">1.5 hrs | Low Priority</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-medkit priority-high"></i> Doctor Appointment</span>
+                                    <span class="entry-amount">1.5 hrs | High Priority</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="priority-section">
+                            <div class="priority-title"><i class="fas fa-layer-group"></i> Priority Distribution</div>
+                            <div id="priority-distribution-desktop">
+                                <div class="priority-item">
+                                    <span class="priority-name">High Priority</span>
+                                    <span class="priority-count">3 tasks (38%)</span>
+                                </div>
+                                <div class="priority-item">
+                                    <span class="priority-name">Medium Priority</span>
+                                    <span class="priority-count">3 tasks (38%)</span>
+                                </div>
+                                <div class="priority-item">
+                                    <span class="priority-name">Low Priority</span>
+                                    <span class="priority-count">2 tasks (25%)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-section">
+                            <div class="category-title"><i class="fas fa-folder"></i> Category Distribution</div>
+                            <div id="category-distribution-desktop">
+                                <div class="category-item">
+                                    <span class="category-name">Work</span>
+                                    <span class="category-count">4 tasks (50%)</span>
+                                </div>
+                                <div class="category-item">
+                                    <span class="category-name">Personal</span>
+                                    <span class="category-count">2 tasks (25%)</span>
+                                </div>
+                                <div class="category-item">
+                                    <span class="category-name">Shopping</span>
+                                    <span class="category-count">1 task (12.5%)</span>
+                                </div>
+                                <div class="category-item">
+                                    <span class="category-name">Health</span>
+                                    <span class="category-count">1 task (12.5%)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> List Insights</div>
+                            <p id="list-insights-desktop">Your to-do list contains 8 tasks with a balanced priority distribution. You have 3 high-priority tasks that should be completed first. The total estimated time needed is 12 hours. Focus on tackling high-priority items during your peak energy hours for maximum efficiency. Consider breaking down larger tasks like "Complete Project Report" into smaller subtasks for better progress tracking. Schedule the "Doctor Appointment" as it's a fixed-time commitment that requires 1.5 hours.</p>
+                        </div>
+                        
+                        <div class="export-section">
+                            <div class="export-title"><i class="fas fa-download"></i> Export Options</div>
+                            <div class="export-buttons">
+                                <button class="export-btn" onclick="exportListDesktop('pdf')">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </button>
+                                <button class="export-btn" onclick="exportListDesktop('excel')">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                                <button class="export-btn" onclick="exportListDesktop('csv')">
+                                    <i class="fas fa-file-csv"></i> CSV
+                                </button>
+                                <button class="export-btn" onclick="exportListDesktop('print')">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                <button class="export-btn" onclick="exportListDesktop('share')">
+                                    <i class="fas fa-share-alt"></i> Share
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="task-actions">
+                            <button class="action-btn" onclick="sortTasksDesktop('priority')">
+                                <i class="fas fa-sort-amount-down"></i> Sort by Priority
+                            </button>
+                            <button class="action-btn" onclick="sortTasksDesktop('category')">
+                                <i class="fas fa-folder"></i> Sort by Category
+                            </button>
+                            <button class="action-btn" onclick="clearAllTasksDesktop()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                        
+                        <div class="completed-section">
+                            <div class="completed-title"><i class="fas fa-check-circle"></i> Recently Completed</div>
+                            <div id="recently-completed-desktop">
+                                <div class="completed-item">
+                                    <span class="completed-name">Morning Exercise</span>
+                                    <span class="completed-date">Today, 8:30 AM</span>
+                                </div>
+                                <div class="completed-item">
+                                    <span class="completed-name">Breakfast</span>
+                                    <span class="completed-date">Today, 7:15 AM</span>
+                                </div>
+                                <div class="completed-item">
+                                    <span class="completed-name">Email Check</span>
+                                    <span class="completed-date">Yesterday, 9:00 AM</span>
+                                </div>
+                                <div class="completed-item">
+                                    <span class="completed-name">Weekly Review</span>
+                                    <span class="completed-date">Oct 1, 5:00 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Productivity Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Complete high-priority tasks during your peak afternoon energy hours (1PM-4PM)</li>
+                                <li>Break large tasks like "Complete Project Report" into smaller subtasks</li>
+                                <li>Block 2 hours daily for deep work without interruptions</li>
+                                <li>Review and update your to-do list daily based on actual progress</li>
+                                <li>Use the "two-minute rule" for quick tasks like responding to emails</li>
+                                <li>Group similar activities together to minimize context switching</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> List Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Priority Focus</h4>
+                                <div class="comparison-value positive" id="priority-focus-tasks-desktop">3</div>
+                                <div class="comparison-label">High Priority Tasks</div>
+                                <div class="comparison-value" id="priority-focus-hours-desktop">6.5</div>
+                                <div class="comparison-label">Hours Needed</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Comprehensive</h4>
+                                <div class="comparison-value positive" id="comprehensive-tasks-desktop">8</div>
+                                <div class="comparison-label">Total Tasks</div>
+                                <div class="comparison-value" id="comprehensive-hours-desktop">12</div>
+                                <div class="comparison-label">Hours Needed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('simple-tab').classList.remove('active');
+            document.getElementById('detailed-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('simple-tab-desktop').classList.remove('active');
+            document.getElementById('detailed-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Todo entry functions
+        function addTodoEntry() {
+            const container = document.getElementById('todo-entries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'todo-entry';
+            newEntry.innerHTML = `
+                <div class="input-group">
+                    <label>Task Name</label>
+                    <input type="text" class="task-name" placeholder="Task name">
+                </div>
+                <div class="input-group">
+                    <label>Priority</label>
+                    <select class="task-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function addTodoEntryDesktop() {
+            const container = document.getElementById('todo-entries-desktop');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'todo-entry';
+            newEntry.innerHTML = `
+                <button class="remove-todo" onclick="removeTodoEntry(this)"><i class="fas fa-times"></i></button>
+                <div class="input-group">
+                    <label>Task Name</label>
+                    <input type="text" class="task-name" placeholder="Task name">
+                </div>
+                <div class="input-group">
+                    <label>Priority</label>
+                    <select class="task-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Category</label>
+                    <select class="task-category">
+                        <option value="work" selected>Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="health">Health</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Estimated Hours</label>
+                    <input type="number" class="task-hours" placeholder="Hours needed" min="0.5" step="0.5">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function removeTodoEntry(button) {
+            if (document.querySelectorAll('.todo-entry').length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one task entry');
+            }
+        }
+        
+        // Todo list generation functions
+        function generateTodoList() {
+            const listName = document.getElementById('list-name').value || 'My To-Do List';
+            const priorityLevel = document.getElementById('priority-level').value;
+            const todoEntries = document.querySelectorAll('#todo-entries .todo-entry');
+            
+            generateList(listName, priorityLevel, todoEntries, 'mobile');
+            compareLists(todoEntries, 'mobile');
+        }
+        
+        function generateTodoListDesktop() {
+            const listName = document.getElementById('list-name-desktop').value || 'My To-Do List';
+            const priorityLevel = document.getElementById('priority-level-desktop').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+            const sortOrder = document.getElementById('sort-order').value;
+            const todoEntries = document.querySelectorAll('#todo-entries-desktop .todo-entry');
+            
+            generateList(listName, priorityLevel, todoEntries, 'desktop');
+            compareLists(todoEntries, 'desktop');
+        }
+        
+        function generateList(listName, priorityLevel, todoEntries, device) {
+            // Count tasks by priority
+            let highPriorityCount = 0;
+            let mediumPriorityCount = 0;
+            let lowPriorityCount = 0;
+            let totalTasks = 0;
+            let estimatedHours = 0;
+            let categoryCounts = { work: 0, personal: 0, shopping: 0, health: 0 };
+            
+            todoEntries.forEach(entry => {
+                const priority = entry.querySelector('.task-priority').value;
+                const category = entry.querySelector('.task-category') ? 
+                    entry.querySelector('.task-category').value : 'work';
+                const hours = entry.querySelector('.task-hours') ? 
+                    parseFloat(entry.querySelector('.task-hours').value) || 0 : 0;
+                
+                totalTasks++;
+                estimatedHours += hours;
+                
+                if (priority === 'high') {
+                    highPriorityCount++;
+                } else if (priority === 'medium') {
+                    mediumPriorityCount++;
+                } else {
+                    lowPriorityCount++;
+                }
+                
+                if (categoryCounts.hasOwnProperty(category)) {
+                    categoryCounts[category]++;
+                }
+            });
+            
+            // Update UI
+            const totalTasksElement = device === 'mobile' ? document.getElementById('total-tasks') : document.getElementById('total-tasks-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const highPriorityCountElement = device === 'mobile' ? document.getElementById('high-priority-count') : document.getElementById('high-priority-count-desktop');
+            const mediumPriorityCountElement = device === 'mobile' ? document.getElementById('medium-priority-count') : document.getElementById('medium-priority-count-desktop');
+            const lowPriorityCountElement = device === 'mobile' ? document.getElementById('low-priority-count') : document.getElementById('low-priority-count-desktop');
+            const generatedTodoListElement = device === 'mobile' ? document.getElementById('generated-todo-list') : document.getElementById('generated-todo-list-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const insightsElement = device === 'mobile' ? document.getElementById('list-insights') : document.getElementById('list-insights-desktop');
+            const priorityDistributionElement = device === 'mobile' ? document.getElementById('priority-distribution') : document.getElementById('priority-distribution-desktop');
+            const categoryDistributionElement = device === 'mobile' ? document.getElementById('category-distribution') : document.getElementById('category-distribution-desktop');
+            
+            totalTasksElement.textContent = totalTasks;
+            resultDescriptionElement.textContent = `Total Tasks: ${totalTasks} | Completed: 0 | Pending: ${totalTasks}`;
+            highPriorityCountElement.textContent = highPriorityCount;
+            mediumPriorityCountElement.textContent = mediumPriorityCount;
+            lowPriorityCountElement.textContent = lowPriorityCount;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const estimatedHoursElement = document.getElementById('estimated-hours-desktop');
+                estimatedHoursElement.textContent = estimatedHours.toFixed(1);
+            }
+            
+            // Update generated to-do list
+            generatedTodoListElement.innerHTML = '';
+            
+            todoEntries.forEach(entry => {
+                const name = entry.querySelector('.task-name').value || 'Unnamed Task';
+                const priority = entry.querySelector('.task-priority').value;
+                const category = entry.querySelector('.task-category') ? entry.querySelector('.task-category').value : 'work';
+                const hours = entry.querySelector('.task-hours') ? 
+                    parseFloat(entry.querySelector('.task-hours').value) || 0 : 0;
+                
+                let priorityClass = '';
+                let priorityIcon = '';
+                let categoryName = '';
+                
+                if (priority === 'high') {
+                    priorityClass = 'priority-high';
+                    priorityIcon = category === 'work' ? 'fa-project-diagram' : 
+                                   category === 'personal' ? 'fa-home' : 
+                                   category === 'shopping' ? 'fa-shopping-cart' : 'fa-medkit';
+                } else if (priority === 'medium') {
+                    priorityClass = 'priority-medium';
+                    priorityIcon = category === 'work' ? 'fa-users' : 
+                                   category === 'personal' ? 'fa-user' : 
+                                   category === 'shopping' ? 'fa-store' : 'fa-heartbeat';
+                } else {
+                    priorityClass = 'priority-low';
+                    priorityIcon = category === 'work' ? 'fa-coffee' : 
+                                   category === 'personal' ? 'fa-utensils' : 
+                                   category === 'shopping' ? 'fa-shopping-bag' : 'fa-running';
+                }
+                
+                if (category === 'work') categoryName = 'Work';
+                else if (category === 'personal') categoryName = 'Personal';
+                else if (category === 'shopping') categoryName = 'Shopping';
+                else categoryName = 'Health';
+                
+                const taskItem = document.createElement('div');
+                taskItem.className = 'entry-item';
+                taskItem.innerHTML = `
+                    <span class="entry-name"><i class="fas ${priorityIcon} ${priorityClass}"></i> ${name}</span>
+                    <span class="entry-amount">${hours > 0 ? hours.toFixed(1) + ' hrs | ' : ''}${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority</span>
+                `;
+                generatedTodoListElement.appendChild(taskItem);
+            });
+            
+            // Update priority distribution
+            priorityDistributionElement.innerHTML = '';
+            
+            if (highPriorityCount > 0) {
+                const highItem = document.createElement('div');
+                highItem.className = 'priority-item';
+                highItem.innerHTML = `
+                    <span class="priority-name">High Priority</span>
+                    <span class="priority-count">${highPriorityCount} tasks ${totalTasks > 0 ? `(${Math.round((highPriorityCount/totalTasks)*100)}%)` : ''}</span>
+                `;
+                priorityDistributionElement.appendChild(highItem);
+            }
+            
+            if (mediumPriorityCount > 0) {
+                const mediumItem = document.createElement('div');
+                mediumItem.className = 'priority-item';
+                mediumItem.innerHTML = `
+                    <span class="priority-name">Medium Priority</span>
+                    <span class="priority-count">${mediumPriorityCount} tasks ${totalTasks > 0 ? `(${Math.round((mediumPriorityCount/totalTasks)*100)}%)` : ''}</span>
+                `;
+                priorityDistributionElement.appendChild(mediumItem);
+            }
+            
+            if (lowPriorityCount > 0) {
+                const lowItem = document.createElement('div');
+                lowItem.className = 'priority-item';
+                lowItem.innerHTML = `
+                    <span class="priority-name">Low Priority</span>
+                    <span class="priority-count">${lowPriorityCount} tasks ${totalTasks > 0 ? `(${Math.round((lowPriorityCount/totalTasks)*100)}%)` : ''}</span>
+                `;
+                priorityDistributionElement.appendChild(lowItem);
+            }
+            
+            // Update category distribution
+            categoryDistributionElement.innerHTML = '';
+            
+            Object.entries(categoryCounts).forEach(([category, count]) => {
+                if (count > 0) {
+                    let categoryName = '';
+                    let categoryIcon = '';
+                    
+                    if (category === 'work') {
+                        categoryName = 'Work';
+                        categoryIcon = 'fa-briefcase';
+                    } else if (category === 'personal') {
+                        categoryName = 'Personal';
+                        categoryIcon = 'fa-user';
+                    } else if (category === 'shopping') {
+                        categoryName = 'Shopping';
+                        categoryIcon = 'fa-shopping-cart';
+                    } else {
+                        categoryName = 'Health';
+                        categoryIcon = 'fa-heartbeat';
+                    }
+                    
+                    const categoryItem = document.createElement('div');
+                    categoryItem.className = 'category-item';
+                    categoryItem.innerHTML = `
+                        <span class="category-name"><i class="fas ${categoryIcon}"></i> ${categoryName}</span>
+                        <span class="category-count">${count} tasks ${totalTasks > 0 ? `(${Math.round((count/totalTasks)*100)}%)` : ''}</span>
+                    `;
+                    categoryDistributionElement.appendChild(categoryItem);
+                }
+            });
+            
+            // Update insights
+            let insightsText = '';
+            if (device === 'mobile') {
+                insightsText = `Your to-do list contains ${totalTasks} tasks with ${highPriorityCount} high-priority items. Focus on tackling high-priority tasks during your peak energy hours for maximum efficiency. Consider breaking down larger tasks into smaller subtasks for better progress tracking.`;
+            } else {
+                insightsText = `Your to-do list contains ${totalTasks} tasks with a balanced priority distribution. You have ${highPriorityCount} high-priority tasks that should be completed first. The total estimated time needed is ${estimatedHours.toFixed(1)} hours. Focus on tackling high-priority items during your peak energy hours for maximum efficiency. Consider breaking down larger tasks like "${todoEntries[0]?.querySelector('.task-name').value || 'Project Report'}" into smaller subtasks for better progress tracking. Schedule fixed-time commitments like appointments early in your planning.`;
+            }
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(highPriorityCount, mediumPriorityCount, lowPriorityCount, totalTasks, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (totalTasks / Math.max(1, totalTasks + 5)) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function compareLists(todoEntries, device) {
+            // Count high priority tasks
+            let highPriorityCount = 0;
+            let totalHours = 0;
+            
+            todoEntries.forEach(entry => {
+                const priority = entry.querySelector('.task-priority').value;
+                const hours = entry.querySelector('.task-hours') ? 
+                    parseFloat(entry.querySelector('.task-hours').value) || 0 : 0;
+                
+                if (priority === 'high') {
+                    highPriorityCount++;
+                }
+                totalHours += hours;
+            });
+            
+            // Update comparison UI
+            const highFocusTasksElement = device === 'mobile' ? document.getElementById('high-focus-tasks') : document.getElementById('priority-focus-tasks-desktop');
+            const balancedTasksElement = device === 'mobile' ? document.getElementById('balanced-tasks') : document.getElementById('comprehensive-tasks-desktop');
+            
+            highFocusTasksElement.textContent = highPriorityCount;
+            balancedTasksElement.textContent = todoEntries.length;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const highFocusHoursElement = document.getElementById('priority-focus-hours-desktop');
+                const comprehensiveHoursElement = document.getElementById('comprehensive-hours-desktop');
+                
+                // Calculate high priority hours
+                let highPriorityHours = 0;
+                todoEntries.forEach(entry => {
+                    const priority = entry.querySelector('.task-priority').value;
+                    const hours = entry.querySelector('.task-hours') ? 
+                        parseFloat(entry.querySelector('.task-hours').value) || 0 : 0;
+                    
+                    if (priority === 'high') {
+                        highPriorityHours += hours;
+                    }
+                });
+                
+                highFocusHoursElement.textContent = highPriorityHours.toFixed(1);
+                comprehensiveHoursElement.textContent = totalHours.toFixed(1);
+            }
+        }
+        
+        function generateChart(highPriority, mediumPriority, lowPriority, totalTasks, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(highPriority, mediumPriority, lowPriority, 1);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // High priority bar
+            const highBar = document.createElement('div');
+            highBar.className = 'chart-bar urgent-bar';
+            const highHeight = maxValue > 0 ? (highPriority / maxValue) * maxHeight : 0;
+            highBar.style.height = highHeight + 'px';
+            highBar.textContent = highPriority;
+            
+            const highLabel = document.createElement('div');
+            highLabel.className = 'chart-label';
+            highLabel.textContent = 'High';
+            
+            const highContainer = document.createElement('div');
+            highContainer.style.display = 'flex';
+            highContainer.style.flexDirection = 'column';
+            highContainer.style.alignItems = 'center';
+            highContainer.style.margin = '0 5px';
+            
+            highContainer.appendChild(highBar);
+            highContainer.appendChild(highLabel);
+            
+            // Medium priority bar
+            const mediumBar = document.createElement('div');
+            mediumBar.className = 'chart-bar important-bar';
+            const mediumHeight = maxValue > 0 ? (mediumPriority / maxValue) * maxHeight : 0;
+            mediumBar.style.height = mediumHeight + 'px';
+            mediumBar.textContent = mediumPriority;
+            
+            const mediumLabel = document.createElement('div');
+            mediumLabel.className = 'chart-label';
+            mediumLabel.textContent = 'Medium';
+            
+            const mediumContainer = document.createElement('div');
+            mediumContainer.style.display = 'flex';
+            mediumContainer.style.flexDirection = 'column';
+            mediumContainer.style.alignItems = 'center';
+            mediumContainer.style.margin = '0 5px';
+            
+            mediumContainer.appendChild(mediumBar);
+            mediumContainer.appendChild(mediumLabel);
+            
+            // Low priority bar
+            const lowBar = document.createElement('div');
+            lowBar.className = 'chart-bar normal-bar';
+            const lowHeight = maxValue > 0 ? (lowPriority / maxValue) * maxHeight : 0;
+            lowBar.style.height = lowHeight + 'px';
+            lowBar.textContent = lowPriority;
+            
+            const lowLabel = document.createElement('div');
+            lowLabel.className = 'chart-label';
+            lowLabel.textContent = 'Low';
+            
+            const lowContainer = document.createElement('div');
+            lowContainer.style.display = 'flex';
+            lowContainer.style.flexDirection = 'column';
+            lowContainer.style.alignItems = 'center';
+            lowContainer.style.margin = '0 5px';
+            
+            lowContainer.appendChild(lowBar);
+            lowContainer.appendChild(lowLabel);
+            
+            // Total tasks bar
+            const totalBar = document.createElement('div');
+            totalBar.className = 'chart-bar completed-bar';
+            const totalHeight = maxValue > 0 ? (totalTasks / maxValue) * maxHeight : 0;
+            totalBar.style.height = totalHeight + 'px';
+            totalBar.textContent = totalTasks;
+            
+            const totalLabel = document.createElement('div');
+            totalLabel.className = 'chart-label';
+            totalLabel.textContent = 'Total';
+            
+            const totalContainer = document.createElement('div');
+            totalContainer.style.display = 'flex';
+            totalContainer.style.flexDirection = 'column';
+            totalContainer.style.alignItems = 'center';
+            totalContainer.style.margin = '0 5px';
+            
+            totalContainer.appendChild(totalBar);
+            totalContainer.appendChild(totalLabel);
+            
+            container.appendChild(highContainer);
+            container.appendChild(mediumContainer);
+            container.appendChild(lowContainer);
+            container.appendChild(totalContainer);
+        }
+        
+        // Additional feature functions
+        function exportList(format) {
+            alert(`Exporting to ${format.toUpperCase()} format...`);
+        }
+        
+        function exportListDesktop(format) {
+            alert(`Exporting to ${format.toUpperCase()} format...`);
+        }
+        
+        function sortTasks(criteria) {
+            alert(`Sorting tasks by ${criteria}...`);
+        }
+        
+        function sortTasksDesktop(criteria) {
+            alert(`Sorting tasks by ${criteria}...`);
+        }
+        
+        function clearAllTasks() {
+            if (confirm('Are you sure you want to clear all tasks?')) {
+                document.getElementById('todo-entries').innerHTML = `
+                    <div class="todo-entry">
+                        <div class="input-group">
+                            <label>Task Name</label>
+                            <input type="text" class="task-name" placeholder="Task name">
+                        </div>
+                        <div class="input-group">
+                            <label>Priority</label>
+                            <select class="task-priority">
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function clearAllTasksDesktop() {
+            if (confirm('Are you sure you want to clear all tasks?')) {
+                document.getElementById('todo-entries-desktop').innerHTML = `
+                    <div class="todo-entry">
+                        <button class="remove-todo" onclick="removeTodoEntry(this)"><i class="fas fa-times"></i></button>
+                        <div class="input-group">
+                            <label>Task Name</label>
+                            <input type="text" class="task-name" placeholder="Task name">
+                        </div>
+                        <div class="input-group">
+                            <label>Priority</label>
+                            <select class="task-priority">
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Category</label>
+                            <select class="task-category">
+                                <option value="work" selected>Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="health">Health</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Estimated Hours</label>
+                            <input type="number" class="task-hours" placeholder="Hours needed" min="0.5" step="0.5">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize generator
+        window.onload = function() {
+            generateTodoList();
+            generateTodoListDesktop();
+        };
+    </script>
+</body>
+</html>

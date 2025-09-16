@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<!-- Category: Beverages -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Brewing Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6f4e37 0%, #8b4513 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #6f4e37, #8b4513);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #6f4e37, #8b4513);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            text-align: center;
+            padding: 40px 20px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f8f8;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            flex: 1;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #FFC107, #FF9800);
+            color: #333;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #F44336, #D32F2F);
+            color: white;
+            flex: 1;
+        }
+        
+        .brewing-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .method-btn {
+            padding: 15px 5px;
+            background: linear-gradient(to bottom, #8b4513, #6f4e37);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .method-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #ffd700, #ff9800);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .method-btn:hover {
+            background: linear-gradient(to bottom, #a0522d, #8b4513);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .method-btn:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .time-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .time-input input {
+            width: 80px;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .time-input input:focus {
+            border-color: #8b4513;
+            outline: none;
+            box-shadow: 0 0 5px rgba(139, 69, 19, 0.5);
+        }
+        
+        .time-input label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .set-time-btn {
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: flex-end;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .set-time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-container {
+            padding: 0 20px 20px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer-state {
+            text-align: center;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #555;
+            font-size: 18px;
+        }
+        
+        .timer-state.running {
+            color: #4CAF50;
+        }
+        
+        .timer-state.paused {
+            color: #FFC107;
+        }
+        
+        .timer-state.stopped {
+            color: #F44336;
+        }
+        
+        .coffee-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .coffee-cup {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            border-radius: 50% 50% 40% 40%;
+            border: 3px solid #ccc;
+            overflow: hidden;
+        }
+        
+        .coffee-liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70%;
+            background: linear-gradient(to top, #6f4e37, #8b4513);
+            transition: height 0.5s ease;
+        }
+        
+        .coffee-steam {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 40px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .coffee-steam.active {
+            opacity: 1;
+        }
+        
+        .steam {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 2px;
+            animation: steam-rise 3s infinite;
+        }
+        
+        @keyframes steam-rise {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-40px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        .coffee-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #8b4513;
+            margin-top: 10px;
+        }
+        
+        .sound-toggle {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px 20px;
+        }
+        
+        .sound-btn {
+            background: #607D8B;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-btn.active {
+            background: #2196F3;
+        }
+        
+        .coffee-info {
+            padding: 0 20px 20px;
+            background: #fff8e1;
+            margin: 0 20px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .coffee-info h3 {
+            color: #8b4513;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .coffee-info ul {
+            padding-left: 20px;
+        }
+        
+        .coffee-info li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .timer-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 0 20px 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8b4513;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .grind-settings {
+            padding: 0 20px 20px;
+        }
+        
+        .grind-settings h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #8b4513;
+            font-size: 20px;
+        }
+        
+        .grind-controls {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .grind-input {
+            flex: 1;
+        }
+        
+        .grind-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .grind-input select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .grind-btn {
+            background: #8b4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .coffee-history {
+            padding: 0 20px 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 0 20px 20px;
+        }
+        
+        .coffee-history h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #8b4513;
+        }
+        
+        .history-list {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .clear-history {
+            display: block;
+            width: 100%;
+            padding: 5px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .coffee-ratio {
+            padding: 0 20px 20px;
+        }
+        
+        .coffee-ratio h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #8b4513;
+            font-size: 20px;
+        }
+        
+        .ratio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .ratio-btn {
+            padding: 8px 15px;
+            background: #8b4513;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .ratio-btn.active {
+            background: #6f4e37;
+            transform: scale(1.1);
+        }
+        
+        .coffee-notes {
+            padding: 0 20px 20px;
+        }
+        
+        .coffee-notes h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #8b4513;
+            font-size: 20px;
+        }
+        
+        .notes-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .save-notes {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background: #8b4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 50px;
+                padding: 30px 15px;
+            }
+            
+            .btn {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            
+            .brewing-methods {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 15px 20px;
+            }
+            
+            .method-btn {
+                padding: 12px 5px;
+                font-size: 14px;
+            }
+            
+            .time-input {
+                gap: 5px;
+                padding: 0 15px 15px;
+            }
+            
+            .time-input input {
+                width: 60px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .coffee-cup {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .timer-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .grind-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Coffee Brewing Timer
+        </div>
+        
+        <div class="timer-state" id="timerState">Ready to brew coffee</div>
+        
+        <div class="timer-display" id="display">00:00:00</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="timer-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="methodStat">Drip</div>
+                <div class="stat-label">Brew Method</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="grindStat">Medium</div>
+                <div class="stat-label">Grind Size</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="timeStat">0 min</div>
+                <div class="stat-label">Brew Time</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="ratioStat">1:15</div>
+                <div class="stat-label">Ratio</div>
+            </div>
+        </div>
+        
+        <div class="coffee-visualization">
+            <div class="coffee-cup">
+                <div class="coffee-liquid" id="coffeeLiquid"></div>
+                <div class="coffee-steam" id="coffeeSteam"></div>
+            </div>
+            <div class="coffee-status" id="coffeeStatus">Coffee ready to brew</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn" id="startBtn">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button class="btn pause-btn" id="pauseBtn">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="sound-toggle">
+            <button class="sound-btn" id="soundBtn">
+                <i class="fas fa-volume-up"></i> Sound
+            </button>
+        </div>
+        
+        <div class="time-input">
+            <label>
+                Minutes
+                <input type="number" id="minutes" min="0" max="59" value="0">
+            </label>
+            <label>
+                Seconds
+                <input type="number" id="seconds" min="0" max="59" value="0">
+            </label>
+            <button class="set-time-btn" id="setTimeBtn">
+                <i class="fas fa-clock"></i> Set
+            </button>
+        </div>
+        
+        <div class="coffee-ratio">
+            <h3><i class="fas fa-percentage"></i> Coffee Ratio</h3>
+            <div class="ratio-controls">
+                <button class="ratio-btn" data-ratio="1:12">1:12</button>
+                <button class="ratio-btn active" data-ratio="1:15">1:15</button>
+                <button class="ratio-btn" data-ratio="1:17">1:17</button>
+                <button class="ratio-btn" data-ratio="1:20">1:20</button>
+            </div>
+        </div>
+        
+        <div class="brewing-methods">
+            <button class="method-btn" data-time="240" data-method="Drip" data-grind="Medium">
+                <i class="fas fa-coffee"></i>
+                <span>Drip</span>
+                <small>4 min</small>
+            </button>
+            <button class="method-btn" data-time="180" data-method="French Press" data-grind="Coarse">
+                <i class="fas fa-mug-hot"></i>
+                <span>French Press</span>
+                <small>3 min</small>
+            </button>
+            <button class="method-btn" data-time="30" data-method="Espresso" data-grind="Fine">
+                <i class="fas fa-bolt"></i>
+                <span>Espresso</span>
+                <small>30 sec</small>
+            </button>
+            <button class="method-btn" data-time="180" data-method="Pour Over" data-grind="Medium-Fine">
+                <i class="fas fa-water"></i>
+                <span>Pour Over</span>
+                <small>3 min</small>
+            </button>
+            <button class="method-btn" data-time="300" data-method="Cold Brew" data-grind="Coarse">
+                <i class="fas fa-snowflake"></i>
+                <span>Cold Brew</span>
+                <small>5 min</small>
+            </button>
+            <button class="method-btn" data-time="120" data-method="AeroPress" data-grind="Fine">
+                <i class="fas fa-wind"></i>
+                <span>AeroPress</span>
+                <small>2 min</small>
+            </button>
+        </div>
+        
+        <div class="grind-settings">
+            <h3><i class="fas fa-blender"></i> Grind Settings</h3>
+            <div class="grind-controls">
+                <div class="grind-input">
+                    <label for="grindSize">Select Grind Size</label>
+                    <select id="grindSize">
+                        <option value="Extra Fine">Extra Fine (Turkish)</option>
+                        <option value="Fine">Fine (Espresso)</option>
+                        <option value="Medium-Fine">Medium-Fine</option>
+                        <option value="Medium" selected>Medium (Drip)</option>
+                        <option value="Medium-Coarse">Medium-Coarse</option>
+                        <option value="Coarse">Coarse (French Press)</option>
+                        <option value="Extra Coarse">Extra Coarse (Cold Brew)</option>
+                    </select>
+                </div>
+                <button class="grind-btn" id="setGrindBtn">Set Grind</button>
+            </div>
+        </div>
+        
+        <div class="coffee-notes">
+            <h3><i class="fas fa-sticky-note"></i> Coffee Notes</h3>
+            <textarea class="notes-input" id="coffeeNotes" placeholder="Add notes about this brew..."></textarea>
+            <button class="save-notes" id="saveNotesBtn">Save Notes</button>
+        </div>
+        
+        <div class="coffee-history">
+            <h3><i class="fas fa-history"></i> Recent Brews</h3>
+            <div class="history-list" id="historyList">
+                <div class="history-item">No coffee sessions yet</div>
+            </div>
+            <button class="clear-history" id="clearHistory">Clear History</button>
+        </div>
+        
+        <div class="coffee-info">
+            <h3><i class="fas fa-lightbulb"></i> Coffee Brewing Tips</h3>
+            <ul>
+                <li>Use a 1:15 to 1:17 coffee-to-water ratio for best results</li>
+                <li>Grind beans just before brewing for maximum freshness</li>
+                <li>Water temperature should be between 195-205°F (90-96°C)</li>
+                <li>Preheat your brewing equipment to maintain temperature</li>
+                <li>Store coffee beans in an airtight container away from light</li>
+                <li>Experiment with grind size and brew time to find your perfect cup</li>
+                <li>For pour over, use a circular motion for even saturation</li>
+                <li>Clean your equipment regularly for consistent taste</li>
+            </ul>
+        </div>
+    </div>
+
+    <audio id="alarmSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Timer variables
+        let timer;
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let initialSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let soundEnabled = true;
+        let currentMethod = 'Drip';
+        let currentGrind = 'Medium';
+        let currentRatio = '1:15';
+        let coffeeHistory = [];
+        let coffeeNotes = '';
+        
+        // DOM elements
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const setTimeBtn = document.getElementById('setTimeBtn');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+        const methodButtons = document.querySelectorAll('.method-btn');
+        const timerState = document.getElementById('timerState');
+        const progressFill = document.getElementById('progressFill');
+        const soundBtn = document.getElementById('soundBtn');
+        const alarmSound = document.getElementById('alarmSound');
+        const coffeeLiquid = document.getElementById('coffeeLiquid');
+        const coffeeSteam = document.getElementById('coffeeSteam');
+        const coffeeStatus = document.getElementById('coffeeStatus');
+        const methodStat = document.getElementById('methodStat');
+        const grindStat = document.getElementById('grindStat');
+        const timeStat = document.getElementById('timeStat');
+        const ratioStat = document.getElementById('ratioStat');
+        const grindSize = document.getElementById('grindSize');
+        const setGrindBtn = document.getElementById('setGrindBtn');
+        const ratioButtons = document.querySelectorAll('.ratio-btn');
+        const coffeeNotesInput = document.getElementById('coffeeNotes');
+        const saveNotesBtn = document.getElementById('saveNotesBtn');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        
+        // Format time to HH:MM:SS
+        function formatTime(total) {
+            const hrs = Math.floor(total / 3600);
+            const mins = Math.floor((total % 3600) / 60);
+            const secs = total % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update display
+        function updateDisplay() {
+            display.textContent = formatTime(totalSeconds);
+            
+            // Update progress bar
+            if (initialSeconds > 0) {
+                const progress = ((initialSeconds - totalSeconds) / initialSeconds) * 100;
+                progressFill.style.width = `${progress}%`;
+                
+                // Update coffee visualization
+                const coffeeHeight = 70 + (30 * (initialSeconds - totalSeconds) / initialSeconds);
+                coffeeLiquid.style.height = `${coffeeHeight}%`;
+            } else {
+                progressFill.style.width = '0%';
+                coffeeLiquid.style.height = '70%';
+            }
+        }
+        
+        // Update timer state display
+        function updateTimerState(state) {
+            timerState.textContent = state;
+            timerState.className = 'timer-state ' + (isRunning ? 'running' : isPaused ? 'paused' : 'stopped');
+        }
+        
+        // Update coffee status
+        function updateCoffeeStatus(status) {
+            coffeeStatus.textContent = status;
+            if (status.includes('Brewing') || status.includes('Ready')) {
+                coffeeStatus.style.color = '#4CAF50';
+                coffeeSteam.classList.add('active');
+                createSteam();
+            } else if (status.includes('Almost')) {
+                coffeeStatus.style.color = '#FFC107';
+                coffeeSteam.classList.add('active');
+                createSteam();
+            } else {
+                coffeeStatus.style.color = '#8b4513';
+                coffeeSteam.classList.remove('active');
+            }
+        }
+        
+        // Update stats
+        function updateStats() {
+            methodStat.textContent = currentMethod;
+            grindStat.textContent = currentGrind;
+            timeStat.textContent = Math.ceil(initialSeconds / 60) + ' min';
+            ratioStat.textContent = currentRatio;
+        }
+        
+        // Create steam animation
+        function createSteam() {
+            coffeeSteam.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const steam = document.createElement('div');
+                steam.className = 'steam';
+                steam.style.left = (i * 12) + 'px';
+                steam.style.animationDelay = (i * 0.2) + 's';
+                coffeeSteam.appendChild(steam);
+            }
+        }
+        
+        // Add to history
+        function addToHistory(method, time, grind, ratio) {
+            const historyItem = {
+                method: method,
+                time: time,
+                grind: grind,
+                ratio: ratio,
+                notes: coffeeNotes,
+                timestamp: new Date()
+            };
+            
+            coffeeHistory.unshift(historyItem);
+            
+            // Keep only last 5 items
+            if (coffeeHistory.length > 5) {
+                coffeeHistory = coffeeHistory.slice(0, 5);
+            }
+            
+            updateHistoryDisplay();
+        }
+        
+        // Update history display
+        function updateHistoryDisplay() {
+            if (coffeeHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No coffee sessions yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            coffeeHistory.forEach(item => {
+                const time = item.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.innerHTML = `${item.method} (${item.grind}) - ${Math.ceil(item.time/60)}min ${time}`;
+                historyList.appendChild(historyElement);
+            });
+        }
+        
+        // Clear history
+        function clearHistory() {
+            coffeeHistory = [];
+            updateHistoryDisplay();
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (totalSeconds > 0) {
+                if (!isRunning) {
+                    isRunning = true;
+                    isPaused = false;
+                    updateTimerState("Coffee brewing...");
+                    updateCoffeeStatus("Coffee brewing...");
+                    
+                    timer = setInterval(() => {
+                        totalSeconds--;
+                        updateDisplay();
+                        
+                        // Update coffee status based on time remaining
+                        const progress = (initialSeconds - totalSeconds) / initialSeconds;
+                        if (progress < 0.7) {
+                            updateCoffeeStatus("Coffee brewing...");
+                        } else if (progress < 0.95) {
+                            updateCoffeeStatus("Almost ready...");
+                        }
+                        
+                        if (totalSeconds <= 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            isPaused = false;
+                            updateTimerState("Coffee is ready!");
+                            updateCoffeeStatus("Coffee is ready! Enjoy your brew.");
+                            display.textContent = "00:00:00";
+                            progressFill.style.width = '100%';
+                            coffeeLiquid.style.height = '100%';
+                            
+                            // Add to history
+                            addToHistory(currentMethod, initialSeconds, currentGrind, currentRatio);
+                            
+                            if (soundEnabled) {
+                                alarmSound.play();
+                            }
+                            
+                            // Flash effect
+                            display.style.color = '#4CAF50';
+                            setTimeout(() => {
+                                display.style.color = '#333';
+                            }, 500);
+                            
+                            setTimeout(() => {
+                                if (soundEnabled) {
+                                    alarmSound.play();
+                                }
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                updateTimerState("Brewing paused");
+                updateCoffeeStatus("Brewing paused");
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            totalSeconds = 0;
+            initialSeconds = 0;
+            updateDisplay();
+            updateTimerState("Ready to brew coffee");
+            updateCoffeeStatus("Coffee ready to brew");
+            progressFill.style.width = '0%';
+            coffeeLiquid.style.height = '70%';
+        }
+        
+        // Set custom time
+        function setCustomTime() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            totalSeconds = mins * 60 + secs;
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Brewing time set");
+            updateCoffeeStatus("Ready to brew");
+            updateStats();
+        }
+        
+        // Set brewing method and time
+        function setBrewingMethod(time, method, grind) {
+            totalSeconds = parseInt(time);
+            initialSeconds = totalSeconds;
+            currentMethod = method;
+            currentGrind = grind;
+            grindSize.value = grind;
+            updateDisplay();
+            updateTimerState(`${method} brewing time set`);
+            updateCoffeeStatus(`Ready to brew ${method} coffee`);
+            updateStats();
+        }
+        
+        // Set coffee ratio
+        function setCoffeeRatio(ratio) {
+            currentRatio = ratio;
+            ratioButtons.forEach(btn => {
+                if (btn.getAttribute('data-ratio') === ratio) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            updateStats();
+        }
+        
+        // Toggle sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundBtn.classList.toggle('active', soundEnabled);
+            soundBtn.innerHTML = soundEnabled ? 
+                '<i class="fas fa-volume-up"></i> Sound On' : 
+                '<i class="fas fa-volume-mute"></i> Sound Off';
+        }
+        
+        // Set grind size
+        function setGrindSize() {
+            currentGrind = grindSize.value;
+            updateStats();
+            updateTimerState(`Grind size set to ${currentGrind}`);
+        }
+        
+        // Save coffee notes
+        function saveCoffeeNotes() {
+            coffeeNotes = coffeeNotesInput.value;
+            if (coffeeNotes) {
+                updateTimerState("Notes saved!");
+                setTimeout(() => {
+                    updateTimerState(isRunning ? "Coffee brewing..." : 
+                                   isPaused ? "Brewing paused" : 
+                                   "Ready to brew coffee");
+                }, 1000);
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        setTimeBtn.addEventListener('click', setCustomTime);
+        soundBtn.addEventListener('click', toggleSound);
+        setGrindBtn.addEventListener('click', setGrindSize);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+        saveNotesBtn.addEventListener('click', saveCoffeeNotes);
+        
+        methodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const time = button.getAttribute('data-time');
+                const method = button.getAttribute('data-method');
+                const grind = button.getAttribute('data-grind');
+                setBrewingMethod(time, method, grind);
+            });
+        });
+        
+        ratioButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const ratio = button.getAttribute('data-ratio');
+                setCoffeeRatio(ratio);
+            });
+        });
+        
+        // Initialize
+        updateDisplay();
+        updateTimerState("Ready to brew coffee");
+        soundBtn.classList.add('active');
+        updateCoffeeStatus("Coffee ready to brew");
+        updateStats();
+        createSteam();
+        updateHistoryDisplay();
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.code === 'Escape') {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>

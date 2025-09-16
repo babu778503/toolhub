@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Fund Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .slider-container {
+            margin-top: 10px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #e1e8ed;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #2980b9;
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #f39c12, #e74c3c, #3498db);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #f39c12;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .recommendation {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(30deg);
+            transition: all 0.8s;
+        }
+        
+        .btn:hover::after {
+            left: 120%;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Emergency Fund Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="monthly-income"><i class="fas fa-wallet"></i> Monthly Income ($)</label>
+                    <input type="number" id="monthly-income" placeholder="Enter your monthly income" min="0" value="5000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="monthly-expenses"><i class="fas fa-receipt"></i> Monthly Expenses ($)</label>
+                    <input type="number" id="monthly-expenses" placeholder="Enter your monthly expenses" min="0" value="3500">
+                </div>
+                
+                <div class="input-group">
+                    <label for="dependents"><i class="fas fa-users"></i> Number of Dependents</label>
+                    <select id="dependents">
+                        <option value="0">None</option>
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4 or more</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="job-security"><i class="fas fa-briefcase"></i> Job Security Level</label>
+                    <select id="job-security">
+                        <option value="1.5">High Risk</option>
+                        <option value="1.2">Moderate Risk</option>
+                        <option value="1.0" selected>Stable</option>
+                        <option value="0.8">Secure</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="months"><i class="fas fa-calendar"></i> Months of Expenses to Cover: <span id="months-value">3</span></label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="12" value="3" class="slider" id="months">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="calculateEmergencyFund()">
+                    <i class="fas fa-calculator"></i> Calculate Emergency Fund
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-shield-alt"></i> Your Emergency Fund Goal</div>
+                <div class="result-amount" id="result">$12,600</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 35%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Based on your monthly expenses of $3,500<br>
+                    Covering 3 months of expenses<br>
+                    Adjusted for 1 dependents and job security
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="monthly-savings">$1,500</div>
+                        <div class="stat-label">Monthly Savings</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="time-to-goal">9 months</div>
+                        <div class="stat-label">Time to Goal</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="coverage-ratio">3.6 months</div>
+                        <div class="stat-label">Coverage Ratio</div>
+                    </div>
+                </div>
+                
+                <div class="recommendation" id="recommendation">
+                    At your current savings rate of $1,500/month, you can build this emergency fund in approximately 9 months.
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Savings Plan</h3>
+                    <ul class="savings-steps">
+                        <li>Set up automatic transfer of $500/week to emergency fund</li>
+                        <li>Create a separate high-yield savings account</li>
+                        <li>Review and adjust plan monthly</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Smart Calculation</h3>
+                        <p>Advanced algorithm considers income, expenses, dependents, and job security</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-line"></i> Progress Tracking</h3>
+                        <p>Visual progress bar shows how close you are to your goal</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Personalized Tips</h3>
+                        <p>Custom recommendations based on your financial situation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Emergency Fund Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="monthly-income-desktop"><i class="fas fa-wallet"></i> Monthly Income ($)</label>
+                            <input type="number" id="monthly-income-desktop" placeholder="Enter your monthly income" min="0" value="5000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="monthly-expenses-desktop"><i class="fas fa-receipt"></i> Monthly Expenses ($)</label>
+                            <input type="number" id="monthly-expenses-desktop" placeholder="Enter your monthly expenses" min="0" value="3500">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="dependents-desktop"><i class="fas fa-users"></i> Number of Dependents</label>
+                            <select id="dependents-desktop">
+                                <option value="0">None</option>
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4 or more</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="job-security-desktop"><i class="fas fa-briefcase"></i> Job Security Level</label>
+                            <select id="job-security-desktop">
+                                <option value="1.5">High Risk</option>
+                                <option value="1.2">Moderate Risk</option>
+                                <option value="1.0" selected>Stable</option>
+                                <option value="0.8">Secure</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="months-desktop"><i class="fas fa-calendar"></i> Months of Expenses to Cover: <span id="months-value-desktop">3</span></label>
+                            <div class="slider-container">
+                                <input type="range" min="1" max="12" value="3" class="slider" id="months-desktop">
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateEmergencyFundDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Emergency Fund
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Smart Calculation</h3>
+                                <p>Advanced algorithm considers income, expenses, dependents, and job security</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-line"></i> Progress Tracking</h3>
+                                <p>Visual progress bar shows how close you are to your goal</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Personalized Tips</h3>
+                                <p>Custom recommendations based on your financial situation</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-piggy-bank"></i> Savings Plan</h3>
+                                <p>Step-by-step guide to build your emergency fund</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Reminders</h3>
+                                <p>Get notified when it's time to review your fund</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-shield-alt"></i> Your Emergency Fund Goal</div>
+                        <div class="result-amount" id="result-desktop">$12,600</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 35%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Based on your monthly expenses of $3,500<br>
+                            Covering 3 months of expenses<br>
+                            Adjusted for 1 dependents and job security
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="monthly-savings-desktop">$1,500</div>
+                                <div class="stat-label">Monthly Savings</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="time-to-goal-desktop">9 months</div>
+                                <div class="stat-label">Time to Goal</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="coverage-ratio-desktop">3.6 months</div>
+                                <div class="stat-label">Coverage Ratio</div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation" id="recommendation-desktop">
+                            At your current savings rate of $1,500/month, you can build this emergency fund in approximately 9 months.
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Savings Plan</h3>
+                            <ul class="savings-steps">
+                                <li>Set up automatic transfer of $500/week to emergency fund</li>
+                                <li>Create a separate high-yield savings account</li>
+                                <li>Review and adjust plan monthly</li>
+                                <li>Consider windfalls (bonuses, tax refunds) for extra contributions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile slider update
+        document.getElementById('months').addEventListener('input', function() {
+            document.getElementById('months-value').textContent = this.value;
+        });
+        
+        // Desktop slider update
+        document.getElementById('months-desktop').addEventListener('input', function() {
+            document.getElementById('months-value-desktop').textContent = this.value;
+        });
+        
+        function calculateEmergencyFund() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+            const expenses = parseFloat(document.getElementById('monthly-expenses').value) || 0;
+            const dependents = parseInt(document.getElementById('dependents').value) || 0;
+            const jobSecurity = parseFloat(document.getElementById('job-security').value) || 1.0;
+            const months = parseInt(document.getElementById('months').value) || 3;
+            
+            calculateResult(income, expenses, dependents, jobSecurity, months, 'mobile');
+        }
+        
+        function calculateEmergencyFundDesktop() {
+            const income = parseFloat(document.getElementById('monthly-income-desktop').value) || 0;
+            const expenses = parseFloat(document.getElementById('monthly-expenses-desktop').value) || 0;
+            const dependents = parseInt(document.getElementById('dependents-desktop').value) || 0;
+            const jobSecurity = parseFloat(document.getElementById('job-security-desktop').value) || 1.0;
+            const months = parseInt(document.getElementById('months-desktop').value) || 3;
+            
+            calculateResult(income, expenses, dependents, jobSecurity, months, 'desktop');
+        }
+        
+        function calculateResult(income, expenses, dependents, jobSecurity, months, device) {
+            // Base calculation: expenses * months
+            let baseAmount = expenses * months;
+            
+            // Adjust for dependents (more dependents = higher need)
+            const dependentMultiplier = 1 + (dependents * 0.2);
+            
+            // Adjust for job security
+            const securityMultiplier = jobSecurity;
+            
+            // Final calculation
+            const emergencyFund = baseAmount * dependentMultiplier * securityMultiplier;
+            
+            // Calculate savings rate
+            const savedAmount = income - expenses;
+            
+            // Display result
+            const resultElement = device === 'mobile' ? document.getElementById('result') : document.getElementById('result-desktop');
+            const descriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const recommendationElement = device === 'mobile' ? document.getElementById('recommendation') : document.getElementById('recommendation-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const monthlySavingsElement = device === 'mobile' ? document.getElementById('monthly-savings') : document.getElementById('monthly-savings-desktop');
+            const timeToGoalElement = device === 'mobile' ? document.getElementById('time-to-goal') : document.getElementById('time-to-goal-desktop');
+            const coverageRatioElement = device === 'mobile' ? document.getElementById('coverage-ratio') : document.getElementById('coverage-ratio-desktop');
+            
+            resultElement.textContent = `$${emergencyFund.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            
+            descriptionElement.innerHTML = `
+                Based on your monthly expenses of $${expenses.toLocaleString()}<br>
+                Covering ${months} months of expenses<br>
+                Adjusted for ${dependents} dependents and job security
+            `;
+            
+            // Update stats
+            monthlySavingsElement.textContent = `$${savedAmount.toLocaleString()}`;
+            coverageRatioElement.textContent = `${(emergencyFund / expenses).toFixed(1)} months`;
+            
+            // Update progress bar (assuming 0 saved initially)
+            progressBar.style.width = '0%';
+            
+            // Recommendation
+            if (savedAmount <= 0) {
+                recommendationElement.innerHTML = `
+                    <strong>Warning:</strong> Your expenses exceed your income. 
+                    Focus on reducing expenses before building an emergency fund.
+                `;
+                timeToGoalElement.textContent = 'N/A';
+            } else {
+                const monthsToSave = Math.ceil(emergencyFund / savedAmount);
+                recommendationElement.innerHTML = `
+                    At your current savings rate of $${savedAmount.toLocaleString()}/month, 
+                    you can build this emergency fund in approximately ${monthsToSave} months.
+                `;
+                timeToGoalElement.textContent = `${monthsToSave} months`;
+                
+                // Animate progress bar
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 300);
+            }
+        }
+        
+        // Initialize slider values and calculate on load
+        window.onload = function() {
+            document.getElementById('months-value').textContent = document.getElementById('months').value;
+            document.getElementById('months-value-desktop').textContent = document.getElementById('months-desktop').value;
+            
+            // Calculate initial values
+            calculateEmergencyFund();
+            calculateEmergencyFundDesktop();
+        };
+    </script>
+</body>
+</html>

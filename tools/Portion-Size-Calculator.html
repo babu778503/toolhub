@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<!-- Category: Cooking -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portion Size Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a93cb 0%, #4a6fa5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #4a6fa5, #2a4a7a);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #4a6fa5, #2a4a7a);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .calculator-container {
+            padding: 30px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .input-box {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .input-box label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2a4a7a;
+            font-size: 16px;
+        }
+        
+        .input-box input, .input-box select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .input-box input:focus, .input-box select:focus {
+            border-color: #4a6fa5;
+            outline: none;
+            box-shadow: 0 0 8px rgba(74, 111, 165, 0.3);
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #4a6fa5, #2a4a7a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: #f8f8f8;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+        }
+        
+        .result-container h3 {
+            color: #2a4a7a;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .result-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4a6fa5;
+            margin: 10px 0;
+        }
+        
+        .result-details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .detail-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .detail-box h4 {
+            color: #2a4a7a;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a6fa5;
+        }
+        
+        .portion-types {
+            margin-top: 25px;
+        }
+        
+        .portion-types h3 {
+            text-align: center;
+            color: #2a4a7a;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .portion-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .portion-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #ddd;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .portion-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #4a6fa5, #2a4a7a);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .portion-item:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .portion-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .portion-item.active {
+            background: #bbdefb;
+            border-color: #4a6fa5;
+        }
+        
+        .portion-item strong {
+            display: block;
+            font-size: 16px;
+            color: #2a4a7a;
+        }
+        
+        .conversion-history {
+            margin-top: 25px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .conversion-history h3 {
+            color: #2a4a7a;
+            margin-bottom: 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .history-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .clear-history {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .measurement-converter {
+            margin-top: 25px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .measurement-converter h3 {
+            color: #2a4a7a;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .converter-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .converter-input {
+            flex: 1;
+        }
+        
+        .converter-input input, .converter-input select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .swap-btn {
+            align-self: flex-end;
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .swap-btn:hover {
+            background: #2a4a7a;
+            transform: rotate(180deg);
+        }
+        
+        .tips-section {
+            margin-top: 25px;
+            background: #fff8e1;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .tips-section h3 {
+            color: #2a4a7a;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .tips-section ul {
+            padding-left: 20px;
+        }
+        
+        .tips-section li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .calculator-container {
+                padding: 20px 15px;
+            }
+            
+            .input-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .result-value {
+                font-size: 28px;
+            }
+            
+            .portion-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .detail-box {
+                min-width: 100px;
+                padding: 10px;
+            }
+            
+            .detail-value {
+                font-size: 18px;
+            }
+            
+            .converter-row {
+                flex-direction: column;
+            }
+            
+            .swap-btn {
+                align-self: center;
+                transform: rotate(90deg);
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Portion Size Calculator
+        </div>
+        
+        <div class="calculator-container">
+            <div class="input-group">
+                <div class="input-row">
+                    <div class="input-box">
+                        <label for="originalServings"><i class="fas fa-users"></i> Original Servings</label>
+                        <input type="number" id="originalServings" min="1" value="4" step="1">
+                    </div>
+                    <div class="input-box">
+                        <label for="desiredServings"><i class="fas fa-user-friends"></i> Desired Servings</label>
+                        <input type="number" id="desiredServings" min="1" value="6" step="1">
+                    </div>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-box">
+                        <label for="ingredient"><i class="fas fa-carrot"></i> Ingredient</label>
+                        <input type="text" id="ingredient" placeholder="e.g., Flour" value="Flour">
+                    </div>
+                    <div class="input-box">
+                        <label for="originalAmount"><i class="fas fa-weight-hanging"></i> Original Amount</label>
+                        <input type="number" id="originalAmount" min="0" value="2" step="0.1">
+                    </div>
+                    <div class="input-box">
+                        <label for="unit"><i class="fas fa-ruler"></i> Unit</label>
+                        <select id="unit">
+                            <option value="cups">Cups</option>
+                            <option value="tbsp">Tablespoons</option>
+                            <option value="tsp">Teaspoons</option>
+                            <option value="oz">Ounces</option>
+                            <option value="g">Grams</option>
+                            <option value="kg">Kilograms</option>
+                            <option value="lb">Pounds</option>
+                            <option value="ml">Milliliters</option>
+                            <option value="l">Liters</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="calculate-btn" id="calculateBtn">
+                <i class="fas fa-calculator"></i> Calculate New Portion
+            </button>
+            
+            <div class="result-container">
+                <h3><i class="fas fa-utensils"></i> Portion Adjustment Result</h3>
+                <div class="result-value" id="resultValue">3.0</div>
+                <div class="result-unit" id="resultUnit">cups</div>
+                
+                <div class="result-details">
+                    <div class="detail-box">
+                        <h4>Adjustment Ratio</h4>
+                        <div class="detail-value" id="ratioValue">1.5x</div>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Original</h4>
+                        <div class="detail-value" id="originalValue">2 cups</div>
+                    </div>
+                    <div class="detail-box">
+                        <h4>New Amount</h4>
+                        <div class="detail-value" id="newValue">3 cups</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="portion-types">
+                <h3><i class="fas fa-pizza-slice"></i> Common Portion Sizes</h3>
+                <div class="portion-grid">
+                    <div class="portion-item" data-servings="1">
+                        <strong>1</strong>
+                        Individual
+                    </div>
+                    <div class="portion-item" data-servings="2">
+                        <strong>2</strong>
+                        Couple
+                    </div>
+                    <div class="portion-item" data-servings="4">
+                        <strong>4</strong>
+                        Family
+                    </div>
+                    <div class="portion-item" data-servings="6">
+                        <strong>6</strong>
+                        Dinner Party
+                    </div>
+                    <div class="portion-item" data-servings="8">
+                        <strong>8</strong>
+                        Gathering
+                    </div>
+                    <div class="portion-item" data-servings="12">
+                        <strong>12</strong>
+                        Party
+                    </div>
+                </div>
+            </div>
+            
+            <div class="measurement-converter">
+                <h3><i class="fas fa-exchange-alt"></i> Measurement Converter</h3>
+                <div class="converter-row">
+                    <div class="converter-input">
+                        <input type="number" id="convertAmount" value="1" step="0.1">
+                    </div>
+                    <div class="converter-input">
+                        <select id="fromUnit">
+                            <option value="cups">Cups</option>
+                            <option value="tbsp">Tablespoons</option>
+                            <option value="tsp">Teaspoons</option>
+                            <option value="oz">Ounces</option>
+                            <option value="g">Grams</option>
+                            <option value="kg">Kilograms</option>
+                            <option value="lb">Pounds</option>
+                            <option value="ml">Milliliters</option>
+                            <option value="l">Liters</option>
+                        </select>
+                    </div>
+                    <button class="swap-btn" id="swapUnits">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                    <div class="converter-input">
+                        <select id="toUnit">
+                            <option value="g">Grams</option>
+                            <option value="oz">Ounces</option>
+                            <option value="cups">Cups</option>
+                            <option value="tbsp">Tablespoons</option>
+                            <option value="tsp">Teaspoons</option>
+                            <option value="kg">Kilograms</option>
+                            <option value="lb">Pounds</option>
+                            <option value="ml">Milliliters</option>
+                            <option value="l">Liters</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 10px; font-weight: bold; color: #4a6fa5;" id="conversionResult">
+                    1 cup = 240 grams
+                </div>
+            </div>
+            
+            <div class="conversion-history">
+                <h3><i class="fas fa-history"></i> Calculation History</h3>
+                <div class="history-list" id="historyList">
+                    <div class="history-item">No calculations yet</div>
+                </div>
+                <button class="clear-history" id="clearHistory">Clear History</button>
+            </div>
+            
+            <div class="tips-section">
+                <h3><i class="fas fa-lightbulb"></i> Portion Tips</h3>
+                <ul>
+                    <li>When scaling up, increase seasonings by 1.25x instead of the full ratio</li>
+                    <li>Reduce cooking time by 10-15% when increasing portions significantly</li>
+                    <li>For baking, keep leavening agents (baking powder, yeast) at original ratio</li>
+                    <li>Always round measurements to practical values (e.g., 2.9 cups → 3 cups)</li>
+                    <li>Consider pan size when scaling - you may need multiple pans</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const originalServings = document.getElementById('originalServings');
+        const desiredServings = document.getElementById('desiredServings');
+        const ingredient = document.getElementById('ingredient');
+        const originalAmount = document.getElementById('originalAmount');
+        const unit = document.getElementById('unit');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultValue = document.getElementById('resultValue');
+        const resultUnit = document.getElementById('resultUnit');
+        const ratioValue = document.getElementById('ratioValue');
+        const originalValue = document.getElementById('originalValue');
+        const newValue = document.getElementById('newValue');
+        const portionItems = document.querySelectorAll('.portion-item');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        const convertAmount = document.getElementById('convertAmount');
+        const fromUnit = document.getElementById('fromUnit');
+        const toUnit = document.getElementById('toUnit');
+        const swapUnits = document.getElementById('swapUnits');
+        const conversionResult = document.getElementById('conversionResult');
+        
+        // Conversion factors (to grams)
+        const conversionFactors = {
+            'cups': 120, // approximate for flour
+            'tbsp': 15,
+            'tsp': 5,
+            'oz': 28.35,
+            'g': 1,
+            'kg': 1000,
+            'lb': 453.59,
+            'ml': 1,
+            'l': 1000
+        };
+        
+        // State variables
+        let calculationHistory = [];
+        
+        // Calculate new portion size
+        function calculatePortion() {
+            const origServ = parseFloat(originalServings.value);
+            const desiredServ = parseFloat(desiredServings.value);
+            const origAmount = parseFloat(originalAmount.value);
+            const unitValue = unit.value;
+            const ingredientName = ingredient.value || 'Ingredient';
+            
+            if (isNaN(origServ) || isNaN(desiredServ) || isNaN(origAmount) || origServ <= 0 || desiredServ <= 0 || origAmount < 0) {
+                alert('Please enter valid positive numbers');
+                return;
+            }
+            
+            const ratio = desiredServ / origServ;
+            const newAmount = origAmount * ratio;
+            
+            // Round to practical values
+            let roundedAmount = Math.round(newAmount * 100) / 100;
+            if (roundedAmount === Math.floor(roundedAmount)) {
+                roundedAmount = Math.floor(roundedAmount);
+            }
+            
+            // Update display
+            resultValue.textContent = roundedAmount;
+            resultUnit.textContent = unitValue;
+            ratioValue.textContent = ratio.toFixed(2) + 'x';
+            originalValue.textContent = `${origAmount} ${unitValue}`;
+            newValue.textContent = `${roundedAmount} ${unitValue}`;
+            
+            // Add to history
+            addToHistory(ingredientName, origAmount, unitValue, origServ, desiredServ, roundedAmount, ratio);
+        }
+        
+        // Add calculation to history
+        function addToHistory(ingredient, origAmount, unit, origServ, desiredServ, newAmount, ratio) {
+            const historyItem = {
+                ingredient: ingredient,
+                origAmount: origAmount,
+                unit: unit,
+                origServ: origServ,
+                desiredServ: desiredServ,
+                newAmount: newAmount,
+                ratio: ratio,
+                timestamp: new Date()
+            };
+            
+            calculationHistory.unshift(historyItem);
+            
+            // Keep only last 10 items
+            if (calculationHistory.length > 10) {
+                calculationHistory = calculationHistory.slice(0, 10);
+            }
+            
+            updateHistoryDisplay();
+        }
+        
+        // Update history display
+        function updateHistoryDisplay() {
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No calculations yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            calculationHistory.forEach(item => {
+                const time = item.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.innerHTML = `
+                    <strong>${item.ingredient}</strong>: ${item.origAmount}${item.unit} for ${item.origServ} → ${item.newAmount}${item.unit} for ${item.desiredServ}
+                    <small>(${time})</small>
+                `;
+                historyList.appendChild(historyElement);
+            });
+        }
+        
+        // Clear history
+        function clearHistory() {
+            calculationHistory = [];
+            updateHistoryDisplay();
+        }
+        
+        // Set desired servings from portion items
+        function setDesiredServings(servings) {
+            desiredServings.value = servings;
+            portionItems.forEach(item => {
+                if (parseInt(item.getAttribute('data-servings')) === servings) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            calculatePortion();
+        }
+        
+        // Convert measurements
+        function convertMeasurements() {
+            const amount = parseFloat(convertAmount.value);
+            const from = fromUnit.value;
+            const to = toUnit.value;
+            
+            if (isNaN(amount)) {
+                conversionResult.textContent = 'Enter a valid number';
+                return;
+            }
+            
+            // Convert to grams first, then to target unit
+            const grams = amount * conversionFactors[from];
+            const result = grams / conversionFactors[to];
+            
+            conversionResult.textContent = `${amount} ${from} = ${result.toFixed(2)} ${to}`;
+        }
+        
+        // Swap units
+        function swapUnitValues() {
+            const tempUnit = fromUnit.value;
+            fromUnit.value = toUnit.value;
+            toUnit.value = tempUnit;
+            convertMeasurements();
+        }
+        
+        // Event listeners
+        calculateBtn.addEventListener('click', calculatePortion);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+        swapUnits.addEventListener('click', swapUnitValues);
+        convertAmount.addEventListener('input', convertMeasurements);
+        fromUnit.addEventListener('change', convertMeasurements);
+        toUnit.addEventListener('change', convertMeasurements);
+        
+        portionItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const servings = parseInt(item.getAttribute('data-servings'));
+                setDesiredServings(servings);
+            });
+        });
+        
+        // Input listeners for real-time calculation
+        [originalServings, desiredServings, originalAmount, unit].forEach(input => {
+            input.addEventListener('input', calculatePortion);
+        });
+        
+        // Initialize
+        updateHistoryDisplay();
+        convertMeasurements();
+        setDesiredServings(6); // Default active
+    </script>
+</body>
+</html>

@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Tax Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .tax-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .price-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .tax-bar {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .total-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .state-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .state-option {
+            padding: 10px;
+            background: #f1f2f6;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .state-option:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        .state-option.selected {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .item-entry {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #3498db;
+        }
+        
+        .remove-item {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .remove-item:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+        }
+        
+        .tax-breakdown-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .breakdown-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .breakdown-title i {
+            margin-right: 8px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .breakdown-rate {
+            font-weight: 600;
+            color: #f1c40f;
+        }
+        
+        .breakdown-amount {
+            color: #2ecc71;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .state-selector {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Sales Tax Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="item-price"><i class="fas fa-tag"></i> Item Price ($)</label>
+                    <input type="number" id="item-price" placeholder="Enter item price" min="0" step="0.01" value="100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="tax-rate"><i class="fas fa-percentage"></i> Sales Tax Rate (%)</label>
+                    <input type="number" id="tax-rate" placeholder="Enter sales tax rate" min="0" max="20" step="0.1" value="8.5">
+                </div>
+                
+                <div class="input-group">
+                    <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
+                    <input type="number" id="quantity" placeholder="Enter quantity" min="1" value="1">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('simple')">
+                        <i class="fas fa-calculator"></i> Simple Calculation
+                    </div>
+                    <div class="tab" onclick="switchTab('detailed')">
+                        <i class="fas fa-list"></i> Detailed Breakdown
+                    </div>
+                </div>
+                
+                <div id="simple-tab" class="tab-content active">
+                    <p>Calculate sales tax for a single item with a specified tax rate.</p>
+                </div>
+                
+                <div id="detailed-tab" class="tab-content">
+                    <p>Get a detailed breakdown with multiple items and different tax rates.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateSalesTax()">
+                    <i class="fas fa-calculator"></i> Calculate Tax
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-receipt"></i> Sales Tax Calculation</div>
+                <div class="result-amount positive" id="total-amount">$108.50</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 85%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Item Price: $100.00 | Tax Amount: $8.50 | Total: $108.50
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="item-price-display">$100.00</div>
+                        <div class="stat-label">Item Price</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="tax-amount">$8.50</div>
+                        <div class="stat-label">Tax Amount</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="tax-rate-display">8.5%</div>
+                        <div class="stat-label">Tax Rate</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="tax-list">
+                    <div class="list-title"><i class="fas fa-receipt"></i> Tax Breakdown</div>
+                    <div id="tax-breakdown">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-tag"></i> Item Price</span>
+                            <span class="entry-amount">$100.00</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-percentage"></i> Sales Tax (8.5%)</span>
+                            <span class="entry-amount positive">$8.50</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-calculator"></i> Total Amount</span>
+                            <span class="entry-amount positive">$108.50</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tax-breakdown-section">
+                    <div class="breakdown-title"><i class="fas fa-layer-group"></i> Tax Rate Breakdown</div>
+                    <div id="rate-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-rate">State Tax (6.0%)</span>
+                            <span class="breakdown-amount">$6.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-rate">Local Tax (2.5%)</span>
+                            <span class="breakdown-amount">$2.50</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Tax Insights</div>
+                    <p id="tax-insights">The sales tax of $8.50 represents 8.5% of your item's price. This is a standard rate for many states in the US. Make sure to keep your receipt for warranty and return purposes.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Shopping Tips</h3>
+                    <ul class="savings-steps">
+                        <li>Check for tax-free holidays in your state</li>
+                        <li>Compare prices including sales tax</li>
+                        <li>Keep receipts for warranty claims</li>
+                        <li>Know your state's return policy</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Rate Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>5% Tax Rate</h4>
+                        <div class="comparison-value positive" id="low-rate-total">$105.00</div>
+                        <div class="comparison-label">Total Amount</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>10% Tax Rate</h4>
+                        <div class="comparison-value positive" id="high-rate-total">$110.00</div>
+                        <div class="comparison-label">Total Amount</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Accurate Calculation</h3>
+                        <p>Calculate sales tax with precision for any rate</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                        <p>See tax details with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Shopping Tips</h3>
+                        <p>Get actionable recommendations to save money</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Sales Tax Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="item-price-desktop"><i class="fas fa-tag"></i> Item Price ($)</label>
+                            <input type="number" id="item-price-desktop" placeholder="Enter item price" min="0" step="0.01" value="150">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="tax-rate-desktop"><i class="fas fa-percentage"></i> Sales Tax Rate (%)</label>
+                            <input type="number" id="tax-rate-desktop" placeholder="Enter sales tax rate" min="0" max="20" step="0.1" value="7.25">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="quantity-desktop"><i class="fas fa-sort-numeric-up"></i> Quantity</label>
+                            <input type="number" id="quantity-desktop" placeholder="Enter quantity" min="1" value="2">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-map-marker-alt"></i> State/Region</label>
+                            <select id="state-selector">
+                                <option value="0">Custom Rate</option>
+                                <option value="7.25" selected>California (7.25%)</option>
+                                <option value="6.25">Texas (6.25%)</option>
+                                <option value="8.0">New York (8.0%)</option>
+                                <option value="6.0">Florida (6.0%)</option>
+                                <option value="6.6">Illinois (6.6%)</option>
+                                <option value="6.0">Ohio (6.0%)</option>
+                                <option value="6.0">Georgia (6.0%)</option>
+                                <option value="4.225">Missouri (4.225%)</option>
+                                <option value="6.0">North Carolina (6.0%)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-shopping-cart"></i> Multiple Items</label>
+                            <div id="item-entries">
+                                <div class="item-entry">
+                                    <div class="input-group">
+                                        <label>Item Name</label>
+                                        <input type="text" class="item-name" placeholder="Item name" value="Electronics">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Price ($)</label>
+                                        <input type="number" class="item-price" placeholder="Item price" min="0" step="0.01" value="200">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Quantity</label>
+                                        <input type="number" class="item-quantity" placeholder="Quantity" min="1" value="1">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Tax Rate (%)</label>
+                                        <input type="number" class="item-tax" placeholder="Tax rate" min="0" max="20" step="0.1" value="7.25">
+                                    </div>
+                                </div>
+                                <div class="item-entry">
+                                    <div class="input-group">
+                                        <label>Item Name</label>
+                                        <input type="text" class="item-name" placeholder="Item name" value="Clothing">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Price ($)</label>
+                                        <input type="number" class="item-price" placeholder="Item price" min="0" step="0.01" value="50">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Quantity</label>
+                                        <input type="number" class="item-quantity" placeholder="Quantity" min="1" value="3">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Tax Rate (%)</label>
+                                        <input type="number" class="item-tax" placeholder="Tax rate" min="0" max="20" step="0.1" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addItemEntry()">
+                                <i class="fas fa-plus"></i> Add Another Item
+                            </button>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('simple')">
+                                <i class="fas fa-calculator"></i> Simple Calculation
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('detailed')">
+                                <i class="fas fa-list"></i> Detailed Breakdown
+                            </div>
+                        </div>
+                        
+                        <div id="simple-tab-desktop" class="tab-content active">
+                            <p>Calculate sales tax for a single item with a specified tax rate. Perfect for quick calculations at checkout.</p>
+                        </div>
+                        
+                        <div id="detailed-tab-desktop" class="tab-content">
+                            <p>Get a detailed breakdown with multiple items, different tax rates, and additional fees. Ideal for complex purchases.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateSalesTaxDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Sales Tax
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Accurate Calculation</h3>
+                                <p>Calculate sales tax with precision for any rate</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                                <p>See tax details with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Shopping Tips</h3>
+                                <p>Get actionable recommendations to save money</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Purchase Tracking</h3>
+                                <p>Monitor spending and tax amounts over time</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Tax Alerts</h3>
+                                <p>Get notified of tax-free shopping events</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-receipt"></i> Sales Tax Calculation</div>
+                        <div class="result-amount positive" id="total-amount-desktop">$339.50</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 75%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Subtotal: $350.00 | Tax Amount: $14.50 | Total: $364.50
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="subtotal-display-desktop">$350.00</div>
+                                <div class="stat-label">Subtotal</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="tax-amount-desktop">$14.50</div>
+                                <div class="stat-label">Tax Amount</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="average-tax-rate-desktop">4.14%</div>
+                                <div class="stat-label">Avg Tax Rate</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="item-count-desktop">2</div>
+                                <div class="stat-label">Items</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="tax-list">
+                            <div class="list-title"><i class="fas fa-receipt"></i> Detailed Tax Breakdown</div>
+                            <div id="tax-breakdown-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-tag"></i> Subtotal</span>
+                                    <span class="entry-amount">$350.00</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percentage"></i> Sales Tax</span>
+                                    <span class="entry-amount positive">$14.50</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calculator"></i> Total Amount</span>
+                                    <span class="entry-amount positive">$364.50</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percentage"></i> Effective Tax Rate</span>
+                                    <span class="entry-amount">4.14%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tax-breakdown-section">
+                            <div class="breakdown-title"><i class="fas fa-layer-group"></i> Itemized Tax Breakdown</div>
+                            <div id="itemized-breakdown">
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Electronics (7.25%)</span>
+                                    <span class="breakdown-amount">$14.50</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Clothing (0%)</span>
+                                    <span class="breakdown-amount">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Tax Insights</div>
+                            <p id="tax-insights-desktop">Your average tax rate is 4.14% across 2 items. Electronics are taxed at 7.25% while clothing is tax-exempt. The total tax of $14.50 represents 4.14% of your subtotal. Consider timing large purchases during tax-free weekends to save money.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Shopping Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Check for tax-free holidays in your state (California has none)</li>
+                                <li>Compare prices including sales tax across retailers</li>
+                                <li>Keep digital receipts for warranty claims and returns</li>
+                                <li>Know your state's return policy and tax refund rules</li>
+                                <li>Consider online purchases from states with no sales tax</li>
+                                <li>Use cashback apps that factor in sales tax savings</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Rate Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Low Rate (5%)</h4>
+                                <div class="comparison-value positive" id="low-rate-total-desktop">$367.50</div>
+                                <div class="comparison-label">Total Amount</div>
+                                <div class="comparison-value" id="low-rate-tax-desktop">$17.50</div>
+                                <div class="comparison-label">Tax Amount</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>High Rate (10%)</h4>
+                                <div class="comparison-value positive" id="high-rate-total-desktop">$385.00</div>
+                                <div class="comparison-label">Total Amount</div>
+                                <div class="comparison-value" id="high-rate-tax-desktop">$35.00</div>
+                                <div class="comparison-label">Tax Amount</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('simple-tab').classList.remove('active');
+            document.getElementById('detailed-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('simple-tab-desktop').classList.remove('active');
+            document.getElementById('detailed-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Item entry functions
+        function addItemEntry() {
+            const container = document.getElementById('item-entries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'item-entry';
+            newEntry.innerHTML = `
+                <button class="remove-item" onclick="removeItemEntry(this)"><i class="fas fa-times"></i></button>
+                <div class="input-group">
+                    <label>Item Name</label>
+                    <input type="text" class="item-name" placeholder="Item name">
+                </div>
+                <div class="input-group">
+                    <label>Price ($)</label>
+                    <input type="number" class="item-price" placeholder="Item price" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Quantity</label>
+                    <input type="number" class="item-quantity" placeholder="Quantity" min="1" value="1">
+                </div>
+                <div class="input-group">
+                    <label>Tax Rate (%)</label>
+                    <input type="number" class="item-tax" placeholder="Tax rate" min="0" max="20" step="0.1" value="7.25">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function removeItemEntry(button) {
+            if (document.querySelectorAll('.item-entry').length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one item entry');
+            }
+        }
+        
+        // State selector function
+        document.getElementById('state-selector').addEventListener('change', function() {
+            const selectedRate = this.value;
+            if (selectedRate !== '0') {
+                document.getElementById('tax-rate-desktop').value = selectedRate;
+                // Update all item tax rates
+                document.querySelectorAll('.item-tax').forEach(input => {
+                    input.value = selectedRate;
+                });
+            }
+        });
+        
+        // Sales tax calculation functions
+        function calculateSalesTax() {
+            const itemPrice = parseFloat(document.getElementById('item-price').value) || 0;
+            const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            
+            calculateResult(itemPrice, taxRate, quantity, 'mobile');
+            calculateComparison(itemPrice, taxRate, quantity, 'mobile');
+        }
+        
+        function calculateSalesTaxDesktop() {
+            // Get values from main inputs
+            const itemPrice = parseFloat(document.getElementById('item-price-desktop').value) || 0;
+            const taxRate = parseFloat(document.getElementById('tax-rate-desktop').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity-desktop').value) || 1;
+            
+            // Get values from item entries
+            const itemEntries = document.querySelectorAll('#item-entries .item-entry');
+            let subtotal = 0;
+            let totalTax = 0;
+            let itemCount = 0;
+            
+            itemEntries.forEach(entry => {
+                const price = parseFloat(entry.querySelector('.item-price').value) || 0;
+                const qty = parseInt(entry.querySelector('.item-quantity').value) || 1;
+                const tax = parseFloat(entry.querySelector('.item-tax').value) || 0;
+                
+                const itemTotal = price * qty;
+                const itemTax = itemTotal * (tax / 100);
+                
+                subtotal += itemTotal;
+                totalTax += itemTax;
+                itemCount++;
+            });
+            
+            // If no items entered, use main inputs
+            if (itemCount === 0) {
+                subtotal = itemPrice * quantity;
+                totalTax = subtotal * (taxRate / 100);
+                itemCount = 1;
+            }
+            
+            const finalTotal = subtotal + totalTax;
+            const averageTaxRate = subtotal > 0 ? (totalTax / subtotal) * 100 : 0;
+            
+            calculateDetailedResult(subtotal, totalTax, finalTotal, averageTaxRate, itemEntries, itemCount);
+            calculateDetailedComparison(subtotal, itemEntries);
+        }
+        
+        function calculateResult(itemPrice, taxRate, quantity, device) {
+            // Calculate values
+            const totalPrice = itemPrice * quantity;
+            const taxAmount = totalPrice * (taxRate / 100);
+            const finalTotal = totalPrice + taxAmount;
+            
+            // Update UI
+            const totalAmountElement = device === 'mobile' ? document.getElementById('total-amount') : document.getElementById('total-amount-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const itemPriceDisplayElement = device === 'mobile' ? document.getElementById('item-price-display') : document.getElementById('subtotal-display-desktop');
+            const taxAmountElement = device === 'mobile' ? document.getElementById('tax-amount') : document.getElementById('tax-amount-desktop');
+            const taxRateDisplayElement = device === 'mobile' ? document.getElementById('tax-rate-display') : document.getElementById('average-tax-rate-desktop');
+            const taxBreakdownElement = device === 'mobile' ? document.getElementById('tax-breakdown') : document.getElementById('tax-breakdown-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const insightsElement = device === 'mobile' ? document.getElementById('tax-insights') : document.getElementById('tax-insights-desktop');
+            
+            totalAmountElement.textContent = `$${finalTotal.toFixed(2)}`;
+            resultDescriptionElement.textContent = `Item Price: $${totalPrice.toFixed(2)} | Tax Amount: $${taxAmount.toFixed(2)} | Total: $${finalTotal.toFixed(2)}`;
+            itemPriceDisplayElement.textContent = `$${totalPrice.toFixed(2)}`;
+            taxAmountElement.textContent = `$${taxAmount.toFixed(2)}`;
+            taxRateDisplayElement.textContent = `${taxRate.toFixed(2)}%`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const itemCountElement = document.getElementById('item-count-desktop');
+                itemCountElement.textContent = '1';
+            }
+            
+            // Update tax breakdown
+            taxBreakdownElement.innerHTML = '';
+            
+            const priceItem = document.createElement('div');
+            priceItem.className = 'entry-item';
+            priceItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Item Price ${quantity > 1 ? `(${quantity} items)` : ''}</span>
+                <span class="entry-amount">$${totalPrice.toFixed(2)}</span>
+            `;
+            taxBreakdownElement.appendChild(priceItem);
+            
+            const taxItem = document.createElement('div');
+            taxItem.className = 'entry-item';
+            taxItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percentage"></i> Sales Tax (${taxRate.toFixed(2)}%)</span>
+                <span class="entry-amount positive">$${taxAmount.toFixed(2)}</span>
+            `;
+            taxBreakdownElement.appendChild(taxItem);
+            
+            const totalItem = document.createElement('div');
+            totalItem.className = 'entry-item';
+            totalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-calculator"></i> Total Amount</span>
+                <span class="entry-amount positive">$${finalTotal.toFixed(2)}</span>
+            `;
+            taxBreakdownElement.appendChild(totalItem);
+            
+            // Desktop additional items
+            if (device === 'desktop') {
+                const effectiveRateItem = document.createElement('div');
+                effectiveRateItem.className = 'entry-item';
+                effectiveRateItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-percentage"></i> Effective Tax Rate</span>
+                    <span class="entry-amount">${taxRate.toFixed(2)}%</span>
+                `;
+                taxBreakdownElement.appendChild(effectiveRateItem);
+            }
+            
+            // Update insights
+            let insightsText = '';
+            if (device === 'mobile') {
+                insightsText = `The sales tax of $${taxAmount.toFixed(2)} represents ${taxRate.toFixed(2)}% of your item's price. This is a standard rate for many states in the US. Make sure to keep your receipt for warranty and return purposes.`;
+            } else {
+                insightsText = `The sales tax of $${taxAmount.toFixed(2)} represents ${taxRate.toFixed(2)}% of your purchase price. For a $${totalPrice.toFixed(2)} purchase, you're paying $${taxAmount.toFixed(2)} in taxes. Consider timing large purchases during tax-free weekends to save money.`;
+            }
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(totalPrice, taxAmount, finalTotal, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (taxAmount / finalTotal) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateDetailedResult(subtotal, totalTax, finalTotal, averageTaxRate, itemEntries, itemCount) {
+            // Update UI
+            const totalAmountElement = document.getElementById('total-amount-desktop');
+            const resultDescriptionElement = document.getElementById('result-description-desktop');
+            const subtotalDisplayElement = document.getElementById('subtotal-display-desktop');
+            const taxAmountElement = document.getElementById('tax-amount-desktop');
+            const averageTaxRateElement = document.getElementById('average-tax-rate-desktop');
+            const itemCountElement = document.getElementById('item-count-desktop');
+            const taxBreakdownElement = document.getElementById('tax-breakdown-desktop');
+            const chartContainer = document.getElementById('chart-container-desktop');
+            const progressBar = document.getElementById('progress-bar-desktop');
+            const insightsElement = document.getElementById('tax-insights-desktop');
+            const itemizedBreakdownElement = document.getElementById('itemized-breakdown');
+            
+            totalAmountElement.textContent = `$${finalTotal.toFixed(2)}`;
+            resultDescriptionElement.textContent = `Subtotal: $${subtotal.toFixed(2)} | Tax Amount: $${totalTax.toFixed(2)} | Total: $${finalTotal.toFixed(2)}`;
+            subtotalDisplayElement.textContent = `$${subtotal.toFixed(2)}`;
+            taxAmountElement.textContent = `$${totalTax.toFixed(2)}`;
+            averageTaxRateElement.textContent = `${averageTaxRate.toFixed(2)}%`;
+            itemCountElement.textContent = itemCount;
+            
+            // Update tax breakdown
+            taxBreakdownElement.innerHTML = '';
+            
+            const subtotalItem = document.createElement('div');
+            subtotalItem.className = 'entry-item';
+            subtotalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Subtotal</span>
+                <span class="entry-amount">$${subtotal.toFixed(2)}</span>
+            `;
+            taxBreakdownElement.appendChild(subtotalItem);
+            
+            const taxItem = document.createElement('div');
+            taxItem.className = 'entry-item';
+            taxItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percentage"></i> Sales Tax</span>
+                <span class="entry-amount positive">$${totalTax.toFixed(2)}</span>
+            `;
+            taxBreakdownElement.appendChild(taxItem);
+            
+            const totalItem = document.createElement('div');
+            totalItem.className = 'entry-item';
+            totalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-calculator"></i> Total Amount</span>
+                <span class="entry-amount positive">$${finalTotal.toFixed(2)}</span>
+            `;
+            taxBreakdownElement.appendChild(totalItem);
+            
+            const effectiveRateItem = document.createElement('div');
+            effectiveRateItem.className = 'entry-item';
+            effectiveRateItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percentage"></i> Effective Tax Rate</span>
+                <span class="entry-amount">${averageTaxRate.toFixed(2)}%</span>
+            `;
+            taxBreakdownElement.appendChild(effectiveRateItem);
+            
+            // Update itemized breakdown
+            itemizedBreakdownElement.innerHTML = '';
+            itemEntries.forEach(entry => {
+                const name = entry.querySelector('.item-name').value || 'Unnamed Item';
+                const price = parseFloat(entry.querySelector('.item-price').value) || 0;
+                const qty = parseInt(entry.querySelector('.item-quantity').value) || 1;
+                const tax = parseFloat(entry.querySelector('.item-tax').value) || 0;
+                
+                const itemTotal = price * qty;
+                const itemTax = itemTotal * (tax / 100);
+                
+                const breakdownItem = document.createElement('div');
+                breakdownItem.className = 'breakdown-item';
+                breakdownItem.innerHTML = `
+                    <span class="breakdown-rate">${name} (${tax.toFixed(2)}%)</span>
+                    <span class="breakdown-amount">$${itemTax.toFixed(2)}</span>
+                `;
+                itemizedBreakdownElement.appendChild(breakdownItem);
+            });
+            
+            // Update insights
+            let insightsText = `Your average tax rate is ${averageTaxRate.toFixed(2)}% across ${itemCount} items. `;
+            
+            // Find highest and lowest taxed items
+            let highestTax = -1;
+            let lowestTax = 100;
+            let highestItem = '';
+            let lowestItem = '';
+            
+            itemEntries.forEach(entry => {
+                const name = entry.querySelector('.item-name').value || 'Unnamed Item';
+                const tax = parseFloat(entry.querySelector('.item-tax').value) || 0;
+                
+                if (tax > highestTax) {
+                    highestTax = tax;
+                    highestItem = name;
+                }
+                if (tax < lowestTax) {
+                    lowestTax = tax;
+                    lowestItem = name;
+                }
+            });
+            
+            if (highestItem && lowestItem) {
+                insightsText += `${highestItem} are taxed at ${highestTax.toFixed(2)}% while ${lowestItem} ${lowestTax > 0 ? 'are taxed at ' + lowestTax.toFixed(2) + '%' : 'are tax-exempt'}. `;
+            }
+            
+            insightsText += `The total tax of $${totalTax.toFixed(2)} represents ${averageTaxRate.toFixed(2)}% of your subtotal. Consider timing large purchases during tax-free weekends to save money.`;
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(subtotal, totalTax, finalTotal, chartContainer, 'desktop');
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (totalTax / finalTotal) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateComparison(itemPrice, taxRate, quantity, device) {
+            const totalPrice = itemPrice * quantity;
+            
+            // Calculate for 5% tax rate
+            const lowRateTax = totalPrice * 0.05;
+            const lowRateTotal = totalPrice + lowRateTax;
+            
+            // Calculate for 10% tax rate
+            const highRateTax = totalPrice * 0.10;
+            const highRateTotal = totalPrice + highRateTax;
+            
+            // Update comparison UI
+            const lowRateTotalElement = device === 'mobile' ? document.getElementById('low-rate-total') : document.getElementById('low-rate-total-desktop');
+            const highRateTotalElement = device === 'mobile' ? document.getElementById('high-rate-total') : document.getElementById('high-rate-total-desktop');
+            
+            lowRateTotalElement.textContent = `$${lowRateTotal.toFixed(2)}`;
+            highRateTotalElement.textContent = `$${highRateTotal.toFixed(2)}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const lowRateTaxElement = document.getElementById('low-rate-tax-desktop');
+                const highRateTaxElement = document.getElementById('high-rate-tax-desktop');
+                
+                lowRateTaxElement.textContent = `$${lowRateTax.toFixed(2)}`;
+                highRateTaxElement.textContent = `$${highRateTax.toFixed(2)}`;
+            }
+        }
+        
+        function calculateDetailedComparison(subtotal, itemEntries) {
+            // Calculate for 5% average tax rate
+            const lowRateTax = subtotal * 0.05;
+            const lowRateTotal = subtotal + lowRateTax;
+            
+            // Calculate for 10% average tax rate
+            const highRateTax = subtotal * 0.10;
+            const highRateTotal = subtotal + highRateTax;
+            
+            // Update comparison UI
+            const lowRateTotalElement = document.getElementById('low-rate-total-desktop');
+            const highRateTotalElement = document.getElementById('high-rate-total-desktop');
+            const lowRateTaxElement = document.getElementById('low-rate-tax-desktop');
+            const highRateTaxElement = document.getElementById('high-rate-tax-desktop');
+            
+            lowRateTotalElement.textContent = `$${lowRateTotal.toFixed(2)}`;
+            highRateTotalElement.textContent = `$${highRateTotal.toFixed(2)}`;
+            lowRateTaxElement.textContent = `$${lowRateTax.toFixed(2)}`;
+            highRateTaxElement.textContent = `$${highRateTax.toFixed(2)}`;
+        }
+        
+        function generateChart(itemPrice, taxAmount, finalTotal, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(itemPrice, taxAmount, finalTotal);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Item price bar
+            const priceBar = document.createElement('div');
+            priceBar.className = 'chart-bar price-bar';
+            const priceHeight = maxValue > 0 ? (itemPrice / maxValue) * maxHeight : 0;
+            priceBar.style.height = priceHeight + 'px';
+            priceBar.textContent = `$${(itemPrice/1000).toFixed(0)}k`;
+            
+            const priceLabel = document.createElement('div');
+            priceLabel.className = 'chart-label';
+            priceLabel.textContent = 'Price';
+            
+            const priceContainer = document.createElement('div');
+            priceContainer.style.display = 'flex';
+            priceContainer.style.flexDirection = 'column';
+            priceContainer.style.alignItems = 'center';
+            priceContainer.style.margin = '0 5px';
+            
+            priceContainer.appendChild(priceBar);
+            priceContainer.appendChild(priceLabel);
+            
+            // Tax amount bar
+            const taxBar = document.createElement('div');
+            taxBar.className = 'chart-bar tax-bar';
+            const taxHeight = maxValue > 0 ? (taxAmount / maxValue) * maxHeight : 0;
+            taxBar.style.height = taxHeight + 'px';
+            taxBar.textContent = `$${taxAmount.toFixed(0)}`;
+            
+            const taxLabel = document.createElement('div');
+            taxLabel.className = 'chart-label';
+            taxLabel.textContent = 'Tax';
+            
+            const taxContainer = document.createElement('div');
+            taxContainer.style.display = 'flex';
+            taxContainer.style.flexDirection = 'column';
+            taxContainer.style.alignItems = 'center';
+            taxContainer.style.margin = '0 5px';
+            
+            taxContainer.appendChild(taxBar);
+            taxContainer.appendChild(taxLabel);
+            
+            // Total amount bar
+            const totalBar = document.createElement('div');
+            totalBar.className = 'chart-bar total-bar';
+            const totalHeight = maxValue > 0 ? (finalTotal / maxValue) * maxHeight : 0;
+            totalBar.style.height = totalHeight + 'px';
+            totalBar.textContent = `$${(finalTotal/1000).toFixed(0)}k`;
+            
+            const totalLabel = document.createElement('div');
+            totalLabel.className = 'chart-label';
+            totalLabel.textContent = 'Total';
+            
+            const totalContainer = document.createElement('div');
+            totalContainer.style.display = 'flex';
+            totalContainer.style.flexDirection = 'column';
+            totalContainer.style.alignItems = 'center';
+            totalContainer.style.margin = '0 5px';
+            
+            totalContainer.appendChild(totalBar);
+            totalContainer.appendChild(totalLabel);
+            
+            container.appendChild(priceContainer);
+            container.appendChild(taxContainer);
+            container.appendChild(totalContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateSalesTax();
+            calculateSalesTaxDesktop();
+        };
+    </script>
+</body>
+</html>

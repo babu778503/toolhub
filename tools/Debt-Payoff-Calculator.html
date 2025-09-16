@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Payoff Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71, #3498db);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #e74c3c;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #e74c3c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+        
+        .debt-entry {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .remove-debt {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .remove-debt:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #e74c3c;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .debt-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .debt-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .debt-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .debt-name i {
+            margin-right: 8px;
+            color: #e74c3c;
+        }
+        
+        .debt-payoff {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        .strategy-info {
+            background: rgba(231, 76, 60, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .strategy-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e74c3c;
+            display: flex;
+            align-items: center;
+        }
+        
+        .strategy-title i {
+            margin-right: 8px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(to top, #3498db, #2ecc71);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #e74c3c;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #e74c3c;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #e74c3c;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Debt Payoff Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="monthly-payment"><i class="fas fa-money-bill-wave"></i> Monthly Payment ($)</label>
+                    <input type="number" id="monthly-payment" placeholder="Enter your monthly payment" min="0" value="500">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('snowball')">
+                        <i class="fas fa-snowflake"></i> Snowball
+                    </div>
+                    <div class="tab" onclick="switchTab('avalanche')">
+                        <i class="fas fa-mountain"></i> Avalanche
+                    </div>
+                </div>
+                
+                <div id="snowball-tab" class="tab-content active">
+                    <p>Pay off debts from smallest to largest balance. This method provides psychological wins early on.</p>
+                </div>
+                
+                <div id="avalanche-tab" class="tab-content">
+                    <p>Pay off debts from highest to lowest interest rate. This method saves you the most money in interest.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-credit-card"></i> Debts</label>
+                    <div id="debt-entries">
+                        <div class="debt-entry">
+                            <div class="input-group">
+                                <label>Name</label>
+                                <input type="text" class="debt-name" placeholder="Credit Card" value="Credit Card">
+                            </div>
+                            <div class="input-group">
+                                <label>Balance ($)</label>
+                                <input type="number" class="debt-balance" placeholder="Balance" min="0" value="5000">
+                            </div>
+                            <div class="input-group">
+                                <label>Interest Rate (%)</label>
+                                <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01" value="18.5">
+                            </div>
+                            <div class="input-group">
+                                <label>Minimum Payment ($)</label>
+                                <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0" value="100">
+                            </div>
+                        </div>
+                        <div class="debt-entry">
+                            <div class="input-group">
+                                <label>Name</label>
+                                <input type="text" class="debt-name" placeholder="Student Loan" value="Student Loan">
+                            </div>
+                            <div class="input-group">
+                                <label>Balance ($)</label>
+                                <input type="number" class="debt-balance" placeholder="Balance" min="0" value="15000">
+                            </div>
+                            <div class="input-group">
+                                <label>Interest Rate (%)</label>
+                                <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01" value="5.2">
+                            </div>
+                            <div class="input-group">
+                                <label>Minimum Payment ($)</label>
+                                <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0" value="200">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addDebtEntry()">
+                        <i class="fas fa-plus"></i> Add Debt
+                    </button>
+                </div>
+                
+                <button class="btn" onclick="calculateDebtPayoff()">
+                    <i class="fas fa-calculator"></i> Calculate Payoff Plan
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-chart-line"></i> Your Debt Payoff Plan</div>
+                <div class="result-amount" id="payoff-time">2 years 4 months</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 35%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Total debt: $20,000 | Total interest: $2,450
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-debt">$20,000</div>
+                        <div class="stat-label">Total Debt</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-interest">$2,450</div>
+                        <div class="stat-label">Total Interest</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="payoff-date">Aug 2025</div>
+                        <div class="stat-label">Payoff Date</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="debt-list">
+                    <h3>Payoff Order:</h3>
+                    <div id="debt-order">
+                        <div class="debt-item">
+                            <span class="debt-name"><i class="fas fa-credit-card"></i> Credit Card</span>
+                            <span class="debt-payoff">10 months</span>
+                        </div>
+                        <div class="debt-item">
+                            <span class="debt-name"><i class="fas fa-graduation-cap"></i> Student Loan</span>
+                            <span class="debt-payoff">24 months</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="strategy-info">
+                    <div class="strategy-title"><i class="fas fa-snowflake"></i> Snowball Strategy</div>
+                    <p>Pay minimums on all debts, then put extra toward the smallest debt. This creates momentum as you eliminate debts and provides psychological wins early on.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Action Plan</h3>
+                    <ul class="savings-steps">
+                        <li>Set up automatic transfers to debt payments</li>
+                        <li>Stop using credit cards for new purchases</li>
+                        <li>Apply windfalls (bonuses, tax refunds) to debts</li>
+                        <li>Track progress monthly</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Strategy Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>Snowball</h4>
+                        <div class="comparison-value" id="snowball-time">28 months</div>
+                        <div class="comparison-label">Time to Payoff</div>
+                        <div class="comparison-value" id="snowball-interest">$2,450</div>
+                        <div class="comparison-label">Total Interest</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>Avalanche</h4>
+                        <div class="comparison-value" id="avalanche-time">26 months</div>
+                        <div class="comparison-label">Time to Payoff</div>
+                        <div class="comparison-value" id="avalanche-interest">$2,120</div>
+                        <div class="comparison-label">Total Interest</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Dual Strategies</h3>
+                        <p>Compare snowball and avalanche methods to choose the best for you</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Progress</h3>
+                        <p>See your payoff timeline with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Action Plan</h3>
+                        <p>Get personalized steps to accelerate debt elimination</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Debt Payoff Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="monthly-payment-desktop"><i class="fas fa-money-bill-wave"></i> Monthly Payment ($)</label>
+                            <input type="number" id="monthly-payment-desktop" placeholder="Enter your monthly payment" min="0" value="500">
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('snowball')">
+                                <i class="fas fa-snowflake"></i> Snowball Method
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('avalanche')">
+                                <i class="fas fa-mountain"></i> Avalanche Method
+                            </div>
+                        </div>
+                        
+                        <div id="snowball-tab-desktop" class="tab-content active">
+                            <p>Pay off debts from smallest to largest balance. This method provides psychological wins early on by eliminating smaller debts first.</p>
+                        </div>
+                        
+                        <div id="avalanche-tab-desktop" class="tab-content">
+                            <p>Pay off debts from highest to lowest interest rate. This method saves you the most money in interest over time by targeting high-interest debts first.</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-credit-card"></i> Debts</label>
+                            <div id="debt-entries-desktop">
+                                <div class="debt-entry">
+                                    <button class="remove-debt" onclick="removeDebtEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Name</label>
+                                        <input type="text" class="debt-name" placeholder="Credit Card" value="Credit Card">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Balance ($)</label>
+                                        <input type="number" class="debt-balance" placeholder="Balance" min="0" value="5000">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Interest Rate (%)</label>
+                                        <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01" value="18.5">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Minimum Payment ($)</label>
+                                        <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0" value="100">
+                                    </div>
+                                </div>
+                                <div class="debt-entry">
+                                    <button class="remove-debt" onclick="removeDebtEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Name</label>
+                                        <input type="text" class="debt-name" placeholder="Student Loan" value="Student Loan">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Balance ($)</label>
+                                        <input type="number" class="debt-balance" placeholder="Balance" min="0" value="15000">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Interest Rate (%)</label>
+                                        <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01" value="5.2">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Minimum Payment ($)</label>
+                                        <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0" value="200">
+                                    </div>
+                                </div>
+                                <div class="debt-entry">
+                                    <button class="remove-debt" onclick="removeDebtEntry(this)"><i class="fas fa-times"></i></button>
+                                    <div class="input-group">
+                                        <label>Name</label>
+                                        <input type="text" class="debt-name" placeholder="Car Loan" value="Car Loan">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Balance ($)</label>
+                                        <input type="number" class="debt-balance" placeholder="Balance" min="0" value="12000">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Interest Rate (%)</label>
+                                        <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01" value="7.5">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Minimum Payment ($)</label>
+                                        <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0" value="300">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addDebtEntryDesktop()">
+                                <i class="fas fa-plus"></i> Add Another Debt
+                            </button>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateDebtPayoffDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Payoff Plan
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Dual Strategies</h3>
+                                <p>Compare snowball and avalanche methods to choose the best for you</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Progress</h3>
+                                <p>See your payoff timeline with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Action Plan</h3>
+                                <p>Get personalized steps to accelerate debt elimination</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-balance-scale"></i> Comparison Tool</h3>
+                                <p>See how different strategies affect your payoff timeline</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Progress Tracking</h3>
+                                <p>Monitor your debt reduction journey over time</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-chart-line"></i> Your Debt Payoff Plan</div>
+                        <div class="result-amount" id="payoff-time-desktop">3 years 2 months</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 35%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Total debt: $32,000 | Total interest: $4,120
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="total-debt-desktop">$32,000</div>
+                                <div class="stat-label">Total Debt</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="total-interest-desktop">$4,120</div>
+                                <div class="stat-label">Total Interest</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="payoff-date-desktop">Oct 2026</div>
+                                <div class="stat-label">Payoff Date</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="debt-list">
+                            <h3>Payoff Order:</h3>
+                            <div id="debt-order-desktop">
+                                <div class="debt-item">
+                                    <span class="debt-name"><i class="fas fa-credit-card"></i> Credit Card</span>
+                                    <span class="debt-payoff">10 months</span>
+                                </div>
+                                <div class="debt-item">
+                                    <span class="debt-name"><i class="fas fa-car"></i> Car Loan</span>
+                                    <span class="debt-payoff">28 months</span>
+                                </div>
+                                <div class="debt-item">
+                                    <span class="debt-name"><i class="fas fa-graduation-cap"></i> Student Loan</span>
+                                    <span class="debt-payoff">38 months</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="strategy-info">
+                            <div class="strategy-title"><i class="fas fa-snowflake"></i> Snowball Strategy</div>
+                            <p>Pay minimums on all debts, then put extra toward the smallest debt. This creates momentum as you eliminate debts and provides psychological wins early on.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Action Plan</h3>
+                            <ul class="savings-steps">
+                                <li>Set up automatic transfers to debt payments</li>
+                                <li>Stop using credit cards for new purchases</li>
+                                <li>Apply windfalls (bonuses, tax refunds) to debts</li>
+                                <li>Track progress monthly</li>
+                                <li>Consider debt consolidation for high-interest debts</li>
+                                <li>Create a budget to free up more money for debt payments</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Strategy Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Snowball Method</h4>
+                                <div class="comparison-value" id="snowball-time-desktop">38 months</div>
+                                <div class="comparison-label">Time to Payoff</div>
+                                <div class="comparison-value" id="snowball-interest-desktop">$4,120</div>
+                                <div class="comparison-label">Total Interest</div>
+                                <div class="comparison-value" id="snowball-savings-desktop">-$0</div>
+                                <div class="comparison-label">Interest Savings</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Avalanche Method</h4>
+                                <div class="comparison-value" id="avalanche-time-desktop">34 months</div>
+                                <div class="comparison-label">Time to Payoff</div>
+                                <div class="comparison-value" id="avalanche-interest-desktop">$3,780</div>
+                                <div class="comparison-label">Total Interest</div>
+                                <div class="comparison-value" id="avalanche-savings-desktop">+$340</div>
+                                <div class="comparison-label">Interest Savings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('snowball-tab').classList.remove('active');
+            document.getElementById('avalanche-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('snowball-tab-desktop').classList.remove('active');
+            document.getElementById('avalanche-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Debt entry functions
+        function addDebtEntry() {
+            const container = document.getElementById('debt-entries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'debt-entry';
+            newEntry.innerHTML = `
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" class="debt-name" placeholder="Debt Name">
+                </div>
+                <div class="input-group">
+                    <label>Balance ($)</label>
+                    <input type="number" class="debt-balance" placeholder="Balance" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Interest Rate (%)</label>
+                    <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Minimum Payment ($)</label>
+                    <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function addDebtEntryDesktop() {
+            const container = document.getElementById('debt-entries-desktop');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'debt-entry';
+            newEntry.innerHTML = `
+                <button class="remove-debt" onclick="removeDebtEntry(this)"><i class="fas fa-times"></i></button>
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" class="debt-name" placeholder="Debt Name">
+                </div>
+                <div class="input-group">
+                    <label>Balance ($)</label>
+                    <input type="number" class="debt-balance" placeholder="Balance" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Interest Rate (%)</label>
+                    <input type="number" class="debt-rate" placeholder="Interest Rate" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Minimum Payment ($)</label>
+                    <input type="number" class="debt-minimum" placeholder="Minimum Payment" min="0">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function removeDebtEntry(button) {
+            if (document.querySelectorAll('.debt-entry').length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one debt entry');
+            }
+        }
+        
+        // Calculation functions
+        function calculateDebtPayoff() {
+            const monthlyPayment = parseFloat(document.getElementById('monthly-payment').value) || 0;
+            const strategy = document.querySelector('.tabs .tab.active').textContent.includes('Snowball') ? 'snowball' : 'avalanche';
+            const debtEntries = document.querySelectorAll('#debt-entries .debt-entry');
+            
+            calculateResult(monthlyPayment, strategy, debtEntries, 'mobile');
+            calculateComparison(monthlyPayment, debtEntries, 'mobile');
+        }
+        
+        function calculateDebtPayoffDesktop() {
+            const monthlyPayment = parseFloat(document.getElementById('monthly-payment-desktop').value) || 0;
+            const strategy = document.querySelector('.tabs .tab.active').textContent.includes('Snowball') ? 'snowball' : 'avalanche';
+            const debtEntries = document.querySelectorAll('#debt-entries-desktop .debt-entry');
+            
+            calculateResult(monthlyPayment, strategy, debtEntries, 'desktop');
+            calculateComparison(monthlyPayment, debtEntries, 'desktop');
+        }
+        
+        function calculateResult(monthlyPayment, strategy, debtEntries, device) {
+            // Collect debt data
+            const debts = [];
+            debtEntries.forEach(entry => {
+                const name = entry.querySelector('.debt-name').value || 'Unnamed Debt';
+                const balance = parseFloat(entry.querySelector('.debt-balance').value) || 0;
+                const rate = parseFloat(entry.querySelector('.debt-rate').value) || 0;
+                const minimum = parseFloat(entry.querySelector('.debt-minimum').value) || 0;
+                
+                if (balance > 0) {
+                    debts.push({
+                        name: name,
+                        balance: balance,
+                        rate: rate / 100,
+                        minimum: minimum
+                    });
+                }
+            });
+            
+            // Sort debts based on strategy
+            if (strategy === 'snowball') {
+                debts.sort((a, b) => a.balance - b.balance);
+            } else {
+                debts.sort((a, b) => b.rate - a.rate);
+            }
+            
+            // Calculate payoff plan
+            let totalDebt = debts.reduce((sum, debt) => sum + debt.balance, 0);
+            let totalInterest = 0;
+            let months = 0;
+            let payoffSchedule = [];
+            
+            // Simulate payoff
+            let remainingDebts = JSON.parse(JSON.stringify(debts));
+            let currentDate = new Date();
+            
+            while (remainingDebts.length > 0) {
+                months++;
+                let totalPayment = monthlyPayment;
+                let monthInterest = 0;
+                
+                // Pay minimums first
+                for (let i = 0; i < remainingDebts.length; i++) {
+                    const debt = remainingDebts[i];
+                    const interestPayment = debt.balance * (debt.rate / 12);
+                    monthInterest += interestPayment;
+                    let payment = Math.min(debt.minimum, debt.balance + interestPayment);
+                    
+                    if (totalPayment >= payment) {
+                        totalPayment -= payment;
+                        debt.balance = Math.max(0, debt.balance + interestPayment - payment);
+                    } else {
+                        debt.balance = Math.max(0, debt.balance + interestPayment - totalPayment);
+                        totalPayment = 0;
+                    }
+                    
+                    if (debt.balance <= 0) {
+                        payoffSchedule.push({
+                            name: debt.name,
+                            months: months
+                        });
+                    }
+                }
+                
+                // Apply extra payment to target debt
+                if (totalPayment > 0 && remainingDebts.length > 0) {
+                    const targetDebt = remainingDebts[0];
+                    const interestPayment = targetDebt.balance * (targetDebt.rate / 12);
+                    monthInterest += interestPayment;
+                    const payment = Math.min(totalPayment, targetDebt.balance + interestPayment);
+                    targetDebt.balance = Math.max(0, targetDebt.balance + interestPayment - payment);
+                    
+                    if (targetDebt.balance <= 0) {
+                        payoffSchedule.push({
+                            name: targetDebt.name,
+                            months: months
+                        });
+                    }
+                }
+                
+                totalInterest += monthInterest;
+                
+                // Remove paid off debts
+                remainingDebts = remainingDebts.filter(debt => debt.balance > 0);
+            }
+            
+            // Calculate payoff date
+            let payoffDate = new Date();
+            payoffDate.setMonth(payoffDate.getMonth() + months);
+            const payoffDateString = payoffDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+            
+            // Format time
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            let timeString = '';
+            if (years > 0) {
+                timeString += years + ' year' + (years > 1 ? 's' : '');
+                if (remainingMonths > 0) timeString += ' ';
+            }
+            if (remainingMonths > 0) {
+                timeString += remainingMonths + ' month' + (remainingMonths > 1 ? 's' : '');
+            }
+            
+            // Update UI
+            const payoffTimeElement = device === 'mobile' ? document.getElementById('payoff-time') : document.getElementById('payoff-time-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const totalDebtElement = device === 'mobile' ? document.getElementById('total-debt') : document.getElementById('total-debt-desktop');
+            const totalInterestElement = device === 'mobile' ? document.getElementById('total-interest') : document.getElementById('total-interest-desktop');
+            const payoffDateElement = device === 'mobile' ? document.getElementById('payoff-date') : document.getElementById('payoff-date-desktop');
+            const debtOrderElement = device === 'mobile' ? document.getElementById('debt-order') : document.getElementById('debt-order-desktop');
+            const strategyInfoElement = device === 'mobile' ? document.querySelector('.strategy-info .strategy-title') : document.querySelector('.strategy-info .strategy-title');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            
+            payoffTimeElement.textContent = timeString;
+            resultDescriptionElement.textContent = `Total debt: $${totalDebt.toLocaleString()} | Total interest: $${totalInterest.toFixed(0)}`;
+            totalDebtElement.textContent = `$${totalDebt.toLocaleString()}`;
+            totalInterestElement.textContent = `$${totalInterest.toFixed(0)}`;
+            payoffDateElement.textContent = payoffDateString;
+            
+            // Update debt order
+            debtOrderElement.innerHTML = '';
+            payoffSchedule.forEach(item => {
+                let icon = 'fa-credit-card';
+                if (item.name.toLowerCase().includes('student') || item.name.toLowerCase().includes('school')) {
+                    icon = 'fa-graduation-cap';
+                } else if (item.name.toLowerCase().includes('car') || item.name.toLowerCase().includes('auto')) {
+                    icon = 'fa-car';
+                } else if (item.name.toLowerCase().includes('mortgage') || item.name.toLowerCase().includes('home')) {
+                    icon = 'fa-home';
+                }
+                
+                const debtItem = document.createElement('div');
+                debtItem.className = 'debt-item';
+                debtItem.innerHTML = `
+                    <span class="debt-name"><i class="fas ${icon}"></i> ${item.name}</span>
+                    <span class="debt-payoff">${item.months} months</span>
+                `;
+                debtOrderElement.appendChild(debtItem);
+            });
+            
+            // Update strategy info
+            const strategyTitle = strategy === 'snowball' ? 'Snowball Strategy' : 'Avalanche Strategy';
+            const strategyIcon = strategy === 'snowball' ? 'fa-snowflake' : 'fa-mountain';
+            strategyInfoElement.innerHTML = `<i class="fas ${strategyIcon}"></i> ${strategyTitle}`;
+            
+            // Generate chart
+            generateChart(payoffSchedule, months, chartContainer, device);
+            
+            // Animate progress bar
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 300);
+        }
+        
+        function calculateComparison(monthlyPayment, debtEntries, device) {
+            // Collect debt data
+            const debts = [];
+            debtEntries.forEach(entry => {
+                const name = entry.querySelector('.debt-name').value || 'Unnamed Debt';
+                const balance = parseFloat(entry.querySelector('.debt-balance').value) || 0;
+                const rate = parseFloat(entry.querySelector('.debt-rate').value) || 0;
+                const minimum = parseFloat(entry.querySelector('.debt-minimum').value) || 0;
+                
+                if (balance > 0) {
+                    debts.push({
+                        name: name,
+                        balance: balance,
+                        rate: rate / 100,
+                        minimum: minimum
+                    });
+                }
+            });
+            
+            // Calculate both strategies
+            const snowballResult = calculateStrategy(debts, 'snowball', monthlyPayment);
+            const avalancheResult = calculateStrategy(debts, 'avalanche', monthlyPayment);
+            
+            // Update comparison UI
+            const snowballTime = device === 'mobile' ? document.getElementById('snowball-time') : document.getElementById('snowball-time-desktop');
+            const snowballInterest = device === 'mobile' ? document.getElementById('snowball-interest') : document.getElementById('snowball-interest-desktop');
+            const avalancheTime = device === 'mobile' ? document.getElementById('avalanche-time') : document.getElementById('avalanche-time-desktop');
+            const avalancheInterest = device === 'mobile' ? document.getElementById('avalanche-interest') : document.getElementById('avalanche-interest-desktop');
+            
+            snowballTime.textContent = formatMonths(snowballResult.months);
+            snowballInterest.textContent = `$${snowballResult.interest.toFixed(0)}`;
+            avalancheTime.textContent = formatMonths(avalancheResult.months);
+            avalancheInterest.textContent = `$${avalancheResult.interest.toFixed(0)}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const snowballSavings = document.getElementById('snowball-savings-desktop');
+                const avalancheSavings = document.getElementById('avalanche-savings-desktop');
+                
+                snowballSavings.textContent = '-$0';
+                avalancheSavings.textContent = `+$${(snowballResult.interest - avalancheResult.interest).toFixed(0)}`;
+                avalancheSavings.style.color = '#2ecc71';
+            }
+        }
+        
+        function calculateStrategy(debts, strategy, monthlyPayment) {
+            // Sort debts based on strategy
+            const sortedDebts = JSON.parse(JSON.stringify(debts));
+            if (strategy === 'snowball') {
+                sortedDebts.sort((a, b) => a.balance - b.balance);
+            } else {
+                sortedDebts.sort((a, b) => b.rate - a.rate);
+            }
+            
+            // Calculate payoff plan
+            let totalInterest = 0;
+            let months = 0;
+            
+            // Simulate payoff
+            let remainingDebts = sortedDebts;
+            
+            while (remainingDebts.length > 0) {
+                months++;
+                let totalPayment = monthlyPayment;
+                let monthInterest = 0;
+                
+                // Pay minimums first
+                for (let i = 0; i < remainingDebts.length; i++) {
+                    const debt = remainingDebts[i];
+                    const interestPayment = debt.balance * (debt.rate / 12);
+                    monthInterest += interestPayment;
+                    let payment = Math.min(debt.minimum, debt.balance + interestPayment);
+                    
+                    if (totalPayment >= payment) {
+                        totalPayment -= payment;
+                        debt.balance = Math.max(0, debt.balance + interestPayment - payment);
+                    } else {
+                        debt.balance = Math.max(0, debt.balance + interestPayment - totalPayment);
+                        totalPayment = 0;
+                    }
+                }
+                
+                // Apply extra payment to target debt
+                if (totalPayment > 0 && remainingDebts.length > 0) {
+                    const targetDebt = remainingDebts[0];
+                    const interestPayment = targetDebt.balance * (targetDebt.rate / 12);
+                    monthInterest += interestPayment;
+                    const payment = Math.min(totalPayment, targetDebt.balance + interestPayment);
+                    targetDebt.balance = Math.max(0, targetDebt.balance + interestPayment - payment);
+                }
+                
+                totalInterest += monthInterest;
+                
+                // Remove paid off debts
+                remainingDebts = remainingDebts.filter(debt => debt.balance > 0);
+            }
+            
+            return {
+                months: months,
+                interest: totalInterest
+            };
+        }
+        
+        function formatMonths(months) {
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            let result = '';
+            if (years > 0) {
+                result += years + ' yr' + (years > 1 ? 's' : '');
+                if (remainingMonths > 0) result += ' ';
+            }
+            if (remainingMonths > 0) {
+                result += remainingMonths + ' mo' + (remainingMonths > 1 ? 's' : '');
+            }
+            return result || '0 months';
+        }
+        
+        function generateChart(payoffSchedule, totalMonths, container, device) {
+            container.innerHTML = '';
+            
+            if (payoffSchedule.length === 0) return;
+            
+            // Find max months for scaling
+            const maxMonths = Math.max(...payoffSchedule.map(item => item.months), 1);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            payoffSchedule.forEach((item, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                const height = (item.months / maxMonths) * maxHeight;
+                bar.style.height = height + 'px';
+                
+                // Add month count inside bar
+                bar.textContent = item.months;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                // Truncate long names
+                const displayName = item.name.length > 10 ? item.name.substring(0, 10) + '...' : item.name;
+                label.textContent = displayName;
+                
+                const barContainer = document.createElement('div');
+                barContainer.style.display = 'flex';
+                barContainer.style.flexDirection = 'column';
+                barContainer.style.alignItems = 'center';
+                barContainer.style.margin = '0 5px';
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(label);
+                container.appendChild(barContainer);
+            });
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateDebtPayoff();
+            calculateDebtPayoffDesktop();
+        };
+    </script>
+</body>
+</html>

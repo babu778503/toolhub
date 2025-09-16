@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break-Even Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .breakdown-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .fixed-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .variable-bar {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .revenue-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .scenario-entry {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border-left: 4px solid #3498db;
+        }
+        
+        .remove-scenario {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .remove-scenario:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+        }
+        
+        .breakdown-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .breakdown-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .breakdown-title i {
+            margin-right: 8px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .breakdown-rate {
+            font-weight: 600;
+            color: #f1c40f;
+        }
+        
+        .breakdown-amount {
+            color: #2ecc71;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Break-Even Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="fixed-costs"><i class="fas fa-building"></i> Fixed Costs ($)</label>
+                    <input type="number" id="fixed-costs" placeholder="Enter fixed costs" min="0" step="0.01" value="5000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="variable-cost"><i class="fas fa-coins"></i> Variable Cost Per Unit ($)</label>
+                    <input type="number" id="variable-cost" placeholder="Enter variable cost per unit" min="0" step="0.01" value="10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="selling-price"><i class="fas fa-tag"></i> Selling Price Per Unit ($)</label>
+                    <input type="number" id="selling-price" placeholder="Enter selling price per unit" min="0" step="0.01" value="25">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('simple')">
+                        <i class="fas fa-calculator"></i> Simple Break-Even
+                    </div>
+                    <div class="tab" onclick="switchTab('detailed')">
+                        <i class="fas fa-chart-line"></i> Detailed Analysis
+                    </div>
+                </div>
+                
+                <div id="simple-tab" class="tab-content active">
+                    <p>Calculate the break-even point for your business with basic cost structure.</p>
+                </div>
+                
+                <div id="detailed-tab" class="tab-content">
+                    <p>Get a detailed analysis with profit projections and sensitivity analysis.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateBreakEven()">
+                    <i class="fas fa-calculator"></i> Calculate Break-Even
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-balance-scale"></i> Break-Even Analysis</div>
+                <div class="result-amount positive" id="break-even-units">334</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 65%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Break-Even Point: 334 units | Revenue: $8,350 | Profit at 500 units: $2,500
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="fixed-costs-display">$5,000</div>
+                        <div class="stat-label">Fixed Costs</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value negative" id="variable-cost-display">$10.00</div>
+                        <div class="stat-label">Variable Cost</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="selling-price-display">$25.00</div>
+                        <div class="stat-label">Selling Price</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="breakdown-list">
+                    <div class="list-title"><i class="fas fa-receipt"></i> Cost Breakdown</div>
+                    <div id="cost-breakdown">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-building"></i> Fixed Costs</span>
+                            <span class="entry-amount negative">$5,000</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-coins"></i> Variable Cost (334 units)</span>
+                            <span class="entry-amount negative">$3,340</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-tag"></i> Total Revenue (334 units)</span>
+                            <span class="entry-amount positive">$8,350</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-calculator"></i> Profit/Loss</span>
+                            <span class="entry-amount">$0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="breakdown-section">
+                    <div class="breakdown-title"><i class="fas fa-layer-group"></i> Break-Even Metrics</div>
+                    <div id="breakdown-metrics">
+                        <div class="breakdown-item">
+                            <span class="breakdown-rate">Contribution Margin</span>
+                            <span class="breakdown-amount">$15.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-rate">Margin Ratio</span>
+                            <span class="breakdown-amount">60%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Business Insights</div>
+                    <p id="break-even-insights">You need to sell 334 units to break even. Each unit contributes $15.00 toward covering fixed costs. With a 60% contribution margin, your business model is strong. Selling 500 units would generate a profit of $2,500.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Business Strategy</h3>
+                    <ul class="savings-steps">
+                        <li>Focus on reducing fixed costs where possible</li>
+                        <li>Negotiate better rates with suppliers to reduce variable costs</li>
+                        <li>Consider premium pricing strategies</li>
+                        <li>Monitor break-even point regularly</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Scenario Analysis</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>Lower Price ($20)</h4>
+                        <div class="comparison-value positive" id="low-price-units">500</div>
+                        <div class="comparison-label">Break-Even Units</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>Higher Price ($30)</h4>
+                        <div class="comparison-value positive" id="high-price-units">250</div>
+                        <div class="comparison-label">Break-Even Units</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Accurate Calculation</h3>
+                        <p>Calculate break-even points with precision</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Analysis</h3>
+                        <p>See business metrics with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Business Insights</h3>
+                        <p>Get actionable recommendations for profitability</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Break-Even Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="fixed-costs-desktop"><i class="fas fa-building"></i> Fixed Costs ($)</label>
+                            <input type="number" id="fixed-costs-desktop" placeholder="Enter fixed costs" min="0" step="0.01" value="10000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="variable-cost-desktop"><i class="fas fa-coins"></i> Variable Cost Per Unit ($)</label>
+                            <input type="number" id="variable-cost-desktop" placeholder="Enter variable cost per unit" min="0" step="0.01" value="15">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="selling-price-desktop"><i class="fas fa-tag"></i> Selling Price Per Unit ($)</label>
+                            <input type="number" id="selling-price-desktop" placeholder="Enter selling price per unit" min="0" step="0.01" value="35">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-chart-line"></i> Scenario Analysis</label>
+                            <div id="scenario-entries">
+                                <div class="scenario-entry">
+                                    <div class="input-group">
+                                        <label>Scenario Name</label>
+                                        <input type="text" class="scenario-name" placeholder="Scenario name" value="Conservative">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Units Sold</label>
+                                        <input type="number" class="units-sold" placeholder="Units sold" min="0" value="400">
+                                    </div>
+                                </div>
+                                <div class="scenario-entry">
+                                    <div class="input-group">
+                                        <label>Scenario Name</label>
+                                        <input type="text" class="scenario-name" placeholder="Scenario name" value="Optimistic">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Units Sold</label>
+                                        <input type="number" class="units-sold" placeholder="Units sold" min="0" value="700">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addScenarioEntry()">
+                                <i class="fas fa-plus"></i> Add Another Scenario
+                            </button>
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('simple')">
+                                <i class="fas fa-calculator"></i> Simple Break-Even
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('detailed')">
+                                <i class="fas fa-chart-line"></i> Detailed Analysis
+                            </div>
+                        </div>
+                        
+                        <div id="simple-tab-desktop" class="tab-content active">
+                            <p>Calculate the break-even point for your business with basic cost structure. Perfect for quick analysis of new products or services.</p>
+                        </div>
+                        
+                        <div id="detailed-tab-desktop" class="tab-content">
+                            <p>Get a detailed analysis with profit projections, sensitivity analysis, and scenario planning. Ideal for comprehensive business planning.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateBreakEvenDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Break-Even
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Accurate Calculation</h3>
+                                <p>Calculate break-even points with precision</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Analysis</h3>
+                                <p>See business metrics with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Business Insights</h3>
+                                <p>Get actionable recommendations for profitability</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Performance Tracking</h3>
+                                <p>Monitor business performance over time</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Alert System</h3>
+                                <p>Get notified when approaching break-even</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-balance-scale"></i> Break-Even Analysis</div>
+                        <div class="result-amount positive" id="break-even-units-desktop">500</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 70%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Break-Even Point: 500 units | Revenue: $17,500 | Profit at 700 units: $4,000
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="fixed-costs-display-desktop">$10,000</div>
+                                <div class="stat-label">Fixed Costs</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value negative" id="variable-cost-display-desktop">$15.00</div>
+                                <div class="stat-label">Variable Cost</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="selling-price-display-desktop">$35.00</div>
+                                <div class="stat-label">Selling Price</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="contribution-margin-desktop">$20.00</div>
+                                <div class="stat-label">Contribution</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="breakdown-list">
+                            <div class="list-title"><i class="fas fa-receipt"></i> Detailed Cost Breakdown</div>
+                            <div id="cost-breakdown-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-building"></i> Fixed Costs</span>
+                                    <span class="entry-amount negative">$10,000</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-coins"></i> Variable Cost (500 units)</span>
+                                    <span class="entry-amount negative">$7,500</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-tag"></i> Total Revenue (500 units)</span>
+                                    <span class="entry-amount positive">$17,500</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-calculator"></i> Profit/Loss</span>
+                                    <span class="entry-amount">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="breakdown-section">
+                            <div class="breakdown-title"><i class="fas fa-layer-group"></i> Profitability Metrics</div>
+                            <div id="profitability-metrics">
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Contribution Margin</span>
+                                    <span class="breakdown-amount">$20.00</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Margin Ratio</span>
+                                    <span class="breakdown-amount">57.1%</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-rate">Safety Margin (700 units)</span>
+                                    <span class="breakdown-amount">200 units</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Business Insights</div>
+                            <p id="break-even-insights-desktop">You need to sell 500 units to break even. Each unit contributes $20.00 toward covering fixed costs. With a 57.1% contribution margin, your business model is strong. Selling 700 units would generate a profit of $4,000. Your safety margin is 200 units, providing a good buffer against sales fluctuations.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Business Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Focus on reducing fixed costs where possible through negotiation</li>
+                                <li>Negotiate better rates with suppliers to reduce variable costs</li>
+                                <li>Consider premium pricing strategies to increase margins</li>
+                                <li>Monitor break-even point regularly and adjust pricing/costs</li>
+                                <li>Diversify product offerings to spread fixed costs</li>
+                                <li>Implement volume discounts to increase unit sales</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Scenario Analysis</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Conservative (400 units)</h4>
+                                <div class="comparison-value negative" id="conservative-profit">-$2,000</div>
+                                <div class="comparison-label">Profit/Loss</div>
+                                <div class="comparison-value" id="conservative-margin">-28.6%</div>
+                                <div class="comparison-label">Margin</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Optimistic (700 units)</h4>
+                                <div class="comparison-value positive" id="optimistic-profit">$4,000</div>
+                                <div class="comparison-label">Profit/Loss</div>
+                                <div class="comparison-value" id="optimistic-margin">11.4%</div>
+                                <div class="comparison-label">Margin</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('simple-tab').classList.remove('active');
+            document.getElementById('detailed-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('simple-tab-desktop').classList.remove('active');
+            document.getElementById('detailed-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Scenario entry functions
+        function addScenarioEntry() {
+            const container = document.getElementById('scenario-entries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'scenario-entry';
+            newEntry.innerHTML = `
+                <button class="remove-scenario" onclick="removeScenarioEntry(this)"><i class="fas fa-times"></i></button>
+                <div class="input-group">
+                    <label>Scenario Name</label>
+                    <input type="text" class="scenario-name" placeholder="Scenario name">
+                </div>
+                <div class="input-group">
+                    <label>Units Sold</label>
+                    <input type="number" class="units-sold" placeholder="Units sold" min="0">
+                </div>
+            `;
+            container.appendChild(newEntry);
+        }
+        
+        function removeScenarioEntry(button) {
+            if (document.querySelectorAll('.scenario-entry').length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one scenario entry');
+            }
+        }
+        
+        // Break-even calculation functions
+        function calculateBreakEven() {
+            const fixedCosts = parseFloat(document.getElementById('fixed-costs').value) || 0;
+            const variableCost = parseFloat(document.getElementById('variable-cost').value) || 0;
+            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
+            
+            calculateResult(fixedCosts, variableCost, sellingPrice, 'mobile');
+            calculateComparison(fixedCosts, variableCost, sellingPrice, 'mobile');
+        }
+        
+        function calculateBreakEvenDesktop() {
+            // Get values from main inputs
+            const fixedCosts = parseFloat(document.getElementById('fixed-costs-desktop').value) || 0;
+            const variableCost = parseFloat(document.getElementById('variable-cost-desktop').value) || 0;
+            const sellingPrice = parseFloat(document.getElementById('selling-price-desktop').value) || 0;
+            
+            // Get values from scenario entries
+            const scenarioEntries = document.querySelectorAll('#scenario-entries .scenario-entry');
+            
+            calculateDetailedResult(fixedCosts, variableCost, sellingPrice, scenarioEntries);
+            calculateDetailedComparison(fixedCosts, variableCost, sellingPrice, scenarioEntries);
+        }
+        
+        function calculateResult(fixedCosts, variableCost, sellingPrice, device) {
+            // Calculate break-even point
+            const contributionMargin = sellingPrice - variableCost;
+            const breakEvenUnits = contributionMargin > 0 ? Math.ceil(fixedCosts / contributionMargin) : 0;
+            const breakEvenRevenue = breakEvenUnits * sellingPrice;
+            
+            // Calculate profit at 500 units
+            const unitsForProfit = 500;
+            const totalRevenue = unitsForProfit * sellingPrice;
+            const totalVariableCost = unitsForProfit * variableCost;
+            const profit = totalRevenue - totalVariableCost - fixedCosts;
+            
+            // Update UI
+            const breakEvenUnitsElement = device === 'mobile' ? document.getElementById('break-even-units') : document.getElementById('break-even-units-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const fixedCostsDisplayElement = device === 'mobile' ? document.getElementById('fixed-costs-display') : document.getElementById('fixed-costs-display-desktop');
+            const variableCostDisplayElement = device === 'mobile' ? document.getElementById('variable-cost-display') : document.getElementById('variable-cost-display-desktop');
+            const sellingPriceDisplayElement = device === 'mobile' ? document.getElementById('selling-price-display') : document.getElementById('selling-price-display-desktop');
+            const costBreakdownElement = device === 'mobile' ? document.getElementById('cost-breakdown') : document.getElementById('cost-breakdown-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const insightsElement = device === 'mobile' ? document.getElementById('break-even-insights') : document.getElementById('break-even-insights-desktop');
+            
+            breakEvenUnitsElement.textContent = breakEvenUnits;
+            resultDescriptionElement.textContent = `Break-Even Point: ${breakEvenUnits} units | Revenue: $${breakEvenRevenue.toLocaleString()} | Profit at ${unitsForProfit} units: $${profit.toLocaleString()}`;
+            fixedCostsDisplayElement.textContent = `$${fixedCosts.toLocaleString()}`;
+            variableCostDisplayElement.textContent = `$${variableCost.toFixed(2)}`;
+            sellingPriceDisplayElement.textContent = `$${sellingPrice.toFixed(2)}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const contributionMarginElement = document.getElementById('contribution-margin-desktop');
+                contributionMarginElement.textContent = `$${contributionMargin.toFixed(2)}`;
+            }
+            
+            // Update cost breakdown
+            costBreakdownElement.innerHTML = '';
+            
+            const fixedCostItem = document.createElement('div');
+            fixedCostItem.className = 'entry-item';
+            fixedCostItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-building"></i> Fixed Costs</span>
+                <span class="entry-amount negative">$${fixedCosts.toLocaleString()}</span>
+            `;
+            costBreakdownElement.appendChild(fixedCostItem);
+            
+            const variableCostItem = document.createElement('div');
+            variableCostItem.className = 'entry-item';
+            variableCostItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-coins"></i> Variable Cost (${breakEvenUnits} units)</span>
+                <span class="entry-amount negative">$${(breakEvenUnits * variableCost).toLocaleString()}</span>
+            `;
+            costBreakdownElement.appendChild(variableCostItem);
+            
+            const revenueItem = document.createElement('div');
+            revenueItem.className = 'entry-item';
+            revenueItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Total Revenue (${breakEvenUnits} units)</span>
+                <span class="entry-amount positive">$${breakEvenRevenue.toLocaleString()}</span>
+            `;
+            costBreakdownElement.appendChild(revenueItem);
+            
+            const profitItem = document.createElement('div');
+            profitItem.className = 'entry-item';
+            profitItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-calculator"></i> Profit/Loss</span>
+                <span class="entry-amount">$0</span>
+            `;
+            costBreakdownElement.appendChild(profitItem);
+            
+            // Update metrics breakdown
+            const metricsElement = device === 'mobile' ? document.getElementById('breakdown-metrics') : document.getElementById('profitability-metrics');
+            metricsElement.innerHTML = '';
+            
+            const contributionItem = document.createElement('div');
+            contributionItem.className = 'breakdown-item';
+            contributionItem.innerHTML = `
+                <span class="breakdown-rate">Contribution Margin</span>
+                <span class="breakdown-amount">$${contributionMargin.toFixed(2)}</span>
+            `;
+            metricsElement.appendChild(contributionItem);
+            
+            const marginItem = document.createElement('div');
+            marginItem.className = 'breakdown-item';
+            const marginRatio = sellingPrice > 0 ? (contributionMargin / sellingPrice) * 100 : 0;
+            marginItem.innerHTML = `
+                <span class="breakdown-rate">Margin Ratio</span>
+                <span class="breakdown-amount">${marginRatio.toFixed(0)}%</span>
+            `;
+            metricsElement.appendChild(marginItem);
+            
+            // Desktop additional metrics
+            if (device === 'desktop') {
+                const safetyMarginItem = document.createElement('div');
+                safetyMarginItem.className = 'breakdown-item';
+                safetyMarginItem.innerHTML = `
+                    <span class="breakdown-rate">Safety Margin (500 units)</span>
+                    <span class="breakdown-amount">${Math.max(0, 500 - breakEvenUnits)} units</span>
+                `;
+                metricsElement.appendChild(safetyMarginItem);
+            }
+            
+            // Update insights
+            let insightsText = '';
+            if (device === 'mobile') {
+                insightsText = `You need to sell ${breakEvenUnits} units to break even. Each unit contributes $${contributionMargin.toFixed(2)} toward covering fixed costs. With a ${marginRatio.toFixed(0)}% contribution margin, your business model is strong. Selling ${unitsForProfit} units would generate a profit of $${profit.toLocaleString()}.`;
+            } else {
+                insightsText = `You need to sell ${breakEvenUnits} units to break even. Each unit contributes $${contributionMargin.toFixed(2)} toward covering fixed costs. With a ${marginRatio.toFixed(1)}% contribution margin, your business model is strong. Selling 700 units would generate a profit of $${profit.toLocaleString()}. Your safety margin is ${Math.max(0, 700 - breakEvenUnits)} units, providing a good buffer against sales fluctuations.`;
+            }
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(fixedCosts, breakEvenUnits * variableCost, breakEvenRevenue, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (breakEvenUnits / 1000) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateDetailedResult(fixedCosts, variableCost, sellingPrice, scenarioEntries) {
+            // Calculate break-even point
+            const contributionMargin = sellingPrice - variableCost;
+            const breakEvenUnits = contributionMargin > 0 ? Math.ceil(fixedCosts / contributionMargin) : 0;
+            const breakEvenRevenue = breakEvenUnits * sellingPrice;
+            
+            // Update UI
+            const breakEvenUnitsElement = document.getElementById('break-even-units-desktop');
+            const resultDescriptionElement = document.getElementById('result-description-desktop');
+            const fixedCostsDisplayElement = document.getElementById('fixed-costs-display-desktop');
+            const variableCostDisplayElement = document.getElementById('variable-cost-display-desktop');
+            const sellingPriceDisplayElement = document.getElementById('selling-price-display-desktop');
+            const contributionMarginElement = document.getElementById('contribution-margin-desktop');
+            const costBreakdownElement = document.getElementById('cost-breakdown-desktop');
+            const chartContainer = document.getElementById('chart-container-desktop');
+            const progressBar = document.getElementById('progress-bar-desktop');
+            const insightsElement = document.getElementById('break-even-insights-desktop');
+            const metricsElement = document.getElementById('profitability-metrics');
+            
+            breakEvenUnitsElement.textContent = breakEvenUnits;
+            resultDescriptionElement.textContent = `Break-Even Point: ${breakEvenUnits} units | Revenue: $${breakEvenRevenue.toLocaleString()} | Profit at 700 units: $${(700 * contributionMargin - fixedCosts).toLocaleString()}`;
+            fixedCostsDisplayElement.textContent = `$${fixedCosts.toLocaleString()}`;
+            variableCostDisplayElement.textContent = `$${variableCost.toFixed(2)}`;
+            sellingPriceDisplayElement.textContent = `$${sellingPrice.toFixed(2)}`;
+            contributionMarginElement.textContent = `$${contributionMargin.toFixed(2)}`;
+            
+            // Update cost breakdown
+            costBreakdownElement.innerHTML = '';
+            
+            const fixedCostItem = document.createElement('div');
+            fixedCostItem.className = 'entry-item';
+            fixedCostItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-building"></i> Fixed Costs</span>
+                <span class="entry-amount negative">$${fixedCosts.toLocaleString()}</span>
+            `;
+            costBreakdownElement.appendChild(fixedCostItem);
+            
+            const variableCostItem = document.createElement('div');
+            variableCostItem.className = 'entry-item';
+            variableCostItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-coins"></i> Variable Cost (${breakEvenUnits} units)</span>
+                <span class="entry-amount negative">$${(breakEvenUnits * variableCost).toLocaleString()}</span>
+            `;
+            costBreakdownElement.appendChild(variableCostItem);
+            
+            const revenueItem = document.createElement('div');
+            revenueItem.className = 'entry-item';
+            revenueItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Total Revenue (${breakEvenUnits} units)</span>
+                <span class="entry-amount positive">$${breakEvenRevenue.toLocaleString()}</span>
+            `;
+            costBreakdownElement.appendChild(revenueItem);
+            
+            const profitItem = document.createElement('div');
+            profitItem.className = 'entry-item';
+            profitItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-calculator"></i> Profit/Loss</span>
+                <span class="entry-amount">$0</span>
+            `;
+            costBreakdownElement.appendChild(profitItem);
+            
+            // Update metrics breakdown
+            metricsElement.innerHTML = '';
+            
+            const contributionItem = document.createElement('div');
+            contributionItem.className = 'breakdown-item';
+            contributionItem.innerHTML = `
+                <span class="breakdown-rate">Contribution Margin</span>
+                <span class="breakdown-amount">$${contributionMargin.toFixed(2)}</span>
+            `;
+            metricsElement.appendChild(contributionItem);
+            
+            const marginItem = document.createElement('div');
+            marginItem.className = 'breakdown-item';
+            const marginRatio = sellingPrice > 0 ? (contributionMargin / sellingPrice) * 100 : 0;
+            marginItem.innerHTML = `
+                <span class="breakdown-rate">Margin Ratio</span>
+                <span class="breakdown-amount">${marginRatio.toFixed(1)}%</span>
+            `;
+            metricsElement.appendChild(marginItem);
+            
+            const safetyMarginItem = document.createElement('div');
+            safetyMarginItem.className = 'breakdown-item';
+            safetyMarginItem.innerHTML = `
+                <span class="breakdown-rate">Safety Margin (700 units)</span>
+                <span class="breakdown-amount">${Math.max(0, 700 - breakEvenUnits)} units</span>
+            `;
+            metricsElement.appendChild(safetyMarginItem);
+            
+            // Update insights
+            let insightsText = `You need to sell ${breakEvenUnits} units to break even. Each unit contributes $${contributionMargin.toFixed(2)} toward covering fixed costs. With a ${marginRatio.toFixed(1)}% contribution margin, your business model is strong. Selling 700 units would generate a profit of $${(700 * contributionMargin - fixedCosts).toLocaleString()}. Your safety margin is ${Math.max(0, 700 - breakEvenUnits)} units, providing a good buffer against sales fluctuations.`;
+            insightsElement.textContent = insightsText;
+            
+            // Generate chart
+            generateChart(fixedCosts, breakEvenUnits * variableCost, breakEvenRevenue, chartContainer, 'desktop');
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (breakEvenUnits / 1000) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateComparison(fixedCosts, variableCost, sellingPrice, device) {
+            // Calculate for lower price ($20)
+            const lowPrice = 20;
+            const lowContribution = lowPrice - variableCost;
+            const lowBreakEven = lowContribution > 0 ? Math.ceil(fixedCosts / lowContribution) : 0;
+            
+            // Calculate for higher price ($30)
+            const highPrice = 30;
+            const highContribution = highPrice - variableCost;
+            const highBreakEven = highContribution > 0 ? Math.ceil(fixedCosts / highContribution) : 0;
+            
+            // Update comparison UI
+            const lowPriceUnitsElement = device === 'mobile' ? document.getElementById('low-price-units') : document.getElementById('low-price-units-desktop');
+            const highPriceUnitsElement = device === 'mobile' ? document.getElementById('high-price-units') : document.getElementById('high-price-units-desktop');
+            
+            lowPriceUnitsElement.textContent = lowBreakEven;
+            highPriceUnitsElement.textContent = highBreakEven;
+        }
+        
+        function calculateDetailedComparison(fixedCosts, variableCost, sellingPrice, scenarioEntries) {
+            // Calculate profits for scenarios
+            const contributionMargin = sellingPrice - variableCost;
+            
+            scenarioEntries.forEach(entry => {
+                const name = entry.querySelector('.scenario-name').value || 'Unnamed Scenario';
+                const units = parseInt(entry.querySelector('.units-sold').value) || 0;
+                
+                const profit = units * contributionMargin - fixedCosts;
+                const margin = units > 0 ? (profit / (units * sellingPrice)) * 100 : 0;
+                
+                // Update comparison UI based on scenario name
+                if (name.toLowerCase().includes('conservative')) {
+                    document.getElementById('conservative-profit').textContent = profit >= 0 ? `$${profit.toLocaleString()}` : `-$${Math.abs(profit).toLocaleString()}`;
+                    document.getElementById('conservative-margin').textContent = `${margin.toFixed(1)}%`;
+                    document.getElementById('conservative-profit').className = profit >= 0 ? 'comparison-value positive' : 'comparison-value negative';
+                } else if (name.toLowerCase().includes('optimistic')) {
+                    document.getElementById('optimistic-profit').textContent = profit >= 0 ? `$${profit.toLocaleString()}` : `-$${Math.abs(profit).toLocaleString()}`;
+                    document.getElementById('optimistic-margin').textContent = `${margin.toFixed(1)}%`;
+                    document.getElementById('optimistic-profit').className = profit >= 0 ? 'comparison-value positive' : 'comparison-value negative';
+                }
+            });
+        }
+        
+        function generateChart(fixedCosts, variableCosts, revenue, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(fixedCosts, variableCosts, revenue);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Fixed costs bar
+            const fixedBar = document.createElement('div');
+            fixedBar.className = 'chart-bar fixed-bar';
+            const fixedHeight = maxValue > 0 ? (fixedCosts / maxValue) * maxHeight : 0;
+            fixedBar.style.height = fixedHeight + 'px';
+            fixedBar.textContent = `$${(fixedCosts/1000).toFixed(0)}k`;
+            
+            const fixedLabel = document.createElement('div');
+            fixedLabel.className = 'chart-label';
+            fixedLabel.textContent = 'Fixed';
+            
+            const fixedContainer = document.createElement('div');
+            fixedContainer.style.display = 'flex';
+            fixedContainer.style.flexDirection = 'column';
+            fixedContainer.style.alignItems = 'center';
+            fixedContainer.style.margin = '0 5px';
+            
+            fixedContainer.appendChild(fixedBar);
+            fixedContainer.appendChild(fixedLabel);
+            
+            // Variable costs bar
+            const variableBar = document.createElement('div');
+            variableBar.className = 'chart-bar variable-bar';
+            const variableHeight = maxValue > 0 ? (variableCosts / maxValue) * maxHeight : 0;
+            variableBar.style.height = variableHeight + 'px';
+            variableBar.textContent = `$${(variableCosts/1000).toFixed(0)}k`;
+            
+            const variableLabel = document.createElement('div');
+            variableLabel.className = 'chart-label';
+            variableLabel.textContent = 'Variable';
+            
+            const variableContainer = document.createElement('div');
+            variableContainer.style.display = 'flex';
+            variableContainer.style.flexDirection = 'column';
+            variableContainer.style.alignItems = 'center';
+            variableContainer.style.margin = '0 5px';
+            
+            variableContainer.appendChild(variableBar);
+            variableContainer.appendChild(variableLabel);
+            
+            // Revenue bar
+            const revenueBar = document.createElement('div');
+            revenueBar.className = 'chart-bar revenue-bar';
+            const revenueHeight = maxValue > 0 ? (revenue / maxValue) * maxHeight : 0;
+            revenueBar.style.height = revenueHeight + 'px';
+            revenueBar.textContent = `$${(revenue/1000).toFixed(0)}k`;
+            
+            const revenueLabel = document.createElement('div');
+            revenueLabel.className = 'chart-label';
+            revenueLabel.textContent = 'Revenue';
+            
+            const revenueContainer = document.createElement('div');
+            revenueContainer.style.display = 'flex';
+            revenueContainer.style.flexDirection = 'column';
+            revenueContainer.style.alignItems = 'center';
+            revenueContainer.style.margin = '0 5px';
+            
+            revenueContainer.appendChild(revenueBar);
+            revenueContainer.appendChild(revenueLabel);
+            
+            container.appendChild(fixedContainer);
+            container.appendChild(variableContainer);
+            container.appendChild(revenueContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateBreakEven();
+            calculateBreakEvenDesktop();
+        };
+    </script>
+</body>
+</html>

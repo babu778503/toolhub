@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Refund Estimator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .tax-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .income-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .deduction-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .tax-bar {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .refund-bar {
+            background: linear-gradient(to top, #f1c40f, #f39c12);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Tax Refund Estimator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="filing-status"><i class="fas fa-user-friends"></i> Filing Status</label>
+                    <select id="filing-status">
+                        <option value="single">Single</option>
+                        <option value="married">Married Filing Jointly</option>
+                        <option value="head">Head of Household</option>
+                        <option value="separate">Married Filing Separately</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="gross-income"><i class="fas fa-money-bill-wave"></i> Gross Income ($)</label>
+                    <input type="number" id="gross-income" placeholder="Enter gross income" min="0" value="75000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="federal-withheld"><i class="fas fa-receipt"></i> Federal Tax Withheld ($)</label>
+                    <input type="number" id="federal-withheld" placeholder="Enter federal tax withheld" min="0" value="12000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="deductions"><i class="fas fa-minus-circle"></i> Deductions ($)</label>
+                    <input type="number" id="deductions" placeholder="Enter total deductions" min="0" value="15000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="dependents"><i class="fas fa-users"></i> Number of Dependents</label>
+                    <input type="number" id="dependents" placeholder="Enter number of dependents" min="0" value="2">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('standard')">
+                        <i class="fas fa-calculator"></i> Standard Calculation
+                    </div>
+                    <div class="tab" onclick="switchTab('detailed')">
+                        <i class="fas fa-list"></i> Detailed Breakdown
+                    </div>
+                </div>
+                
+                <div id="standard-tab" class="tab-content active">
+                    <p>Estimate your tax refund using standard tax brackets and deductions.</p>
+                </div>
+                
+                <div id="detailed-tab" class="tab-content">
+                    <p>Get a detailed breakdown of your tax calculation with itemized deductions.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateTaxRefund()">
+                    <i class="fas fa-calculator"></i> Estimate Refund
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-file-invoice-dollar"></i> Tax Refund Estimate</div>
+                <div class="result-amount positive" id="refund-amount">$1,850</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 72%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Taxable Income: $60,000 | Taxes Owed: $10,150 | Refund: $1,850
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="gross-income-display">$75,000</div>
+                        <div class="stat-label">Gross Income</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="taxable-income">$60,000</div>
+                        <div class="stat-label">Taxable Income</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value negative" id="tax-owed">$10,150</div>
+                        <div class="stat-label">Taxes Owed</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="tax-list">
+                    <div class="list-title"><i class="fas fa-receipt"></i> Tax Breakdown</div>
+                    <div id="tax-breakdown">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-money-bill-wave"></i> Gross Income</span>
+                            <span class="entry-amount">$75,000</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-minus-circle"></i> Deductions</span>
+                            <span class="entry-amount">-$15,000</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-percentage"></i> Taxable Income</span>
+                            <span class="entry-amount">$60,000</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-receipt"></i> Taxes Owed</span>
+                            <span class="entry-amount negative">-$10,150</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-coins"></i> Tax Withheld</span>
+                            <span class="entry-amount">$12,000</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-hand-holding-usd"></i> Refund</span>
+                            <span class="entry-amount positive">$1,850</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Tax Insights</div>
+                    <p>Based on your inputs, you're estimated to receive a $1,850 tax refund. This represents a 2.5% return on your gross income. Consider adjusting your withholding to better match your tax liability.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Tax Strategy</h3>
+                    <ul class="savings-steps">
+                        <li>Maximize retirement contributions to reduce taxable income</li>
+                        <li>Itemize deductions if they exceed standard deduction</li>
+                        <li>Consider tax-loss harvesting for investment accounts</li>
+                        <li>Review withholding amounts annually</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Scenario Analysis</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>10% Higher Income</h4>
+                        <div class="comparison-value positive" id="higher-income-refund">$2,450</div>
+                        <div class="comparison-label">Refund</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>$5,000 More Deductions</h4>
+                        <div class="comparison-value positive" id="more-deductions-refund">$2,100</div>
+                        <div class="comparison-label">Refund</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Accurate Estimation</h3>
+                        <p>Estimate refunds using current tax brackets and rates</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                        <p>See tax details with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Tax Insights</h3>
+                        <p>Get actionable recommendations to optimize taxes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Tax Refund Estimator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="filing-status-desktop"><i class="fas fa-user-friends"></i> Filing Status</label>
+                            <select id="filing-status-desktop">
+                                <option value="single">Single</option>
+                                <option value="married" selected>Married Filing Jointly</option>
+                                <option value="head">Head of Household</option>
+                                <option value="separate">Married Filing Separately</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="gross-income-desktop"><i class="fas fa-money-bill-wave"></i> Gross Income ($)</label>
+                            <input type="number" id="gross-income-desktop" placeholder="Enter gross income" min="0" value="120000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="federal-withheld-desktop"><i class="fas fa-receipt"></i> Federal Tax Withheld ($)</label>
+                            <input type="number" id="federal-withheld-desktop" placeholder="Enter federal tax withheld" min="0" value="18000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="deductions-desktop"><i class="fas fa-minus-circle"></i> Deductions ($)</label>
+                            <input type="number" id="deductions-desktop" placeholder="Enter total deductions" min="0" value="24000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="dependents-desktop"><i class="fas fa-users"></i> Number of Dependents</label>
+                            <input type="number" id="dependents-desktop" placeholder="Enter number of dependents" min="0" value="2">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="state-tax"><i class="fas fa-map-marker-alt"></i> State Tax Rate (%)</label>
+                            <input type="number" id="state-tax" placeholder="Enter state tax rate" min="0" max="15" step="0.1" value="5.5">
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('standard')">
+                                <i class="fas fa-calculator"></i> Standard Tax Calculation
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('detailed')">
+                                <i class="fas fa-list"></i> Detailed Tax Breakdown
+                            </div>
+                        </div>
+                        
+                        <div id="standard-tab-desktop" class="tab-content active">
+                            <p>Estimate your tax refund using standard federal tax brackets and deductions for a quick overview.</p>
+                        </div>
+                        
+                        <div id="detailed-tab-desktop" class="tab-content">
+                            <p>Get a detailed breakdown of your tax calculation with itemized deductions, credits, and state taxes.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateTaxRefundDesktop()">
+                            <i class="fas fa-calculator"></i> Estimate Tax Refund
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Accurate Estimation</h3>
+                                <p>Estimate refunds using current tax brackets and rates</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                                <p>See tax details with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Tax Insights</h3>
+                                <p>Get actionable recommendations to optimize taxes</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Historical Tracking</h3>
+                                <p>Monitor tax changes over multiple years</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Filing Reminders</h3>
+                                <p>Get notified of important tax deadlines</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-file-invoice-dollar"></i> Tax Refund Estimate</div>
+                        <div class="result-amount positive" id="refund-amount-desktop">$2,350</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 78%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Taxable Income: $96,000 | Taxes Owed: $15,650 | Refund: $2,350
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="gross-income-display-desktop">$120,000</div>
+                                <div class="stat-label">Gross Income</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="taxable-income-desktop">$96,000</div>
+                                <div class="stat-label">Taxable Income</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value negative" id="tax-owed-desktop">$15,650</div>
+                                <div class="stat-label">Federal Taxes</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value negative" id="state-tax-owed">$5,280</div>
+                                <div class="stat-label">State Taxes</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="tax-list">
+                            <div class="list-title"><i class="fas fa-receipt"></i> Detailed Tax Breakdown</div>
+                            <div id="tax-breakdown-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-money-bill-wave"></i> Gross Income</span>
+                                    <span class="entry-amount">$120,000</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-minus-circle"></i> Deductions</span>
+                                    <span class="entry-amount">-$24,000</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percentage"></i> Taxable Income</span>
+                                    <span class="entry-amount">$96,000</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-receipt"></i> Federal Tax</span>
+                                    <span class="entry-amount negative">-$15,650</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-map-marker-alt"></i> State Tax</span>
+                                    <span class="entry-amount negative">-$5,280</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-child"></i> Child Tax Credit</span>
+                                    <span class="entry-amount positive">$2,000</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-coins"></i> Total Tax Withheld</span>
+                                    <span class="entry-amount">$18,000</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-hand-holding-usd"></i> Refund</span>
+                                    <span class="entry-amount positive">$2,350</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Tax Insights</div>
+                            <p>Based on your inputs, you're estimated to receive a $2,350 tax refund. This represents a 1.96% return on your gross income. Your effective tax rate is 13.1%. Consider maximizing your 401(k) contributions to reduce taxable income and increase your refund. With 2 dependents, you qualify for the Child Tax Credit which increased your refund by $2,000.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Tax Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Maximize retirement contributions ($22,500 401k limit for 2023) to reduce taxable income</li>
+                                <li>Itemize deductions if they exceed the standard deduction for your filing status</li>
+                                <li>Consider tax-loss harvesting for investment accounts before year-end</li>
+                                <li>Review withholding amounts annually to avoid large refunds or owing at filing</li>
+                                <li>Explore education credits if you have college expenses</li>
+                                <li>Maximize HSA contributions for triple tax advantages</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Scenario Analysis</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Optimistic (10% Higher Income)</h4>
+                                <div class="comparison-value positive" id="higher-income-refund-desktop">$3,150</div>
+                                <div class="comparison-label">Refund</div>
+                                <div class="comparison-value" id="higher-income-effective-desktop">14.2%</div>
+                                <div class="comparison-label">Effective Rate</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Conservative ($5,000 More Deduct)</h4>
+                                <div class="comparison-value positive" id="more-deductions-refund-desktop">$2,600</div>
+                                <div class="comparison-label">Refund</div>
+                                <div class="comparison-value" id="more-deductions-effective-desktop">12.8%</div>
+                                <div class="comparison-label">Effective Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('standard-tab').classList.remove('active');
+            document.getElementById('detailed-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('standard-tab-desktop').classList.remove('active');
+            document.getElementById('detailed-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Tax calculation functions
+        function calculateTaxRefund() {
+            const filingStatus = document.getElementById('filing-status').value;
+            const grossIncome = parseFloat(document.getElementById('gross-income').value) || 0;
+            const federalWithheld = parseFloat(document.getElementById('federal-withheld').value) || 0;
+            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+            const dependents = parseInt(document.getElementById('dependents').value) || 0;
+            
+            calculateResult(filingStatus, grossIncome, federalWithheld, deductions, dependents, 0, 0, 'mobile');
+            calculateComparison(grossIncome, federalWithheld, deductions, dependents, 0, 0, 'mobile');
+        }
+        
+        function calculateTaxRefundDesktop() {
+            const filingStatus = document.getElementById('filing-status-desktop').value;
+            const grossIncome = parseFloat(document.getElementById('gross-income-desktop').value) || 0;
+            const federalWithheld = parseFloat(document.getElementById('federal-withheld-desktop').value) || 0;
+            const deductions = parseFloat(document.getElementById('deductions-desktop').value) || 0;
+            const dependents = parseInt(document.getElementById('dependents-desktop').value) || 0;
+            const stateTaxRate = parseFloat(document.getElementById('state-tax').value) || 0;
+            
+            calculateResult(filingStatus, grossIncome, federalWithheld, deductions, dependents, stateTaxRate, 2000, 'desktop');
+            calculateComparison(grossIncome, federalWithheld, deductions, dependents, stateTaxRate, 2000, 'desktop');
+        }
+        
+        function calculateResult(filingStatus, grossIncome, federalWithheld, deductions, dependents, stateTaxRate, childCredit, device) {
+            // Calculate taxable income
+            const taxableIncome = Math.max(0, grossIncome - deductions);
+            
+            // Calculate federal tax using 2023 tax brackets
+            let federalTax = 0;
+            const brackets = getTaxBrackets(filingStatus);
+            
+            let remainingIncome = taxableIncome;
+            let previousBracketLimit = 0;
+            
+            for (let i = 0; i < brackets.length; i++) {
+                const bracket = brackets[i];
+                const bracketLimit = bracket.limit === Infinity ? taxableIncome : bracket.limit;
+                const bracketIncome = Math.min(remainingIncome, bracketLimit - previousBracketLimit);
+                
+                if (bracketIncome > 0) {
+                    federalTax += bracketIncome * bracket.rate;
+                    remainingIncome -= bracketIncome;
+                    previousBracketLimit = bracketLimit;
+                }
+                
+                if (remainingIncome <= 0) break;
+            }
+            
+            // Apply child tax credit
+            const totalChildCredit = childCredit * dependents;
+            federalTax = Math.max(0, federalTax - totalChildCredit);
+            
+            // Calculate state tax
+            const stateTax = taxableIncome * (stateTaxRate / 100);
+            
+            // Total tax owed
+            const totalTaxOwed = federalTax + stateTax;
+            
+            // Calculate refund
+            const refund = Math.max(0, federalWithheld - totalTaxOwed);
+            const amountOwed = Math.max(0, totalTaxOwed - federalWithheld);
+            
+            // Effective tax rate
+            const effectiveRate = grossIncome > 0 ? (totalTaxOwed / grossIncome) * 100 : 0;
+            
+            // Update UI
+            const refundAmountElement = device === 'mobile' ? document.getElementById('refund-amount') : document.getElementById('refund-amount-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const grossIncomeDisplayElement = device === 'mobile' ? document.getElementById('gross-income-display') : document.getElementById('gross-income-display-desktop');
+            const taxableIncomeElement = device === 'mobile' ? document.getElementById('taxable-income') : document.getElementById('taxable-income-desktop');
+            const taxOwedElement = device === 'mobile' ? document.getElementById('tax-owed') : document.getElementById('tax-owed-desktop');
+            const taxBreakdownElement = device === 'mobile' ? document.getElementById('tax-breakdown') : document.getElementById('tax-breakdown-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const summaryElement = device === 'mobile' ? document.querySelector('.summary-section p') : document.querySelector('.summary-section p');
+            
+            // Set refund amount color and text
+            if (refund > 0) {
+                refundAmountElement.textContent = `$${refund.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+                refundAmountElement.className = 'result-amount positive';
+            } else if (amountOwed > 0) {
+                refundAmountElement.textContent = `-$${amountOwed.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+                refundAmountElement.className = 'result-amount negative';
+            } else {
+                refundAmountElement.textContent = '$0';
+                refundAmountElement.className = 'result-amount';
+            }
+            
+            resultDescriptionElement.textContent = `Taxable Income: $${taxableIncome.toLocaleString()} | Taxes Owed: $${totalTaxOwed.toLocaleString(undefined, {maximumFractionDigits: 0})} | ${refund > 0 ? 'Refund' : 'Amount Owed'}: $${Math.abs(refund - amountOwed).toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            grossIncomeDisplayElement.textContent = `$${grossIncome.toLocaleString()}`;
+            taxableIncomeElement.textContent = `$${taxableIncome.toLocaleString()}`;
+            taxOwedElement.textContent = `$${federalTax.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const stateTaxOwedElement = document.getElementById('state-tax-owed');
+                stateTaxOwedElement.textContent = `$${stateTax.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            }
+            
+            // Update tax breakdown
+            taxBreakdownElement.innerHTML = '';
+            
+            const grossItem = document.createElement('div');
+            grossItem.className = 'entry-item';
+            grossItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-money-bill-wave"></i> Gross Income</span>
+                <span class="entry-amount">$${grossIncome.toLocaleString()}</span>
+            `;
+            taxBreakdownElement.appendChild(grossItem);
+            
+            const deductionItem = document.createElement('div');
+            deductionItem.className = 'entry-item';
+            deductionItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-minus-circle"></i> Deductions</span>
+                <span class="entry-amount">-$${deductions.toLocaleString()}</span>
+            `;
+            taxBreakdownElement.appendChild(deductionItem);
+            
+            const taxableItem = document.createElement('div');
+            taxableItem.className = 'entry-item';
+            taxableItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-percentage"></i> Taxable Income</span>
+                <span class="entry-amount">$${taxableIncome.toLocaleString()}</span>
+            `;
+            taxBreakdownElement.appendChild(taxableItem);
+            
+            const federalItem = document.createElement('div');
+            federalItem.className = 'entry-item';
+            federalItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-receipt"></i> Federal Tax</span>
+                <span class="entry-amount negative">-$${federalTax.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+            `;
+            taxBreakdownElement.appendChild(federalItem);
+            
+            // Desktop additional items
+            if (device === 'desktop') {
+                const stateItem = document.createElement('div');
+                stateItem.className = 'entry-item';
+                stateItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-map-marker-alt"></i> State Tax</span>
+                    <span class="entry-amount negative">-$${stateTax.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                `;
+                taxBreakdownElement.appendChild(stateItem);
+                
+                if (childCredit > 0) {
+                    const creditItem = document.createElement('div');
+                    creditItem.className = 'entry-item';
+                    creditItem.innerHTML = `
+                        <span class="entry-name"><i class="fas fa-child"></i> Child Tax Credit</span>
+                        <span class="entry-amount positive">$${totalChildCredit.toLocaleString()}</span>
+                    `;
+                    taxBreakdownElement.appendChild(creditItem);
+                }
+            }
+            
+            const withheldItem = document.createElement('div');
+            withheldItem.className = 'entry-item';
+            withheldItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-coins"></i> Total Tax Withheld</span>
+                <span class="entry-amount">$${federalWithheld.toLocaleString()}</span>
+            `;
+            taxBreakdownElement.appendChild(withheldItem);
+            
+            const refundItem = document.createElement('div');
+            refundItem.className = 'entry-item';
+            refundItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-hand-holding-usd"></i> ${refund > 0 ? 'Refund' : 'Amount Owed'}</span>
+                <span class="entry-amount ${refund > 0 ? 'positive' : 'negative'}">$${Math.abs(refund - amountOwed).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+            `;
+            taxBreakdownElement.appendChild(refundItem);
+            
+            // Update summary
+            let summaryText = '';
+            if (refund > 0) {
+                summaryText = `Based on your inputs, you're estimated to receive a $${refund.toLocaleString(undefined, {maximumFractionDigits: 0})} tax refund. This represents a ${effectiveRate.toFixed(2)}% effective tax rate on your gross income. Your refund represents ${(refund/grossIncome*100).toFixed(2)}% of your gross income.`;
+            } else if (amountOwed > 0) {
+                summaryText = `Based on your inputs, you're estimated to owe $${amountOwed.toLocaleString(undefined, {maximumFractionDigits: 0})} in taxes. This represents a ${effectiveRate.toFixed(2)}% effective tax rate on your gross income. Consider adjusting your withholding to avoid a large payment next year.`;
+            } else {
+                summaryText = `Based on your inputs, your taxes are perfectly balanced - you neither owe nor receive a refund. This represents a ${effectiveRate.toFixed(2)}% effective tax rate on your gross income.`;
+            }
+            
+            // Desktop additional summary
+            if (device === 'desktop') {
+                summaryText += ` With ${dependents} dependents, you qualify for tax benefits which ${childCredit > 0 ? 'increased' : 'would increase'} your refund.`;
+            }
+            summaryElement.textContent = summaryText;
+            
+            // Generate chart
+            generateChart(grossIncome, taxableIncome, federalTax, stateTax, refund, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (totalTaxOwed / grossIncome) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function getTaxBrackets(filingStatus) {
+            // 2023 Federal Tax Brackets
+            if (filingStatus === 'single') {
+                return [
+                    { limit: 11000, rate: 0.10 },
+                    { limit: 44725, rate: 0.12 },
+                    { limit: 95375, rate: 0.22 },
+                    { limit: 182100, rate: 0.24 },
+                    { limit: 231250, rate: 0.32 },
+                    { limit: 578125, rate: 0.35 },
+                    { limit: Infinity, rate: 0.37 }
+                ];
+            } else if (filingStatus === 'married') {
+                return [
+                    { limit: 22000, rate: 0.10 },
+                    { limit: 89450, rate: 0.12 },
+                    { limit: 190750, rate: 0.22 },
+                    { limit: 364200, rate: 0.24 },
+                    { limit: 462500, rate: 0.32 },
+                    { limit: 693750, rate: 0.35 },
+                    { limit: Infinity, rate: 0.37 }
+                ];
+            } else if (filingStatus === 'head') {
+                return [
+                    { limit: 15700, rate: 0.10 },
+                    { limit: 59850, rate: 0.12 },
+                    { limit: 95350, rate: 0.22 },
+                    { limit: 182100, rate: 0.24 },
+                    { limit: 231250, rate: 0.32 },
+                    { limit: 578100, rate: 0.35 },
+                    { limit: Infinity, rate: 0.37 }
+                ];
+            } else { // separate
+                return [
+                    { limit: 11000, rate: 0.10 },
+                    { limit: 44725, rate: 0.12 },
+                    { limit: 95375, rate: 0.22 },
+                    { limit: 182100, rate: 0.24 },
+                    { limit: 231250, rate: 0.32 },
+                    { limit: 346875, rate: 0.35 },
+                    { limit: Infinity, rate: 0.37 }
+                ];
+            }
+        }
+        
+        function calculateComparison(grossIncome, federalWithheld, deductions, dependents, stateTaxRate, childCredit, device) {
+            // Calculate for 10% higher income
+            const higherIncome = grossIncome * 1.10;
+            const higherIncomeTaxable = Math.max(0, higherIncome - deductions);
+            const higherIncomeBrackets = getTaxBrackets('married'); // Using default for comparison
+            
+            let higherIncomeTax = 0;
+            let remainingIncome = higherIncomeTaxable;
+            let previousBracketLimit = 0;
+            
+            for (let i = 0; i < higherIncomeBrackets.length; i++) {
+                const bracket = higherIncomeBrackets[i];
+                const bracketLimit = bracket.limit === Infinity ? higherIncomeTaxable : bracket.limit;
+                const bracketIncome = Math.min(remainingIncome, bracketLimit - previousBracketLimit);
+                
+                if (bracketIncome > 0) {
+                    higherIncomeTax += bracketIncome * bracket.rate;
+                    remainingIncome -= bracketIncome;
+                    previousBracketLimit = bracketLimit;
+                }
+                
+                if (remainingIncome <= 0) break;
+            }
+            
+            const higherIncomeStateTax = higherIncomeTaxable * (stateTaxRate / 100);
+            const higherIncomeTotalTax = higherIncomeTax + higherIncomeStateTax - (childCredit * dependents);
+            const higherIncomeRefund = Math.max(0, federalWithheld - higherIncomeTotalTax);
+            const higherIncomeEffective = higherIncome > 0 ? (higherIncomeTotalTax / higherIncome) * 100 : 0;
+            
+            // Calculate for $5,000 more deductions
+            const moreDeductions = deductions + 5000;
+            const moreDeductionsTaxable = Math.max(0, grossIncome - moreDeductions);
+            
+            let moreDeductionsTax = 0;
+            remainingIncome = moreDeductionsTaxable;
+            previousBracketLimit = 0;
+            
+            for (let i = 0; i < higherIncomeBrackets.length; i++) {
+                const bracket = higherIncomeBrackets[i];
+                const bracketLimit = bracket.limit === Infinity ? moreDeductionsTaxable : bracket.limit;
+                const bracketIncome = Math.min(remainingIncome, bracketLimit - previousBracketLimit);
+                
+                if (bracketIncome > 0) {
+                    moreDeductionsTax += bracketIncome * bracket.rate;
+                    remainingIncome -= bracketIncome;
+                    previousBracketLimit = bracketLimit;
+                }
+                
+                if (remainingIncome <= 0) break;
+            }
+            
+            const moreDeductionsStateTax = moreDeductionsTaxable * (stateTaxRate / 100);
+            const moreDeductionsTotalTax = moreDeductionsTax + moreDeductionsStateTax - (childCredit * dependents);
+            const moreDeductionsRefund = Math.max(0, federalWithheld - moreDeductionsTotalTax);
+            const moreDeductionsEffective = grossIncome > 0 ? (moreDeductionsTotalTax / grossIncome) * 100 : 0;
+            
+            // Update comparison UI
+            const higherIncomeRefundElement = device === 'mobile' ? document.getElementById('higher-income-refund') : document.getElementById('higher-income-refund-desktop');
+            const moreDeductionsRefundElement = device === 'mobile' ? document.getElementById('more-deductions-refund') : document.getElementById('more-deductions-refund-desktop');
+            
+            higherIncomeRefundElement.textContent = `$${higherIncomeRefund.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            moreDeductionsRefundElement.textContent = `$${moreDeductionsRefund.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const higherIncomeEffectiveElement = document.getElementById('higher-income-effective-desktop');
+                const moreDeductionsEffectiveElement = document.getElementById('more-deductions-effective-desktop');
+                
+                higherIncomeEffectiveElement.textContent = `${higherIncomeEffective.toFixed(1)}%`;
+                moreDeductionsEffectiveElement.textContent = `${moreDeductionsEffective.toFixed(1)}%`;
+            }
+        }
+        
+        function generateChart(grossIncome, taxableIncome, federalTax, stateTax, refund, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(grossIncome, federalTax + stateTax);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Gross income bar
+            const incomeBar = document.createElement('div');
+            incomeBar.className = 'chart-bar income-bar';
+            const incomeHeight = maxValue > 0 ? (grossIncome / maxValue) * maxHeight : 0;
+            incomeBar.style.height = incomeHeight + 'px';
+            incomeBar.textContent = `$${(grossIncome/1000).toFixed(0)}k`;
+            
+            const incomeLabel = document.createElement('div');
+            incomeLabel.className = 'chart-label';
+            incomeLabel.textContent = 'Gross';
+            
+            const incomeContainer = document.createElement('div');
+            incomeContainer.style.display = 'flex';
+            incomeContainer.style.flexDirection = 'column';
+            incomeContainer.style.alignItems = 'center';
+            incomeContainer.style.margin = '0 5px';
+            
+            incomeContainer.appendChild(incomeBar);
+            incomeContainer.appendChild(incomeLabel);
+            
+            // Taxable income bar
+            const taxableBar = document.createElement('div');
+            taxableBar.className = 'chart-bar deduction-bar';
+            const taxableHeight = maxValue > 0 ? (taxableIncome / maxValue) * maxHeight : 0;
+            taxableBar.style.height = taxableHeight + 'px';
+            taxableBar.textContent = `$${(taxableIncome/1000).toFixed(0)}k`;
+            
+            const taxableLabel = document.createElement('div');
+            taxableLabel.className = 'chart-label';
+            taxableLabel.textContent = 'Taxable';
+            
+            const taxableContainer = document.createElement('div');
+            taxableContainer.style.display = 'flex';
+            taxableContainer.style.flexDirection = 'column';
+            taxableContainer.style.alignItems = 'center';
+            taxableContainer.style.margin = '0 5px';
+            
+            taxableContainer.appendChild(taxableBar);
+            taxableContainer.appendChild(taxableLabel);
+            
+            // Tax bar
+            const taxBar = document.createElement('div');
+            taxBar.className = 'chart-bar tax-bar';
+            const taxHeight = maxValue > 0 ? ((federalTax + stateTax) / maxValue) * maxHeight : 0;
+            taxBar.style.height = taxHeight + 'px';
+            taxBar.textContent = `$${((federalTax + stateTax)/1000).toFixed(0)}k`;
+            
+            const taxLabel = document.createElement('div');
+            taxLabel.className = 'chart-label';
+            taxLabel.textContent = 'Taxes';
+            
+            const taxContainer = document.createElement('div');
+            taxContainer.style.display = 'flex';
+            taxContainer.style.flexDirection = 'column';
+            taxContainer.style.alignItems = 'center';
+            taxContainer.style.margin = '0 5px';
+            
+            taxContainer.appendChild(taxBar);
+            taxContainer.appendChild(taxLabel);
+            
+            // Refund bar
+            const refundBar = document.createElement('div');
+            refundBar.className = 'chart-bar refund-bar';
+            const refundHeight = maxValue > 0 ? (Math.abs(refund) / maxValue) * maxHeight : 0;
+            refundBar.style.height = refundHeight + 'px';
+            refundBar.textContent = `$${(Math.abs(refund)/1000).toFixed(0)}k`;
+            
+            const refundLabel = document.createElement('div');
+            refundLabel.className = 'chart-label';
+            refundLabel.textContent = refund >= 0 ? 'Refund' : 'Owed';
+            
+            const refundContainer = document.createElement('div');
+            refundContainer.style.display = 'flex';
+            refundContainer.style.flexDirection = 'column';
+            refundContainer.style.alignItems = 'center';
+            refundContainer.style.margin = '0 5px';
+            
+            refundContainer.appendChild(refundBar);
+            refundContainer.appendChild(refundLabel);
+            
+            container.appendChild(incomeContainer);
+            container.appendChild(taxableContainer);
+            container.appendChild(taxContainer);
+            container.appendChild(refundContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateTaxRefund();
+            calculateTaxRefundDesktop();
+        };
+    </script>
+</body>
+</html>

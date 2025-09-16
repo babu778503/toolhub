@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<!-- Category: Cooking -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egg Boiling Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            text-align: center;
+            padding: 40px 20px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f8f8;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            flex: 1;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #FFC107, #FF9800);
+            color: #333;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #F44336, #D32F2F);
+            color: white;
+            flex: 1;
+        }
+        
+        .egg-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .egg-btn {
+            padding: 15px 5px;
+            background: linear-gradient(to bottom, #ff8e8e, #ff6b6b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .egg-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #ffd700, #ff9800);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .egg-btn:hover {
+            background: linear-gradient(to bottom, #ff9a9e, #ff8e8e);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .egg-btn:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .time-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .time-input input {
+            width: 80px;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .time-input input:focus {
+            border-color: #ff6b6b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+        }
+        
+        .time-input label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .set-time-btn {
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: flex-end;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .set-time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-container {
+            padding: 0 20px 20px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer-state {
+            text-align: center;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #555;
+            font-size: 18px;
+        }
+        
+        .timer-state.running {
+            color: #4CAF50;
+        }
+        
+        .timer-state.paused {
+            color: #FFC107;
+        }
+        
+        .timer-state.stopped {
+            color: #F44336;
+        }
+        
+        .egg-visualization {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        
+        .egg-container {
+            position: relative;
+            width: 120px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        
+        .egg {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 100px;
+            background: #fff9c4;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .egg-shell {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid #ffd54f;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+        
+        .egg-white {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: #ffffff;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+        
+        .egg-yolk {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: #ffd54f;
+            border-radius: 50%;
+            transition: all 0.5s ease;
+        }
+        
+        .egg-yolk.runny {
+            background: #ffd54f;
+        }
+        
+        .egg-yolk.medium {
+            background: #ffb300;
+        }
+        
+        .egg-yolk.hard {
+            background: #ff8f00;
+        }
+        
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0%;
+            background: linear-gradient(to top, #4fc3f7, #29b6f6);
+            border-radius: 50%;
+            transition: height 0.5s ease;
+            opacity: 0.7;
+        }
+        
+        .bubbles {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .bubbles.active {
+            opacity: 1;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            bottom: 0;
+            animation: bubble-rise 3s infinite;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-150px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        .egg-status {
+            font-weight: bold;
+            font-size: 18px;
+            color: #ff6b6b;
+            margin-top: 10px;
+        }
+        
+        .sound-toggle {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px 20px;
+        }
+        
+        .sound-btn {
+            background: #607D8B;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-btn.active {
+            background: #2196F3;
+        }
+        
+        .egg-info {
+            padding: 0 20px 20px;
+            background: #fff8e1;
+            margin: 0 20px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .egg-info h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .egg-info ul {
+            padding-left: 20px;
+        }
+        
+        .egg-info li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .timer-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 0 20px 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 50px;
+                padding: 30px 15px;
+            }
+            
+            .btn {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            
+            .egg-types {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 15px 20px;
+            }
+            
+            .egg-btn {
+                padding: 12px 5px;
+                font-size: 14px;
+            }
+            
+            .time-input {
+                gap: 5px;
+                padding: 0 15px 15px;
+            }
+            
+            .time-input input {
+                width: 60px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .egg-container {
+                width: 100px;
+                height: 120px;
+            }
+            
+            .egg {
+                width: 60px;
+                height: 80px;
+            }
+            
+            .timer-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Egg Boiling Timer
+        </div>
+        
+        <div class="timer-state" id="timerState">Ready to boil eggs</div>
+        
+        <div class="timer-display" id="display">00:00:00</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="timer-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="eggTypeStat">Soft</div>
+                <div class="stat-label">Egg Type</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="eggCountStat">1</div>
+                <div class="stat-label">Egg Count</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="timeStat">0 min</div>
+                <div class="stat-label">Boil Time</div>
+            </div>
+        </div>
+        
+        <div class="egg-visualization">
+            <div class="egg-container">
+                <div class="water" id="waterLevel"></div>
+                <div class="bubbles" id="bubbles"></div>
+                <div class="egg">
+                    <div class="egg-shell"></div>
+                    <div class="egg-white"></div>
+                    <div class="egg-yolk" id="eggYolk"></div>
+                </div>
+            </div>
+            <div class="egg-status" id="eggStatus">Eggs ready to boil</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn" id="startBtn">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button class="btn pause-btn" id="pauseBtn">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="sound-toggle">
+            <button class="sound-btn" id="soundBtn">
+                <i class="fas fa-volume-up"></i> Sound
+            </button>
+        </div>
+        
+        <div class="time-input">
+            <label>
+                Minutes
+                <input type="number" id="minutes" min="0" max="59" value="0">
+            </label>
+            <label>
+                Seconds
+                <input type="number" id="seconds" min="0" max="59" value="0">
+            </label>
+            <button class="set-time-btn" id="setTimeBtn">
+                <i class="fas fa-clock"></i> Set
+            </button>
+        </div>
+        
+        <div class="egg-types">
+            <button class="egg-btn" data-time="180" data-type="Soft" data-yolk="runny">
+                <i class="fas fa-egg"></i>
+                <span>Soft Boiled</span>
+                <small>3 min</small>
+            </button>
+            <button class="egg-btn" data-time="300" data-type="Medium" data-yolk="medium">
+                <i class="fas fa-egg"></i>
+                <span>Medium</span>
+                <small>5 min</small>
+            </button>
+            <button class="egg-btn" data-time="600" data-type="Hard" data-yolk="hard">
+                <i class="fas fa-egg"></i>
+                <span>Hard Boiled</span>
+                <small>10 min</small>
+            </button>
+            <button class="egg-btn" data-time="60" data-type="Poached" data-yolk="runny">
+                <i class="fas fa-water"></i>
+                <span>Poached</span>
+                <small>1 min</small>
+            </button>
+            <button class="egg-btn" data-time="420" data-type="Jammy" data-yolk="medium">
+                <i class="fas fa-egg"></i>
+                <span>Jammy</span>
+                <small>7 min</small>
+            </button>
+            <button class="egg-btn" data-time="120" data-type="Soft-Soft" data-yolk="runny">
+                <i class="fas fa-egg"></i>
+                <span>Very Soft</span>
+                <small>2 min</small>
+            </button>
+        </div>
+        
+        <div class="egg-info">
+            <h3><i class="fas fa-lightbulb"></i> Egg Boiling Tips</h3>
+            <ul>
+                <li>Start with cold water and bring to a boil with eggs in the pot</li>
+                <li>Use eggs at room temperature for more even cooking</li>
+                <li>Add a pinch of salt to the water to prevent cracking</li>
+                <li>For easy peeling, use eggs that are at least a week old</li>
+                <li>Transfer boiled eggs to ice water immediately to stop cooking</li>
+                <li>Roll boiled eggs gently on the counter to crack the shell all over for easier peeling</li>
+            </ul>
+        </div>
+    </div>
+
+    <audio id="alarmSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Timer variables
+        let timer;
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let initialSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let soundEnabled = true;
+        let currentEggType = 'Soft';
+        let currentYolkType = 'runny';
+        let eggCount = 1;
+        
+        // DOM elements
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const setTimeBtn = document.getElementById('setTimeBtn');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+        const eggButtons = document.querySelectorAll('.egg-btn');
+        const timerState = document.getElementById('timerState');
+        const progressFill = document.getElementById('progressFill');
+        const soundBtn = document.getElementById('soundBtn');
+        const alarmSound = document.getElementById('alarmSound');
+        const waterLevel = document.getElementById('waterLevel');
+        const bubbles = document.getElementById('bubbles');
+        const eggYolk = document.getElementById('eggYolk');
+        const eggStatus = document.getElementById('eggStatus');
+        const eggTypeStat = document.getElementById('eggTypeStat');
+        const eggCountStat = document.getElementById('eggCountStat');
+        const timeStat = document.getElementById('timeStat');
+        
+        // Format time to HH:MM:SS
+        function formatTime(total) {
+            const hrs = Math.floor(total / 3600);
+            const mins = Math.floor((total % 3600) / 60);
+            const secs = total % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update display
+        function updateDisplay() {
+            display.textContent = formatTime(totalSeconds);
+            
+            // Update progress bar
+            if (initialSeconds > 0) {
+                const progress = ((initialSeconds - totalSeconds) / initialSeconds) * 100;
+                progressFill.style.width = `${progress}%`;
+                
+                // Update water visualization
+                const waterHeight = (initialSeconds - totalSeconds) / initialSeconds * 100;
+                waterLevel.style.height = `${waterHeight}%`;
+            } else {
+                progressFill.style.width = '0%';
+                waterLevel.style.height = '0%';
+            }
+        }
+        
+        // Update timer state display
+        function updateTimerState(state) {
+            timerState.textContent = state;
+            timerState.className = 'timer-state ' + (isRunning ? 'running' : isPaused ? 'paused' : 'stopped');
+        }
+        
+        // Update egg status
+        function updateEggStatus(status) {
+            eggStatus.textContent = status;
+            if (status.includes('Boiling') || status.includes('Ready')) {
+                eggStatus.style.color = '#4CAF50';
+                bubbles.classList.add('active');
+                createBubbles();
+            } else if (status.includes('Heating') || status.includes('Almost')) {
+                eggStatus.style.color = '#FFC107';
+                bubbles.classList.add('active');
+                createBubbles();
+            } else {
+                eggStatus.style.color = '#ff6b6b';
+                bubbles.classList.remove('active');
+            }
+        }
+        
+        // Update stats
+        function updateStats() {
+            eggTypeStat.textContent = currentEggType;
+            eggCountStat.textContent = eggCount;
+            timeStat.textContent = Math.ceil(initialSeconds / 60) + ' min';
+        }
+        
+        // Create bubbles animation
+        function createBubbles() {
+            bubbles.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = (Math.random() * 8 + 4) + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = (Math.random() * 2) + 's';
+                bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                bubbles.appendChild(bubble);
+            }
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (totalSeconds > 0) {
+                if (!isRunning) {
+                    isRunning = true;
+                    isPaused = false;
+                    updateTimerState("Eggs boiling...");
+                    updateEggStatus("Eggs boiling...");
+                    
+                    timer = setInterval(() => {
+                        totalSeconds--;
+                        updateDisplay();
+                        
+                        // Update egg status based on time remaining
+                        const progress = (initialSeconds - totalSeconds) / initialSeconds;
+                        if (progress < 0.3) {
+                            updateEggStatus("Eggs heating up...");
+                        } else if (progress < 0.7) {
+                            updateEggStatus("Eggs boiling...");
+                        } else if (progress < 0.95) {
+                            updateEggStatus("Almost ready...");
+                        }
+                        
+                        // Update yolk appearance
+                        if (progress > 0.5) {
+                            eggYolk.className = 'egg-yolk ' + currentYolkType;
+                        }
+                        
+                        if (totalSeconds <= 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            isPaused = false;
+                            updateTimerState("Eggs are ready!");
+                            updateEggStatus("Eggs are ready! Transfer to ice water.");
+                            display.textContent = "00:00:00";
+                            progressFill.style.width = '100%';
+                            waterLevel.style.height = '100%';
+                            
+                            if (soundEnabled) {
+                                alarmSound.play();
+                            }
+                            
+                            // Flash effect
+                            display.style.color = '#4CAF50';
+                            setTimeout(() => {
+                                display.style.color = '#333';
+                            }, 500);
+                            
+                            setTimeout(() => {
+                                if (soundEnabled) {
+                                    alarmSound.play();
+                                }
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                updateTimerState("Boiling paused");
+                updateEggStatus("Boiling paused");
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            totalSeconds = 0;
+            initialSeconds = 0;
+            updateDisplay();
+            updateTimerState("Ready to boil eggs");
+            updateEggStatus("Eggs ready to boil");
+            progressFill.style.width = '0%';
+            waterLevel.style.height = '0%';
+            eggYolk.className = 'egg-yolk';
+        }
+        
+        // Set custom time
+        function setCustomTime() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            totalSeconds = mins * 60 + secs;
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Boiling time set");
+            updateEggStatus("Ready to boil eggs");
+            updateStats();
+        }
+        
+        // Set egg type and time
+        function setEggType(time, type, yolk) {
+            totalSeconds = parseInt(time);
+            initialSeconds = totalSeconds;
+            currentEggType = type;
+            currentYolkType = yolk;
+            updateDisplay();
+            updateTimerState(`${type} eggs time set`);
+            updateEggStatus(`Ready to boil ${type} eggs`);
+            updateStats();
+        }
+        
+        // Toggle sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundBtn.classList.toggle('active', soundEnabled);
+            soundBtn.innerHTML = soundEnabled ? 
+                '<i class="fas fa-volume-up"></i> Sound On' : 
+                '<i class="fas fa-volume-mute"></i> Sound Off';
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        setTimeBtn.addEventListener('click', setCustomTime);
+        soundBtn.addEventListener('click', toggleSound);
+        
+        eggButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const time = button.getAttribute('data-time');
+                const type = button.getAttribute('data-type');
+                const yolk = button.getAttribute('data-yolk');
+                setEggType(time, type, yolk);
+            });
+        });
+        
+        // Initialize
+        updateDisplay();
+        updateTimerState("Ready to boil eggs");
+        soundBtn.classList.add('active');
+        updateEggStatus("Eggs ready to boil");
+        updateStats();
+        createBubbles();
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.code === 'Escape') {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1491 @@
+<!-- Category: Food & Nutrition -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Desktop Styles */
+        .desktop-view {
+            display: block;
+        }
+
+        .mobile-view {
+            display: none;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h1 i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+        }
+
+        .meal-planner-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            height: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #4a5568;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .meal-type {
+            margin-bottom: 25px;
+        }
+
+        .meal-type h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .meal-type h3 i {
+            color: #667eea;
+        }
+
+        .meal-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8fafc;
+            margin-bottom: 10px;
+        }
+
+        .meal-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+        }
+
+        .meal-plan {
+            margin-top: 30px;
+        }
+
+        .week-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background: #f7fafc;
+            padding: 15px 20px;
+            border-radius: 12px;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .current-week {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 18px;
+        }
+
+        .day-plan {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .day-plan:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .day-header {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .day-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .day-header i {
+            color: #667eea;
+        }
+
+        .meal-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .meal-item:last-child {
+            border-bottom: none;
+        }
+
+        .meal-label {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 110px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meal-label i {
+            color: #764ba2;
+            font-size: 14px;
+        }
+
+        .meal-value {
+            flex: 1;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .empty-meal {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #c53030;
+        }
+
+        .meal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .stats-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .meal-suggestions {
+            background: #f0fff4;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid #48bb78;
+        }
+
+        .suggestions-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2f855a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .suggestion-item:hover {
+            background: #ebf8ff;
+            transform: translateX(5px);
+        }
+
+        .grocery-list {
+            background: #fff5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .grocery-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #c53030;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .grocery-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #fed7d7;
+        }
+
+        .grocery-checkbox {
+            margin-right: 10px;
+        }
+
+        .grocery-text {
+            flex: 1;
+        }
+
+        .grocery-item.checked .grocery-text {
+            text-decoration: line-through;
+            color: #a0aec0;
+        }
+
+        .export-section {
+            background: #ebf8ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid #3182ce;
+        }
+
+        .export-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2b6cb0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            background: #3182ce;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .export-btn:hover {
+            background: #2c5282;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease-in-out;
+            z-index: 10000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .desktop-view {
+                display: none;
+            }
+
+            .mobile-view {
+                display: block;
+            }
+
+            header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 15px;
+                text-align: center;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                border-radius: 0 0 15px 15px;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+                color: white;
+                gap: 10px;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            }
+
+            h1 i {
+                font-size: 20px;
+            }
+
+            .mobile-container {
+                padding: 0 15px 20px;
+                max-width: 100%;
+            }
+
+            .mobile-card {
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                border: 1px solid rgba(255,255,255,0.3);
+            }
+
+            .mobile-section-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+                color: #4a5568;
+                text-align: center;
+                font-weight: 700;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #667eea;
+            }
+
+            .mobile-meal-input {
+                width: 100%;
+                padding: 14px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 16px;
+                margin-bottom: 15px;
+                background: #f8fafc;
+            }
+
+            .mobile-btn {
+                width: 100%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 14px;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-bottom: 10px;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+
+            .mobile-btn-secondary {
+                background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+                box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            }
+
+            .mobile-btn-warning {
+                background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+                box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+            }
+
+            .mobile-day-plan {
+                background: #f7fafc;
+                border-radius: 12px;
+                padding: 18px;
+                margin-bottom: 18px;
+                border-left: 4px solid #667eea;
+            }
+
+            .mobile-day-header {
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 15px;
+                color: #2d3748;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            .mobile-day-header-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .mobile-meal-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px 0;
+                border-bottom: 1px solid #e2e8f0;
+                font-size: 14px;
+            }
+
+            .mobile-meal-item:last-child {
+                border-bottom: none;
+            }
+
+            .mobile-meal-label {
+                font-weight: 600;
+                color: #4a5568;
+                min-width: 80px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .mobile-meal-label i {
+                color: #764ba2;
+                font-size: 12px;
+            }
+
+            .mobile-meal-value {
+                flex: 1;
+                color: #718096;
+                text-align: right;
+                font-weight: 500;
+            }
+
+            .mobile-week-nav {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                background: #f7fafc;
+                padding: 12px 15px;
+                border-radius: 10px;
+            }
+
+            .mobile-nav-btn {
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+            }
+
+            .mobile-current-week {
+                font-weight: 600;
+                color: #4a5568;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            .mobile-stats-card {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 12px;
+                padding: 18px;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+            .mobile-stats-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+
+            .mobile-stats-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .mobile-stat-item {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .mobile-stat-number {
+                font-size: 20px;
+                font-weight: 700;
+                margin-bottom: 3px;
+            }
+
+            .mobile-stat-label {
+                font-size: 12px;
+                opacity: 0.9;
+            }
+
+            .mobile-suggestions, .mobile-grocery-list, .mobile-export-section {
+                background: white;
+                border-radius: 12px;
+                padding: 15px;
+                margin-top: 15px;
+                border-left: 3px solid #667eea;
+            }
+
+            .mobile-section-small-title {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 12px;
+                color: #4a5568;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .mobile-suggestion-item {
+                padding: 10px;
+                background: #f7fafc;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                font-size: 14px;
+                cursor: pointer;
+                border: 1px solid #e2e8f0;
+            }
+
+            .mobile-grocery-item {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                background: #fff5f5;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .mobile-grocery-checkbox {
+                margin-right: 10px;
+                transform: scale(0.9);
+            }
+
+            .mobile-export-buttons {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .mobile-export-btn {
+                background: #3182ce;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .mobile-export-btn i {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mobile-export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop View -->
+    <div class="desktop-view">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-utensils"></i> Meal Planner</h1>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="meal-planner-grid">
+                <div class="sidebar">
+                    <h2 class="section-title">Plan Your Meals</h2>
+                    <div class="meal-type">
+                        <h3><i class="fas fa-sun"></i> Breakfast</h3>
+                        <input type="text" class="meal-input" id="breakfast-input" placeholder="What's for breakfast?">
+                    </div>
+                    <div class="meal-type">
+                        <h3><i class="fas fa-cloud-sun"></i> Lunch</h3>
+                        <input type="text" class="meal-input" id="lunch-input" placeholder="What's for lunch?">
+                    </div>
+                    <div class="meal-type">
+                        <h3><i class="fas fa-moon"></i> Dinner</h3>
+                        <input type="text" class="meal-input" id="dinner-input" placeholder="What's for dinner?">
+                    </div>
+                    <div class="meal-type">
+                        <h3><i class="fas fa-apple-alt"></i> Snacks</h3>
+                        <input type="text" class="meal-input" id="snacks-input" placeholder="Any snacks?">
+                    </div>
+                    <div class="meal-type">
+                        <h3><i class="fas fa-calendar-day"></i> Day</h3>
+                        <select class="meal-input" id="day-select">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="meal-actions">
+                        <button class="btn" id="add-meal-btn"><i class="fas fa-plus"></i> Add to Plan</button>
+                        <button class="btn btn-secondary" id="clear-btn"><i class="fas fa-broom"></i> Clear All</button>
+                        <button class="btn btn-warning" id="generate-btn"><i class="fas fa-magic"></i> Generate Ideas</button>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-title"><i class="fas fa-chart-pie"></i> Weekly Statistics</div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="total-meals">0</div>
+                                <div class="stat-label">Meals Planned</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="days-planned">0</div>
+                                <div class="stat-label">Days Planned</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="healthy-meals">0</div>
+                                <div class="stat-label">Healthy Meals</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="variety-score">0%</div>
+                                <div class="stat-label">Variety</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="meal-suggestions">
+                        <div class="suggestions-title"><i class="fas fa-lightbulb"></i> Quick Suggestions</div>
+                        <div class="suggestion-item" data-meal="Oatmeal with berries">Oatmeal with berries</div>
+                        <div class="suggestion-item" data-meal="Grilled chicken salad">Grilled chicken salad</div>
+                        <div class="suggestion-item" data-meal="Pasta with vegetables">Pasta with vegetables</div>
+                        <div class="suggestion-item" data-meal="Smoothie bowl">Smoothie bowl</div>
+                        <div class="suggestion-item" data-meal="Avocado toast">Avocado toast</div>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <h2 class="section-title">Weekly Meal Plan</h2>
+                    <div class="week-navigation">
+                        <button class="nav-btn" id="prev-week"><i class="fas fa-arrow-left"></i> Previous</button>
+                        <div class="current-week" id="current-week">Week of Oct 23 - Oct 29, 2023</div>
+                        <button class="nav-btn" id="next-week">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    
+                    <div class="meal-plan" id="meal-plan-container">
+                        <!-- Meal plans will be dynamically generated -->
+                    </div>
+
+                    <div class="grocery-list">
+                        <div class="grocery-title">
+                            <span><i class="fas fa-shopping-cart"></i> Grocery List</span>
+                            <button class="delete-btn" id="clear-grocery-btn">Clear List</button>
+                        </div>
+                        <div id="grocery-items">
+                            <div class="grocery-item">
+                                <input type="checkbox" class="grocery-checkbox">
+                                <span class="grocery-text">Oats</span>
+                            </div>
+                            <div class="grocery-item">
+                                <input type="checkbox" class="grocery-checkbox">
+                                <span class="grocery-text">Berries</span>
+                            </div>
+                            <div class="grocery-item">
+                                <input type="checkbox" class="grocery-checkbox">
+                                <span class="grocery-text">Chicken breast</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <input type="text" class="meal-input" id="grocery-input" placeholder="Add grocery item...">
+                            <button class="btn btn-secondary" id="add-grocery-btn" style="margin-top: 10px;"><i class="fas fa-plus"></i> Add Item</button>
+                        </div>
+                    </div>
+
+                    <div class="export-section">
+                        <div class="export-title"><i class="fas fa-download"></i> Export Your Plan</div>
+                        <div class="export-buttons">
+                            <button class="export-btn" id="export-pdf"><i class="fas fa-file-pdf"></i> Export to PDF</button>
+                            <button class="export-btn" id="export-calendar"><i class="fas fa-calendar-plus"></i> Add to Calendar</button>
+                            <button class="export-btn" id="share-plan"><i class="fas fa-share-alt"></i> Share Plan</button>
+                            <button class="export-btn" id="print-plan"><i class="fas fa-print"></i> Print</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-utensils"></i> Meal Planner</h1>
+            </div>
+        </header>
+
+        <div class="mobile-container">
+            <div class="mobile-card">
+                <h2 class="mobile-section-title">Plan Your Meals</h2>
+                <input type="text" class="mobile-meal-input" id="mobile-breakfast-input" placeholder="Breakfast">
+                <input type="text" class="mobile-meal-input" id="mobile-lunch-input" placeholder="Lunch">
+                <input type="text" class="mobile-meal-input" id="mobile-dinner-input" placeholder="Dinner">
+                <input type="text" class="mobile-meal-input" id="mobile-snacks-input" placeholder="Snacks">
+                <select class="mobile-meal-input" id="mobile-day-select">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+                <button class="mobile-btn" id="mobile-add-btn"><i class="fas fa-plus"></i> Add to Plan</button>
+                <button class="mobile-btn mobile-btn-secondary" id="mobile-clear-btn"><i class="fas fa-broom"></i> Clear All</button>
+                <button class="mobile-btn mobile-btn-warning" id="mobile-generate-btn"><i class="fas fa-magic"></i> Generate Ideas</button>
+            </div>
+
+            <div class="mobile-stats-card">
+                <div class="mobile-stats-title"><i class="fas fa-chart-pie"></i> Statistics</div>
+                <div class="mobile-stats-grid">
+                    <div class="mobile-stat-item">
+                        <div class="mobile-stat-number" id="mobile-total-meals">0</div>
+                        <div class="mobile-stat-label">Meals</div>
+                    </div>
+                    <div class="mobile-stat-item">
+                        <div class="mobile-stat-number" id="mobile-days-planned">0</div>
+                        <div class="mobile-stat-label">Days</div>
+                    </div>
+                    <div class="mobile-stat-item">
+                        <div class="mobile-stat-number" id="mobile-healthy-meals">0</div>
+                        <div class="mobile-stat-label">Healthy</div>
+                    </div>
+                    <div class="mobile-stat-item">
+                        <div class="mobile-stat-number" id="mobile-variety-score">0%</div>
+                        <div class="mobile-stat-label">Variety</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-suggestions">
+                <div class="mobile-section-small-title"><i class="fas fa-lightbulb"></i> Quick Suggestions</div>
+                <div class="mobile-suggestion-item" data-meal="Oatmeal with berries">Oatmeal with berries</div>
+                <div class="mobile-suggestion-item" data-meal="Grilled chicken salad">Grilled chicken salad</div>
+                <div class="mobile-suggestion-item" data-meal="Pasta with vegetables">Pasta with vegetables</div>
+                <div class="mobile-suggestion-item" data-meal="Smoothie bowl">Smoothie bowl</div>
+                <div class="mobile-suggestion-item" data-meal="Avocado toast">Avocado toast</div>
+            </div>
+
+            <div class="mobile-card">
+                <h2 class="mobile-section-title">This Week</h2>
+                <div class="mobile-week-nav">
+                    <button class="mobile-nav-btn" id="mobile-prev-week"><i class="fas fa-arrow-left"></i></button>
+                    <div class="mobile-current-week" id="mobile-current-week">Oct 23-29</div>
+                    <button class="mobile-nav-btn" id="mobile-next-week"><i class="fas fa-arrow-right"></i></button>
+                </div>
+                
+                <div class="meal-plan" id="mobile-meal-plan-container">
+                    <!-- Mobile meal plans will be dynamically generated -->
+                </div>
+            </div>
+
+            <div class="mobile-grocery-list">
+                <div class="mobile-section-small-title"><i class="fas fa-shopping-cart"></i> Grocery List</div>
+                <div class="mobile-grocery-item">
+                    <input type="checkbox" class="mobile-grocery-checkbox">
+                    <span class="grocery-text">Oats</span>
+                </div>
+                <div class="mobile-grocery-item">
+                    <input type="checkbox" class="mobile-grocery-checkbox">
+                    <span class="grocery-text">Berries</span>
+                </div>
+                <div class="mobile-grocery-item">
+                    <input type="checkbox" class="mobile-grocery-checkbox">
+                    <span class="grocery-text">Chicken breast</span>
+                </div>
+                <div style="margin-top: 15px;">
+                    <input type="text" class="mobile-meal-input" id="mobile-grocery-input" placeholder="Add grocery item...">
+                    <button class="mobile-btn mobile-btn-secondary" id="mobile-add-grocery-btn" style="margin-top: 10px;"><i class="fas fa-plus"></i> Add Item</button>
+                </div>
+            </div>
+
+            <div class="mobile-export-section">
+                <div class="mobile-section-small-title"><i class="fas fa-download"></i> Export Options</div>
+                <div class="mobile-export-buttons">
+                    <button class="mobile-export-btn" id="mobile-export-pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="mobile-export-btn" id="mobile-export-calendar"><i class="fas fa-calendar-plus"></i> Calendar</button>
+                    <button class="mobile-export-btn" id="mobile-share-plan"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="mobile-export-btn" id="mobile-print-plan"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notification-text">Action completed successfully!</span>
+    </div>
+
+    <script>
+        // Meal Planner Application
+        class MealPlanner {
+            constructor() {
+                this.currentWeek = 0;
+                this.mealPlans = {};
+                this.groceryList = [
+                    { item: 'Oats', checked: false },
+                    { item: 'Berries', checked: false },
+                    { item: 'Chicken breast', checked: false }
+                ];
+                this.days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                this.suggestions = [
+                    'Oatmeal with berries',
+                    'Grilled chicken salad',
+                    'Pasta with vegetables',
+                    'Smoothie bowl',
+                    'Avocado toast',
+                    'Salmon with roasted vegetables',
+                    'Quinoa bowl with vegetables',
+                    'Greek yogurt with honey',
+                    'Egg scramble with spinach',
+                    'Vegetable stir-fry with tofu'
+                ];
+                this.init();
+            }
+
+            init() {
+                this.loadFromLocalStorage();
+                this.setupEventListeners();
+                this.renderWeek();
+                this.updateStats();
+                this.renderGroceryList();
+            }
+
+            setupEventListeners() {
+                // Desktop event listeners
+                const addBtn = document.getElementById('add-meal-btn');
+                const clearBtn = document.getElementById('clear-btn');
+                const generateBtn = document.getElementById('generate-btn');
+                const prevBtn = document.getElementById('prev-week');
+                const nextBtn = document.getElementById('next-week');
+                const clearGroceryBtn = document.getElementById('clear-grocery-btn');
+                const addGroceryBtn = document.getElementById('add-grocery-btn');
+                const exportPdfBtn = document.getElementById('export-pdf');
+                const exportCalendarBtn = document.getElementById('export-calendar');
+                const sharePlanBtn = document.getElementById('share-plan');
+                const printPlanBtn = document.getElementById('print-plan');
+
+                if (addBtn) addBtn.addEventListener('click', () => this.addMealPlan());
+                if (clearBtn) clearBtn.addEventListener('click', () => this.clearAll());
+                if (generateBtn) generateBtn.addEventListener('click', () => this.generateMealIdeas());
+                if (prevBtn) prevBtn.addEventListener('click', () => this.changeWeek(-1));
+                if (nextBtn) nextBtn.addEventListener('click', () => this.changeWeek(1));
+                if (clearGroceryBtn) clearGroceryBtn.addEventListener('click', () => this.clearGroceryList());
+                if (addGroceryBtn) addGroceryBtn.addEventListener('click', () => this.addGroceryItem());
+                if (exportPdfBtn) exportPdfBtn.addEventListener('click', () => this.exportToPDF());
+                if (exportCalendarBtn) exportCalendarBtn.addEventListener('click', () => this.addToCalendar());
+                if (sharePlanBtn) sharePlanBtn.addEventListener('click', () => this.sharePlan());
+                if (printPlanBtn) printPlanBtn.addEventListener('click', () => this.printPlan());
+
+                // Mobile event listeners
+                const mobileAddBtn = document.getElementById('mobile-add-btn');
+                const mobileClearBtn = document.getElementById('mobile-clear-btn');
+                const mobileGenerateBtn = document.getElementById('mobile-generate-btn');
+                const mobilePrevBtn = document.getElementById('mobile-prev-week');
+                const mobileNextBtn = document.getElementById('mobile-next-week');
+                const mobileAddGroceryBtn = document.getElementById('mobile-add-grocery-btn');
+                const mobileExportPdfBtn = document.getElementById('mobile-export-pdf');
+                const mobileExportCalendarBtn = document.getElementById('mobile-export-calendar');
+                const mobileSharePlanBtn = document.getElementById('mobile-share-plan');
+                const mobilePrintPlanBtn = document.getElementById('mobile-print-plan');
+
+                if (mobileAddBtn) mobileAddBtn.addEventListener('click', () => this.addMealPlan());
+                if (mobileClearBtn) mobileClearBtn.addEventListener('click', () => this.clearAll());
+                if (mobileGenerateBtn) mobileGenerateBtn.addEventListener('click', () => this.generateMealIdeas());
+                if (mobilePrevBtn) mobilePrevBtn.addEventListener('click', () => this.changeWeek(-1));
+                if (mobileNextBtn) mobileNextBtn.addEventListener('click', () => this.changeWeek(1));
+                if (mobileAddGroceryBtn) mobileAddGroceryBtn.addEventListener('click', () => this.addGroceryItem());
+                if (mobileExportPdfBtn) mobileExportPdfBtn.addEventListener('click', () => this.exportToPDF());
+                if (mobileExportCalendarBtn) mobileExportCalendarBtn.addEventListener('click', () => this.addToCalendar());
+                if (mobileSharePlanBtn) mobileSharePlanBtn.addEventListener('click', () => this.sharePlan());
+                if (mobilePrintPlanBtn) mobilePrintPlanBtn.addEventListener('click', () => this.printPlan());
+
+                // Suggestion click handlers
+                document.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const meal = e.target.getAttribute('data-meal') || e.target.textContent;
+                        this.fillRandomMeal(meal);
+                    });
+                });
+
+                // Grocery checkbox handlers
+                document.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('grocery-checkbox')) {
+                        this.toggleGroceryItem(e.target);
+                    }
+                });
+
+                // Grocery item click handlers
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('grocery-text')) {
+                        const item = e.target.closest('.grocery-item');
+                        const checkbox = item.querySelector('.grocery-checkbox');
+                        checkbox.checked = !checkbox.checked;
+                        this.toggleGroceryItem(checkbox);
+                    }
+                });
+            }
+
+            addMealPlan() {
+                const inputs = {
+                    breakfast: document.getElementById('breakfast-input') || document.getElementById('mobile-breakfast-input'),
+                    lunch: document.getElementById('lunch-input') || document.getElementById('mobile-lunch-input'),
+                    dinner: document.getElementById('dinner-input') || document.getElementById('mobile-dinner-input'),
+                    snacks: document.getElementById('snacks-input') || document.getElementById('mobile-snacks-input'),
+                    day: document.getElementById('day-select') || document.getElementById('mobile-day-select')
+                };
+
+                const meals = {
+                    breakfast: inputs.breakfast.value.trim(),
+                    lunch: inputs.lunch.value.trim(),
+                    dinner: inputs.dinner.value.trim(),
+                    snacks: inputs.snacks.value.trim()
+                };
+
+                const selectedDay = inputs.day.value;
+
+                if (!meals.breakfast && !meals.lunch && !meals.dinner && !meals.snacks) {
+                    this.showNotification('Please enter at least one meal!', 'error');
+                    return;
+                }
+
+                const weekKey = this.getWeekKey();
+                if (!this.mealPlans[weekKey]) {
+                    this.mealPlans[weekKey] = {};
+                }
+
+                if (!this.mealPlans[weekKey][selectedDay]) {
+                    this.mealPlans[weekKey][selectedDay] = {};
+                }
+
+                Object.assign(this.mealPlans[weekKey][selectedDay], meals);
+                this.saveToLocalStorage();
+                this.renderWeek();
+                this.updateStats();
+                this.clearInputs();
+                this.showNotification('Meal plan added successfully!');
+            }
+
+            clearInputs() {
+                const inputs = [
+                    'breakfast-input', 'lunch-input', 'dinner-input', 'snacks-input',
+                    'mobile-breakfast-input', 'mobile-lunch-input', 'mobile-dinner-input', 'mobile-snacks-input'
+                ];
+
+                inputs.forEach(id => {
+                    const input = document.getElementById(id);
+                    if (input) input.value = '';
+                });
+            }
+
+            clearAll() {
+                if (confirm('Are you sure you want to clear all meal plans for this week?')) {
+                    const weekKey = this.getWeekKey();
+                    delete this.mealPlans[weekKey];
+                    this.saveToLocalStorage();
+                    this.renderWeek();
+                    this.updateStats();
+                    this.showNotification('All meal plans cleared!');
+                }
+            }
+
+            changeWeek(direction) {
+                this.currentWeek += direction;
+                this.renderWeek();
+                this.updateStats();
+            }
+
+            getWeekKey() {
+                const now = new Date();
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() + (this.currentWeek * 7) - now.getDay());
+                return weekStart.toISOString().split('T')[0];
+            }
+
+            renderWeek() {
+                const weekKey = this.getWeekKey();
+                const weekData = this.mealPlans[weekKey] || {};
+                const weekStart = new Date(weekKey);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+
+                // Update week display
+                const weekString = `${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
+                const shortWeekString = `${weekStart.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}-${weekEnd.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}`;
+
+                document.getElementById('current-week').textContent = `Week of ${weekString}`;
+                document.getElementById('mobile-current-week').textContent = shortWeekString;
+
+                // Render desktop view
+                const desktopContainer = document.getElementById('meal-plan-container');
+                if (desktopContainer) {
+                    desktopContainer.innerHTML = this.generateWeekHTML(weekData, false);
+                }
+
+                // Render mobile view
+                const mobileContainer = document.getElementById('mobile-meal-plan-container');
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = this.generateWeekHTML(weekData, true);
+                }
+            }
+
+            generateWeekHTML(weekData, isMobile) {
+                let html = '';
+                const containerClass = isMobile ? 'mobile-day-plan' : 'day-plan';
+                const headerClass = isMobile ? 'mobile-day-header' : 'day-header';
+                const mealItemClass = isMobile ? 'mobile-meal-item' : 'meal-item';
+                const mealLabelClass = isMobile ? 'mobile-meal-label' : 'meal-label';
+                const mealValueClass = isMobile ? 'mobile-meal-value' : 'meal-value';
+
+                this.days.forEach(day => {
+                    const dayData = weekData[day] || {};
+                    html += `<div class="${containerClass}">
+                        <div class="${headerClass}">
+                            <div class="day-header-left">
+                                <i class="fas fa-calendar-day"></i> ${day}
+                            </div>
+                        </div>`;
+                    
+                    const meals = [
+                        { key: 'breakfast', label: 'Breakfast', icon: 'sun' },
+                        { key: 'lunch', label: 'Lunch', icon: 'cloud-sun' },
+                        { key: 'dinner', label: 'Dinner', icon: 'moon' },
+                        { key: 'snacks', label: 'Snacks', icon: 'apple-alt' }
+                    ];
+
+                    meals.forEach(meal => {
+                        const value = dayData[meal.key] || '';
+                        html += `<div class="${mealItemClass}">
+                            <span class="${mealLabelClass}"><i class="fas fa-${meal.icon}"></i> ${meal.label}:</span>
+                            <span class="${mealValueClass}">${value || '<span class="empty-meal">Not planned</span>'}</span>
+                        </div>`;
+                    });
+
+                    html += '</div>';
+                });
+
+                return html || '<div class="no-plans" style="text-align: center; padding: 40px; color: #a0aec0;">No meal plans for this week. Start planning!</div>';
+            }
+
+            updateStats() {
+                const weekKey = this.getWeekKey();
+                const weekData = this.mealPlans[weekKey] || {};
+                
+                let totalMeals = 0;
+                let daysPlanned = 0;
+                let healthyMeals = 0;
+                const allMeals = [];
+
+                Object.keys(weekData).forEach(day => {
+                    const dayData = weekData[day];
+                    let dayMeals = 0;
+                    
+                    Object.keys(dayData).forEach(mealType => {
+                        if (dayData[mealType]) {
+                            dayMeals++;
+                            totalMeals++;
+                            allMeals.push(dayData[mealType].toLowerCase());
+                            
+                            // Simple healthy meal detection
+                            const healthyKeywords = ['salad', 'vegetable', 'fruit', 'grilled', 'oat', 'yogurt', 'smoothie', 'quinoa', 'tofu', 'spinach'];
+                            if (healthyKeywords.some(keyword => dayData[mealType].toLowerCase().includes(keyword))) {
+                                healthyMeals++;
+                            }
+                        }
+                    });
+                    
+                    if (dayMeals > 0) daysPlanned++;
+                });
+
+                // Calculate variety score
+                const uniqueMeals = [...new Set(allMeals)].length;
+                const varietyScore = totalMeals > 0 ? Math.round((uniqueMeals / totalMeals) * 100) : 0;
+
+                // Update desktop stats
+                const totalMealsEl = document.getElementById('total-meals');
+                const daysPlannedEl = document.getElementById('days-planned');
+                const healthyMealsEl = document.getElementById('healthy-meals');
+                const varietyScoreEl = document.getElementById('variety-score');
+
+                if (totalMealsEl) totalMealsEl.textContent = totalMeals;
+                if (daysPlannedEl) daysPlannedEl.textContent = daysPlanned;
+                if (healthyMealsEl) healthyMealsEl.textContent = healthyMeals;
+                if (varietyScoreEl) varietyScoreEl.textContent = `${varietyScore}%`;
+
+                // Update mobile stats
+                const mobileTotalMealsEl = document.getElementById('mobile-total-meals');
+                const mobileDaysPlannedEl = document.getElementById('mobile-days-planned');
+                const mobileHealthyMealsEl = document.getElementById('mobile-healthy-meals');
+                const mobileVarietyScoreEl = document.getElementById('mobile-variety-score');
+
+                if (mobileTotalMealsEl) mobileTotalMealsEl.textContent = totalMeals;
+                if (mobileDaysPlannedEl) mobileDaysPlannedEl.textContent = daysPlanned;
+                if (mobileHealthyMealsEl) mobileHealthyMealsEl.textContent = healthyMeals;
+                if (mobileVarietyScoreEl) mobileVarietyScoreEl.textContent = `${varietyScore}%`;
+            }
+
+            saveToLocalStorage() {
+                localStorage.setItem('mealPlannerData', JSON.stringify(this.mealPlans));
+                localStorage.setItem('mealPlannerGroceryList', JSON.stringify(this.groceryList));
+                localStorage.setItem('mealPlannerWeek', this.currentWeek);
+            }
+
+            loadFromLocalStorage() {
+                const savedData = localStorage.getItem('mealPlannerData');
+                const savedGroceryList = localStorage.getItem('mealPlannerGroceryList');
+                const savedWeek = localStorage.getItem('mealPlannerWeek');
+                
+                if (savedData) {
+                    this.mealPlans = JSON.parse(savedData);
+                }
+                
+                if (savedGroceryList) {
+                    this.groceryList = JSON.parse(savedGroceryList);
+                }
+                
+                if (savedWeek) {
+                    this.currentWeek = parseInt(savedWeek);
+                }
+            }
+
+            generateMealIdeas() {
+                const randomMeals = [];
+                for (let i = 0; i < 3; i++) {
+                    const randomIndex = Math.floor(Math.random() * this.suggestions.length);
+                    randomMeals.push(this.suggestions[randomIndex]);
+                }
+                
+                const inputs = {
+                    breakfast: document.getElementById('breakfast-input') || document.getElementById('mobile-breakfast-input'),
+                    lunch: document.getElementById('lunch-input') || document.getElementById('mobile-lunch-input'),
+                    dinner: document.getElementById('dinner-input') || document.getElementById('mobile-dinner-input')
+                };
+
+                if (inputs.breakfast) inputs.breakfast.value = randomMeals[0];
+                if (inputs.lunch) inputs.lunch.value = randomMeals[1];
+                if (inputs.dinner) inputs.dinner.value = randomMeals[2];
+                
+                this.showNotification('Generated meal ideas!');
+            }
+
+            fillRandomMeal(meal) {
+                const inputs = [
+                    document.getElementById('breakfast-input'),
+                    document.getElementById('lunch-input'),
+                    document.getElementById('dinner-input'),
+                    document.getElementById('snacks-input'),
+                    document.getElementById('mobile-breakfast-input'),
+                    document.getElementById('mobile-lunch-input'),
+                    document.getElementById('mobile-dinner-input'),
+                    document.getElementById('mobile-snacks-input')
+                ];
+
+                // Fill the first empty input
+                for (let input of inputs) {
+                    if (input && !input.value.trim()) {
+                        input.value = meal;
+                        break;
+                    }
+                }
+
+                this.showNotification(`Added: ${meal}`);
+            }
+
+            renderGroceryList() {
+                const groceryContainer = document.getElementById('grocery-items');
+                const mobileGroceryContainer = document.getElementById('mobile-grocery-list');
+                
+                if (groceryContainer) {
+                    groceryContainer.innerHTML = this.groceryList.map((item, index) => `
+                        <div class="grocery-item ${item.checked ? 'checked' : ''}">
+                            <input type="checkbox" class="grocery-checkbox" data-index="${index}" ${item.checked ? 'checked' : ''}>
+                            <span class="grocery-text">${item.item}</span>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            addGroceryItem() {
+                const input = document.getElementById('grocery-input') || document.getElementById('mobile-grocery-input');
+                const item = input.value.trim();
+                
+                if (item) {
+                    this.groceryList.push({ item, checked: false });
+                    this.saveToLocalStorage();
+                    this.renderGroceryList();
+                    input.value = '';
+                    this.showNotification('Grocery item added!');
+                }
+            }
+
+            toggleGroceryItem(checkbox) {
+                const index = parseInt(checkbox.getAttribute('data-index'));
+                if (this.groceryList[index]) {
+                    this.groceryList[index].checked = checkbox.checked;
+                    this.saveToLocalStorage();
+                    this.renderGroceryList();
+                }
+            }
+
+            clearGroceryList() {
+                if (confirm('Clear all grocery items?')) {
+                    this.groceryList = [];
+                    this.saveToLocalStorage();
+                    this.renderGroceryList();
+                    this.showNotification('Grocery list cleared!');
+                }
+            }
+
+            exportToPDF() {
+                this.showNotification('PDF export feature would be implemented in a full application');
+            }
+
+            addToCalendar() {
+                this.showNotification('Calendar integration would be implemented in a full application');
+            }
+
+            sharePlan() {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'My Meal Plan',
+                        text: 'Check out my weekly meal plan!',
+                        url: window.location.href
+                    }).catch(() => {
+                        this.copyToClipboard();
+                    });
+                } else {
+                    this.copyToClipboard();
+                }
+            }
+
+            copyToClipboard() {
+                const text = 'Check out my meal plan on Meal Planner!';
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showNotification('Link copied to clipboard!');
+                });
+            }
+
+            printPlan() {
+                window.print();
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                
+                notificationText.textContent = message;
+                notification.className = 'notification show';
+                
+                if (type === 'error') {
+                    notification.style.background = '#e53e3e';
+                } else {
+                    notification.style.background = '#48bb78';
+                }
+                
+                setTimeout(() => {
+                    notification.className = 'notification';
+                }, 3000);
+            }
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            window.mealPlanner = new MealPlanner();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<!-- Category: Cooking -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6f4e37 0%, #8b4513 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #d2691e, #8b4513);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #d2691e, #8b4513);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            text-align: center;
+            padding: 40px 20px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f8f8;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            flex: 1;
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #FFC107, #FF9800);
+            color: #333;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #F44336, #D32F2F);
+            color: white;
+            flex: 1;
+        }
+        
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+        
+        .preset-btn {
+            padding: 15px 5px;
+            background: linear-gradient(to bottom, #8B4513, #5D2906);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .preset-btn:hover {
+            background: linear-gradient(to bottom, #A0522D, #6F320D);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .time-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .time-input input {
+            width: 80px;
+            padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .time-input input:focus {
+            border-color: #d2691e;
+            outline: none;
+            box-shadow: 0 0 5px rgba(210, 105, 30, 0.5);
+        }
+        
+        .time-input label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .set-time-btn {
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: flex-end;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .set-time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-container {
+            padding: 0 20px 20px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer-state {
+            text-align: center;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #555;
+            font-size: 18px;
+        }
+        
+        .timer-state.running {
+            color: #4CAF50;
+        }
+        
+        .timer-state.paused {
+            color: #FFC107;
+        }
+        
+        .timer-state.stopped {
+            color: #F44336;
+        }
+        
+        .sound-toggle {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px 20px;
+        }
+        
+        .sound-btn {
+            background: #607D8B;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-btn.active {
+            background: #2196F3;
+        }
+        
+        .recipes {
+            padding: 0 20px 20px;
+        }
+        
+        .recipes h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #5D2906;
+            font-size: 20px;
+        }
+        
+        .recipe-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .recipe-item {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #ddd;
+        }
+        
+        .recipe-item:hover {
+            background: #e8f5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 50px;
+                padding: 30px 15px;
+            }
+            
+            .btn {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            
+            .presets {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 15px 20px;
+            }
+            
+            .preset-btn {
+                padding: 12px 5px;
+                font-size: 14px;
+            }
+            
+            .time-input {
+                gap: 5px;
+                padding: 0 15px 15px;
+            }
+            
+            .time-input input {
+                width: 60px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            
+            .recipe-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-utensils"></i> Cooking Timer
+        </div>
+        
+        <div class="timer-state" id="timerState">Ready to cook!</div>
+        
+        <div class="timer-display" id="display">00:00:00</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn start-btn" id="startBtn">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button class="btn pause-btn" id="pauseBtn">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="sound-toggle">
+            <button class="sound-btn" id="soundBtn">
+                <i class="fas fa-volume-up"></i> Sound
+            </button>
+        </div>
+        
+        <div class="time-input">
+            <label>
+                Minutes
+                <input type="number" id="minutes" min="0" max="59" value="0">
+            </label>
+            <label>
+                Seconds
+                <input type="number" id="seconds" min="0" max="59" value="0">
+            </label>
+            <button class="set-time-btn" id="setTimeBtn">
+                <i class="fas fa-clock"></i> Set
+            </button>
+        </div>
+        
+        <div class="presets">
+            <button class="preset-btn" data-time="30">
+                <i class="fas fa-bolt"></i> 30 Sec
+            </button>
+            <button class="preset-btn" data-time="60">
+                <i class="fas fa-egg"></i> 1 Min
+            </button>
+            <button class="preset-btn" data-time="120">
+                <i class="fas fa-bread-slice"></i> 2 Min
+            </button>
+            <button class="preset-btn" data-time="300">
+                <i class="fas fa-fire"></i> 5 Min
+            </button>
+            <button class="preset-btn" data-time="600">
+                <i class="fas fa-pizza-slice"></i> 10 Min
+            </button>
+            <button class="preset-btn" data-time="900">
+                <i class="fas fa-drumstick-bite"></i> 15 Min
+            </button>
+        </div>
+        
+        <div class="recipes">
+            <h3><i class="fas fa-book"></i> Quick Recipes</h3>
+            <div class="recipe-list">
+                <div class="recipe-item" data-time="180">Boiled Eggs (3 min)</div>
+                <div class="recipe-item" data-time="300">Pasta (5 min)</div>
+                <div class="recipe-item" data-time="600">Rice (10 min)</div>
+                <div class="recipe-item" data-time="1200">Baked Potato (20 min)</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="alarmSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Timer variables
+        let timer;
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let initialSeconds = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let soundEnabled = true;
+        
+        // DOM elements
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const setTimeBtn = document.getElementById('setTimeBtn');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        const recipeItems = document.querySelectorAll('.recipe-item');
+        const timerState = document.getElementById('timerState');
+        const progressFill = document.getElementById('progressFill');
+        const soundBtn = document.getElementById('soundBtn');
+        const alarmSound = document.getElementById('alarmSound');
+        
+        // Format time to HH:MM:SS
+        function formatTime(total) {
+            const hrs = Math.floor(total / 3600);
+            const mins = Math.floor((total % 3600) / 60);
+            const secs = total % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update display
+        function updateDisplay() {
+            display.textContent = formatTime(totalSeconds);
+            
+            // Update progress bar
+            if (initialSeconds > 0) {
+                const progress = ((initialSeconds - totalSeconds) / initialSeconds) * 100;
+                progressFill.style.width = `${progress}%`;
+            } else {
+                progressFill.style.width = '0%';
+            }
+        }
+        
+        // Update timer state display
+        function updateTimerState(state) {
+            timerState.textContent = state;
+            timerState.className = 'timer-state ' + (isRunning ? 'running' : isPaused ? 'paused' : 'stopped');
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (totalSeconds > 0) {
+                if (!isRunning) {
+                    isRunning = true;
+                    isPaused = false;
+                    updateTimerState("Cooking in progress...");
+                    
+                    timer = setInterval(() => {
+                        totalSeconds--;
+                        updateDisplay();
+                        
+                        if (totalSeconds <= 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            isPaused = false;
+                            updateTimerState("Time's up!");
+                            display.textContent = "00:00:00";
+                            progressFill.style.width = '100%';
+                            
+                            if (soundEnabled) {
+                                alarmSound.play();
+                            }
+                            
+                            // Flash effect
+                            display.style.color = '#F44336';
+                            setTimeout(() => {
+                                display.style.color = '#333';
+                            }, 500);
+                            
+                            setTimeout(() => {
+                                if (soundEnabled) {
+                                    alarmSound.play();
+                                }
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                updateTimerState("Timer paused");
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            totalSeconds = 0;
+            initialSeconds = 0;
+            updateDisplay();
+            updateTimerState("Ready to cook!");
+            progressFill.style.width = '0%';
+        }
+        
+        // Set custom time
+        function setCustomTime() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const secs = parseInt(secondsInput.value) || 0;
+            totalSeconds = mins * 60 + secs;
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Time set");
+        }
+        
+        // Set preset time
+        function setPresetTime(time) {
+            totalSeconds = parseInt(time);
+            initialSeconds = totalSeconds;
+            updateDisplay();
+            updateTimerState("Time set");
+        }
+        
+        // Toggle sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundBtn.classList.toggle('active', soundEnabled);
+            soundBtn.innerHTML = soundEnabled ? 
+                '<i class="fas fa-volume-up"></i> Sound On' : 
+                '<i class="fas fa-volume-mute"></i> Sound Off';
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        setTimeBtn.addEventListener('click', setCustomTime);
+        soundBtn.addEventListener('click', toggleSound);
+        
+        presetButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                setPresetTime(button.getAttribute('data-time'));
+            });
+        });
+        
+        recipeItems.forEach(item => {
+            item.addEventListener('click', () => {
+                setPresetTime(item.getAttribute('data-time'));
+            });
+        });
+        
+        // Initialize
+        updateDisplay();
+        updateTimerState("Ready to cook!");
+        soundBtn.classList.add('active');
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.code === 'Escape') {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>

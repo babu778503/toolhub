@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<!-- Category: Food Safety -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leftover Reminder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .header {
+                background: linear-gradient(to right, #3f2b96, #a8c0ff);
+                color: white;
+                text-align: center;
+                padding: 25px;
+                font-size: 32px;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: #ffd700;
+                border-radius: 3px;
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .header {
+                height: 50px;
+                background: linear-gradient(to right, #3f2b96, #a8c0ff);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .add-leftover-form {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #3f2b96, #a8c0ff);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: #3f2b96;
+        }
+        
+        .search-box {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .leftover-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .leftover-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .leftover-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #28a745;
+        }
+        
+        .leftover-item.expired::before {
+            background: #dc3545;
+        }
+        
+        .leftover-item.warning::before {
+            background: #ffc107;
+        }
+        
+        .leftover-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .leftover-info {
+            flex: 1;
+        }
+        
+        .leftover-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .leftover-details {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .expiry-date {
+            font-weight: 500;
+        }
+        
+        .expiry-date.expired {
+            color: #dc3545;
+        }
+        
+        .expiry-date.warning {
+            color: #ffc107;
+        }
+        
+        .expiry-date.safe {
+            color: #28a745;
+        }
+        
+        .leftover-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .consume-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stat-box {
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3f2b96;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .reminder-settings {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .reminder-settings h3 {
+            margin-bottom: 10px;
+            color: #3f2b96;
+        }
+        
+        .reminder-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .reminder-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reminder-option input {
+            margin: 0;
+        }
+        
+        .quick-add {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .quick-add-btn {
+            padding: 6px 12px;
+            background: #6f42c1;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-add-btn:hover {
+            background: #5a32a3;
+        }
+        
+        .import-export {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .import-export-btn {
+            padding: 8px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .import-export-btn:hover {
+            background: #5a6268;
+        }
+        
+        .category-colors {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .category-color {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        
+        .color-box {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        
+        .storage-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .storage-box {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .storage-icon {
+            font-size: 16px;
+        }
+        
+        .fridge {
+            color: #007bff;
+        }
+        
+        .freezer {
+            color: #17a2b8;
+        }
+        
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-controls {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .leftover-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .leftover-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                flex: 1 0 40%;
+            }
+            
+            .reminder-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .category-colors, .storage-indicator {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Leftover Reminder
+        </div>
+        
+        <div class="add-leftover-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="leftoverName"><i class="fas fa-utensils"></i> Leftover Item</label>
+                    <input type="text" id="leftoverName" placeholder="e.g., Chicken Curry, Pasta Salad">
+                </div>
+                <div class="form-group">
+                    <label for="storageType"><i class="fas fa-box"></i> Storage Type</label>
+                    <select id="storageType">
+                        <option value="refrigerator">Refrigerator</option>
+                        <option value="freezer">Freezer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="storageDate"><i class="fas fa-calendar-plus"></i> Storage Date</label>
+                    <input type="date" id="storageDate">
+                </div>
+                <div class="form-group">
+                    <label for="consumeByDate"><i class="fas fa-calendar-check"></i> Best By Date</label>
+                    <input type="date" id="consumeByDate">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="quantity"><i class="fas fa-weight-hanging"></i> Quantity</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="category"><i class="fas fa-tags"></i> Category</label>
+                    <select id="category">
+                        <option value="meat">Meat & Poultry</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="grains">Grains & Pasta</option>
+                        <option value="dairy">Dairy</option>
+                        <option value="soup">Soups & Stews</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="notes"><i class="fas fa-sticky-note"></i> Notes</label>
+                    <input type="text" id="notes" placeholder="Optional notes">
+                </div>
+                <div class="form-group">
+                    <label for="description"><i class="fas fa-align-left"></i> Description/Ingredients</label>
+                    <input type="text" id="description" placeholder="Main ingredients">
+                </div>
+            </div>
+            <button class="add-btn" id="addLeftoverBtn">
+                <i class="fas fa-plus-circle"></i> Add Leftover Item
+            </button>
+        </div>
+        
+        <div class="quick-add">
+            <button class="quick-add-btn" data-item="Chicken Curry" data-days="4" data-category="meat">Chicken Curry (4 days)</button>
+            <button class="quick-add-btn" data-item="Rice" data-days="5" data-category="grains">Rice (5 days)</button>
+            <button class="quick-add-btn" data-item="Vegetable Soup" data-days="3" data-category="soup">Vegetable Soup (3 days)</button>
+            <button class="quick-add-btn" data-item="Pasta Salad" data-days="3" data-category="grains">Pasta Salad (3 days)</button>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search leftover items...">
+        </div>
+        
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Items</button>
+            <button class="filter-btn" data-filter="safe">Safe</button>
+            <button class="filter-btn" data-filter="warning">Warning</button>
+            <button class="filter-btn" data-filter="expired">Expired</button>
+            <button class="filter-btn" data-filter="refrigerator">Fridge</button>
+            <button class="filter-btn" data-filter="freezer">Freezer</button>
+            <button class="filter-btn" data-filter="soon">Expiring Soon</button>
+        </div>
+        
+        <div class="category-colors">
+            <div class="category-color">
+                <div class="color-box" style="background: #28a745;"></div>
+                <span>Safe</span>
+            </div>
+            <div class="category-color">
+                <div class="color-box" style="background: #ffc107;"></div>
+                <span>Warning</span>
+            </div>
+            <div class="category-color">
+                <div class="color-box" style="background: #dc3545;"></div>
+                <span>Expired</span>
+            </div>
+        </div>
+        
+        <div class="storage-indicator">
+            <div class="storage-box">
+                <i class="fas fa-refrigerator fridge storage-icon"></i>
+                <span>Fridge Items</span>
+            </div>
+            <div class="storage-box">
+                <i class="fas fa-snowflake freezer storage-icon"></i>
+                <span>Freezer Items</span>
+            </div>
+        </div>
+        
+        <div class="leftover-list" id="leftoverList">
+            <div class="empty-state">
+                <i class="fas fa-utensils"></i>
+                <p>No leftover items added yet</p>
+                <p>Add your first item above</p>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-value" id="totalItems">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="safeItems">0</div>
+                <div class="stat-label">Safe</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="warningItems">0</div>
+                <div class="stat-label">Warning</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="expiredItems">0</div>
+                <div class="stat-label">Expired</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="fridgeItems">0</div>
+                <div class="stat-label">Fridge</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="freezerItems">0</div>
+                <div class="stat-label">Freezer</div>
+            </div>
+        </div>
+        
+        <div class="reminder-settings">
+            <h3><i class="fas fa-bell"></i> Reminder Settings</h3>
+            <div class="reminder-options">
+                <div class="reminder-option">
+                    <input type="checkbox" id="dailyReminder" checked>
+                    <label for="dailyReminder">Daily Reminder</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="expiringSoon" checked>
+                    <label for="expiringSoon">Notify Before Expiry</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="expiredAlert" checked>
+                    <label for="expiredAlert">Expired Alerts</label>
+                </div>
+                <div class="reminder-option">
+                    <input type="checkbox" id="consumedAlert" checked>
+                    <label for="consumedAlert">Consumption Confirmation</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="import-export">
+            <button class="import-export-btn" id="exportBtn">
+                <i class="fas fa-file-export"></i> Export Data
+            </button>
+            <button class="import-export-btn" id="importBtn">
+                <i class="fas fa-file-import"></i> Import Data
+            </button>
+            <button class="import-export-btn" id="clearBtn">
+                <i class="fas fa-trash-alt"></i> Clear All
+            </button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <script>
+        // Leftover items array
+        let leftoverItems = [];
+        let currentFilter = 'all';
+        let editIndex = -1;
+        let consumptionCount = 0;
+        
+        // DOM elements
+        const leftoverName = document.getElementById('leftoverName');
+        const storageType = document.getElementById('storageType');
+        const storageDate = document.getElementById('storageDate');
+        const consumeByDate = document.getElementById('consumeByDate');
+        const quantity = document.getElementById('quantity');
+        const category = document.getElementById('category');
+        const notes = document.getElementById('notes');
+        const description = document.getElementById('description');
+        const addLeftoverBtn = document.getElementById('addLeftoverBtn');
+        const leftoverList = document.getElementById('leftoverList');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const totalItems = document.getElementById('totalItems');
+        const safeItems = document.getElementById('safeItems');
+        const warningItems = document.getElementById('warningItems');
+        const expiredItems = document.getElementById('expiredItems');
+        const fridgeItems = document.getElementById('fridgeItems');
+        const freezerItems = document.getElementById('freezerItems');
+        const notification = document.getElementById('notification');
+        const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+        const dailyReminder = document.getElementById('dailyReminder');
+        const expiringSoon = document.getElementById('expiringSoon');
+        const expiredAlert = document.getElementById('expiredAlert');
+        const consumedAlert = document.getElementById('consumedAlert');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileInput = document.getElementById('fileInput');
+        
+        // Set default dates
+        const today = new Date();
+        const consumeBy = new Date();
+        consumeBy.setDate(consumeBy.getDate() + 4);
+        
+        storageDate.valueAsDate = today;
+        consumeByDate.valueAsDate = consumeBy;
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Get days until expiry
+        function getDaysUntilExpiry(expiry) {
+            const expiryDate = new Date(expiry);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffTime = expiryDate - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        // Get expiry status
+        function getExpiryStatus(expiry) {
+            const days = getDaysUntilExpiry(expiry);
+            if (days < 0) return 'expired';
+            if (days <= 1) return 'warning';
+            return 'safe';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Add or update leftover item
+        function addLeftoverItem() {
+            const name = leftoverName.value.trim();
+            const storage = storageType.value;
+            const storeDate = storageDate.value;
+            const consumeBy = consumeByDate.value;
+            const qty = parseInt(quantity.value) || 1;
+            const cat = category.value;
+            const note = notes.value.trim();
+            const desc = description.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter a leftover item name', 'error');
+                return;
+            }
+            
+            if (!storeDate || !consumeBy) {
+                showNotification('Please select both dates', 'error');
+                return;
+            }
+            
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                storageType: storage,
+                storageDate: storeDate,
+                consumeByDate: consumeBy,
+                quantity: qty,
+                category: cat,
+                notes: note,
+                description: desc,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editIndex === -1) {
+                leftoverItems.push(newItem);
+                showNotification('Leftover item added successfully!', 'success');
+            } else {
+                leftoverItems[editIndex] = newItem;
+                showNotification('Leftover item updated successfully!', 'success');
+                editIndex = -1;
+                addLeftoverBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Leftover Item';
+            }
+            
+            // Reset form
+            leftoverName.value = '';
+            storageType.value = 'refrigerator';
+            storageDate.valueAsDate = today;
+            consumeByDate.valueAsDate = consumeBy;
+            quantity.value = '1';
+            category.value = 'meat';
+            notes.value = '';
+            description.value = '';
+            
+            saveToLocalStorage();
+            renderLeftoverList();
+            updateStats();
+        }
+        
+        // Quick add leftover item
+        function quickAddLeftover(item, days, category) {
+            const name = item;
+            const storage = 'refrigerator';
+            const storeDate = new Date().toISOString().split('T')[0];
+            const consumeBy = new Date();
+            consumeBy.setDate(consumeBy.getDate() + days);
+            const consumeByDateStr = consumeBy.toISOString().split('T')[0];
+            
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                storageType: storage,
+                storageDate: storeDate,
+                consumeByDate: consumeByDateStr,
+                quantity: 1,
+                category: category,
+                notes: '',
+                description: '',
+                createdAt: new Date().toISOString()
+            };
+            
+            leftoverItems.push(newItem);
+            saveToLocalStorage();
+            renderLeftoverList();
+            updateStats();
+            showNotification(`${name} added for ${days} days`, 'success');
+        }
+        
+        // Edit leftover item
+        function editLeftoverItem(index) {
+            const item = leftoverItems[index];
+            leftoverName.value = item.name;
+            storageType.value = item.storageType;
+            storageDate.value = item.storageDate;
+            consumeByDate.value = item.consumeByDate;
+            quantity.value = item.quantity;
+            category.value = item.category;
+            notes.value = item.notes || '';
+            description.value = item.description || '';
+            
+            editIndex = index;
+            addLeftoverBtn.innerHTML = '<i class="fas fa-save"></i> Update Item';
+            
+            // Scroll to form
+            document.querySelector('.add-leftover-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete leftover item
+        function deleteLeftoverItem(index) {
+            if (confirm('Are you sure you want to delete this leftover item?')) {
+                leftoverItems.splice(index, 1);
+                saveToLocalStorage();
+                renderLeftoverList();
+                updateStats();
+                showNotification('Leftover item deleted!', 'success');
+            }
+        }
+        
+        // Mark as consumed
+        function consumeLeftoverItem(index) {
+            if (confirm('Mark this item as consumed?')) {
+                const item = leftoverItems[index];
+                const days = getDaysUntilExpiry(item.consumeByDate);
+                
+                if (consumedAlert.checked) {
+                    if (days >= 0) {
+                        showNotification(`Great! You consumed ${item.name} before it expired.`, 'success');
+                    } else {
+                        showNotification(`${item.name} was expired. Please be more careful next time.`, 'warning');
+                    }
+                }
+                
+                consumptionCount++;
+                leftoverItems.splice(index, 1);
+                saveToLocalStorage();
+                renderLeftoverList();
+                updateStats();
+            }
+        }
+        
+        // Render leftover list
+        function renderLeftoverList(filter = 'all', search = '') {
+            // Filter items
+            let filteredItems = [...leftoverItems];
+            
+            // Apply search filter
+            if (search) {
+                filteredItems = filteredItems.filter(item => 
+                    item.name.toLowerCase().includes(search.toLowerCase()) ||
+                    (item.description && item.description.toLowerCase().includes(search.toLowerCase())) ||
+                    (item.notes && item.notes.toLowerCase().includes(search.toLowerCase())) ||
+                    (item.category && item.category.toLowerCase().includes(search.toLowerCase()))
+                );
+            }
+            
+            // Apply status filter
+            if (filter === 'safe') {
+                filteredItems = filteredItems.filter(item => getExpiryStatus(item.consumeByDate) === 'safe');
+            } else if (filter === 'warning') {
+                filteredItems = filteredItems.filter(item => getExpiryStatus(item.consumeByDate) === 'warning');
+            } else if (filter === 'expired') {
+                filteredItems = filteredItems.filter(item => getExpiryStatus(item.consumeByDate) === 'expired');
+            } else if (filter === 'refrigerator') {
+                filteredItems = filteredItems.filter(item => item.storageType === 'refrigerator');
+            } else if (filter === 'freezer') {
+                filteredItems = filteredItems.filter(item => item.storageType === 'freezer');
+            } else if (filter === 'soon') {
+                filteredItems = filteredItems.filter(item => {
+                    const days = getDaysUntilExpiry(item.consumeByDate);
+                    return days >= 0 && days <= 3;
+                });
+            }
+            
+            // Sort by expiry date (closest first)
+            filteredItems.sort((a, b) => new Date(a.consumeByDate) - new Date(b.consumeByDate));
+            
+            if (filteredItems.length === 0) {
+                leftoverList.innerHTML = '<div class="empty-state"><i class="fas fa-utensils"></i><p>No leftover items found</p></div>';
+                return;
+            }
+            
+            let html = '';
+            filteredItems.forEach((item, index) => {
+                const itemIndex = leftoverItems.indexOf(item);
+                html += generateLeftoverItemHTML(item, itemIndex);
+            });
+            
+            leftoverList.innerHTML = html;
+            attachEventListeners();
+        }
+        
+        // Generate HTML for leftover item
+        function generateLeftoverItemHTML(item, index) {
+            const days = getDaysUntilExpiry(item.consumeByDate);
+            const status = getExpiryStatus(item.consumeByDate);
+            const statusClass = status;
+            const statusText = days < 0 ? `${Math.abs(days)} days ago` : 
+                              days === 0 ? 'Today' : 
+                              days === 1 ? '1 day' : 
+                              `${days} days`;
+            
+            // Category icons
+            const categoryIcons = {
+                'meat': ' drumstick-bite',
+                'vegetables': ' carrot',
+                'grains': ' bread-slice',
+                'dairy': ' cheese',
+                'soup': ' mug-hot',
+                'other': ' utensils'
+            };
+            
+            const categoryIcon = categoryIcons[item.category] || ' utensils';
+            
+            return `
+                <div class="leftover-item ${status}">
+                    <div class="leftover-info">
+                        <div class="leftover-name">
+                            <i class="fas fa${categoryIcon}"></i> ${item.name} 
+                            ${item.quantity > 1 ? `(${item.quantity})` : ''}
+                        </div>
+                        <div class="leftover-details">
+                            <span>Category: ${item.category.charAt(0).toUpperCase() + item.category.slice(1)}</span>
+                            <span>Storage: ${item.storageType === 'refrigerator' ? 'Fridge' : 'Freezer'}</span>
+                            <span>Stored: ${formatDate(item.storageDate)}</span>
+                            <span class="expiry-date ${statusClass}">Best by: ${formatDate(item.consumeByDate)} (${statusText})</span>
+                            ${item.description ? `<span>Description: ${item.description}</span>` : ''}
+                            ${item.notes ? `<span>Notes: ${item.notes}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="leftover-actions">
+                        <button class="action-btn consume-btn" data-index="${index}" title="Mark as Consumed">
+                            <i class="fas fa-utensils"></i>
+                        </button>
+                        <button class="action-btn edit-btn" data-index="${index}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Attach event listeners to action buttons
+        function attachEventListeners() {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    editLeftoverItem(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    deleteLeftoverItem(index);
+                });
+            });
+            
+            document.querySelectorAll('.consume-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    consumeLeftoverItem(index);
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalItems.textContent = leftoverItems.length;
+            
+            let safe = 0, warning = 0, expired = 0, fridge = 0, freezer = 0;
+            leftoverItems.forEach(item => {
+                const status = getExpiryStatus(item.consumeByDate);
+                if (status === 'safe') safe++;
+                else if (status === 'warning') warning++;
+                else if (status === 'expired') expired++;
+                
+                if (item.storageType === 'refrigerator') fridge++;
+                else if (item.storageType === 'freezer') freezer++;
+            });
+            
+            safeItems.textContent = safe;
+            warningItems.textContent = warning;
+            expiredItems.textContent = expired;
+            fridgeItems.textContent = fridge;
+            freezerItems.textContent = freezer;
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('leftoverItems', JSON.stringify(leftoverItems));
+            localStorage.setItem('consumptionCount', consumptionCount.toString());
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('leftoverItems');
+            const savedCount = localStorage.getItem('consumptionCount');
+            if (saved) {
+                leftoverItems = JSON.parse(saved);
+            }
+            if (savedCount) {
+                consumptionCount = parseInt(savedCount);
+            }
+            renderLeftoverList();
+            updateStats();
+        }
+        
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderLeftoverList(filter, searchInput.value.toLowerCase());
+        }
+        
+        // Check for expiring items
+        function checkExpiringItems() {
+            const expiringSoonItems = leftoverItems.filter(item => {
+                const days = getDaysUntilExpiry(item.consumeByDate);
+                return days >= 0 && days <= 2;
+            });
+            
+            if (expiringSoonItems.length > 0 && expiringSoon.checked) {
+                const itemNames = expiringSoonItems.map(item => item.name).join(', ');
+                showNotification(`Expiring soon: ${itemNames}`, 'warning');
+            }
+            
+            const expiredItems = leftoverItems.filter(item => getExpiryStatus(item.consumeByDate) === 'expired');
+            if (expiredItems.length > 0 && expiredAlert.checked) {
+                const itemNames = expiredItems.map(item => item.name).join(', ');
+                showNotification(`Expired items: ${itemNames}`, 'error');
+            }
+        }
+        
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(leftoverItems, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'leftover-reminder-data.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully!', 'success');
+        }
+        
+        // Import data
+        function importData() {
+            fileInput.click();
+        }
+        
+        // Handle file import
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        leftoverItems = importedData;
+                        saveToLocalStorage();
+                        renderLeftoverList();
+                        updateStats();
+                        showNotification('Data imported successfully!', 'success');
+                    } else {
+                        showNotification('Invalid file format', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error parsing file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                leftoverItems = [];
+                consumptionCount = 0;
+                saveToLocalStorage();
+                renderLeftoverList();
+                updateStats();
+                showNotification('All data cleared!', 'success');
+            }
+        }
+        
+        // Event listeners
+        addLeftoverBtn.addEventListener('click', addLeftoverItem);
+        
+        searchInput.addEventListener('input', (e) => {
+            renderLeftoverList(currentFilter, e.target.value.toLowerCase());
+        });
+        
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFilter(btn.getAttribute('data-filter'));
+            });
+        });
+        
+        quickAddButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.getAttribute('data-item');
+                const days = parseInt(btn.getAttribute('data-days'));
+                const category = btn.getAttribute('data-category');
+                quickAddLeftover(item, days, category);
+            });
+        });
+        
+        exportBtn.addEventListener('click', exportData);
+        importBtn.addEventListener('click', importData);
+        clearBtn.addEventListener('click', clearAllData);
+        fileInput.addEventListener('change', handleFileImport);
+        
+        // Initialize
+        loadFromLocalStorage();
+        
+        // Check for expiring items on load
+        setTimeout(checkExpiringItems, 1000);
+        
+        // Daily check (simulate with 30 second intervals for demo)
+        setInterval(checkExpiringItems, 30000);
+        
+        // Show consumption stats occasionally
+        setInterval(() => {
+            if (consumptionCount > 0 && dailyReminder.checked) {
+                showNotification(`You've consumed ${consumptionCount} items so far. Great job reducing waste!`, 'success');
+            }
+        }, 120000); // Every 2 minutes for demo
+    </script>
+</body>
+</html>

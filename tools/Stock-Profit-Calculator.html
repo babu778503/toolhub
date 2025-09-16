@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<!-- Category: Finance -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Profit Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71, #d76d77, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Desktop Styles */
+        .desktop-view {
+            display: none;
+        }
+        
+        .mobile-view {
+            display: block;
+        }
+        
+        header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #f1c40f);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin: 15px 0;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            flex: 1;
+            margin: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .transaction-list {
+            text-align: left;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .list-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .entry-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entry-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .entry-name i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #2ecc71;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .summary-section {
+            background: rgba(52, 152, 219, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        
+        .buy-bar {
+            background: linear-gradient(to top, #3498db, #2980b9);
+        }
+        
+        .sell-bar {
+            background: linear-gradient(to top, #2ecc71, #27ae60);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .savings-plan {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .savings-plan h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .savings-plan h3 i {
+            margin-right: 10px;
+        }
+        
+        .savings-steps {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .savings-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-section h2 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .comparison-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .comparison-card h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab i {
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .desktop-view {
+                display: block;
+            }
+            
+            .mobile-view {
+                display: none;
+            }
+            
+            header {
+                height: auto;
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .calculator-layout {
+                display: flex;
+                gap: 30px;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .result-section {
+                flex: 1;
+            }
+            
+            .calculator-card {
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                max-width: 300px;
+                margin: 0 auto 15px;
+            }
+            
+            .tabs {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-bar {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-label {
+                width: 50px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile View -->
+        <div class="mobile-view">
+            <header>
+                <h1>Stock Profit Calculator</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="stock-name"><i class="fas fa-chart-line"></i> Stock Name/Symbol</label>
+                    <input type="text" id="stock-name" placeholder="Enter stock name or symbol" value="AAPL">
+                </div>
+                
+                <div class="input-group">
+                    <label for="buy-price"><i class="fas fa-shopping-cart"></i> Buy Price Per Share ($)</label>
+                    <input type="number" id="buy-price" placeholder="Enter buy price" min="0" step="0.01" value="150">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sell-price"><i class="fas fa-tag"></i> Sell Price Per Share ($)</label>
+                    <input type="number" id="sell-price" placeholder="Enter sell price" min="0" step="0.01" value="185">
+                </div>
+                
+                <div class="input-group">
+                    <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Number of Shares</label>
+                    <input type="number" id="quantity" placeholder="Enter number of shares" min="1" value="100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="commission"><i class="fas fa-credit-card"></i> Commission/Fees ($)</label>
+                    <input type="number" id="commission" placeholder="Enter commission/fees" min="0" step="0.01" value="10">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('single')">
+                        <i class="fas fa-coins"></i> Single Trade
+                    </div>
+                    <div class="tab" onclick="switchTab('multiple')">
+                        <i class="fas fa-exchange-alt"></i> Multiple Trades
+                    </div>
+                </div>
+                
+                <div id="single-tab" class="tab-content active">
+                    <p>Calculate profit for a single buy-sell transaction.</p>
+                </div>
+                
+                <div id="multiple-tab" class="tab-content">
+                    <p>Calculate profit across multiple buy-sell transactions.</p>
+                </div>
+                
+                <button class="btn" onclick="calculateStockProfit()">
+                    <i class="fas fa-calculator"></i> Calculate Profit
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-title"><i class="fas fa-chart-line"></i> Profit Analysis</div>
+                <div class="result-amount positive" id="profit-amount">$3,490</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 85%"></div>
+                </div>
+                
+                <div class="result-description" id="result-description">
+                    Buy: $15,000 | Sell: $18,500 | Profit: $3,490
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-invested">$15,010</div>
+                        <div class="stat-label">Total Invested</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="total-returns">$18,500</div>
+                        <div class="stat-label">Total Returns</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value positive" id="roi">23.3%</div>
+                        <div class="stat-label">ROI</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" id="chart-container">
+                    <!-- Chart will be generated here -->
+                </div>
+                
+                <div class="transaction-list">
+                    <div class="list-title"><i class="fas fa-receipt"></i> Transaction Details</div>
+                    <div id="transaction-details">
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-shopping-cart"></i> Buy Cost</span>
+                            <span class="entry-amount negative">$15,010</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-tag"></i> Sell Proceeds</span>
+                            <span class="entry-amount positive">$18,500</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-credit-card"></i> Commission</span>
+                            <span class="entry-amount negative">$10</span>
+                        </div>
+                        <div class="entry-item">
+                            <span class="entry-name"><i class="fas fa-coins"></i> Net Profit</span>
+                            <span class="entry-amount positive">$3,490</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-title"><i class="fas fa-lightbulb"></i> Trading Insights</div>
+                    <p>This trade resulted in a 23.3% return on investment. The stock price increased by $35 per share, generating a solid profit after accounting for commissions.</p>
+                </div>
+                
+                <div class="savings-plan">
+                    <h3><i class="fas fa-clipboard-list"></i> Trading Strategy</h3>
+                    <ul class="savings-steps">
+                        <li>Set profit targets and stop-loss orders</li>
+                        <li>Diversify your stock portfolio</li>
+                        <li>Keep detailed records of all transactions</li>
+                        <li>Review and adjust your strategy regularly</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Scenario Analysis</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>10% Lower Sell Price</h4>
+                        <div class="comparison-value negative" id="lower-scenario">-$150</div>
+                        <div class="comparison-label">Profit</div>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>10% Higher Sell Price</h4>
+                        <div class="comparison-value positive" id="higher-scenario">$4,190</div>
+                        <div class="comparison-label">Profit</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-section">
+                <h2><i class="fas fa-star"></i> Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-calculator"></i> Comprehensive Analysis</h3>
+                        <p>Calculate profit for single and multiple trades</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                        <p>See transaction details with interactive charts</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3><i class="fas fa-lightbulb"></i> Trading Insights</h3>
+                        <p>Get actionable recommendations to optimize trades</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="desktop-view">
+            <header>
+                <h1>Stock Profit Calculator</h1>
+            </header>
+            
+            <div class="calculator-layout">
+                <div class="input-section">
+                    <div class="calculator-card">
+                        <div class="input-group">
+                            <label for="stock-name-desktop"><i class="fas fa-chart-line"></i> Stock Name/Symbol</label>
+                            <input type="text" id="stock-name-desktop" placeholder="Enter stock name or symbol" value="AAPL">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="buy-price-desktop"><i class="fas fa-shopping-cart"></i> Buy Price Per Share ($)</label>
+                            <input type="number" id="buy-price-desktop" placeholder="Enter buy price" min="0" step="0.01" value="150">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="sell-price-desktop"><i class="fas fa-tag"></i> Sell Price Per Share ($)</label>
+                            <input type="number" id="sell-price-desktop" placeholder="Enter sell price" min="0" step="0.01" value="185">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="quantity-desktop"><i class="fas fa-sort-numeric-up"></i> Number of Shares</label>
+                            <input type="number" id="quantity-desktop" placeholder="Enter number of shares" min="1" value="100">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="commission-desktop"><i class="fas fa-credit-card"></i> Commission/Fees ($)</label>
+                            <input type="number" id="commission-desktop" placeholder="Enter commission/fees" min="0" step="0.01" value="10">
+                        </div>
+                        
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTabDesktop('single')">
+                                <i class="fas fa-coins"></i> Single Trade Analysis
+                            </div>
+                            <div class="tab" onclick="switchTabDesktop('multiple')">
+                                <i class="fas fa-exchange-alt"></i> Multiple Trades Analysis
+                            </div>
+                        </div>
+                        
+                        <div id="single-tab-desktop" class="tab-content active">
+                            <p>Calculate profit for a single buy-sell transaction with detailed breakdown of costs and returns.</p>
+                        </div>
+                        
+                        <div id="multiple-tab-desktop" class="tab-content">
+                            <p>Calculate profit across multiple buy-sell transactions with average cost and weighted returns.</p>
+                        </div>
+                        
+                        <button class="btn" onclick="calculateStockProfitDesktop()">
+                            <i class="fas fa-calculator"></i> Calculate Stock Profit
+                        </button>
+                    </div>
+                    
+                    <div class="feature-section">
+                        <h2><i class="fas fa-star"></i> Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <h3><i class="fas fa-calculator"></i> Comprehensive Analysis</h3>
+                                <p>Calculate profit for single and multiple trades</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-chart-bar"></i> Visual Breakdown</h3>
+                                <p>See transaction details with interactive charts</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lightbulb"></i> Trading Insights</h3>
+                                <p>Get actionable recommendations to optimize trades</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-history"></i> Historical Tracking</h3>
+                                <p>Monitor performance across multiple transactions</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-bell"></i> Profit Alerts</h3>
+                                <p>Get notified when profit targets are reached</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3><i class="fas fa-lock"></i> Secure</h3>
+                                <p>All calculations happen locally in your browser</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-container">
+                        <div class="result-title"><i class="fas fa-chart-line"></i> Profit Analysis</div>
+                        <div class="result-amount positive" id="profit-amount-desktop">$3,490</div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar-desktop" style="width: 85%"></div>
+                        </div>
+                        
+                        <div class="result-description" id="result-description-desktop">
+                            Buy: $15,000 | Sell: $18,500 | Profit: $3,490
+                        </div>
+                        
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <div class="stat-value" id="total-invested-desktop">$15,010</div>
+                                <div class="stat-label">Total Invested</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="total-returns-desktop">$18,500</div>
+                                <div class="stat-label">Total Returns</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value positive" id="roi-desktop">23.3%</div>
+                                <div class="stat-label">ROI</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" id="chart-container-desktop">
+                            <!-- Chart will be generated here -->
+                        </div>
+                        
+                        <div class="transaction-list">
+                            <div class="list-title"><i class="fas fa-receipt"></i> Transaction Details</div>
+                            <div id="transaction-details-desktop">
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-shopping-cart"></i> Buy Cost</span>
+                                    <span class="entry-amount negative">$15,010</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-tag"></i> Sell Proceeds</span>
+                                    <span class="entry-amount positive">$18,500</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-credit-card"></i> Commission</span>
+                                    <span class="entry-amount negative">$10</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-coins"></i> Net Profit</span>
+                                    <span class="entry-amount positive">$3,490</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-percentage"></i> Profit Margin</span>
+                                    <span class="entry-amount positive">18.9%</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name"><i class="fas fa-arrow-up"></i> Price Change</span>
+                                    <span class="entry-amount positive">$35.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-section">
+                            <div class="summary-title"><i class="fas fa-lightbulb"></i> Trading Insights</div>
+                            <p>This trade resulted in a 23.3% return on investment. The stock price increased by $35 per share, generating a solid profit after accounting for commissions. With a profit margin of 18.9%, this represents a successful trade. Consider setting a stop-loss order at 10% below your buy price for future trades to limit downside risk.</p>
+                        </div>
+                        
+                        <div class="savings-plan">
+                            <h3><i class="fas fa-clipboard-list"></i> Trading Strategy</h3>
+                            <ul class="savings-steps">
+                                <li>Set profit targets (15-25%) and stop-loss orders (5-10%)</li>
+                                <li>Diversify your stock portfolio across sectors</li>
+                                <li>Keep detailed records of all transactions for tax purposes</li>
+                                <li>Review and adjust your strategy regularly based on market conditions</li>
+                                <li>Consider dollar-cost averaging for volatile stocks</li>
+                                <li>Reinvest profits to compound your returns over time</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Scenario Analysis</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-card">
+                                <h4>Conservative (10% Lower)</h4>
+                                <div class="comparison-value negative" id="lower-scenario-desktop">-$150</div>
+                                <div class="comparison-label">Profit</div>
+                                <div class="comparison-value" id="lower-roi-desktop">-1.0%</div>
+                                <div class="comparison-label">ROI</div>
+                            </div>
+                            <div class="comparison-card">
+                                <h4>Optimistic (10% Higher)</h4>
+                                <div class="comparison-value positive" id="higher-scenario-desktop">$4,190</div>
+                                <div class="comparison-label">Profit</div>
+                                <div class="comparison-value" id="higher-roi-desktop">27.9%</div>
+                                <div class="comparison-label">ROI</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functions
+        function switchTab(tabName) {
+            document.getElementById('single-tab').classList.remove('active');
+            document.getElementById('multiple-tab').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function switchTabDesktop(tabName) {
+            document.getElementById('single-tab-desktop').classList.remove('active');
+            document.getElementById('multiple-tab-desktop').classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[0].classList.remove('active');
+            document.querySelectorAll('.tabs .tab')[1].classList.remove('active');
+            
+            document.getElementById(tabName + '-tab-desktop').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Calculation functions
+        function calculateStockProfit() {
+            const stockName = document.getElementById('stock-name').value || 'Stock';
+            const buyPrice = parseFloat(document.getElementById('buy-price').value) || 0;
+            const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const commission = parseFloat(document.getElementById('commission').value) || 0;
+            
+            calculateResult(stockName, buyPrice, sellPrice, quantity, commission, 'mobile');
+            calculateComparison(buyPrice, sellPrice, quantity, commission, 'mobile');
+        }
+        
+        function calculateStockProfitDesktop() {
+            const stockName = document.getElementById('stock-name-desktop').value || 'Stock';
+            const buyPrice = parseFloat(document.getElementById('buy-price-desktop').value) || 0;
+            const sellPrice = parseFloat(document.getElementById('sell-price-desktop').value) || 0;
+            const quantity = parseFloat(document.getElementById('quantity-desktop').value) || 0;
+            const commission = parseFloat(document.getElementById('commission-desktop').value) || 0;
+            
+            calculateResult(stockName, buyPrice, sellPrice, quantity, commission, 'desktop');
+            calculateComparison(buyPrice, sellPrice, quantity, commission, 'desktop');
+        }
+        
+        function calculateResult(stockName, buyPrice, sellPrice, quantity, commission, device) {
+            // Calculate values
+            const buyCost = buyPrice * quantity;
+            const sellProceeds = sellPrice * quantity;
+            const totalInvested = buyCost + commission;
+            const netProfit = sellProceeds - totalInvested;
+            const roi = totalInvested > 0 ? (netProfit / totalInvested) * 100 : 0;
+            const profitMargin = sellProceeds > 0 ? (netProfit / sellProceeds) * 100 : 0;
+            const priceChange = sellPrice - buyPrice;
+            
+            // Update UI
+            const profitAmountElement = device === 'mobile' ? document.getElementById('profit-amount') : document.getElementById('profit-amount-desktop');
+            const resultDescriptionElement = device === 'mobile' ? document.getElementById('result-description') : document.getElementById('result-description-desktop');
+            const totalInvestedElement = device === 'mobile' ? document.getElementById('total-invested') : document.getElementById('total-invested-desktop');
+            const totalReturnsElement = device === 'mobile' ? document.getElementById('total-returns') : document.getElementById('total-returns-desktop');
+            const roiElement = device === 'mobile' ? document.getElementById('roi') : document.getElementById('roi-desktop');
+            const transactionDetailsElement = device === 'mobile' ? document.getElementById('transaction-details') : document.getElementById('transaction-details-desktop');
+            const chartContainer = device === 'mobile' ? document.getElementById('chart-container') : document.getElementById('chart-container-desktop');
+            const progressBar = device === 'mobile' ? document.getElementById('progress-bar') : document.getElementById('progress-bar-desktop');
+            const summaryElement = device === 'mobile' ? document.querySelector('.summary-section p') : document.querySelector('.summary-section p');
+            
+            // Set profit amount color
+            profitAmountElement.textContent = `$${netProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            profitAmountElement.className = netProfit >= 0 ? 'result-amount positive' : 'result-amount negative';
+            
+            resultDescriptionElement.textContent = `Buy: $${buyCost.toLocaleString()} | Sell: $${sellProceeds.toLocaleString()} | Profit: $${netProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            totalInvestedElement.textContent = `$${totalInvested.toLocaleString()}`;
+            totalReturnsElement.textContent = `$${sellProceeds.toLocaleString()}`;
+            roiElement.textContent = `${roi.toFixed(1)}%`;
+            roiElement.className = roi >= 0 ? 'stat-value positive' : 'stat-value negative';
+            
+            // Update transaction details
+            transactionDetailsElement.innerHTML = '';
+            
+            const buyItem = document.createElement('div');
+            buyItem.className = 'entry-item';
+            buyItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-shopping-cart"></i> Buy Cost</span>
+                <span class="entry-amount negative">-$${buyCost.toLocaleString()}</span>
+            `;
+            transactionDetailsElement.appendChild(buyItem);
+            
+            const sellItem = document.createElement('div');
+            sellItem.className = 'entry-item';
+            sellItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-tag"></i> Sell Proceeds</span>
+                <span class="entry-amount positive">$${sellProceeds.toLocaleString()}</span>
+            `;
+            transactionDetailsElement.appendChild(sellItem);
+            
+            const commissionItem = document.createElement('div');
+            commissionItem.className = 'entry-item';
+            commissionItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-credit-card"></i> Commission</span>
+                <span class="entry-amount negative">-$${commission.toLocaleString()}</span>
+            `;
+            transactionDetailsElement.appendChild(commissionItem);
+            
+            const profitItem = document.createElement('div');
+            profitItem.className = 'entry-item';
+            profitItem.innerHTML = `
+                <span class="entry-name"><i class="fas fa-coins"></i> Net Profit</span>
+                <span class="entry-amount ${netProfit >= 0 ? 'positive' : 'negative'}">$${netProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+            `;
+            transactionDetailsElement.appendChild(profitItem);
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const marginItem = document.createElement('div');
+                marginItem.className = 'entry-item';
+                marginItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-percentage"></i> Profit Margin</span>
+                    <span class="entry-amount ${profitMargin >= 0 ? 'positive' : 'negative'}">${profitMargin.toFixed(1)}%</span>
+                `;
+                transactionDetailsElement.appendChild(marginItem);
+                
+                const changeItem = document.createElement('div');
+                changeItem.className = 'entry-item';
+                changeItem.innerHTML = `
+                    <span class="entry-name"><i class="fas fa-arrow-up"></i> Price Change</span>
+                    <span class="entry-amount ${priceChange >= 0 ? 'positive' : 'negative'}">$${priceChange.toFixed(2)}</span>
+                `;
+                transactionDetailsElement.appendChild(changeItem);
+            }
+            
+            // Update summary
+            let summaryText = '';
+            if (netProfit > 0) {
+                summaryText = `This trade resulted in a ${roi.toFixed(1)}% return on investment. The stock price increased by $${priceChange.toFixed(2)} per share, generating a solid profit after accounting for commissions. With a profit margin of ${profitMargin.toFixed(1)}%, this represents a successful trade. Consider setting a stop-loss order at 10% below your buy price for future trades to limit downside risk.`;
+            } else if (netProfit < 0) {
+                summaryText = `This trade resulted in a ${Math.abs(roi).toFixed(1)}% loss on investment. The stock price decreased by $${Math.abs(priceChange).toFixed(2)} per share. Review your trading strategy and consider setting stop-loss orders to limit future losses. Remember to factor in commissions when calculating potential profits.`;
+            } else {
+                summaryText = `This trade broke even with no profit or loss. The stock price remained relatively unchanged, and commissions eliminated any small gains. Consider trading higher-volume stocks or reducing transaction costs to improve profitability.`;
+            }
+            summaryElement.textContent = summaryText;
+            
+            // Generate chart
+            generateChart(buyCost, sellProceeds, commission, chartContainer, device);
+            
+            // Animate progress bar
+            const progressPercentage = Math.min(100, Math.max(0, (Math.abs(netProfit) / sellProceeds) * 100));
+            setTimeout(() => {
+                progressBar.style.width = `${progressPercentage}%`;
+            }, 300);
+        }
+        
+        function calculateComparison(buyPrice, sellPrice, quantity, commission, device) {
+            // Calculate for 10% lower sell price
+            const lowerSellPrice = sellPrice * 0.9;
+            const lowerBuyCost = buyPrice * quantity;
+            const lowerSellProceeds = lowerSellPrice * quantity;
+            const lowerNetProfit = lowerSellProceeds - (lowerBuyCost + commission);
+            const lowerRoi = (lowerBuyCost + commission) > 0 ? (lowerNetProfit / (lowerBuyCost + commission)) * 100 : 0;
+            
+            // Calculate for 10% higher sell price
+            const higherSellPrice = sellPrice * 1.1;
+            const higherBuyCost = buyPrice * quantity;
+            const higherSellProceeds = higherSellPrice * quantity;
+            const higherNetProfit = higherSellProceeds - (higherBuyCost + commission);
+            const higherRoi = (higherBuyCost + commission) > 0 ? (higherNetProfit / (higherBuyCost + commission)) * 100 : 0;
+            
+            // Update comparison UI
+            const lowerScenarioElement = device === 'mobile' ? document.getElementById('lower-scenario') : document.getElementById('lower-scenario-desktop');
+            const higherScenarioElement = device === 'mobile' ? document.getElementById('higher-scenario') : document.getElementById('higher-scenario-desktop');
+            
+            lowerScenarioElement.textContent = `$${lowerNetProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            lowerScenarioElement.className = lowerNetProfit >= 0 ? 'comparison-value positive' : 'comparison-value negative';
+            
+            higherScenarioElement.textContent = `$${higherNetProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            higherScenarioElement.className = higherNetProfit >= 0 ? 'comparison-value positive' : 'comparison-value negative';
+            
+            // Desktop additional fields
+            if (device === 'desktop') {
+                const lowerRoiElement = document.getElementById('lower-roi-desktop');
+                const higherRoiElement = document.getElementById('higher-roi-desktop');
+                
+                lowerRoiElement.textContent = `${lowerRoi.toFixed(1)}%`;
+                lowerRoiElement.className = lowerRoi >= 0 ? 'comparison-value positive' : 'comparison-value negative';
+                
+                higherRoiElement.textContent = `${higherRoi.toFixed(1)}%`;
+                higherRoiElement.className = higherRoi >= 0 ? 'comparison-value positive' : 'comparison-value negative';
+            }
+        }
+        
+        function generateChart(buyCost, sellProceeds, commission, container, device) {
+            container.innerHTML = '';
+            
+            const maxValue = Math.max(buyCost + commission, sellProceeds);
+            const maxHeight = device === 'mobile' ? 150 : 200;
+            
+            // Buy bar
+            const buyBar = document.createElement('div');
+            buyBar.className = 'chart-bar buy-bar';
+            const buyHeight = maxValue > 0 ? ((buyCost + commission) / maxValue) * maxHeight : 0;
+            buyBar.style.height = buyHeight + 'px';
+            buyBar.textContent = `$${((buyCost + commission)/1000).toFixed(0)}k`;
+            
+            const buyLabel = document.createElement('div');
+            buyLabel.className = 'chart-label';
+            buyLabel.textContent = 'Buy';
+            
+            const buyContainer = document.createElement('div');
+            buyContainer.style.display = 'flex';
+            buyContainer.style.flexDirection = 'column';
+            buyContainer.style.alignItems = 'center';
+            buyContainer.style.margin = '0 10px';
+            
+            buyContainer.appendChild(buyBar);
+            buyContainer.appendChild(buyLabel);
+            
+            // Sell bar
+            const sellBar = document.createElement('div');
+            sellBar.className = 'chart-bar sell-bar';
+            const sellHeight = maxValue > 0 ? (sellProceeds / maxValue) * maxHeight : 0;
+            sellBar.style.height = sellHeight + 'px';
+            sellBar.textContent = `$${(sellProceeds/1000).toFixed(0)}k`;
+            
+            const sellLabel = document.createElement('div');
+            sellLabel.className = 'chart-label';
+            sellLabel.textContent = 'Sell';
+            
+            const sellContainer = document.createElement('div');
+            sellContainer.style.display = 'flex';
+            sellContainer.style.flexDirection = 'column';
+            sellContainer.style.alignItems = 'center';
+            sellContainer.style.margin = '0 10px';
+            
+            sellContainer.appendChild(sellBar);
+            sellContainer.appendChild(sellLabel);
+            
+            container.appendChild(buyContainer);
+            container.appendChild(sellContainer);
+        }
+        
+        // Initialize calculator
+        window.onload = function() {
+            calculateStockProfit();
+            calculateStockProfitDesktop();
+        };
+    </script>
+</body>
+</html>
