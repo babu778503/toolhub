@@ -1,16 +1,6 @@
-// ✅ LCP FIX: Embed tool data directly to remove the network dependency.
-const toolsData = [
-  // PASTE THE ENTIRE CONTENTS OF YOUR tools.json FILE HERE.
-  // Example:
-  // { "id": "App-Usage-Monitor", "Name": "App Usage Monitor", "Category": "Utility" },
-  // { "id": "Asthma-Trigger-Monitor", "Name": "Asthma Trigger Monitor", "Category": "Health" },
-  // ... and so on for all your tools ...
-];
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const GOOGLE_CLIENT_ID = '208793911052-4eeuooehop93nmjdbc672vlk0am737bf.apps.googleusercontent.com';
-    
+    let toolsData = [];
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const mainHeader = document.querySelector('.main-header');
     const hamburgerMenu = document.getElementById('hamburger-menu');
@@ -20,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoLink = document.querySelector('.logo');
     const signInModal = document.getElementById('signInModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
-    
     const popularGrid = document.getElementById('popular-tools-grid');
     const newGrid = document.getElementById('new-tools-grid');
     const toolViewerContainer = document.getElementById('tool-viewer-container');
@@ -45,12 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUEST_BOOKMARK_LIMIT = 20;
     const RECENTLY_USED_LIMIT = 100;
     let lastScrollTop = 0;
-
     const profileLink = document.getElementById('profile-link');
     const profileSignInModal = document.getElementById('profileSignInModal');
     const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
     let userProfile = null;
-
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
     const unlockAudio = () => { alarmSound.play().catch(() => {}); alarmSound.pause(); alarmSound.currentTime = 0; };
     document.body.addEventListener('click', unlockAudio, { once: true });
@@ -290,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (alarmsChanged) { saveAlarms(); }
     };
 
+    // ✅ NEW: Function updated to include a loading spinner
     const createToolViewerHTML = (toolId, toolName) => {
         const saneToolName = sanitizeHTML(toolName);
         return `<div class="container">
@@ -516,8 +504,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ✅ MODIFIED: The initializeApp function is now the main entry point
-    function initializeApp() {
+    // ✅ NEW: Prefetching logic added for popular tools
+    function initializeApp(data) {
+        toolsData = data;
+        
         const storedProfile = localStorage.getItem('toolHubUserProfile');
         if (storedProfile) {
             userProfile = JSON.parse(storedProfile);
@@ -526,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadAndScheduleAlarms();
         updateYourWorkBadge();
-        const shuffledTools = [...toolsData].sort(() => 0.5 - Math.random());
+        const shuffledTools = [...data].sort(() => 0.5 - Math.random());
         const numPopular = 18;
         const numNew = 18;
         const popularTools = shuffledTools.slice(0, numPopular);
@@ -566,7 +556,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // ✅ REMOVED: The old loadData() function is gone.
-    // We now call initializeApp directly since data is embedded.
-    initializeApp();
+    async function loadData() { 
+        try { 
+            const response = await fetch(`/tools.json`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); 
+            initializeApp(await response.json()); 
+        } catch (error) { 
+            console.error("Failed to load tools data:", error);
+            if(popularGrid) popularGrid.innerHTML = `<p style="text-align: center; padding: 2rem;">Could not load tools. Please try again later.</p>`;
+            if(newGrid) newGrid.innerHTML = '';
+        } 
+    }
+    loadData();
 });
