@@ -336,7 +336,16 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerMenu.addEventListener('click', () => mainNav.classList.toggle('active'));
     logoLink.addEventListener('click', (e) => { e.preventDefault(); history.pushState({view: 'home'}, '', '/'); switchView('home'); });
     
-    const handleDataViewClick = (e) => { const link = e.target.closest('a[data-view]'); if (link && link.id !== 'profile-link') { e.preventDefault(); history.pushState({view: link.dataset.view}, '', '/'); switchView(link.dataset.view); } };
+    const handleDataViewClick = (e) => {
+        const link = e.target.closest('a[data-view]');
+        if (link && link.id !== 'profile-link') {
+            e.preventDefault();
+            const view = link.dataset.view;
+            const newPath = view === 'home' ? '/' : `/${view}`;
+            history.pushState({view: view}, '', newPath);
+            switchView(view);
+        }
+    };
     mainNav.addEventListener('click', handleDataViewClick);
     footerLinks.forEach(link => link.addEventListener('click', handleDataViewClick));
 
@@ -381,7 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             hideTool(false);
-            switchView(history.state?.view || 'home');
+            const validViews = ['home', 'categories', 'popular', 'your-tools', 'your-work'];
+            let view = path.substring(1) || 'home';
+            if (!validViews.includes(view)) {
+                view = 'home';
+                history.replaceState({ view: 'home' }, '', '/');
+            }
+            switchView(view);
         }
     };
 
