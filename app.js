@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const GOOGLE_CLIENT_ID = '208793911052-4eeuooehop93nmjdbc672vlk0am737bf.apps.googleusercontent.com';
+    const GOOGLE_CLIENT_ID = '208793911052-i7llo7t1j7age2h804ij2lca76ju3jsg.apps.googleusercontent.com';
     let toolsData = [];
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const mainHeader = document.querySelector('.main-header');
@@ -584,3 +584,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadData();
 });
+
