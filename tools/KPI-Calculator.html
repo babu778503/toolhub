@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI Calculator</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #f4f7f9; --card-bg: #ffffff; --text-color: #333;
+            --primary-color: #007bff; --secondary-color: #6c757d; --border-color: #dee2e6;
+            --header-bg: #343a40; --header-text: #ffffff; --weekend-bg: #f8d7da;
+            --holiday-bg: #d1ecf1; --good-color: #28a745; --bad-color: #dc3545;
+            --today-bg: #e7f3ff; --today-border: #007bff;
+        }
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;margin:0;padding:1rem;background-color:var(--bg-color);color:var(--text-color);line-height:1.6;}
+        .container{max-width:1400px;margin:0 auto;display:grid;gap:1.5rem;}
+        header{background-color:var(--header-bg);color:var(--header-text);padding:1rem 1.5rem;border-radius:8px;position:relative;text-align:center;}
+        header h1 { margin: 0; }
+        header h2 { margin: 0.25rem 0 0; font-size: 1rem; font-weight: 400; color: rgba(255,255,255,0.8); }
+        #toggleFooterBtn { background: transparent; border: none; padding: 0.5rem; cursor: pointer; color: var(--header-text); position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);}
+        #toggleFooterBtn .toggle-icon .icon-eye-open { display: inline-block; fill: var(--good-color); }
+        #toggleFooterBtn .toggle-icon .icon-eye-closed { display: none; fill: var(--bad-color); }
+        #toggleFooterBtn.is-toggled .toggle-icon .icon-eye-open { display: none; }
+        #toggleFooterBtn.is-toggled .toggle-icon .icon-eye-closed { display: inline-block; }
+        footer.is-hidden { display: none; }
+
+        .card{background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:1.5rem;box-shadow:0 2px 4px rgba(0,0,0,.05);}
+        .card-header{display:flex;justify-content:space-between;align-items:center;font-size:1.25rem;font-weight:600;margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border-color);}
+        .card-header.is-collapsible{cursor:pointer;}
+        .card-content{transition:all .3s ease-in-out;}
+        .is-collapsed .card-content{display:none;}
+        .toggle-icon svg{width:1.5em;height:1.5em;vertical-align:middle;}
+        .toggle-icon .icon-eye-open{display:inline-block;fill:var(--good-color);}
+        .toggle-icon .icon-eye-closed{display:none;fill:var(--bad-color);}
+        .is-collapsed .toggle-icon .icon-eye-open{display:none;}
+        .is-collapsed .toggle-icon .icon-eye-closed{display:inline-block;}
+        .grid-container,.weekend-selector{display:flex;flex-wrap:wrap;gap:1rem;}
+        .form-group{margin-bottom:1rem;flex:1;min-width:250px;}
+        .form-group label{display:block;font-weight:600;margin-bottom:.5rem;}
+        .input-group{display:flex;}
+        .form-group input[type="date"],.form-group input[type="text"],.form-group input[type="number"],.form-group input[type="password"]{width:100%;padding:.5rem;border:1px solid var(--border-color);border-radius:4px;box-sizing:border-box;font-size:1rem;}
+        .form-group input.error{border-color:var(--bad-color);box-shadow:0 0 3px var(--bad-color);}
+        .lockable-input:disabled { background-color: #e9ecef; cursor: not-allowed; }
+        .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1rem;text-align:center;}
+        .summary-item .value{font-size:2rem;font-weight:700;color:var(--primary-color);}
+        .summary-item .label{font-size:.9rem;color:var(--secondary-color);}
+        .kpi-config-row{border:1px solid var(--border-color);border-radius:6px;padding:1rem;margin-bottom:1rem;}
+        .kpi-config-row .kpi-config-header{display:flex;justify-content:space-between;align-items:center;}
+        .kpi-name-input{font-size:1.1rem;font-weight:bold;border:none;border-bottom:2px solid var(--primary-color);padding:.25rem 0;width:80%;}
+        .target-mode-selector{display:flex;gap:1rem;font-size:.9rem;}
+        .kpi-config-row[data-mode="monthly"] .blockwise-inputs,.kpi-config-row[data-mode="blockwise"] .monthly-inputs{display:none;}
+        .bw-grid{display:grid;gap:1rem;grid-template-columns:1fr 1fr;}
+        .bw-blocks-container { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+        .bw-block-row { border: 1px solid #e9ecef; padding: 1rem; border-radius: 6px; background-color: #fdfdfd;}
+        .bw-block-name-input { font-weight: bold; border: none; background: transparent; font-size: 1.1rem; padding: 0.25rem; width: 60%; border-bottom: 2px solid transparent; }
+        .bw-block-name-input:focus { outline: none; border-bottom: 2px solid var(--primary-color); background-color: #fff; }
+        .remove-block-btn { padding: 0 .5rem; font-size: 1.5rem; line-height: 1; border: none; background: transparent; cursor: pointer; color: var(--bad-color); }
+        #addKpiBtn{width:100%;margin-top:1rem;}
+        #kpi-summary-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:1.5rem;}
+        .kpi-table{width:100%;border-collapse:collapse;}
+        .kpi-table td{padding:.5rem;text-align:left;border-bottom:1px solid var(--border-color);}
+        .kpi-table .label{font-weight:600;}
+        .kpi-table .value{text-align:right;font-weight:bold;}
+        .kpi-table .required-ads{color:var(--bad-color);}
+        .kpi-table .block-value{font-size:.9em;}
+        .kpi-table .block-value .actual{color:var(--good-color);}
+        .kpi-table .block-value .ach-percent{color:var(--secondary-color);font-style:italic;}
+        #daily-tracking-table-container{overflow-x:auto;}
+        #daily-tracking-table{width:100%;margin-top:1rem;border-collapse:collapse;font-size:.9rem;}
+        #daily-tracking-table th,#daily-tracking-table td{padding:.5rem;text-align:center;border:1px solid var(--border-color);white-space:nowrap;}
+        #daily-tracking-table thead{background-color:#e9ecef;position:sticky;top:0;z-index:10;}
+        #daily-tracking-table .actual-input:disabled { background-color: #f8f9fa; color: #6c757d; }
+        .weekend-row{background-color:var(--weekend-bg)!important;}
+        .holiday-row{background-color:var(--holiday-bg)!important;}
+        .today-row{background-color:var(--today-bg)!important;font-weight:bold;}
+        .today-row .actual-input:not(:disabled) { background-color: #fff; border: 1px solid var(--good-color); box-shadow: 0 0 5px var(--good-color); }
+        .today-row td{border-top:2px solid var(--today-border);border-bottom:2px solid var(--today-border);}
+        .btn{padding:.6rem 1.2rem;border:none;border-radius:5px;cursor:pointer;font-size:1rem;font-weight:600;}
+        .btn:disabled { background-color: #ced4da; cursor: not-allowed; }
+        .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow-y:auto;background-color:rgba(0,0,0,.5);align-items:flex-start;justify-content:center;padding:2rem 1rem;}
+        .modal-content{background-color:#fff;margin:auto;padding:20px;border-radius:8px;width:90%;max-width:800px;box-shadow:0 5px 15px rgba(0,0,0,.3);position:relative;}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:.5rem;margin-bottom:1rem;}
+        .modal-title{font-size:1.5rem;margin:0;}
+        .close-btn{font-size:2rem;line-height:1;border:none;background:transparent;cursor:pointer;color:var(--secondary-color);padding:0 .5rem;}
+        .modal-footer{padding-top:1rem;margin-top:1rem;border-top:1px solid var(--border-color);display:flex;justify-content:flex-end;gap:1rem;align-items:center;}
+        .modal-footer .modal-help-text { margin-right: auto; font-size: 0.9em; color: var(--secondary-color); }
+        .calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+        .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;}
+        .date-cell{cursor:pointer;user-select:none;}
+        .date-cell:focus{outline:2px solid var(--primary-color);outline-offset:-2px;}
+        .date-cell:hover{background-color:#e9ecef;}
+        .date-cell.selected{background-color:var(--primary-color);color:#fff;}
+        .date-cell.range-start{background-color:var(--good-color);color:#fff;}
+        #export-content{display:grid;gap:1.5rem;}
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: start; }
+        .footer-section h3 { font-size: 1.1rem; margin-top: 0; margin-bottom: 0.75rem; color: var(--secondary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .footer-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .footer-info p { font-size: 0.9rem; margin: 0.5rem 0; }
+        .footer-info strong { color: var(--primary-color); }
+        .footer-section .form-group { margin-bottom: 0.5rem; }
+        .footer-section label { font-size: 0.9rem; margin-bottom: 0.25rem; }
+        #preserved-data-container, #user-manual-content { display: grid; gap: 1rem; max-height: 70vh; overflow-y: auto; padding: .5rem; background-color: #f8f9fa; border-radius: 6px; }
+        #user-manual-content h4 { margin-bottom: 0.5rem; } #user-manual-content p, #user-manual-content ol { margin-top: 0; font-size: 0.95rem; } #user-manual-content li { margin-bottom: 0.5rem; }
+        .preserved-month-card { background-color: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; }
+        .preserved-data-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+        .preserved-data-table th, .preserved-data-table td { padding: .5rem; text-align: left; border-bottom: 1px solid #e9ecef; }
+        .preserved-data-table th { background-color: #e9ecef; }
+        .preserved-data-table td:not(:first-child) { text-align: right; }
+        #print-area{display:none;}
+        .mobile-only { display: none; }
+        @media print{
+            body *{visibility:hidden;}
+            #print-area,#print-area *{visibility:visible;}
+            #print-area{display:block;position:absolute;left:0;top:0;width:100%;}
+            .card{box-shadow:none;border:1px solid #ccc;}
+            #print-area .card-content{display:block!important;}
+            #print-area #daily-tracking-table input{-webkit-appearance:none;appearance:none;border:none;background-color:transparent;width:auto;text-align:center;color:#333;}
+            .weekend-row,.holiday-row,.today-row{background-color:#eee!important;-webkit-print-color-adjust:exact!important;color-adjust:exact!important;}
+        }
+
+        /* --- Mobile Friendly Styles --- */
+        @media (max-width: 800px) {
+            body { padding: 0.5rem; font-size: 16px; }
+            .container, #export-content { gap: 0.5rem; }
+            .card { padding: 1rem; }
+            header { height: 50px; padding-top: 0; padding-bottom: 0; display: flex; align-items: center; box-sizing: border-box; justify-content: center; }
+            header h1 { font-size: 1.2rem; line-height: 1.3; }
+            header h2 { display: none; }
+            .grid-container, .footer-grid, #kpi-summary-container, .bw-grid { grid-template-columns: 1fr; }
+            #kpi-summary-container { gap: 1rem; }
+            .summary-grid { gap: 0.5rem; }
+            .summary-item .value { font-size: 1.5rem; }
+            .summary-item .label { font-size: 0.8rem; }
+            .footer-buttons .btn { flex-grow: 1; }
+            .weekend-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+            .modal-content { width: 95%; padding: 15px; }
+            .modal-title { font-size: 1.2rem; }
+            .mobile-only { display: inline-flex; align-items: center; font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+
+            /* New Mobile Table Styles */
+            #daily-tracking-table-container { overflow-x: visible; }
+            #daily-tracking-table, #daily-tracking-table thead, #daily-tracking-table tbody,
+            #daily-tracking-table tr, #daily-tracking-table td { display: block; }
+            #daily-tracking-table thead { display: none; }
+            #daily-tracking-table tr { margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+            #daily-tracking-table td { border: none; border-bottom: 1px solid #f0f0f0; padding-left: 0; padding-right: 0; white-space: normal; display: flex; justify-content: space-between; align-items: center; }
+            #daily-tracking-table tr td:last-child { border-bottom: none; }
+            #daily-tracking-table td:nth-child(1), #daily-tracking-table td:nth-child(2), #daily-tracking-table td:nth-child(3) { padding-bottom: .5rem; margin-bottom: .5rem; font-size: 1.1rem; }
+            #daily-tracking-table td:nth-child(1) { font-weight: bold; font-size: 1.2rem; color: var(--primary-color); }
+            #daily-tracking-table td:nth-child(2) { color: var(--secondary-color); }
+            #daily-tracking-table td:nth-child(3) { justify-content: flex-end; }
+            #daily-tracking-table td:nth-child(1)::before, #daily-tracking-table td:nth-child(2)::before, #daily-tracking-table td:nth-child(3)::before { content: none; }
+            #daily-tracking-table td:nth-child(n+4)::before { content: attr(data-kpi-name); font-weight: 600; }
+            #daily-tracking-table .actual-input { width: 40%; text-align: right; padding: .4rem; }
+
+            #daily-tracking-card.today-only tr.not-today { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>KPI Calculator</h1>
+        <h2>Save your time, Enjoy your life</h2>
+        <button id="toggleFooterBtn" title="Toggle Actions & Info Panel">
+             <span class="toggle-icon">
+                <svg class="icon-eye-open" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>
+                <svg class="icon-eye-closed" viewBox="0 0 16 16"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.94 5.94 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.288l.822.822.084.083a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829l.822.822.084.083z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 6.884-12-12 .708-.708 12 12-.708.708z"/></svg>
+            </span>
+        </button>
+    </header>
+
+    <!-- UI Sections 1-2 -->
+    <div class="card no-print is-collapsed">
+        <h2 class="card-header is-collapsible"><span>1. General Configuration</span><span class="toggle-icon"><svg class="icon-eye-open" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg><svg class="icon-eye-closed" viewBox="0 0 16 16"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.94 5.94 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.288l.822.822.084.083a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829l.822.822.084.083z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 6.884-12-12 .708-.708 12 12-.708.708z"/></svg></span></h2>
+        <div class="card-content">
+            <div class="grid-container">
+                <div class="form-group"><label for="startDate">Start Date</label><input type="date" id="startDate" class="config-input lockable-input"></div>
+                <div class="form-group"><label for="endDate">End Date</label><input type="date" id="endDate" class="config-input lockable-input"></div>
+                <div class="form-group"><label for="holidays">Holidays</label><div class="input-group"><input type="text" id="holidays" class="config-input lockable-input" placeholder="Select..."><button id="openHolidayPickerBtn" class="input-group-btn lockable-input" title="Select Holidays">📅</button></div></div>
+                <div class="form-group"><label>Weekend Days</label><div class="weekend-selector"><label><input type="checkbox" class="config-input weekend-day lockable-input" value="0"> Sun</label><label><input type="checkbox" class="config-input weekend-day lockable-input" value="1"> Mon</label><label><input type="checkbox" class="config-input weekend-day lockable-input" value="2"> Tue</label><label><input type="checkbox" class="config-input weekend-day lockable-input" value="3"> Wed</label><label><input type="checkbox" class="config-input weekend-day lockable-input" value="4"> Thu</label><label><input type="checkbox" class="config-input weekend-day lockable-input" value="5" checked> Fri</label><label><input type="checkbox" class="config-input weekend-day lockable-input" value="6" checked> Sat</label></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="card no-print is-collapsed">
+        <h2 class="card-header is-collapsible"><span>2. KPI & Target Configuration</span><span class="toggle-icon"><svg class="icon-eye-open" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg><svg class="icon-eye-closed" viewBox="0 0 16 16"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.94 5.94 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.288l.822.822.084.083a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829l.822.822.084.083z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 6.884-12-12 .708-.708 12 12-.708.708z"/></svg></span></h2>
+        <div id="kpi-card-content" class="card-content"><div id="kpi-config-container"></div><button id="addKpiBtn" class="btn btn-success no-print lockable-input">+ Add Another KPI</button></div>
+    </div>
+    
+    <!-- UI Sections 3-5 -->
+    <div id="export-content">
+        <div class="card">
+            <h2 class="card-header is-collapsible"><span>3. Period Summary</span><span class="toggle-icon"><svg class="icon-eye-open" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg><svg class="icon-eye-closed" viewBox="0 0 16 16"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.94 5.94 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.288l.822.822.084.083a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829l.822.822.084.083z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 6.884-12-12 .708-.708 12 12-.708.708z"/></svg></span></h2>
+            <div class="card-content">
+                <div class="summary-grid">
+                    <div class="summary-item"><div class="value" id="totalWorkingDays">0</div><div class="label">Working Days</div></div>
+                    <div class="summary-item"><div class="value" id="presentWorkingDays">0</div><div class="label">Present Days</div></div>
+                    <div class="summary-item"><div class="value" id="remainingWorkingDays">0</div><div class="label">Remaining Days</div></div>
+                    <div class="summary-item"><div class="value" id="totalWeekends">0</div><div class="label">Weekends</div></div>
+                    <div class="summary-item"><div class="value" id="totalHolidays">0</div><div class="label">Holidays</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2 class="card-header is-collapsible"><span>4. KPI Performance Dashboard</span><span class="toggle-icon"><svg class="icon-eye-open" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg><svg class="icon-eye-closed" viewBox="0 0 16 16"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.94 5.94 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.288l.822.822.084.083a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829l.822.822.084.083z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 6.884-12-12 .708-.708 12 12-.708.708z"/></svg></span></h2>
+            <div class="card-content"><div id="kpi-summary-container"></div></div>
+        </div>
+        <div class="card" id="daily-tracking-card">
+            <h2 class="card-header"><span>5. Daily Actuals Tracking</span><button id="toggle-dates-btn" class="btn mobile-only">Show All Dates</button></h2>
+            <div id="daily-tracking-table-container">
+                <table id="daily-tracking-table"><thead id="daily-table-head"></thead><tbody id="daily-table-body"></tbody></table>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="no-print">
+        <div class="card">
+            <h2 class="card-header">Actions & Information</h2>
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Export Data</h3>
+                    <div class="footer-buttons">
+                        <button id="downloadBtn" class="btn btn-primary">Download CSV</button>
+                        <button id="pdfBtn" class="btn btn-primary">Download PDF</button>
+                        <button id="printBtn" class="btn btn-primary">Print</button>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Data History</h3>
+                    <div class="footer-buttons">
+                        <button id="dataPreserveBtn" class="btn btn-primary">Preserve Current Month</button>
+                        <button id="viewPreservedDataBtn" class="btn btn-secondary">View History</button>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Administration & Security</h3>
+                    <div class="form-group">
+                        <label for="passwordInput">Password</label>
+                        <input type="password" id="passwordInput" placeholder="Set / Change / Unlock">
+                    </div>
+                    <div class="footer-buttons">
+                        <button id="setPasswordBtn" class="btn btn-secondary lockable-input">Set Password</button>
+                        <button id="lockUnlockBtn" class="btn btn-primary">Lock</button>
+                        <button id="resetBtn" class="btn btn-secondary">Reset All</button>
+                        <button id="forgotPasswordBtn" class="btn btn-secondary">Forgot Password?</button>
+                    </div>
+                </div>
+                <div class="footer-section footer-info">
+                    <h3>About This Tool</h3>
+                     <div class="footer-buttons">
+                        <button id="viewUserManualBtn" class="btn btn-secondary">View User Manual</button>
+                    </div>
+                    <p>A comprehensive tool for tracking field force performance against multiple KPIs.</p>
+                    <p><strong>Version:</strong> 5.04</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<div id="print-area"></div>
+<div id="holidayPickerModal" class="modal no-print">
+    <div class="modal-content">
+        <div class="modal-header"><button id="prevMonthBtn" class="btn btn-secondary"><</button><span id="holidayMonthYear"></span><button id="nextMonthBtn" class="btn btn-secondary">></button></div>
+        <div class="calendar-grid" id="calendarDayHeaders"></div>
+        <div class="calendar-grid" id="calendarDatesGrid"></div>
+        <div class="modal-footer"><span class="modal-help-text">Click / Space to toggle a date. <b>Shift+Click</b> to select/deselect a range.</span><button id="doneHolidaySelectionBtn" class="btn btn-primary">Done</button></div>
+    </div>
+</div>
+<div id="preservedDataModal" class="modal no-print">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Preserved Monthly Data</h2>
+            <button id="closePreservedDataModalBtn" class="close-btn" aria-label="Close">×</button>
+        </div>
+        <div id="preserved-data-container"><p>No data has been preserved yet.</p></div>
+    </div>
+</div>
+<div id="userManualModal" class="modal no-print">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">User Manual</h2>
+            <button id="closeUserManualModalBtn" class="close-btn" aria-label="Close">×</button>
+        </div>
+        <div id="user-manual-content">
+            <h4>Welcome to the KPI Calculator!</h4>
+            <p>This tool is a self-contained HTML file. All data is saved directly in your browser's local storage, meaning it's private and works offline. No data is sent over the internet.</p>
+            
+            <h4>1. General Configuration</h4>
+            <ol>
+                <li><strong>Start/End Date:</strong> Set the period you want to track. The tool automatically defaults to the current month.</li>
+                <li><strong>Holidays:</strong> Click the 📅 icon to open a calendar. Click on dates to mark them as holidays. They will not be counted as working days.</li>
+                <li><strong>Weekend Days:</strong> Check the boxes for days that should be considered weekends. These are also not counted as working days.</li>
+            </ol>
+            
+            <h4>2. KPI & Target Configuration</h4>
+            <ol>
+                <li><strong>Add/Remove KPI:</strong> Use the <strong>+ Add Another KPI</strong> button to add a new performance indicator. Use the <strong>×</strong> button on a KPI to remove it.</li>
+                <li><strong>Target Mode:</strong>
+                    <ul>
+                        <li><strong>Monthly:</strong> Set a single, total target for the entire month.</li>
+                        <li><strong>Block Wise:</strong> This mode allows you to create custom sales blocks.
+                            <ul>
+                                <li>Click <strong>+ Add Block</strong> to add another sales period.</li>
+                                <li>The name of each block (e.g., "Block 1") is also editable. Just click on it and type a new name.</li>
+                                <li>Set the <strong>End Date</strong> for each block (except the last one).</li>
+                                <li>Set the <strong>Target %</strong> for each block (except the last one). The final block's percentage is calculated automatically to ensure the total is 100%.</li>
+                                <li>Click the <strong>×</strong> on a block to remove it (you must have at least two).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h4>3. Daily Actuals Tracking</h4>
+            <p>In the main table, enter your achieved numbers for each KPI on the corresponding day. The dashboards and summaries will update instantly. When the tracker is <strong>Locked</strong>, you can only enter data for the current day. On mobile, only today's card is shown by default; use the "Show All Dates" button to see others.</p>
+            
+            <h4>4. Footer Actions</h4>
+            <ol>
+                <li><strong>Toggle Footer:</strong> Click the eye icon in the top-right of the header to hide or show the entire "Actions & Information" footer panel.</li>
+                <li><strong>Export Data:</strong> Download your daily tracking data as a CSV, PDF, or send it to a printer.</li>
+                 <li><strong>Data History:</strong>
+                    <ul>
+                        <li><strong>Preserve Current Month:</strong> Opens a dialog to choose how to save the data.
+                            <ul>
+                                <li><b>Temporary Snapshot:</b> Takes a snapshot of the current month's performance and saves it to history. Your current data remains unchanged.</li>
+                                <li><b>Finalize and Reset Month:</b> Takes a final snapshot, saves it to history, and then clears the `Holidays`, `Total Target` for all KPIs, and all daily entry data to prepare for the next tracking month. This is a destructive action.</li>
+                            </ul>
+                        </li>
+                        <li><strong>View History:</strong> Opens a window to view all your saved monthly snapshots.</li>
+                    </ul>
+                </li>
+                <li><strong>Administration & Security:</strong>
+                    <ul>
+                        <li><strong>Set Password:</strong> Enter a password in the input box and click this button to protect your tracker. When you set a password, the Tracker will give you a <strong>one-time recovery code</strong>. Save it in a safe place!</li>
+                        <li><strong>Lock / Unlock:</strong> Click <strong>Lock</strong> to make all inputs read-only, except for today's data entry. Click <strong>Unlock</strong> (and enter your password if set) to make everything editable again.</li>
+                        <li><strong>Reset All:</strong> This will permanently delete all data and settings. It will ask for your password if one is set.</li>
+                        <li><strong>Forgot Password?:</strong> If you forget your password, click this. You will be prompted to enter the recovery code you saved.
+                            <ul>
+                                <li><strong>Last Resort Recovery:</strong> If you have also lost your recovery code, this process offers a final option. The Tracker will ask you to provide the exact <strong>Start Date</strong> and <strong>End Date</strong> of the current tracking period. Save these dates in a safe place! If the dates you provide match what is saved in the tracker, your password will be removed.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                 <li><strong>About this Tool:</strong>
+                    <ul>
+                         <li><strong>View User Manual:</strong> Opens this guide.</li>
+                    </ul>
+                </li>
+            </ol>
+             <p><strong>Remember:</strong> All configuration changes, data entry, and even the collapsed state of cards are saved automatically as you work!</p>
+
+ 
+
+        </div>
+    </div>
+</div>
+
+<div id="preserveChoiceModal" class="modal no-print">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 class="modal-title">Choose Preservation Type</h2>
+            <button id="closePreserveChoiceModalBtn" class="close-btn" aria-label="Close">×</button>
+        </div>
+        <p>How would you like to preserve this month's data?</p>
+        <div class="modal-footer">
+            <button id="temporaryPreserveBtn" class="btn btn-secondary">Temporary Snapshot</button>
+            <button id="monthEndPreserveBtn" class="btn btn-primary">Finalize & Reset Month</button>
+        </div>
+    </div>
+</div>
+
+<div id="recoveryCodeModal" class="modal no-print">
+    <div class="modal-content" style="max-width: 500px; text-align: center;">
+        <div class="modal-header" style="justify-content: center;">
+            <h2 class="modal-title">Save Your Recovery Information!</h2>
+        </div>
+        <p>Your password has been set. To recover access if you forget it, you will need the information below.</p>
+        <p style="background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 1rem; border-radius: 6px; font-weight: bold; font-size: 1.2rem; letter-spacing: 2px;" id="recoveryCodeDisplay"></p>
+        <p id="lastResortInfo" style="background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 1rem; border-radius: 6px; margin-top: 1rem;"></p>
+        <p><strong>⚠️ IMPORTANT:</strong> Please write down all of the information above and store it in a safe place. This is the <strong>only</strong> time it will be shown.</p>
+        <div class="modal-footer" style="justify-content: center;">
+            <button id="closeRecoveryCodeModalBtn" class="btn btn-primary">I have saved my recovery information</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let kpis = [], dayCounts = {}, D = {}, pickerCurrentDate = new Date(), selectedHolidays = new Set(), holidayRangeStart = null, dailyActualsData = {};
+    let passwordHash = null, recoveryCodeHash = null, isLocked = false, preservedData = [];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const STORAGE_KEY = 'advancedFieldForceTrackerState_v5_7';
+
+    function getAdsLabels(kpiName) {
+        const lowerKpiName = (kpiName || '').toLowerCase();
+        if (lowerKpiName.includes('adm')) {
+            return { present: 'Current ADM', required: 'Required ADM' };
+        } else if (lowerKpiName.includes('ubo')) {
+            return { present: 'Current Daily UBO', required: 'Required Daily UBO' };
+        } else if (lowerKpiName.includes('memo') || lowerKpiName.includes('bpr')) {
+            return { present: 'Current Daily Memo', required: 'Required Daily Memo' };
+        }
+        return { present: 'Current ADS', required: 'Required ADS' };
+    }
+
+    /* ---------- Core ---------- */
+    function initialize() {
+        cacheDomElements();
+        addEventListeners();
+        D.dailyTrackingCard.classList.add('today-only');
+        const stateLoaded = loadState();
+
+        if (!stateLoaded) {
+            setDefaultDates();
+            addKpi(true);
+        } else {
+            rebuildUiForKpis();
+        }
+        
+        updateAllCalculations();
+        applyLockState(isLocked, true);
+    }
+    function addKpi(isDefault = false) {
+        kpis.push({ 
+            id: Date.now(), 
+            name: `KPI #${kpis.length + 1}`, 
+            targetMode: 'monthly', 
+            totalTarget: 10000,
+            blocks: [
+                { name: 'Block 1', percent: 50, endDate: '' },
+                { name: 'Block 2', percent: 50, endDate: '' }
+            ]
+        }); 
+        rebuildUiForKpis(); 
+        if (!isDefault) updateAllCalculations(); 
+    }
+    function removeKpi(kpiId) { kpis = kpis.filter(k => k.id !== kpiId); rebuildUiForKpis(); updateAllCalculations(); }
+    function rebuildUiForKpis() { buildKpiConfigUI(); buildKpiSummaryUI(); buildDailyTableUI(); applyLockState(isLocked); }
+
+    /* ---------- UI builders ---------- */
+    function buildKpiConfigUI() {
+        D.kpiConfigContainer.innerHTML = kpis.map(kpi => {
+            let blocksHtml = '';
+            if (kpi.blocks) {
+                kpi.blocks.forEach((block, index) => {
+                    const isLastBlock = index === kpi.blocks.length - 1;
+                    blocksHtml += `
+                    <div class="bw-block-row" data-index="${index}">
+                        <div class="kpi-config-header">
+                            <input type="text" class="bw-block-name-input lockable-input" value="${block.name || `Block ${index + 1}`}">
+                            ${kpi.blocks.length > 2 ? `<button class="remove-block-btn lockable-input" title="Remove Block">×</button>` : ''}
+                        </div>
+                        <div class="bw-grid">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" class="bw-block-end-date lockable-input" value="${block.endDate}" ${isLastBlock ? 'disabled' : ''}>
+                            </div>
+                            <div class="form-group">
+                                <label>Target %</label>
+                                <input type="number" class="bw-block-percent lockable-input" value="${block.percent}" ${isLastBlock ? 'disabled' : ''}>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            }
+
+            return `
+            <div class="kpi-config-row lockable-container" data-kpi-id="${kpi.id}" data-mode="${kpi.targetMode}">
+                <div class="kpi-config-header"><input type="text" class="kpi-name-input lockable-input" value="${kpi.name}"><button class="btn btn-danger remove-kpi-btn lockable-input" title="Delete KPI" aria-label="Delete KPI">×</button></div>
+                <div class="target-mode-selector">
+                    <label><input type="radio" name="targetMode-${kpi.id}" value="monthly" ${kpi.targetMode==='monthly'?'checked':''} class="lockable-input"> Monthly</label>
+                    <label><input type="radio" name="targetMode-${kpi.id}" value="blockwise" ${kpi.targetMode==='blockwise'?'checked':''} class="lockable-input"> Block Wise</label>
+                </div><hr>
+                <div class="form-group monthly-inputs"><label>Total Target</label><input type="number" class="monthly-target-input lockable-input" value="${kpi.totalTarget}"></div>
+                <div class="blockwise-inputs">
+                    <div class="form-group"><label>Total Target</label><input type="number" class="bw-total-target-input lockable-input" value="${kpi.totalTarget}"></div>
+                    <div class="bw-blocks-container">${blocksHtml}</div>
+                    <div class="form-group" style="text-align:right; margin-bottom: 0.5rem;">
+                        <label>Total %: <span class="bw-total-percent">100%</span></label>
+                    </div>
+                    <button class="btn add-block-btn lockable-input">+ Add Block</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+    function buildKpiSummaryUI() {
+        D.kpiSummaryContainer.innerHTML = kpis.map(kpi => {
+            const adsLabels = getAdsLabels(kpi.name);
+            return `
+            <div class="card kpi-summary-card" id="kpi-summary-${kpi.id}">
+                <h3 class="card-header">${kpi.name}</h3>
+                <table class="kpi-table"><tbody>
+                    <tr><td class="label">Total Target</td><td class="value kpi-val-target">0</td></tr>
+                    <tr><td class="label">MTD</td><td class="value kpi-val-actual">0</td></tr>
+                    <tr><td class="label">Achievement %</td><td class="value kpi-val-achieve">0%</td></tr>
+                    <tr><td class="label present-ads-label">${adsLabels.present}</td><td class="value kpi-val-present-ads">0.00</td></tr>
+                    <tr><td class="label required-ads-label">${adsLabels.required}</td><td class="value kpi-val-required-ads required-ads">0.00</td></tr>
+                </tbody></table>
+                <div class="collapsible-section" style="display:${kpi.targetMode==='blockwise'?'block':'none'}">
+                    <div class="collapsible-header">Target Blocks</div><div class="collapsible-content">
+                        <table class="kpi-table"><tbody id="kpi-summary-blocks-tbody-${kpi.id}"></tbody></table>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+    function buildDailyTableUI() {
+        const kpiHeaders = kpis.map(k => `<th>${k.name}</th>`).join('');
+        D.dailyTableHead.innerHTML = `<tr><th>Date</th><th>Day</th><th>Status</th>${kpiHeaders}</tr>`;
+        if (D.startDate.value && D.endDate.value) generateDailyTableBody(new Date(D.startDate.value + 'T00:00:00'), new Date(D.endDate.value + 'T00:00:00'));
+    }
+
+    /* ---------- Calculations ---------- */
+    function updateAllCalculations() {
+        if (!D.startDate.value || !D.endDate.value) return;
+        const start = new Date(D.startDate.value + 'T00:00:00'), end = new Date(D.endDate.value + 'T00:00:00');
+        if (isNaN(start) || isNaN(end) || start > end) return;
+        if (!isLocked) updateKpiStateFromDOM();
+        updateDayCounts(start, end);
+        kpis.forEach(kpi => {
+            const totalActual = calculateKpiTotalActual(kpi.id);
+            const blockActuals = calculateBlockActuals(kpi);
+            const presentADS = dayCounts.presentWorking > 0 ? totalActual / dayCounts.presentWorking : 0;
+            const remainingWorking = dayCounts.totalWorking - dayCounts.presentWorking;
+            const requiredADS = remainingWorking > 0 ? ((kpi.totalTarget - totalActual) / remainingWorking) : 0;
+            updateKpiSummaryDOM(kpi, totalActual, blockActuals, presentADS, requiredADS);
+        });
+        saveState();
+    }
+    function updateKpiStateFromDOM() {
+        kpis.forEach(kpi => {
+            const row = D.kpiConfigContainer.querySelector(`[data-kpi-id="${kpi.id}"]`); if (!row) return;
+            kpi.name = row.querySelector('.kpi-name-input').value || `KPI #${kpi.id}`;
+            const radio = row.querySelector('input[type="radio"]:checked');
+            if(radio) kpi.targetMode = radio.value;
+            if (kpi.targetMode === 'monthly') {
+                kpi.totalTarget = parseFloat(row.querySelector('.monthly-target-input').value) || 0;
+            } else {
+                kpi.totalTarget = parseFloat(row.querySelector('.bw-total-target-input').value) || 0;
+                const newBlocks = [];
+                const blockRows = row.querySelectorAll('.bw-block-row');
+                let totalPercent = 0;
+                blockRows.forEach((blockRow, index) => {
+                    const isLastBlock = index === blockRows.length - 1;
+                    let percent = 0;
+                    if (!isLastBlock) {
+                        percent = parseFloat(blockRow.querySelector('.bw-block-percent').value) || 0;
+                        totalPercent += percent;
+                    }
+                    newBlocks.push({ 
+                        name: blockRow.querySelector('.bw-block-name-input').value || `Block ${index + 1}`,
+                        percent: percent, 
+                        endDate: blockRow.querySelector('.bw-block-end-date').value || '' 
+                    });
+                });
+
+                if (newBlocks.length > 0) {
+                    const lastBlock = newBlocks[newBlocks.length - 1];
+                    lastBlock.percent = 100 - totalPercent;
+                    kpi.blocks = newBlocks;
+                    const lastBlockPercentInput = blockRows[blockRows.length - 1]?.querySelector('.bw-block-percent');
+                    if (lastBlockPercentInput) lastBlockPercentInput.value = lastBlock.percent;
+                    const totalPercentDisplay = row.querySelector('.bw-total-percent');
+                    const finalTotal = newBlocks.reduce((sum, b) => sum + b.percent, 0);
+                    totalPercentDisplay.textContent = `${Math.round(finalTotal)}%`;
+                    totalPercentDisplay.style.color = Math.round(finalTotal) !== 100 ? 'var(--bad-color)' : 'var(--good-color)';
+                }
+
+                for (let i = 0; i < kpi.blocks.length - 1; i++) {
+                    const currentDateInput = blockRows[i].querySelector('.bw-block-end-date');
+                    let hasError = false;
+                    if (i > 0) {
+                        if (kpi.blocks[i].endDate && kpi.blocks[i-1].endDate && kpi.blocks[i].endDate <= kpi.blocks[i-1].endDate) hasError = true;
+                    }
+                    currentDateInput.classList.toggle('error', hasError);
+                }
+            }
+        });
+    }
+    function calculateKpiTotalActual(kpiId) { let t = 0; Object.entries(dailyActualsData).forEach(([key, value]) => { if (key.endsWith(`-${kpiId}`)) t += parseFloat(value) || 0; }); return t; }
+    function calculateBlockActuals(kpi) {
+        if (kpi.targetMode !== 'blockwise' || !kpi.blocks || kpi.blocks.length === 0) return [];
+        const blockActuals = Array(kpi.blocks.length).fill(0);
+        const getBlockIndexForDate = (date, kpi) => {
+            const entryDate = new Date(date + 'T00:00:00');
+            for (let i = 0; i < kpi.blocks.length - 1; i++) {
+                const block = kpi.blocks[i];
+                if (!block.endDate) continue;
+                const blockEndDate = new Date(block.endDate + 'T00:00:00');
+                if (entryDate <= blockEndDate) return i;
+            }
+            return kpi.blocks.length - 1;
+        };
+        Object.entries(dailyActualsData).forEach(([key, value]) => {
+            if (!key.endsWith(`-${kpi.id}`)) return;
+            const dateStr = key.substring(0, 10), val = parseFloat(value) || 0;
+            if (!val) return;
+            const blockIndex = getBlockIndexForDate(dateStr, kpi);
+            blockActuals[blockIndex] += val;
+        });
+        return blockActuals;
+    }
+    function updateKpiSummaryDOM(kpi, totalActual, blockActuals, presentADS, requiredADS) {
+        const s = document.getElementById(`kpi-summary-${kpi.id}`); if (!s) return;
+        const adsLabels = getAdsLabels(kpi.name);
+        s.querySelector('.present-ads-label').textContent = adsLabels.present;
+        s.querySelector('.required-ads-label').textContent = adsLabels.required;
+        s.querySelector('.card-header').textContent = kpi.name;
+        s.querySelector('.kpi-val-target').textContent = kpi.totalTarget.toLocaleString();
+        s.querySelector('.kpi-val-actual').textContent = totalActual.toLocaleString();
+        s.querySelector('.kpi-val-achieve').textContent = `${(kpi.totalTarget ? (totalActual / kpi.totalTarget) * 100 : 0).toFixed(1)}%`;
+        s.querySelector('.kpi-val-present-ads').textContent = presentADS.toFixed(2);
+        s.querySelector('.kpi-val-required-ads').textContent = requiredADS.toFixed(2);
+        const c = s.querySelector('.collapsible-section');
+        c.style.display = kpi.targetMode === 'blockwise' ? 'block' : 'none';
+        if (kpi.targetMode === 'blockwise' && kpi.blocks) {
+            const tbody = s.querySelector(`#kpi-summary-blocks-tbody-${kpi.id}`);
+            tbody.innerHTML = '';
+            kpi.blocks.forEach((block, index) => {
+                const blockTarget = kpi.totalTarget * block.percent / 100;
+                const blockActual = blockActuals[index] || 0;
+                const blockAchievePercent = blockTarget ? (blockActual / blockTarget) * 100 : 0;
+                const row = tbody.insertRow();
+                row.innerHTML = `<td class="label">${block.name} (${block.percent.toFixed(0)}%)</td><td class="value block-value"><span class="actual">${blockActual.toLocaleString()}</span> / <span class="target">${blockTarget.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span><span class="ach-percent"> / ${blockAchievePercent.toFixed(0)}%</span></td>`;
+            });
+        }
+    }
+    function updateDayCounts(s, e) {
+        dayCounts = analyzeDateRange(s, e, getWeekendArray(), parseHolidays());
+        D.totalWorkingDays.textContent = dayCounts.totalWorking;
+        D.presentWorkingDays.textContent = dayCounts.presentWorking;
+        D.remainingWorkingDays.textContent = dayCounts.totalWorking - dayCounts.presentWorking;
+        D.totalWeekends.textContent = dayCounts.weekendCount;
+        D.totalHolidays.textContent = dayCounts.holidayCount;
+    }
+    function isTodayPresent(todayDateStr) { return kpis.some(kpi => { const key = `${todayDateStr}-${kpi.id}`; const value = parseFloat(dailyActualsData[key]); return value > 0; }); }
+    function analyzeDateRange(start, end, weekends, holidays) {
+        let counts = { totalWorking: 0, presentWorking: 0, weekendCount: 0, holidayCount: 0 };
+        const today = new Date(); today.setHours(0,0,0,0);
+        let d = new Date(start);
+        while (d <= end) {
+            const day = d.getDay();
+            const dateStr = formatDate(d);
+            if (weekends.includes(day)) { counts.weekendCount++; } 
+            else if (holidays.includes(dateStr)) { counts.holidayCount++; } 
+            else {
+                counts.totalWorking++;
+                if (d < today) { counts.presentWorking++; } 
+                else if (d.getTime() === today.getTime()) { if (isTodayPresent(dateStr)) { counts.presentWorking++; } }
+            }
+            d.setDate(d.getDate() + 1);
+        }
+        return counts;
+    }
+    function generateDailyTableBody(s, e) {
+        D.dailyTableBody.innerHTML = '';
+        const weekends = getWeekendArray(), holidays = parseHolidays(), today = formatDate(new Date());
+        let d = new Date(s);
+        while (d <= e) {
+            const tr = document.createElement('tr'), day = d.getDay(), dateStr = formatDate(d);
+            let status = 'Working';
+            if (weekends.includes(day)) { status = 'Weekend'; tr.classList.add('weekend-row'); }
+            else if (holidays.includes(dateStr)) { status = 'Holiday'; tr.classList.add('holiday-row'); }
+            if (dateStr === today) { tr.classList.add('today-row'); } 
+            else { tr.classList.add('not-today'); }
+            const kpiCells = kpis.map(k => `<td data-kpi-name="${k.name}"><input type="number" class="actual-input" data-date="${dateStr}" data-kpi-id="${k.id}" min="0" placeholder="0" value="${dailyActualsData[`${dateStr}-${k.id}`] || ''}"></td>`).join('');
+            tr.innerHTML = `<td>${dateStr}</td><td>${dayNames[day]}</td><td>${status}</td>${kpiCells}`;
+            D.dailyTableBody.appendChild(tr);
+            d.setDate(d.getDate() + 1);
+        }
+    }
+
+    /* ---------- Utilities ---------- */
+    function downloadCSV() {
+        const headers = ['Date', 'Day', 'Status', ...kpis.map(k => k.name)];
+        const rows = [];
+        D.dailyTableBody.querySelectorAll('tr').forEach(tr => {
+            const cells = [ tr.children[0].innerText, tr.children[1].innerText, tr.children[2].innerText ];
+            kpis.forEach(k => { const inp = tr.querySelector(`.actual-input[data-kpi-id="${k.id}"]`); cells.push(inp ? inp.value || '0' : '0'); });
+            rows.push(cells);
+        });
+        if (!rows.length) { alert('No data to download.'); return; }
+        const escape = c => `"${String(c).replace(/"/g, '""')}"`;
+        const csv = [headers.map(escape).join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `kpi_calculator_${D.startDate.value}.csv`; a.style.display = 'none';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const header = document.querySelector('header');
+        const exportContent = document.querySelector('#export-content');
+        const container = document.querySelector('.container');
+        const btn = document.getElementById('pdfBtn');
+        if (!header || !exportContent || !container) return;
+        const original = btn.innerHTML; btn.innerHTML = 'Generating…'; btn.disabled = true;
+        const headerClone = header.cloneNode(true);
+        exportContent.prepend(headerClone);
+        const originalMax = container.style.maxWidth;
+        container.style.maxWidth = 'none';
+        const collapsed = exportContent.querySelectorAll('.card.is-collapsible');
+        collapsed.forEach(c => c.classList.remove('is-collapsed'));
+        try {
+            const canvas = await html2canvas(exportContent, { scale: 2, useCORS: true, onclone: doc => {
+                doc.querySelectorAll('#daily-tracking-table .actual-input').forEach(inp => {
+                    const span = doc.createElement('span'); span.textContent = inp.value || '0'; inp.parentNode.replaceChild(span, inp);
+                });
+            }});
+            const img = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+            const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+            const ih = (canvas.height * pw) / canvas.width;
+            let hLeft = ih, pos = 0;
+            pdf.addImage(img, 'PNG', 0, pos, pw, ih); hLeft -= ph;
+            while (hLeft > 0) { pos -= ph; pdf.addPage(); pdf.addImage(img, 'PNG', 0, pos, pw, ih); hLeft -= ph; }
+            pdf.save(`kpi_calculator_${D.startDate.value}.pdf`);
+        } catch (e) { console.error(e); alert('PDF generation failed.'); }
+        finally {
+            container.style.maxWidth = originalMax;
+            collapsed.forEach(c => c.classList.add('is-collapsed'));
+            exportContent.removeChild(headerClone);
+            btn.innerHTML = original; btn.disabled = false;
+        }
+    }
+    function cacheDomElements() {
+        Object.assign(D, {
+            footer: document.querySelector('footer'),
+            toggleFooterBtn: document.getElementById('toggleFooterBtn'),
+            startDate: document.getElementById('startDate'), endDate: document.getElementById('endDate'), holidays: document.getElementById('holidays'), weekendCheckboxes: document.querySelectorAll('.weekend-day'),
+            totalWorkingDays: document.getElementById('totalWorkingDays'), presentWorkingDays: document.getElementById('presentWorkingDays'), remainingWorkingDays: document.getElementById('remainingWorkingDays'),
+            totalWeekends: document.getElementById('totalWeekends'), totalHolidays: document.getElementById('totalHolidays'), kpiConfigContainer: document.getElementById('kpi-config-container'),
+            addKpiBtn: document.getElementById('addKpiBtn'), kpiSummaryContainer: document.getElementById('kpi-summary-container'), dailyTableHead: document.getElementById('daily-table-head'),
+            dailyTableBody: document.getElementById('daily-table-body'), resetBtn: document.getElementById('resetBtn'), downloadBtn: document.getElementById('downloadBtn'),
+            pdfBtn: document.getElementById('pdfBtn'), printBtn: document.getElementById('printBtn'), openHolidayPickerBtn: document.getElementById('openHolidayPickerBtn'),
+            holidayPickerModal: document.getElementById('holidayPickerModal'), passwordInput: document.getElementById('passwordInput'), setPasswordBtn: document.getElementById('setPasswordBtn'),
+            lockUnlockBtn: document.getElementById('lockUnlockBtn'), lockableInputs: document.querySelectorAll('.lockable-input'), kpiCardContent: document.getElementById('kpi-card-content'),
+            dataPreserveBtn: document.getElementById('dataPreserveBtn'), viewPreservedDataBtn: document.getElementById('viewPreservedDataBtn'),
+            preservedDataModal: document.getElementById('preservedDataModal'), preservedDataContainer: document.getElementById('preserved-data-container'),
+            closePreservedDataModalBtn: document.getElementById('closePreservedDataModalBtn'),
+            holidayPickerContent: document.querySelector('#holidayPickerModal .modal-content'),
+            viewUserManualBtn: document.getElementById('viewUserManualBtn'), userManualModal: document.getElementById('userManualModal'),
+            closeUserManualModalBtn: document.getElementById('closeUserManualModalBtn'),
+            dailyTrackingCard: document.getElementById('daily-tracking-card'),
+            toggleDatesBtn: document.getElementById('toggle-dates-btn'),
+            preserveChoiceModal: document.getElementById('preserveChoiceModal'),
+            temporaryPreserveBtn: document.getElementById('temporaryPreserveBtn'),
+            monthEndPreserveBtn: document.getElementById('monthEndPreserveBtn'),
+            closePreserveChoiceModalBtn: document.getElementById('closePreserveChoiceModalBtn'),
+            forgotPasswordBtn: document.getElementById('forgotPasswordBtn'),
+            recoveryCodeModal: document.getElementById('recoveryCodeModal'),
+            recoveryCodeDisplay: document.getElementById('recoveryCodeDisplay'),
+            closeRecoveryCodeModalBtn: document.getElementById('closeRecoveryCodeModalBtn'),
+            lastResortInfo: document.getElementById('lastResortInfo'),
+        });
+    }
+    function setDefaultDates() {
+        const now = new Date();
+        D.startDate.value = formatDate(new Date(now.getFullYear(), now.getMonth(), 1));
+        D.endDate.value = formatDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+    }
+    function getWeekendArray() { return [...D.weekendCheckboxes].filter(c => c.checked).map(c => parseInt(c.value)); }
+    function parseHolidays() { return D.holidays.value.split(',').map(d => d.trim()).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)); }
+    function formatDate(date) { if (!(date instanceof Date) || isNaN(date)) return ''; const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0'); return `${y}-${m}-${d}`; }
+
+    /* ---------- Event Listeners ---------- */
+    function addEventListeners() {
+        D.kpiConfigContainer.addEventListener('input', e => { if (e.target.matches('.kpi-name-input, .monthly-target-input, .bw-total-target-input, .bw-block-percent, .bw-block-end-date, .bw-block-name-input')) updateAllCalculations(); });
+        D.kpiConfigContainer.addEventListener('change', e => { if (e.target.matches('input[type="radio"]')) { e.target.closest('.kpi-config-row').dataset.mode = e.target.value; updateAllCalculations(); } });
+        D.kpiConfigContainer.addEventListener('click', e => {
+            if (e.target.matches('.remove-kpi-btn')) { const row = e.target.closest('.kpi-config-row'); if (confirm(`Delete “${row.querySelector('.kpi-name-input').value || 'KPI'}”?`)) removeKpi(parseInt(row.dataset.kpiId)); }
+            if (e.target.matches('.add-block-btn')) {
+                const kpiId = parseInt(e.target.closest('.kpi-config-row').dataset.kpiId);
+                const kpi = kpis.find(k => k.id === kpiId);
+                if (kpi) { updateKpiStateFromDOM(); const kpiToUpdate = kpis.find(k => k.id === kpiId); kpiToUpdate.blocks.push({ name: `Block ${kpiToUpdate.blocks.length + 1}`, percent: 0, endDate: '' }); rebuildUiForKpis(); updateAllCalculations(); }
+            }
+            if (e.target.matches('.remove-block-btn')) {
+                const kpiId = parseInt(e.target.closest('.kpi-config-row').dataset.kpiId);
+                const blockIndex = parseInt(e.target.closest('.bw-block-row').dataset.index);
+                const kpi = kpis.find(k => k.id === kpiId);
+                if (kpi && kpi.blocks.length > 2) { updateKpiStateFromDOM(); const kpiToUpdate = kpis.find(k => k.id === kpiId); kpiToUpdate.blocks.splice(blockIndex, 1); rebuildUiForKpis(); updateAllCalculations(); }
+            }
+        });
+        D.dailyTableBody.addEventListener('input', e => { if (e.target.matches('.actual-input')) { const input = e.target; const key = `${input.dataset.date}-${input.dataset.kpiId}`; if (input.value) { dailyActualsData[key] = input.value; } else { delete dailyActualsData[key]; } updateAllCalculations(); } });
+        document.querySelectorAll('.is-collapsible').forEach(h => h.addEventListener('click', e => { e.currentTarget.closest('.card').classList.toggle('is-collapsed'); saveState(); }));
+        document.querySelectorAll('.config-input').forEach(i => i.addEventListener('change', () => { buildDailyTableUI(); updateAllCalculations(); }));
+        D.addKpiBtn.addEventListener('click', () => addKpi());
+        D.resetBtn.addEventListener('click', handleReset);
+        D.downloadBtn.addEventListener('click', downloadCSV);
+        D.pdfBtn.addEventListener('click', downloadPDF);
+        D.openHolidayPickerBtn.addEventListener('click', openHolidayPicker);
+        D.holidayPickerModal.addEventListener('click', e => { if (!D.holidayPickerContent.contains(e.target)) closeHolidayPicker(); });
+        document.getElementById('doneHolidaySelectionBtn').addEventListener('click', closeHolidayPicker);
+        D.printBtn.addEventListener('click', () => { const pa = document.getElementById('print-area'); pa.innerHTML = ''; const hc = document.querySelector('header').cloneNode(true); const ec = document.querySelector('#export-content').cloneNode(true); ec.querySelectorAll('.actual-input').forEach(inp => { inp.parentElement.textContent = inp.value || '0'; }); pa.appendChild(hc); pa.appendChild(ec); window.print(); });
+        D.setPasswordBtn.addEventListener('click', handleSetPassword);
+        D.lockUnlockBtn.addEventListener('click', handleLockUnlock);
+        D.viewPreservedDataBtn.addEventListener('click', openPreservedDataModal);
+        D.closePreservedDataModalBtn.addEventListener('click', closePreservedDataModal);
+        D.preservedDataModal.addEventListener('click', e => { if(e.target === D.preservedDataModal) closePreservedDataModal(); });
+        D.viewUserManualBtn.addEventListener('click', () => D.userManualModal.style.display = 'flex');
+        D.closeUserManualModalBtn.addEventListener('click', () => D.userManualModal.style.display = 'none');
+        D.userManualModal.addEventListener('click', e => { if (e.target === D.userManualModal) D.userManualModal.style.display = 'none'; });
+        D.toggleDatesBtn.addEventListener('click', () => { const card = D.dailyTrackingCard; card.classList.toggle('today-only'); D.toggleDatesBtn.textContent = card.classList.contains('today-only') ? 'Show All Dates' : 'Show Only Today'; });
+        D.dataPreserveBtn.addEventListener('click', () => D.preserveChoiceModal.style.display = 'flex');
+        D.closePreserveChoiceModalBtn.addEventListener('click', () => D.preserveChoiceModal.style.display = 'none');
+        D.preserveChoiceModal.addEventListener('click', e => { if(e.target === D.preserveChoiceModal) D.preserveChoiceModal.style.display = 'none'; });
+        D.temporaryPreserveBtn.addEventListener('click', handleTemporaryPreserve);
+        D.monthEndPreserveBtn.addEventListener('click', handleMonthEndPreserve);
+        D.toggleFooterBtn.addEventListener('click', () => {
+            D.footer.classList.toggle('is-hidden');
+            D.toggleFooterBtn.classList.toggle('is-toggled');
+            saveState();
+        });
+        D.forgotPasswordBtn.addEventListener('click', handleForgotPassword);
+        D.closeRecoveryCodeModalBtn.addEventListener('click', () => D.recoveryCodeModal.style.display = 'none');
+    }
+
+    /* ---------- Security & Lock ---------- */
+    function simpleHash(str) { if (!str) return 0; let hash = 0; for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash |= 0; } return hash; }
+    
+    function generateRecoveryCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid ambiguous chars like I, O, 0, 1
+        let result = '';
+        for (let i = 0; i < 12; i++) {
+            if (i > 0 && i % 4 === 0) result += '-';
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    function handleSetPassword() { 
+        const pass = D.passwordInput.value; 
+        if (!pass) { 
+            alert('Password cannot be empty.'); 
+            return; 
+        }
+        const recoveryCode = generateRecoveryCode();
+        D.recoveryCodeDisplay.textContent = recoveryCode;
+        passwordHash = simpleHash(pass); 
+        recoveryCodeHash = simpleHash(recoveryCode.replace(/-/g, ''));
+        
+        const startDate = D.startDate.value;
+        const endDate = D.endDate.value;
+        D.lastResortInfo.innerHTML = `<strong>Last-Resort Recovery Info:</strong><br>If you lose the code above, the Tracker will ask for your current <strong>Start Date (${startDate})</strong> and <strong>End Date (${endDate})</strong>. Save these dates too!`;
+
+        D.passwordInput.value = ''; 
+        saveState(); 
+
+        D.recoveryCodeModal.style.display = 'flex';
+        alert('Password set! Please review the dialog and save ALL your recovery details.');
+    }
+
+    function handleForgotPassword() {
+        if (!passwordHash) {
+            alert('No password is set on this tracker.');
+            return;
+        }
+
+        const code = prompt('Please enter your 12-character recovery code:');
+        if (code === null) return; 
+
+        const enteredCodeForHashing = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+        if (recoveryCodeHash && simpleHash(enteredCodeForHashing) === recoveryCodeHash) {
+            alert('Recovery successful! Your password has been removed.');
+            passwordHash = null;
+            recoveryCodeHash = null;
+            applyLockState(false);
+            D.passwordInput.value = '';
+        } else {
+            const lastResort = confirm('The recovery code is incorrect or was not found.\n\nDo you want to try the last-resort recovery method? (This requires knowing your currently set Start and End dates).');
+            if (lastResort) {
+                const enteredStartDate = prompt('LAST RESORT RECOVERY\n\nEnter the Start Date for the current period (YYYY-MM-DD):');
+                if (enteredStartDate === null) return;
+                const enteredEndDate = prompt('LAST RESORT RECOVERY\n\nEnter the End Date for the current period (YYYY-MM-DD):');
+                if (enteredEndDate === null) return;
+                
+                if (enteredStartDate === D.startDate.value && enteredEndDate === D.endDate.value) {
+                    alert('Last resort recovery successful! Your password has been removed.');
+                    passwordHash = null;
+                    recoveryCodeHash = null;
+                    applyLockState(false);
+                    D.passwordInput.value = '';
+                } else {
+                    alert('Recovery failed. The dates provided do not match the locked data.');
+                }
+            }
+        }
+    }
+
+    function handleLockUnlock() { if (isLocked) { if (!passwordHash) { applyLockState(false); return; } const pass = prompt('Enter password to unlock:'); if (simpleHash(pass) === passwordHash) { applyLockState(false); } else if (pass !== null) { alert('Incorrect password.'); } } else { applyLockState(true); } }
+    
+    function applyLockState(locked, isInitialLoad = false) { isLocked = locked; D.lockUnlockBtn.textContent = locked ? 'Unlock' : 'Lock'; document.querySelectorAll('.lockable-input').forEach(el => el.disabled = locked); D.kpiConfigContainer.querySelectorAll('.lockable-input').forEach(el => el.disabled = locked); const todayStr = formatDate(new Date()); D.dailyTableBody.querySelectorAll('.actual-input').forEach(input => { input.disabled = locked && input.dataset.date !== todayStr; }); if (!isInitialLoad) { saveState(); } }
+    
+    function handleReset() { if (passwordHash) { const pass = prompt('Enter password to reset all data:'); if (simpleHash(pass) !== passwordHash) { if (pass !== null) alert('Incorrect password. Reset cancelled.'); return; } } if (confirm('Are you absolutely sure you want to reset ALL data? This cannot be undone.')) { passwordHash = null; recoveryCodeHash = null; localStorage.clear(); location.reload(); } }
+
+    /* ---------- Data Preservation ---------- */
+    function performPreservation() {
+        if (!D.startDate.value) { alert("Please set a Start Date first."); return false; }
+        const preserveDate = new Date(D.startDate.value + 'T00:00:00');
+        const monthId = D.startDate.value.substring(0, 7); // YYYY-MM
+        const monthName = preserveDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        const existingIndex = preservedData.findIndex(p => p.id === monthId);
+        if (existingIndex > -1) { if (!confirm(`Data for ${monthName} already exists. Do you want to overwrite it?`)) { return false; } }
+        const newPreservation = {
+            id: monthId, monthName: monthName, preservedOn: new Date().toISOString(),
+            kpiSummaries: kpis.map(kpi => {
+                const summaryCard = document.getElementById(`kpi-summary-${kpi.id}`);
+                return {
+                    name: kpi.name, target: summaryCard.querySelector('.kpi-val-target').textContent,
+                    actual: summaryCard.querySelector('.kpi-val-actual').textContent, achievement: summaryCard.querySelector('.kpi-val-achieve').textContent
+                };
+            })
+        };
+        if (existingIndex > -1) { preservedData[existingIndex] = newPreservation; } else { preservedData.push(newPreservation); }
+        saveState();
+        alert(`Data for ${monthName} has been successfully preserved.`);
+        return true;
+    }
+    function handleTemporaryPreserve() {
+        if (performPreservation()) {
+            D.preserveChoiceModal.style.display = 'none';
+            openPreservedDataModal();
+        }
+    }
+    function handleMonthEndPreserve() {
+        const confirmMsg = 'This will finalize the month, save a snapshot, and then clear all Total Targets, Holidays, and Daily Actuals to prepare for the next month.\n\nThis action cannot be undone. Are you sure?';
+        if (!confirm(confirmMsg)) return;
+        if (performPreservation()) {
+            dailyActualsData = {}; D.holidays.value = '';
+            kpis.forEach(kpi => { kpi.totalTarget = 0; });
+            D.preserveChoiceModal.style.display = 'none';
+            rebuildUiForKpis(); updateAllCalculations();
+            alert('Month-end data preserved. Tracker has been reset for the next tracking month.');
+            openPreservedDataModal();
+        }
+    }
+    function openPreservedDataModal() {
+        D.preservedDataContainer.innerHTML = '';
+        if (preservedData.length === 0) {
+            D.preservedDataContainer.innerHTML = '<p>No data has been preserved yet.</p>';
+        } else {
+            [...preservedData].sort((a, b) => b.preservedOn.localeCompare(a.preservedOn)).forEach(p => {
+                const tableRows = p.kpiSummaries.map(s => `<tr><td>${s.name}</td><td>${s.target}</td><td>${s.actual}</td><td>${s.achievement}</td></tr>`).join('');
+                const cardHTML = `<div class="preserved-month-card"><h3>${p.monthName} <small style="font-weight:normal;color:var(--secondary-color)">(Saved: ${new Date(p.preservedOn).toLocaleString()})</small></h3><table class="preserved-data-table"><thead><tr><th>KPI</th><th>Target</th><th>Actual</th><th>Achievement</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
+                D.preservedDataContainer.innerHTML += cardHTML;
+            });
+        }
+        D.preservedDataModal.style.display = 'flex';
+    }
+    function closePreservedDataModal() { D.preservedDataModal.style.display = 'none'; }
+    
+    /* ---------- State Management (localStorage) ---------- */
+    function saveState() {
+        const state = {
+            startDate: D.startDate.value, endDate: D.endDate.value, holidays: D.holidays.value,
+            weekends: [...D.weekendCheckboxes].filter(c => c.checked).map(c => c.value), kpis: kpis,
+            dailyActuals: dailyActualsData,
+            collapsedSections: [...document.querySelectorAll('.card.is-collapsible.is-collapsed')].map(c => c.querySelector('h2 > span:first-child')?.textContent.trim()).filter(Boolean),
+            isFooterHidden: D.footer.classList.contains('is-hidden'),
+            passwordHash: passwordHash, recoveryCodeHash: recoveryCodeHash, isLocked: isLocked, preservedData: preservedData,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function loadState() {
+        const legacyKeys = ['advancedFieldForceTrackerState_v5_6', 'advancedFieldForceTrackerState_v5_5', 'advancedFieldForceTrackerState_v5_4', 'advancedFieldForceTrackerState_v5_3'];
+        let savedStateJSON = localStorage.getItem(STORAGE_KEY);
+        if (!savedStateJSON) {
+            for (const key of legacyKeys) {
+                const legacyData = localStorage.getItem(key);
+                if (legacyData) {
+                    savedStateJSON = legacyData;
+                    break;
+                }
+            }
+        }
+        if (!savedStateJSON) return false;
+        try {
+            const state = JSON.parse(savedStateJSON);
+            D.startDate.value = state.startDate || ''; D.endDate.value = state.endDate || ''; D.holidays.value = state.holidays || '';
+            D.weekendCheckboxes.forEach(cb => { cb.checked = state.weekends ? state.weekends.includes(cb.value) : (cb.value === '5' || cb.value === '6'); });
+            if (state.kpis && state.kpis.length > 0) {
+                state.kpis.forEach(kpi => { // DATA MIGRATION LOGIC
+                    if (kpi.hasOwnProperty('blk1EndDate')) {
+                        const blk3Percent = 100 - (kpi.blk1Percent || 0) - (kpi.blk2Percent || 0);
+                        kpi.blocks = [ { name: 'Block 1', percent: kpi.blk1Percent || 33, endDate: kpi.blk1EndDate || '' }, { name: 'Block 2', percent: kpi.blk2Percent || 30, endDate: kpi.blk2EndDate || '' }, { name: 'Block 3', percent: blk3Percent, endDate: '' } ];
+                        delete kpi.blk1EndDate; delete kpi.blk2EndDate; delete kpi.blk1Percent; delete kpi.blk2Percent;
+                    }
+                    if (!kpi.blocks) kpi.blocks = [{ name: 'Block 1', percent: 50, endDate: '' }, { name: 'Block 2', percent: 50, endDate: '' }];
+                    kpi.blocks.forEach((block, index) => { if (!block.name) block.name = `Block ${index + 1}`; });
+                });
+                kpis = state.kpis;
+            }
+            dailyActualsData = state.dailyActuals || {};
+            if (state.collapsedSections && state.collapsedSections.length > 0) {
+                document.querySelectorAll('.card.is-collapsible').forEach(card => {
+                    const title = card.querySelector('h2 > span:first-child')?.textContent.trim();
+                    card.classList.toggle('is-collapsed', state.collapsedSections.includes(title));
+                });
+            }
+            const isFooterHidden = state.isFooterHidden || false;
+            D.footer.classList.toggle('is-hidden', isFooterHidden);
+            D.toggleFooterBtn.classList.toggle('is-toggled', isFooterHidden);
+
+            passwordHash = state.passwordHash || null; 
+            recoveryCodeHash = state.recoveryCodeHash || null;
+            isLocked = state.isLocked || false; 
+            preservedData = state.preservedData || [];
+            return true;
+        } catch(e) { console.error("Failed to load state, resetting:", e); localStorage.removeItem(STORAGE_KEY); return false; }
+    }
+
+    /* ---------- Holiday Picker ---------- */
+    function openHolidayPicker() {
+        pickerCurrentDate = D.startDate.value ? new Date(D.startDate.value + 'T00:00:00') : new Date();
+        selectedHolidays = new Set(parseHolidays()); holidayRangeStart = null;
+        renderHolidayCalendar(); setupCalendarDayHeaders();
+        D.holidayPickerModal.style.display = 'flex';
+    }
+    function closeHolidayPicker() { D.holidays.value = [...selectedHolidays].sort().join(', '); D.holidayPickerModal.style.display = 'none'; buildDailyTableUI(); updateAllCalculations(); }
+    function handleDateClick(e) {
+        const cell = e.target.closest('.date-cell'); if (!cell) return;
+        const dateStr = cell.dataset.date;
+        if (e.shiftKey && holidayRangeStart) {
+            const start = new Date(holidayRangeStart + 'T00:00:00'); const end = new Date(dateStr + 'T00:00:00');
+            const loopStart = new Date(Math.min(start, end)); const loopEnd = new Date(Math.max(start, end));
+            let allSelected = true;
+            for (let d = new Date(loopStart); d <= loopEnd; d.setDate(d.getDate() + 1)) { if (!selectedHolidays.has(formatDate(d))) { allSelected = false; break; } }
+            for (let d = new Date(loopStart); d <= loopEnd; d.setDate(d.getDate() + 1)) { if (allSelected) { selectedHolidays.delete(formatDate(d)); } else { selectedHolidays.add(formatDate(d)); } }
+        } else { selectedHolidays.has(dateStr) ? selectedHolidays.delete(dateStr) : selectedHolidays.add(dateStr); holidayRangeStart = dateStr; }
+        renderHolidayCalendar();
+    }
+    function renderHolidayCalendar() {
+        const y = pickerCurrentDate.getFullYear(), m = pickerCurrentDate.getMonth();
+        document.getElementById('holidayMonthYear').textContent = pickerCurrentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        const grid = document.getElementById('calendarDatesGrid'); grid.innerHTML = '';
+        document.getElementById('prevMonthBtn').onclick = () => { pickerCurrentDate.setMonth(pickerCurrentDate.getMonth() - 1); renderHolidayCalendar(); };
+        document.getElementById('nextMonthBtn').onclick = () => { pickerCurrentDate.setMonth(pickerCurrentDate.getMonth() + 1); renderHolidayCalendar(); };
+        const first = new Date(y, m, 1), lastDay = new Date(y, m + 1, 0).getDate(), startDay = first.getDay();
+        for (let i = 0; i < startDay; i++) grid.appendChild(document.createElement('div'));
+        for (let d = 1; d <= lastDay; d++) {
+            const cell = document.createElement('div');
+            cell.textContent = d; cell.classList.add('date-cell'); cell.tabIndex = 0; cell.role = 'button';
+            const dateStr = formatDate(new Date(y, m, d)); cell.dataset.date = dateStr;
+            if (selectedHolidays.has(dateStr)) cell.classList.add('selected');
+            if (holidayRangeStart === dateStr) cell.classList.add('range-start');
+            cell.onclick = handleDateClick;
+            cell.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); handleDateClick(ev); } };
+            grid.appendChild(cell);
+        }
+    }
+    function setupCalendarDayHeaders() {
+        const head = document.getElementById('calendarDayHeaders');
+        if (head.children.length) return;
+        dayNames.forEach(d => { const c = document.createElement('div'); c.textContent = d; head.appendChild(c); });
+    }
+
+    /* ---------- INIT ---------- */
+    initialize();
+});
+</script>
+</body>
+</html>
