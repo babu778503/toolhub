@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const filteredTools = toolsData.filter(tool => tool.Name.toLowerCase().includes(query));
         searchResultsHeading.innerHTML = `Found ${filteredTools.length} tools for "<strong>${safeQuery}</strong>"`;
-        const emptyMessage = `Found 0 tools for "<strong>${safeQuery}</strong>". Please email the tool name to <a href="mailto:support@toolshub365.com">Support Team</a>. Your requested tool will be added shortly with Name.<div class="idea-credit"><i class="fas fa-lightbulb"></i> Idea Share: Ayra, New York, USA</div>`;
+        const emptyMessage = `Found 0 tools for "<strong>${safeQuery}</strong>". Please email the tool name to <a href="mailto:support@toolshub365.com">Support_Team</a>. Your requested tool will be added shortly with Name.Day to day update <a href="https://whatsapp.com/channel/0029VbBM5GhDuMRZKFJO6x14">Whatsapp_Channel</a>.<div class="idea-credit"><i class="fas fa-lightbulb"></i> Idea Share: Ayra, New York, USA</div>`;
         renderTools(searchResultsGrid, filteredTools, false, emptyMessage);
     };
     searchInput.addEventListener('input', debounce(handleSearch, 300));
@@ -584,6 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadData();
 });
+
 
 
 
