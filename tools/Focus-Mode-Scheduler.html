@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<!-- Category: Productivity -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Focus Mode Scheduler - Boost productivity with customizable focus sessions. Schedule work and break intervals, track progress, and enhance time management.">
+    <meta name="keywords" content="focus mode, productivity scheduler, time management, work timer, Pomodoro technique, focus timer, task scheduler, concentration tool">
+    <title>Focus Mode Scheduler - Boost Your Productivity</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --card-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        /* Desktop Styles */
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h2 i {
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .btn:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #2a9d8f;
+            color: white;
+        }
+        
+        .timer-display {
+            font-size: 4rem;
+            text-align: center;
+            margin: 25px 0;
+            font-weight: 800;
+            color: var(--primary);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+        
+        .session-info {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.3rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .progress-container {
+            height: 16px;
+            background: #e9ecef;
+            border-radius: 8px;
+            margin: 25px 0;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--success));
+            border-radius: 8px;
+            transition: width 1s linear;
+        }
+        
+        .history-list {
+            list-style: none;
+        }
+        
+        .history-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        /* Additional Features */
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .theme-btn.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px white, 0 0 0 5px var(--primary);
+        }
+        
+        .sound-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .preset-btn {
+            padding: 8px 15px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .preset-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            header {
+                height: 50px;
+                padding: 0 15px;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .container {
+                margin: 15px auto;
+                padding: 0 15px;
+            }
+            
+            .card {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .timer-display {
+                font-size: 3rem;
+                margin: 20px 0;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .flip {
+            animation: flip 0.6s ease;
+        }
+        
+        @keyframes flip {
+            0% { transform: rotateY(0); }
+            50% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-brain"></i> Focus Mode Scheduler</h1>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2><i class="fas fa-clock"></i> Current Session</h2>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="session-info" id="sessionInfo">Work Session</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn"><i class="fas fa-play"></i> Start</button>
+                <button class="btn btn-outline" id="pauseBtn"><i class="fas fa-pause"></i> Pause</button>
+                <button class="btn btn-outline" id="resetBtn"><i class="fas fa-redo"></i> Reset</button>
+                <button class="btn btn-warning" id="skipBtn"><i class="fas fa-step-forward"></i> Skip</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-cog"></i> Schedule Settings</h2>
+            <div class="preset-buttons">
+                <button class="preset-btn" data-preset="pomodoro">Pomodoro (25/5)</button>
+                <button class="preset-btn" data-preset="deep">Deep Focus (50/10)</button>
+                <button class="preset-btn" data-preset="short">Short Bursts (15/3)</button>
+                <button class="preset-btn" data-preset="long">Long Sessions (45/15)</button>
+            </div>
+            <div class="form-group">
+                <label for="workDuration"><i class="fas fa-briefcase"></i> Work Duration (minutes)</label>
+                <input type="number" id="workDuration" min="1" max="120" value="25">
+            </div>
+            <div class="form-group">
+                <label for="breakDuration"><i class="fas fa-coffee"></i> Break Duration (minutes)</label>
+                <input type="number" id="breakDuration" min="1" max="60" value="5">
+            </div>
+            <div class="form-group">
+                <label for="sessions"><i class="fas fa-sync"></i> Number of Sessions</label>
+                <input type="number" id="sessions" min="1" max="20" value="4">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-palette"></i> Theme</label>
+                <div class="theme-selector">
+                    <div class="theme-btn active" style="background: #4361ee;" data-theme="blue"></div>
+                    <div class="theme-btn" style="background: #2a9d8f;" data-theme="green"></div>
+                    <div class="theme-btn" style="background: #e76f51;" data-theme="orange"></div>
+                    <div class="theme-btn" style="background: #9b5de5;" data-theme="purple"></div>
+                </div>
+            </div>
+            <div class="sound-controls">
+                <label><i class="fas fa-bell"></i> Sound Alerts</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="btn btn-primary" id="saveSettings"><i class="fas fa-save"></i> Save Settings</button>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-tasks stat-icon"></i>
+                    <div class="stat-value" id="totalSessions">0</div>
+                    <div class="stat-label">Sessions Completed</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock stat-icon"></i>
+                    <div class="stat-value" id="totalFocusTime">0</div>
+                    <div class="stat-label">Minutes Focused</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-fire stat-icon"></i>
+                    <div class="stat-value" id="currentStreak">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-alt stat-icon"></i>
+                    <div class="stat-value" id="totalDays">0</div>
+                    <div class="stat-label">Active Days</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-history"></i> Session History</h2>
+            <ul class="history-list" id="historyList">
+                <li class="history-item">No sessions completed yet</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-trash-alt"></i> Data Management</h2>
+            <p>Session data is automatically saved to your device. You can clear all data if needed.</p>
+            <button class="btn btn-danger" id="clearData"><i class="fas fa-trash"></i> Clear All Data</button>
+            <button class="btn btn-outline" id="exportData" style="margin-left: 10px;"><i class="fas fa-download"></i> Export Data</button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <audio id="alarmSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // DOM Elements
+        const timerDisplay = document.getElementById('timer');
+        const sessionInfo = document.getElementById('sessionInfo');
+        const progressBar = document.getElementById('progressBar');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const workDurationInput = document.getElementById('workDuration');
+        const breakDurationInput = document.getElementById('breakDuration');
+        const sessionsInput = document.getElementById('sessions');
+        const saveSettingsBtn = document.getElementById('saveSettings');
+        const clearDataBtn = document.getElementById('clearData');
+        const exportDataBtn = document.getElementById('exportData');
+        const historyList = document.getElementById('historyList');
+        const notification = document.getElementById('notification');
+        const soundToggle = document.getElementById('soundToggle');
+        const alarmSound = document.getElementById('alarmSound');
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        
+        // Stats Elements
+        const totalSessionsEl = document.getElementById('totalSessions');
+        const totalFocusTimeEl = document.getElementById('totalFocusTime');
+        const currentStreakEl = document.getElementById('currentStreak');
+        const totalDaysEl = document.getElementById('totalDays');
+        
+        // Timer variables
+        let timer;
+        let isRunning = false;
+        let isPaused = false;
+        let currentTime = 0;
+        let totalTime = 0;
+        let currentSession = 0;
+        let totalSessions = 0;
+        let isWorkSession = true;
+        let startTime = null;
+        
+        // Settings
+        let workDuration = 25 * 60; // 25 minutes in seconds
+        let breakDuration = 5 * 60; // 5 minutes in seconds
+        let numberOfSessions = 4;
+        let soundEnabled = true;
+        let currentTheme = 'blue';
+        
+        // Stats
+        let stats = {
+            totalSessions: 0,
+            totalFocusTime: 0,
+            currentStreak: 0,
+            totalActiveDays: 0,
+            lastSessionDate: null,
+            history: [],
+            dailyStats: {}
+        };
+        
+        // Preset configurations
+        const presets = {
+            pomodoro: { work: 25, break: 5, sessions: 4 },
+            deep: { work: 50, break: 10, sessions: 2 },
+            short: { work: 15, break: 3, sessions: 6 },
+            long: { work: 45, break: 15, sessions: 3 }
+        };
+        
+        // Themes
+        const themes = {
+            blue: { primary: '#4361ee', secondary: '#3f37c9' },
+            green: { primary: '#2a9d8f', secondary: '#264653' },
+            orange: { primary: '#e76f51', secondary: '#f4a261' },
+            purple: { primary: '#9b5de5', secondary: '#7209b7' }
+        };
+        
+        // Initialize
+        function init() {
+            loadSettings();
+            loadStats();
+            updateStatsDisplay();
+            updateHistoryDisplay();
+            applyTheme();
+            resetTimer();
+        }
+        
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('focusSchedulerSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                workDuration = settings.workDuration || workDuration;
+                breakDuration = settings.breakDuration || breakDuration;
+                numberOfSessions = settings.numberOfSessions || numberOfSessions;
+                soundEnabled = settings.soundEnabled !== undefined ? settings.soundEnabled : true;
+                currentTheme = settings.theme || 'blue';
+                
+                workDurationInput.value = workDuration;
+                breakDurationInput.value = breakDuration;
+                sessionsInput.value = numberOfSessions;
+                soundToggle.checked = soundEnabled;
+                
+                // Update theme buttons
+                themeButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.theme === currentTheme) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        // Save settings to localStorage
+        function saveSettings() {
+            workDuration = parseInt(workDurationInput.value) * 60;
+            breakDuration = parseInt(breakDurationInput.value) * 60;
+            numberOfSessions = parseInt(sessionsInput.value);
+            soundEnabled = soundToggle.checked;
+            
+            const settings = {
+                workDuration,
+                breakDuration,
+                numberOfSessions,
+                soundEnabled,
+                theme: currentTheme
+            };
+            
+            localStorage.setItem('focusSchedulerSettings', JSON.stringify(settings));
+            showNotification('Settings saved successfully!', 'success');
+        }
+        
+        // Load stats from localStorage
+        function loadStats() {
+            const savedStats = localStorage.getItem('focusSchedulerStats');
+            if (savedStats) {
+                stats = JSON.parse(savedStats);
+            }
+        }
+        
+        // Save stats to localStorage
+        function saveStats() {
+            localStorage.setItem('focusSchedulerStats', JSON.stringify(stats));
+        }
+        
+        // Update stats display
+        function updateStatsDisplay() {
+            totalSessionsEl.textContent = stats.totalSessions;
+            totalFocusTimeEl.textContent = stats.totalFocusTime;
+            currentStreakEl.textContent = stats.currentStreak;
+            totalDaysEl.textContent = stats.totalActiveDays;
+        }
+        
+        // Update history display
+        function updateHistoryDisplay() {
+            if (stats.history.length === 0) {
+                historyList.innerHTML = '<li class="history-item">No sessions completed yet</li>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            stats.history.slice(-10).reverse().forEach(session => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                const icon = session.type === 'Work Session' ? '💼' : '☕';
+                li.innerHTML = `
+                    <div>
+                        <strong>${icon} ${session.type}</strong>
+                        <div class="history-date">${new Date(session.date).toLocaleString()}</div>
+                    </div>
+                    <div>${session.duration} min</div>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            isRunning = false;
+            isPaused = false;
+            currentSession = 0;
+            isWorkSession = true;
+            totalTime = workDuration;
+            currentTime = totalTime;
+            startTime = null;
+            updateTimerDisplay();
+            updateSessionInfo();
+            progressBar.style.width = '0%';
+            clearInterval(timer);
+            timer = null;
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (isRunning && !isPaused) return;
+            
+            isRunning = true;
+            isPaused = false;
+            startTime = startTime || Date.now();
+            
+            if (!timer) {
+                timer = setInterval(updateTimer, 1000);
+            }
+            
+            showNotification('Focus session started!', 'success');
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (!isRunning) return;
+            
+            isPaused = true;
+            clearInterval(timer);
+            timer = null;
+            showNotification('Session paused', 'warning');
+        }
+        
+        // Update timer
+        function updateTimer() {
+            if (currentTime > 0) {
+                currentTime--;
+                updateTimerDisplay();
+                updateProgressBar();
+            } else {
+                completeSession();
+            }
+        }
+        
+        // Complete current session
+        function completeSession() {
+            clearInterval(timer);
+            timer = null;
+            
+            // Play sound if enabled
+            if (soundEnabled) {
+                alarmSound.currentTime = 0;
+                alarmSound.play().catch(e => console.log("Audio play failed:", e));
+            }
+            
+            // Update stats
+            const sessionDuration = isWorkSession ? workDuration : breakDuration;
+            
+            if (isWorkSession) {
+                stats.totalSessions++;
+                stats.totalFocusTime += sessionDuration / 60;
+                
+                // Add to history
+                stats.history.push({
+                    type: 'Work Session',
+                    duration: sessionDuration / 60,
+                    date: new Date().toISOString()
+                });
+                
+                // Update daily stats
+                const today = new Date().toDateString();
+                if (!stats.dailyStats[today]) {
+                    stats.dailyStats[today] = { sessions: 0, focusTime: 0 };
+                    stats.totalActiveDays++;
+                }
+                stats.dailyStats[today].sessions++;
+                stats.dailyStats[today].focusTime += sessionDuration / 60;
+            } else {
+                // Add break to history
+                stats.history.push({
+                    type: 'Break',
+                    duration: sessionDuration / 60,
+                    date: new Date().toISOString()
+                });
+            }
+            
+            // Update streak
+            const today = new Date().toDateString();
+            if (!stats.lastSessionDate || stats.lastSessionDate !== today) {
+                if (stats.lastSessionDate) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    yesterday.setHours(0, 0, 0, 0);
+                    const lastDate = new Date(stats.lastSessionDate);
+                    lastDate.setHours(0, 0, 0, 0);
+                    
+                    if (lastDate.getTime() === yesterday.getTime()) {
+                        stats.currentStreak++;
+                    } else {
+                        stats.currentStreak = 1;
+                    }
+                } else {
+                    stats.currentStreak = 1;
+                }
+                stats.lastSessionDate = today;
+            }
+            
+            saveStats();
+            updateStatsDisplay();
+            updateHistoryDisplay();
+            
+            // Move to next session
+            currentSession++;
+            
+            if (currentSession >= numberOfSessions * 2) {
+                // All sessions completed
+                showNotification('🎉 All sessions completed! Great job!', 'success');
+                resetTimer();
+                return;
+            }
+            
+            // Toggle between work and break
+            isWorkSession = !isWorkSession;
+            totalTime = isWorkSession ? workDuration : breakDuration;
+            currentTime = totalTime;
+            
+            updateSessionInfo();
+            updateTimerDisplay();
+            updateProgressBar();
+            
+            // Auto-start next session after 3 seconds
+            setTimeout(() => {
+                if (isRunning) {
+                    startTimer();
+                }
+            }, 3000);
+        }
+        
+        // Skip current session
+        function skipSession() {
+            if (confirm('Skip current session?')) {
+                completeSession();
+            }
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timerDisplay.classList.add('flip');
+            setTimeout(() => timerDisplay.classList.remove('flip'), 600);
+        }
+        
+        // Update session info
+        function updateSessionInfo() {
+            const sessionType = isWorkSession ? '💼 Work Session' : '☕ Break Time';
+            const sessionNumber = Math.ceil((currentSession + 1) / 2);
+            sessionInfo.textContent = `${sessionType} - Session ${sessionNumber} of ${numberOfSessions}`;
+            sessionInfo.classList.add('pulse');
+            setTimeout(() => sessionInfo.classList.remove('pulse'), 2000);
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const progress = ((totalTime - currentTime) / totalTime) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // Clear all data
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.removeItem('focusSchedulerSettings');
+                localStorage.removeItem('focusSchedulerStats');
+                stats = {
+                    totalSessions: 0,
+                    totalFocusTime: 0,
+                    currentStreak: 0,
+                    totalActiveDays: 0,
+                    lastSessionDate: null,
+                    history: [],
+                    dailyStats: {}
+                };
+                loadSettings();
+                updateStatsDisplay();
+                updateHistoryDisplay();
+                resetTimer();
+                showNotification('All data cleared successfully!', 'success');
+            }
+        }
+        
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify({
+                settings: {
+                    workDuration,
+                    breakDuration,
+                    numberOfSessions,
+                    soundEnabled,
+                    theme: currentTheme
+                },
+                stats
+            }, null, 2);
+            
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'focus-scheduler-data.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Data exported successfully!', 'success');
+        }
+        
+        // Apply theme
+        function applyTheme() {
+            const theme = themes[currentTheme];
+            document.documentElement.style.setProperty('--primary', theme.primary);
+            document.documentElement.style.setProperty('--secondary', theme.secondary);
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Preset button handler
+        function applyPreset(presetName) {
+            const preset = presets[presetName];
+            workDurationInput.value = preset.work;
+            breakDurationInput.value = preset.break;
+            sessionsInput.value = preset.sessions;
+            
+            // Update active state
+            presetButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            showNotification(`Applied ${presetName} preset!`, 'success');
+        }
+        
+        // Theme button handler
+        function changeTheme(themeName) {
+            currentTheme = themeName;
+            applyTheme();
+            
+            // Update active state
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Save theme preference
+            const settings = JSON.parse(localStorage.getItem('focusSchedulerSettings') || '{}');
+            settings.theme = currentTheme;
+            localStorage.setItem('focusSchedulerSettings', JSON.stringify(settings));
+            
+            showNotification('Theme updated!', 'success');
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        skipBtn.addEventListener('click', skipSession);
+        saveSettingsBtn.addEventListener('click', saveSettings);
+        clearDataBtn.addEventListener('click', clearData);
+        exportDataBtn.addEventListener('click', exportData);
+        
+        // Preset buttons
+        presetButtons.forEach(btn => {
+            btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+        });
+        
+        // Theme buttons
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', () => changeTheme(btn.dataset.theme));
+        });
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

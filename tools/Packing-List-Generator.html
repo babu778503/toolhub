@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<!-- Category: Travel -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packing List Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            header {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 12px;
+                padding: 25px;
+                margin-bottom: 30px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            header::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: linear-gradient(90deg, #3498db, #1e3c72, #2980b9);
+            }
+
+            h1 {
+                color: #1e3c72;
+                font-size: 2.8rem;
+                margin-bottom: 10px;
+                position: relative;
+                display: inline-block;
+            }
+
+            h1::after {
+                content: "";
+                position: absolute;
+                bottom: -10px;
+                left: 25%;
+                right: 25%;
+                height: 3px;
+                background: #3498db;
+                border-radius: 3px;
+            }
+
+            .generator-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                gap: 30px;
+                margin-bottom: 30px;
+            }
+
+            .input-section {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .input-section h2 {
+                color: #1e3c72;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #e0e0e0;
+                font-size: 1.8rem;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #1e3c72;
+                font-size: 1.1rem;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 14px;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                transition: border-color 0.3s ease;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                border-color: #3498db;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            }
+
+            .btn-generate {
+                background: #1e3c72;
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                font-size: 1.2rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                width: 100%;
+                margin-top: 10px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-generate:hover {
+                background: #152a54;
+                transform: translateY(-3px);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .result-section {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .result-section h2 {
+                color: #1e3c72;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #e0e0e0;
+                font-size: 1.8rem;
+            }
+
+            .packing-list {
+                max-height: 500px;
+                overflow-y: auto;
+            }
+
+            .category {
+                margin-bottom: 25px;
+            }
+
+            .category-header {
+                background: #e3f2fd;
+                padding: 12px 15px;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                font-weight: 600;
+                color: #1e3c72;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .item {
+                display: flex;
+                align-items: center;
+                padding: 12px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            .item:last-child {
+                border-bottom: none;
+            }
+
+            .item input[type="checkbox"] {
+                width: 22px;
+                height: 22px;
+                margin-right: 15px;
+                cursor: pointer;
+                accent-color: #3498db;
+            }
+
+            .item label {
+                flex: 1;
+                font-size: 1.1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                padding: 5px 0;
+            }
+
+            .item input:checked + label {
+                text-decoration: line-through;
+                color: #888;
+            }
+
+            .controls {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 12px;
+                padding: 30px;
+                text-align: center;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                margin-bottom: 30px;
+            }
+
+            .controls h3 {
+                color: #1e3c72;
+                margin-bottom: 20px;
+                font-size: 1.5rem;
+            }
+
+            .btn-group {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .btn {
+                background: #1e3c72;
+                color: white;
+                border: none;
+                padding: 14px 28px;
+                font-size: 1.1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn:hover {
+                background: #152a54;
+                transform: translateY(-3px);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .btn:active {
+                transform: translateY(-1px);
+            }
+
+            .btn-clear {
+                background: #dc3545;
+            }
+
+            .btn-clear:hover {
+                background: #c82333;
+            }
+
+            .btn-add {
+                background: #3498db;
+            }
+
+            .btn-add:hover {
+                background: #2980b9;
+            }
+
+            .btn-print {
+                background: #28a745;
+            }
+
+            .btn-print:hover {
+                background: #218838;
+            }
+
+            .history-section {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                margin-top: 30px;
+            }
+
+            .history-section h2 {
+                color: #1e3c72;
+                margin-bottom: 20px;
+                font-size: 1.8rem;
+            }
+
+            .history-list {
+                max-height: 300px;
+                overflow-y: auto;
+            }
+
+            .history-item {
+                padding: 15px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .history-item:last-child {
+                border-bottom: none;
+            }
+
+            .history-trip {
+                font-weight: 600;
+            }
+
+            .history-items {
+                color: #1e3c72;
+                font-weight: 600;
+            }
+
+            .history-details {
+                font-size: 0.9rem;
+                color: #666;
+                margin-top: 5px;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin: 20px 0;
+            }
+
+            .stat-card {
+                background: #e3f2fd;
+                border-radius: 10px;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .stat-value {
+                font-size: 2rem;
+                font-weight: bold;
+                color: #1e3c72;
+            }
+
+            .stat-label {
+                font-size: 1rem;
+                color: #666;
+                margin-top: 5px;
+            }
+
+            .add-item-form {
+                display: none;
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                margin-top: 20px;
+                border: 2px dashed #3498db;
+            }
+
+            .form-buttons {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .btn-form {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 600;
+            }
+
+            .btn-save {
+                background: #3498db;
+                color: white;
+            }
+
+            .btn-cancel {
+                background: #6c757d;
+                color: white;
+            }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                height: 50px;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 8px;
+                margin-bottom: 15px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            h1 {
+                color: #1e3c72;
+                font-size: 1.4rem;
+                text-align: center;
+                padding: 0 10px;
+            }
+
+            .generator-container {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .input-section {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .input-section h2 {
+                color: #1e3c72;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #e0e0e0;
+                font-size: 1.3rem;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 600;
+                color: #1e3c72;
+                font-size: 1rem;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #ddd;
+                border-radius: 6px;
+                font-size: 1rem;
+            }
+
+            .btn-generate {
+                background: #1e3c72;
+                color: white;
+                border: none;
+                padding: 14px 20px;
+                font-size: 1.1rem;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                width: 100%;
+                margin-top: 10px;
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-generate:hover {
+                background: #152a54;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .result-section {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .result-section h2 {
+                color: #1e3c72;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #e0e0e0;
+                font-size: 1.3rem;
+            }
+
+            .packing-list {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .category {
+                margin-bottom: 20px;
+            }
+
+            .category-header {
+                background: #e3f2fd;
+                padding: 10px 12px;
+                border-radius: 6px;
+                margin-bottom: 12px;
+                font-weight: 600;
+                color: #1e3c72;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .item {
+                display: flex;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .item:last-child {
+                border-bottom: none;
+            }
+
+            .item input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+                margin-right: 12px;
+                cursor: pointer;
+                accent-color: #3498db;
+            }
+
+            .item label {
+                flex: 1;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                padding: 3px 0;
+            }
+
+            .item input:checked + label {
+                text-decoration: line-through;
+                color: #888;
+            }
+
+            .controls {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 10px;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .controls h3 {
+                color: #1e3c72;
+                margin-bottom: 15px;
+                font-size: 1.3rem;
+            }
+
+            .btn-group {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .btn {
+                background: #1e3c72;
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                font-size: 1rem;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .btn:hover {
+                background: #152a54;
+                transform: translateY(-1px);
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-clear {
+                background: #dc3545;
+            }
+
+            .btn-clear:hover {
+                background: #c82333;
+            }
+
+            .btn-add {
+                background: #3498db;
+            }
+
+            .btn-add:hover {
+                background: #2980b9;
+            }
+
+            .btn-print {
+                background: #28a745;
+            }
+
+            .btn-print:hover {
+                background: #218838;
+            }
+
+            .history-section {
+                background: rgba(255, 255, 255, 0.97);
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                margin-top: 20px;
+            }
+
+            .history-section h2 {
+                color: #1e3c72;
+                margin-bottom: 15px;
+                font-size: 1.3rem;
+            }
+
+            .history-list {
+                max-height: 200px;
+                overflow-y: auto;
+            }
+
+            .history-item {
+                padding: 12px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            .history-item:last-child {
+                border-bottom: none;
+            }
+
+            .history-trip {
+                font-weight: 600;
+            }
+
+            .history-items {
+                color: #1e3c72;
+                font-weight: 600;
+            }
+
+            .history-details {
+                font-size: 0.8rem;
+                color: #666;
+                margin-top: 3px;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 15px;
+                margin: 15px 0;
+            }
+
+            .stat-card {
+                background: #e3f2fd;
+                border-radius: 8px;
+                padding: 15px;
+                text-align: center;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #1e3c72;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+                color: #666;
+                margin-top: 3px;
+            }
+
+            .add-item-form {
+                display: none;
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 15px;
+                border: 2px dashed #3498db;
+            }
+
+            .form-buttons {
+                display: flex;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .btn-form {
+                flex: 1;
+                padding: 10px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+            .btn-save {
+                background: #3498db;
+                color: white;
+            }
+
+            .btn-cancel {
+                background: #6c757d;
+                color: white;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            header, .controls, .btn, .add-item-form, .history-section, .stats-container {
+                display: none;
+            }
+            
+            .input-section, .result-section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+            
+            .item input:checked + label {
+                text-decoration: line-through;
+                color: #888;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-suitcase"></i> Packing List Generator</h1>
+        </header>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="total-trips">0</div>
+                <div class="stat-label">Trips Generated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-items">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avg-items">0</div>
+                <div class="stat-label">Avg Items/Trip</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="packed-items">0</div>
+                <div class="stat-label">Items Packed</div>
+            </div>
+        </div>
+
+        <div class="generator-container">
+            <div class="input-section">
+                <h2><i class="fas fa-cog"></i> Trip Details</h2>
+                <div class="form-group">
+                    <label for="trip-name">Trip Name:</label>
+                    <input type="text" id="trip-name" placeholder="e.g., Summer Vacation, Business Trip">
+                </div>
+                <div class="form-group">
+                    <label for="trip-type">Trip Type:</label>
+                    <select id="trip-type">
+                        <option value="beach">Beach Vacation</option>
+                        <option value="business">Business Trip</option>
+                        <option value="adventure">Adventure/Hiking</option>
+                        <option value="city">City Break</option>
+                        <option value="winter">Winter/Ski Trip</option>
+                        <option value="backpacking">Backpacking</option>
+                        <option value="cruise">Cruise</option>
+                        <option value="camping">Camping</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="trip-duration">Duration (days):</label>
+                    <input type="number" id="trip-duration" min="1" max="365" value="7" placeholder="Number of days">
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination (Optional):</label>
+                    <input type="text" id="destination" placeholder="e.g., Paris, Bali, New York">
+                </div>
+                <div class="form-group">
+                    <label for="season">Season:</label>
+                    <select id="season">
+                        <option value="summer">Summer</option>
+                        <option value="winter">Winter</option>
+                        <option value="spring">Spring</option>
+                        <option value="autumn">Autumn</option>
+                    </select>
+                </div>
+                <button class="btn-generate" id="generate-btn">
+                    <i class="fas fa-magic"></i> Generate Packing List
+                </button>
+                
+                <div class="add-item-form" id="add-item-form">
+                    <div class="form-group">
+                        <label for="custom-category">Category:</label>
+                        <select id="custom-category">
+                            <option value="clothing">Clothing</option>
+                            <option value="toiletries">Toiletries</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="documents">Documents</option>
+                            <option value="medications">Medications</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="custom-item">Item Name:</label>
+                        <input type="text" id="custom-item" placeholder="Enter item name">
+                    </div>
+                    <div class="form-group">
+                        <label for="item-notes">Notes (Optional):</label>
+                        <textarea id="item-notes" placeholder="Additional notes (e.g., quantity, specific brand)" rows="2"></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button class="btn-form btn-save" id="save-item-btn">Add Item</button>
+                        <button class="btn-form btn-cancel" id="cancel-item-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h2><i class="fas fa-list"></i> Your Packing List</h2>
+                <div class="packing-list" id="packing-list">
+                    <p style="text-align: center; color: #666; margin: 30px 0;">
+                        Enter trip details and click "Generate Packing List" to create your personalized packing checklist
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3><i class="fas fa-tools"></i> Packing Tools</h3>
+            <div class="btn-group">
+                <button class="btn btn-add" id="add-item-btn">
+                    <i class="fas fa-plus-circle"></i> Add Custom Item
+                </button>
+                <button class="btn btn-print" id="print-btn">
+                    <i class="fas fa-print"></i> Print List
+                </button>
+                <button class="btn btn-clear" id="clear-btn">
+                    <i class="fas fa-trash-alt"></i> Clear All Data
+                </button>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h2><i class="fas fa-history"></i> Packing History</h2>
+            <div class="history-list" id="history-list">
+                <div class="history-item">
+                    <span>No packing lists generated yet</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Packing list templates by trip type
+        const packingTemplates = {
+            beach: {
+                clothing: [
+                    "Swimsuit",
+                    "Cover-up/Beach dress",
+                    "Lightweight shirts",
+                    "Shorts",
+                    "Sundress",
+                    "Light pants",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear",
+                    "Hat/Visor",
+                    "Sunglasses"
+                ],
+                toiletries: [
+                    "Sunscreen (SPF 30+)",
+                    "After-sun lotion",
+                    "Shampoo/Conditioner",
+                    "Body wash",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Razor",
+                    "Beach towel"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Camera",
+                    "Power bank",
+                    "E-reader"
+                ],
+                accessories: [
+                    "Beach bag",
+                    "Flip flops",
+                    "Sandals",
+                    "Beach umbrella",
+                    "Snorkel gear"
+                ]
+            },
+            business: {
+                clothing: [
+                    "Business suits",
+                    "Dress shirts",
+                    "Ties",
+                    "Dress pants/skirts",
+                    "Dress shoes",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear",
+                    "Blazer"
+                ],
+                toiletries: [
+                    "Shampoo/Conditioner",
+                    "Body wash",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Razor",
+                    "Shaving cream",
+                    "Hair products"
+                ],
+                documents: [
+                    "Passport/ID",
+                    "Boarding passes",
+                    "Hotel reservations",
+                    "Business cards",
+                    "Presentation materials"
+                ],
+                electronics: [
+                    "Laptop",
+                    "Phone charger",
+                    "Tablet",
+                    "Power adapter",
+                    "Headphones"
+                ]
+            },
+            adventure: {
+                clothing: [
+                    "Hiking boots",
+                    "Moisture-wicking shirts",
+                    "Hiking pants",
+                    "Warm layers",
+                    "Rain jacket",
+                    "Underwear",
+                    "Socks (hiking)",
+                    "Sleepwear",
+                    "Hat"
+                ],
+                toiletries: [
+                    "Biodegradable soap",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Sunscreen",
+                    "Insect repellent",
+                    "First aid kit"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Headlamp/Flashlight",
+                    "Power bank",
+                    "GPS device"
+                ],
+                accessories: [
+                    "Backpack",
+                    "Water bottle",
+                    "Trekking poles",
+                    "Sleeping bag",
+                    "Camping pillow"
+                ]
+            },
+            city: {
+                clothing: [
+                    "Casual shirts",
+                    "Jeans",
+                    "Dress pants/skirts",
+                    "Light jacket",
+                    "Comfortable shoes",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear",
+                    "Hat"
+                ],
+                toiletries: [
+                    "Shampoo/Conditioner",
+                    "Body wash",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Razor",
+                    "Makeup"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Camera",
+                    "Power bank",
+                    "Guidebook/E-reader"
+                ],
+                documents: [
+                    "Passport/ID",
+                    "Boarding passes",
+                    "Hotel reservations",
+                    "Travel insurance"
+                ]
+            },
+            winter: {
+                clothing: [
+                    "Winter coat",
+                    "Thermal underwear",
+                    "Sweaters",
+                    "Warm pants",
+                    "Winter boots",
+                    "Gloves",
+                    "Hat/Beanie",
+                    "Scarf",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear"
+                ],
+                toiletries: [
+                    "Shampoo/Conditioner",
+                    "Body wash",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Lip balm",
+                    "Moisturizer"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Power bank",
+                    "Camera"
+                ],
+                accessories: [
+                    "Sunglasses",
+                    "Hand warmers",
+                    "Thermal socks"
+                ]
+            },
+            backpacking: {
+                clothing: [
+                    "Quick-dry shirts",
+                    "Convertible pants",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear",
+                    "Light jacket"
+                ],
+                toiletries: [
+                    "Travel-sized shampoo",
+                    "Body wash",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Razor",
+                    "Towel"
+                ],
+                documents: [
+                    "Passport/ID",
+                    "Visas",
+                    "Travel insurance",
+                    "Emergency contacts"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Power bank",
+                    "Universal adapter"
+                ],
+                medications: [
+                    "Prescription medications",
+                    "Pain relievers",
+                    "Anti-diarrheal",
+                    "Bandages"
+                ]
+            },
+            cruise: {
+                clothing: [
+                    "Formal wear",
+                    "Casual outfits",
+                    "Swimsuits",
+                    "Cover-ups",
+                    "Sundresses",
+                    "Light jacket",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear"
+                ],
+                toiletries: [
+                    "Shampoo/Conditioner",
+                    "Body wash",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Razor",
+                    "Sunscreen",
+                    "Hair dryer (if not provided)"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Camera",
+                    "Power bank",
+                    "E-reader"
+                ],
+                documents: [
+                    "Passport/ID",
+                    "Boarding passes",
+                    "Cruise tickets",
+                    "Travel insurance"
+                ]
+            },
+            camping: {
+                clothing: [
+                    "Hiking boots",
+                    "Moisture-wicking shirts",
+                    "Warm layers",
+                    "Rain gear",
+                    "Underwear",
+                    "Socks",
+                    "Sleepwear",
+                    "Hat"
+                ],
+                toiletries: [
+                    "Biodegradable soap",
+                    "Toothbrush/Toothpaste",
+                    "Deodorant",
+                    "Sunscreen",
+                    "Insect repellent"
+                ],
+                electronics: [
+                    "Phone charger",
+                    "Flashlight/Headlamp",
+                    "Power bank",
+                    "Portable speaker"
+                ],
+                accessories: [
+                    "Sleeping bag",
+                    "Camping pillow",
+                    "Tent",
+                    "Cooking supplies",
+                    "Water bottle",
+                    "First aid kit"
+                ]
+            }
+        };
+
+        // DOM elements
+        const tripName = document.getElementById('trip-name');
+        const tripType = document.getElementById('trip-type');
+        const tripDuration = document.getElementById('trip-duration');
+        const destination = document.getElementById('destination');
+        const season = document.getElementById('season');
+        const generateBtn = document.getElementById('generate-btn');
+        const packingList = document.getElementById('packing-list');
+        const clearBtn = document.getElementById('clear-btn');
+        const addItemBtn = document.getElementById('add-item-btn');
+        const printBtn = document.getElementById('print-btn');
+        const addItemForm = document.getElementById('add-item-form');
+        const saveItemBtn = document.getElementById('save-item-btn');
+        const cancelItemBtn = document.getElementById('cancel-item-btn');
+        const customCategory = document.getElementById('custom-category');
+        const customItem = document.getElementById('custom-item');
+        const itemNotes = document.getElementById('item-notes');
+        const historyList = document.getElementById('history-list');
+        const totalTrips = document.getElementById('total-trips');
+        const totalItems = document.getElementById('total-items');
+        const avgItems = document.getElementById('avg-items');
+        const packedItems = document.getElementById('packed-items');
+
+        // Generate packing list
+        function generatePackingList() {
+            const name = tripName.value.trim() || 'My Trip';
+            const type = tripType.value;
+            const duration = parseInt(tripDuration.value) || 7;
+            const dest = destination.value.trim();
+            const seasonVal = season.value;
+
+            // Get template for selected trip type
+            const template = packingTemplates[type] || packingTemplates.city;
+            
+            // Create packing list HTML
+            let html = `<h3 style="text-align: center; margin-bottom: 20px; color: #1e3c72;">
+                ${name}${dest ? ` to ${dest}` : ''} (${duration} days)
+            </h3>`;
+            
+            let totalItemCount = 0;
+            
+            for (const [category, items] of Object.entries(template)) {
+                // Adjust item quantities based on trip duration
+                const adjustedItems = adjustItemsForDuration(items, duration);
+                
+                html += `
+                    <div class="category">
+                        <div class="category-header">
+                            <i class="fas fa-${getCategoryIcon(category)}"></i>
+                            ${category.charAt(0).toUpperCase() + category.slice(1)}
+                        </div>
+                `;
+                
+                adjustedItems.forEach((item, index) => {
+                    const itemId = `${category}-${index}`;
+                    html += `
+                        <div class="item">
+                            <input type="checkbox" id="${itemId}">
+                            <label for="${itemId}">${item}</label>
+                        </div>
+                    `;
+                    totalItemCount++;
+                });
+                
+                html += '</div>';
+            }
+            
+            packingList.innerHTML = html;
+            
+            // Add event listeners to checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    // Save checkbox state to localStorage
+                    localStorage.setItem(`packing-item-${this.id}`, this.checked);
+                    updatePackedItemsCount();
+                });
+                
+                // Restore checkbox state from localStorage
+                const savedState = localStorage.getItem(`packing-item-${checkbox.id}`);
+                if (savedState === 'true') {
+                    checkbox.checked = true;
+                }
+            });
+            
+            // Save to history
+            const packingData = {
+                name: name,
+                type: type,
+                duration: duration,
+                destination: dest,
+                season: seasonVal,
+                itemCount: totalItemCount,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            savePackingList(packingData);
+            updateHistoryDisplay();
+            updateStats();
+            updatePackedItemsCount();
+        }
+
+        // Adjust items based on trip duration
+        function adjustItemsForDuration(items, duration) {
+            // For longer trips, suggest more items or quantities
+            if (duration > 7) {
+                return items.map(item => {
+                    if (item.includes('underwear') || item.includes('socks') || item.includes('shirts')) {
+                        return `${item} (${Math.ceil(duration / 2)} sets)`;
+                    }
+                    return item;
+                });
+            }
+            return items;
+        }
+
+        // Get icon for category
+        function getCategoryIcon(category) {
+            const icons = {
+                clothing: 'tshirt',
+                toiletries: 'soap',
+                electronics: 'laptop',
+                documents: 'file-alt',
+                medications: 'prescription-bottle',
+                accessories: 'hat-cowboy'
+            };
+            return icons[category] || 'box';
+        }
+
+        // Save packing list to localStorage
+        function savePackingList(data) {
+            let history = JSON.parse(localStorage.getItem('packingHistory') || '[]');
+            history.unshift(data);
+            if (history.length > 20) history.pop(); // Keep only last 20
+            localStorage.setItem('packingHistory', JSON.stringify(history));
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const history = JSON.parse(localStorage.getItem('packingHistory') || '[]');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-item"><span>No packing lists generated yet</span></div>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div>
+                        <div class="history-trip">${item.name}${item.destination ? ` to ${item.destination}` : ''}</div>
+                        <div class="history-details">${item.timestamp} | ${item.duration} days | ${item.type}</div>
+                    </div>
+                    <div class="history-items">${item.itemCount} items</div>
+                </div>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats() {
+            const history = JSON.parse(localStorage.getItem('packingHistory') || '[]');
+            
+            if (history.length === 0) {
+                totalTrips.textContent = '0';
+                totalItems.textContent = '0';
+                avgItems.textContent = '0';
+                packedItems.textContent = '0';
+                return;
+            }
+
+            totalTrips.textContent = history.length;
+            
+            const totalItemsCount = history.reduce((sum, item) => sum + item.itemCount, 0);
+            totalItems.textContent = totalItemsCount;
+            
+            const avgItemsCount = Math.round(totalItemsCount / history.length);
+            avgItems.textContent = avgItemsCount;
+            
+            updatePackedItemsCount();
+        }
+
+        // Update packed items count
+        function updatePackedItemsCount() {
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            packedItems.textContent = checkedCount;
+        }
+
+        // Toggle add item form
+        function toggleAddItemForm() {
+            addItemForm.style.display = addItemForm.style.display === 'block' ? 'none' : 'block';
+            if (addItemForm.style.display === 'block') {
+                customItem.focus();
+            }
+        }
+
+        // Add custom item to current list
+        function addCustomItem() {
+            const category = customCategory.value;
+            const itemName = customItem.value.trim();
+            const notes = itemNotes.value.trim();
+            
+            if (!itemName) {
+                alert('Please enter an item name');
+                return;
+            }
+            
+            const fullItemName = notes ? `${itemName} (${notes})` : itemName;
+            
+            // Add to current packing list
+            const categoryElements = document.querySelectorAll('.category-header');
+            let targetCategory = null;
+            
+            for (let element of categoryElements) {
+                if (element.textContent.toLowerCase().includes(category)) {
+                    targetCategory = element.parentElement;
+                    break;
+                }
+            }
+            
+            if (targetCategory) {
+                const newItemId = `custom-${Date.now()}`;
+                const newItem = document.createElement('div');
+                newItem.className = 'item';
+                newItem.innerHTML = `
+                    <input type="checkbox" id="${newItemId}">
+                    <label for="${newItemId}">${fullItemName}</label>
+                `;
+                targetCategory.appendChild(newItem);
+                
+                // Add event listener to new checkbox
+                const newCheckbox = newItem.querySelector('input[type="checkbox"]');
+                newCheckbox.addEventListener('change', function() {
+                    localStorage.setItem(`packing-item-${this.id}`, this.checked);
+                    updatePackedItemsCount();
+                });
+            } else {
+                // If category doesn't exist, create it
+                const packingListContainer = document.querySelector('.packing-list');
+                const newCategory = document.createElement('div');
+                newCategory.className = 'category';
+                const categoryId = `category-${Date.now()}`;
+                newCategory.innerHTML = `
+                    <div class="category-header">
+                        <i class="fas fa-${getCategoryIcon(category)}"></i>
+                        ${category.charAt(0).toUpperCase() + category.slice(1)}
+                    </div>
+                    <div class="item">
+                        <input type="checkbox" id="custom-${Date.now()}">
+                        <label for="custom-${Date.now()}">${fullItemName}</label>
+                    </div>
+                `;
+                packingListContainer.appendChild(newCategory);
+                
+                // Add event listener to new checkbox
+                const newCheckbox = newCategory.querySelector('input[type="checkbox"]');
+                newCheckbox.addEventListener('change', function() {
+                    localStorage.setItem(`packing-item-${this.id}`, this.checked);
+                    updatePackedItemsCount();
+                });
+            }
+            
+            // Reset form
+            customItem.value = '';
+            itemNotes.value = '';
+            addItemForm.style.display = 'none';
+        }
+
+        // Print packing list
+        function printPackingList() {
+            window.print();
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all packing list data?')) {
+                localStorage.removeItem('packingHistory');
+                // Clear all checkbox states
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('packing-item-')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                packingList.innerHTML = '<p style="text-align: center; color: #666; margin: 30px 0;">Enter trip details and click "Generate Packing List" to create your personalized packing checklist</p>';
+                updateHistoryDisplay();
+                updateStats();
+                packedItems.textContent = '0';
+            }
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', generatePackingList);
+        clearBtn.addEventListener('click', clearAllData);
+        addItemBtn.addEventListener('click', toggleAddItemForm);
+        printBtn.addEventListener('click', printPackingList);
+        saveItemBtn.addEventListener('click', addCustomItem);
+        cancelItemBtn.addEventListener('click', () => {
+            addItemForm.style.display = 'none';
+            customItem.value = '';
+            itemNotes.value = '';
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateHistoryDisplay();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
