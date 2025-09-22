@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<!-- Category: Productivity -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Usage Calculator</title>
+    <meta name="description" content="Calculate your data usage with our free data usage calculator. Track mobile data consumption, estimate bandwidth needs, and manage your internet usage effectively.">
+    <meta name="keywords" content="data usage calculator, mobile data tracker, bandwidth calculator, internet usage monitor, data consumption tool, network usage calculator">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 15px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                position: sticky;
+                top: 20px;
+                z-index: 100;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+                color: #2c3e50;
+                text-align: center;
+                font-weight: 700;
+                background: linear-gradient(90deg, #6a11cb, #2575fc);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 20px;
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+                padding: 40px;
+                backdrop-filter: blur(10px);
+            }
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                position: sticky;
+                top: 10px;
+                z-index: 100;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                color: #2c3e50;
+                text-align: center;
+                font-weight: 700;
+                background: linear-gradient(90deg, #6a11cb, #2575fc);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            h1 i {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                padding: 20px;
+                backdrop-filter: blur(5px);
+                margin: 0 10px;
+            }
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .calculator-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+        
+        .input-section, .result-section, .usage-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        @media (max-width: 767px) {
+            .input-section, .result-section, .usage-section {
+                padding: 20px;
+            }
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .result-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .unit {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+        
+        .data-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 767px) {
+            .data-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(90deg, #27ae60, #219653);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .storage-info {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .storage-info h3 {
+            color: #0d47a1;
+            margin-bottom: 10px;
+        }
+        
+        .storage-info p {
+            color: #546e7a;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #fce4ec, #f8bbd0);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .usage-card {
+            background: #f1f8ff;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #d1e7ff;
+            transition: all 0.3s ease;
+        }
+        
+        .usage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
+        
+        .usage-card i {
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .usage-card h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .usage-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+        
+        .chart-container {
+            margin-top: 25px;
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #3498db, #2c3e50);
+            border-radius: 5px 5px 0 0;
+            min-width: 30px;
+            position: relative;
+            transition: height 1s ease;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .chart-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(90deg, #27ae60, #219653);
+        }
+        
+        .notification.error {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+        
+        .history-section {
+            margin-top: 25px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            color: #7f8c8d;
+        }
+        
+        .history-value {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-calculator"></i> Data Usage Calculator</h1>
+    </header>
+    
+    <div class="container">
+        <div class="calculator-grid">
+            <div class="input-section">
+                <h2><i class="fas fa-edit"></i> Usage Details</h2>
+                <div class="form-group">
+                    <label for="dataAmount">Data Amount</label>
+                    <input type="number" id="dataAmount" placeholder="Enter data amount" min="0" step="0.1" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dataUnit">Data Unit</label>
+                    <select id="dataUnit">
+                        <option value="MB">MB (Megabytes)</option>
+                        <option value="GB" selected>GB (Gigabytes)</option>
+                        <option value="TB">TB (Terabytes)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="usageType">Usage Type</label>
+                    <select id="usageType">
+                        <option value="streaming">Video Streaming</option>
+                        <option value="music">Music Streaming</option>
+                        <option value="browsing">Web Browsing</option>
+                        <option value="gaming">Online Gaming</option>
+                        <option value="social">Social Media</option>
+                        <option value="email">Email</option>
+                        <option value="downloads">File Downloads</option>
+                        <option value="videoCalls">Video Calls</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timePeriod">Time Period</label>
+                    <select id="timePeriod">
+                        <option value="day">Per Day</option>
+                        <option value="week">Per Week</option>
+                        <option value="month" selected>Per Month</option>
+                        <option value="year">Per Year</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dataPlan">Your Data Plan (GB)</label>
+                    <input type="number" id="dataPlan" placeholder="Enter your plan size" min="0" step="1" value="50">
+                </div>
+                
+                <button class="btn" onclick="calculateDataUsage()">
+                    <i class="fas fa-calculator"></i> Calculate Usage
+                </button>
+                
+                <div class="data-actions">
+                    <button class="btn btn-secondary" onclick="saveData()">
+                        <i class="fas fa-save"></i> Save Data
+                    </button>
+                    <button class="btn btn-danger" onclick="clearData()">
+                        <i class="fas fa-trash-alt"></i> Clear Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h2><i class="fas fa-chart-bar"></i> Calculation Results</h2>
+                <div class="result-item">
+                    <div class="result-label"><i class="fas fa-database"></i> Total Data Usage</div>
+                    <div class="result-value"><span id="totalUsage">0</span> <span class="unit" id="resultUnit">GB</span></div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label"><i class="fas fa-calendar-day"></i> Daily Average</div>
+                    <div class="result-value"><span id="dailyUsage">0</span> <span class="unit">GB/day</span></div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label"><i class="fas fa-calendar-week"></i> Weekly Usage</div>
+                    <div class="result-value"><span id="weeklyUsage">0</span> <span class="unit">GB/week</span></div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label"><i class="fas fa-mobile-alt"></i> Data Plan Comparison</div>
+                    <div class="result-value"><span id="planComparison">0</span>% <span class="unit">of <span id="planSize">50</span>GB plan</span></div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Plan Usage</span>
+                        <span id="progressValue">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-bar" id="dayBar" style="height: 0%">
+                        <div class="chart-value" id="dayValue">0GB</div>
+                        <div class="chart-label">Daily</div>
+                    </div>
+                    <div class="chart-bar" id="weekBar" style="height: 0%">
+                        <div class="chart-value" id="weekValue">0GB</div>
+                        <div class="chart-label">Weekly</div>
+                    </div>
+                    <div class="chart-bar" id="monthBar" style="height: 0%">
+                        <div class="chart-value" id="monthValue">0GB</div>
+                        <div class="chart-label">Monthly</div>
+                    </div>
+                    <div class="chart-bar" id="yearBar" style="height: 0%">
+                        <div class="chart-value" id="yearValue">0GB</div>
+                        <div class="chart-label">Yearly</div>
+                    </div>
+                </div>
+                
+                <div class="history-section">
+                    <h3 style="margin-bottom: 10px; color: #2c3e50;">Calculation History</h3>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+            
+            <div class="usage-section">
+                <h2><i class="fas fa-info-circle"></i> Usage Information</h2>
+                
+                <div class="usage-grid">
+                    <div class="usage-card">
+                        <i class="fas fa-film"></i>
+                        <h4>Video Streaming</h4>
+                        <p>HD: 3GB/hr</p>
+                    </div>
+                    <div class="usage-card">
+                        <i class="fas fa-music"></i>
+                        <h4>Music Streaming</h4>
+                        <p>Standard: 150MB/hr</p>
+                    </div>
+                    <div class="usage-card">
+                        <i class="fas fa-globe"></i>
+                        <h4>Web Browsing</h4>
+                        <p>Avg: 60MB/hr</p>
+                    </div>
+                    <div class="usage-card">
+                        <i class="fas fa-gamepad"></i>
+                        <h4>Gaming</h4>
+                        <p>Online: 80MB/hr</p>
+                    </div>
+                    <div class="usage-card">
+                        <i class="fas fa-video"></i>
+                        <h4>Video Calls</h4>
+                        <p>HD: 450MB/hr</p>
+                    </div>
+                    <div class="usage-card">
+                        <i class="fas fa-download"></i>
+                        <h4>File Downloads</h4>
+                        <p>Varies by file</p>
+                    </div>
+                </div>
+                
+                <div class="storage-info">
+                    <h3><i class="fas fa-lightbulb"></i> Data Usage Tips</h3>
+                    <p>Your data is automatically saved on your device. For <span class="highlight">Video Streaming</span>, HD quality uses about 3GB/hour. For <span class="highlight">Music Streaming</span>, standard quality uses about 150MB/hour.</p>
+                    <p style="margin-top: 10px;">To save data, consider using Wi-Fi when available, adjusting streaming quality, and monitoring app usage.</p>
+                </div>
+                
+                <div class="result-item" style="margin-top: 20px;">
+                    <div class="result-label"><i class="fas fa-exclamation-triangle"></i> Data Warning</div>
+                    <div class="result-value" id="warningMessage">-</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label"><i class="fas fa-bolt"></i> Efficiency Score</div>
+                    <div class="result-value"><span id="efficiencyScore">0</span>/100</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            loadData();
+            updateHistoryDisplay();
+        };
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function calculateDataUsage() {
+            // Get input values
+            const dataAmount = parseFloat(document.getElementById('dataAmount').value) || 0;
+            const dataUnit = document.getElementById('dataUnit').value;
+            const usageType = document.getElementById('usageType').value;
+            const timePeriod = document.getElementById('timePeriod').value;
+            const dataPlan = parseFloat(document.getElementById('dataPlan').value) || 50;
+            
+            // Update plan size display
+            document.getElementById('planSize').textContent = dataPlan;
+            
+            // Convert to GB for calculations
+            let dataInGB = dataAmount;
+            if (dataUnit === 'MB') {
+                dataInGB = dataAmount / 1024;
+            } else if (dataUnit === 'TB') {
+                dataInGB = dataAmount * 1024;
+            }
+            
+            // Calculate based on time period
+            let totalUsage = dataInGB;
+            let dailyUsage = 0;
+            let weeklyUsage = 0;
+            let yearlyUsage = 0;
+            
+            switch(timePeriod) {
+                case 'day':
+                    dailyUsage = dataInGB;
+                    weeklyUsage = dataInGB * 7;
+                    totalUsage = dataInGB * 30;
+                    yearlyUsage = dataInGB * 365;
+                    break;
+                case 'week':
+                    dailyUsage = dataInGB / 7;
+                    weeklyUsage = dataInGB;
+                    totalUsage = dataInGB * 4.3;
+                    yearlyUsage = dataInGB * 52;
+                    break;
+                case 'month':
+                    dailyUsage = dataInGB / 30;
+                    weeklyUsage = dataInGB / 4.3;
+                    totalUsage = dataInGB;
+                    yearlyUsage = dataInGB * 12;
+                    break;
+                case 'year':
+                    dailyUsage = dataInGB / 365;
+                    weeklyUsage = dataInGB / 52;
+                    totalUsage = dataInGB;
+                    yearlyUsage = dataInGB;
+                    break;
+            }
+            
+            // Update results
+            document.getElementById('totalUsage').textContent = totalUsage.toFixed(2);
+            document.getElementById('dailyUsage').textContent = dailyUsage.toFixed(3);
+            document.getElementById('weeklyUsage').textContent = weeklyUsage.toFixed(2);
+            document.getElementById('resultUnit').textContent = timePeriod === 'year' ? 'GB/year' : 'GB';
+            
+            // Calculate plan comparison
+            const planPercentage = Math.min((totalUsage / dataPlan) * 100, 100);
+            document.getElementById('planComparison').textContent = planPercentage.toFixed(1);
+            document.getElementById('progressValue').textContent = planPercentage.toFixed(1) + '%';
+            document.getElementById('progressFill').style.width = planPercentage + '%';
+            
+            // Update chart bars
+            const maxVal = Math.max(dailyUsage, weeklyUsage, totalUsage, yearlyUsage);
+            document.getElementById('dayBar').style.height = (dailyUsage / maxVal * 80) + '%';
+            document.getElementById('weekBar').style.height = (weeklyUsage / maxVal * 80) + '%';
+            document.getElementById('monthBar').style.height = (totalUsage / maxVal * 80) + '%';
+            document.getElementById('yearBar').style.height = (yearlyUsage / maxVal * 80) + '%';
+            
+            document.getElementById('dayValue').textContent = dailyUsage.toFixed(1) + 'GB';
+            document.getElementById('weekValue').textContent = weeklyUsage.toFixed(1) + 'GB';
+            document.getElementById('monthValue').textContent = totalUsage.toFixed(1) + 'GB';
+            document.getElementById('yearValue').textContent = yearlyUsage.toFixed(1) + 'GB';
+            
+            // Set warning message
+            let warning = '';
+            if (planPercentage > 100) {
+                warning = 'You have exceeded your data plan!';
+                document.getElementById('warningMessage').style.color = '#e74c3c';
+            } else if (planPercentage > 80) {
+                warning = 'Approaching data limit - consider reducing usage';
+                document.getElementById('warningMessage').style.color = '#f39c12';
+            } else if (planPercentage > 50) {
+                warning = 'Moderate data usage - on track';
+                document.getElementById('warningMessage').style.color = '#3498db';
+            } else {
+                warning = 'Good data usage - well under limit';
+                document.getElementById('warningMessage').style.color = '#27ae60';
+            }
+            document.getElementById('warningMessage').textContent = warning;
+            
+            // Calculate efficiency score (0-100)
+            let efficiencyScore = 100 - Math.min(planPercentage, 100);
+            if (planPercentage > 100) efficiencyScore = 0;
+            document.getElementById('efficiencyScore').textContent = Math.round(efficiencyScore);
+            
+            // Add to history
+            addToHistory(totalUsage.toFixed(2) + ' GB');
+        }
+        
+        function addToHistory(value) {
+            let history = JSON.parse(localStorage.getItem('dataUsageHistory') || '[]');
+            const now = new Date();
+            const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            history.unshift({
+                value: value,
+                date: dateStr
+            });
+            
+            // Keep only last 10 items
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            
+            localStorage.setItem('dataUsageHistory', JSON.stringify(history));
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            const history = JSON.parse(localStorage.getItem('dataUsageHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No history yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            history.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <span class="history-date">${item.date}</span>
+                    <span class="history-value">${item.value}</span>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+        
+        function saveData() {
+            // Save current values to localStorage
+            const data = {
+                dataAmount: document.getElementById('dataAmount').value,
+                dataUnit: document.getElementById('dataUnit').value,
+                usageType: document.getElementById('usageType').value,
+                timePeriod: document.getElementById('timePeriod').value,
+                dataPlan: document.getElementById('dataPlan').value
+            };
+            
+            localStorage.setItem('dataUsageCalculator', JSON.stringify(data));
+            showNotification('Data saved successfully!', 'success');
+        }
+        
+        function loadData() {
+            // Load saved data from localStorage
+            const savedData = localStorage.getItem('dataUsageCalculator');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('dataAmount').value = data.dataAmount || '10';
+                document.getElementById('dataUnit').value = data.dataUnit || 'GB';
+                document.getElementById('usageType').value = data.usageType || 'streaming';
+                document.getElementById('timePeriod').value = data.timePeriod || 'month';
+                document.getElementById('dataPlan').value = data.dataPlan || '50';
+                
+                // Recalculate with loaded data
+                calculateDataUsage();
+            }
+        }
+        
+        function clearData() {
+            // Clear localStorage
+            localStorage.removeItem('dataUsageCalculator');
+            localStorage.removeItem('dataUsageHistory');
+            
+            // Reset form to default values
+            document.getElementById('dataAmount').value = '10';
+            document.getElementById('dataUnit').value = 'GB';
+            document.getElementById('usageType').value = 'streaming';
+            document.getElementById('timePeriod').value = 'month';
+            document.getElementById('dataPlan').value = '50';
+            
+            // Reset results
+            document.getElementById('totalUsage').textContent = '0';
+            document.getElementById('dailyUsage').textContent = '0';
+            document.getElementById('weeklyUsage').textContent = '0';
+            document.getElementById('planComparison').textContent = '0';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressValue').textContent = '0%';
+            document.getElementById('warningMessage').textContent = '-';
+            document.getElementById('efficiencyScore').textContent = '0';
+            
+            // Reset chart
+            document.getElementById('dayBar').style.height = '0%';
+            document.getElementById('weekBar').style.height = '0%';
+            document.getElementById('monthBar').style.height = '0%';
+            document.getElementById('yearBar').style.height = '0%';
+            
+            document.getElementById('dayValue').textContent = '0GB';
+            document.getElementById('weekValue').textContent = '0GB';
+            document.getElementById('monthValue').textContent = '0GB';
+            document.getElementById('yearValue').textContent = '0GB';
+            
+            updateHistoryDisplay();
+            showNotification('Data cleared successfully!', 'success');
+        }
+        
+        // Calculate on page load if there's saved data
+        window.onload = function() {
+            loadData();
+            updateHistoryDisplay();
+        };
+        
+        // Add event listeners for real-time calculation
+        document.getElementById('dataAmount').addEventListener('input', calculateDataUsage);
+        document.getElementById('dataUnit').addEventListener('change', calculateDataUsage);
+        document.getElementById('usageType').addEventListener('change', calculateDataUsage);
+        document.getElementById('timePeriod').addEventListener('change', calculateDataUsage);
+        document.getElementById('dataPlan').addEventListener('input', calculateDataUsage);
+    </script>
+</body>
+</html>
