@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<!-- Category: Fitness -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Workout Recovery Timer - Track and manage your workout rest periods with this easy-to-use fitness tool. Perfect for interval training, HIIT, and strength workouts.">
+    <meta name="keywords" content="workout recovery timer, rest timer, interval timer, HIIT timer, strength training timer, fitness timer, exercise recovery, workout rest periods">
+    <title>Workout Recovery Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Desktop Styles */
+        header {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #e74c3c;
+            border-bottom: 3px solid #e74c3c;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .reset-btn {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+        }
+
+        .reset-btn:hover {
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .export-btn {
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+
+        .export-btn:hover {
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .timer-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .timer-value {
+            font-size: 72px;
+            font-weight: 700;
+            color: #e74c3c;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-label {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .timer-status {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .active { background-color: #d4edda; color: #155724; }
+        .resting { background-color: #fff3cd; color: #856404; }
+        .completed { background-color: #cce5ff; color: #004085; }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .control-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .start-btn {
+            background: linear-gradient(to right, #27ae60, #219653);
+            color: white;
+        }
+
+        .pause-btn {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .stop-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .preset-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .preset-card:hover {
+            transform: translateY(-5px);
+            border-color: #e74c3c;
+        }
+
+        .preset-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .preset-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        .interpretation {
+            background: #fce4ec;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .interpretation h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .interpretation ul {
+            padding-left: 20px;
+        }
+
+        .interpretation li {
+            margin-bottom: 10px;
+            color: #c0392b;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .data-actions button {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+
+        .clear-btn:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .health-tip {
+            background: linear-gradient(135deg, #fce4ec, #f8d7da);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            font-size: 15px;
+            color: #2c3e50;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .health-tip h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .history-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .history-item-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .history-value {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .history-value-label {
+            font-weight: 500;
+            color: #777;
+        }
+
+        .history-value-data {
+            font-weight: 600;
+            color: #e74c3c;
+        }
+
+        .delete-history {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .no-history {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .recommendations {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .recommendations h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .recommendation-list {
+            padding-left: 20px;
+        }
+
+        .recommendation-list li {
+            margin-bottom: 10px;
+            color: #27663a;
+        }
+
+        .progress-tracker {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .progress-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .progress-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .progress-chart {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .progress-chart h4 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .progress-line {
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            border-radius: 15px;
+            transition: width 1s ease-in-out;
+        }
+
+        .progress-target {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #27ae60;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                height: 50px;
+                padding: 0 15px;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 18px;
+                gap: 8px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            input, select {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 14px;
+                min-width: auto;
+            }
+
+            .timer-value {
+                font-size: 48px;
+            }
+
+            .timer-label {
+                font-size: 20px;
+            }
+
+            .control-buttons {
+                gap: 15px;
+            }
+
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+
+            .preset-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .data-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px 15px;
+            }
+
+            .history-item-values {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                min-width: 50%;
+            }
+
+            .progress-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transform: translateX(200%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+
+        .notification.error {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+
+        .notification.info {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+        }
+
+        .workout-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .workout-icon {
+            font-size: 32px;
+            color: #e74c3c;
+        }
+
+        .workout-details {
+            flex: 1;
+        }
+
+        .workout-details h4 {
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .workout-details p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .sound-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .sound-control input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .sound-control label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .beep-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-stopwatch"></i> Workout Recovery Timer</h1>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="timer">Timer</div>
+            <div class="tab" data-tab="history">History</div>
+            <div class="tab" data-tab="progress">Progress</div>
+            <div class="tab" data-tab="resources">Resources</div>
+        </div>
+
+        <div class="tab-content active" id="timer-tab">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="workout-type"><i class="fas fa-dumbbell"></i> Workout Type</label>
+                    <select id="workout-type">
+                        <option value="strength">Strength Training</option>
+                        <option value="hiit">HIIT</option>
+                        <option value="cardio">Cardio</option>
+                        <option value="yoga">Yoga/Pilates</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="rest-time"><i class="fas fa-clock"></i> Rest Time (seconds)</label>
+                    <input type="number" id="rest-time" placeholder="Enter rest time" min="1" value="60">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sets"><i class="fas fa-list-ol"></i> Number of Sets</label>
+                    <input type="number" id="sets" placeholder="Enter number of sets" min="1" value="5">
+                </div>
+                
+                <div class="input-group">
+                    <label for="date"><i class="fas fa-calendar"></i> Date & Time</label>
+                    <input type="datetime-local" id="date">
+                </div>
+            </div>
+            
+            <div class="sound-control">
+                <input type="checkbox" id="sound" checked>
+                <label for="sound"><i class="fas fa-volume-up"></i> Enable Sound Alerts</label>
+            </div>
+
+            <div class="workout-info">
+                <div class="workout-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="workout-details">
+                    <h4>Recovery Guidelines</h4>
+                    <p>Strength Training: 60-90 seconds | HIIT: 30-60 seconds | Cardio: 30-120 seconds</p>
+                </div>
+            </div>
+
+            <div class="timer-display">
+                <div class="timer-label" id="timer-label">Rest Time Remaining</div>
+                <div class="timer-value" id="timer-value">01:00</div>
+                <div class="timer-status resting" id="timer-status">Ready to Start</div>
+            </div>
+
+            <div class="control-buttons">
+                <button class="control-btn start-btn" id="start-btn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="control-btn pause-btn" id="pause-btn">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <button class="control-btn stop-btn" id="stop-btn">
+                    <i class="fas fa-stop"></i>
+                </button>
+            </div>
+
+            <div class="preset-grid">
+                <div class="preset-card" data-time="30">
+                    <h4>Quick Rest</h4>
+                    <div class="preset-time">30s</div>
+                </div>
+                <div class="preset-card" data-time="45">
+                    <h4>HIIT Rest</h4>
+                    <div class="preset-time">45s</div>
+                </div>
+                <div class="preset-card" data-time="60">
+                    <h4>Standard</h4>
+                    <div class="preset-time">60s</div>
+                </div>
+                <div class="preset-card" data-time="90">
+                    <h4>Strength</h4>
+                    <div class="preset-time">90s</div>
+                </div>
+                <div class="preset-card" data-time="120">
+                    <h4>Long Rest</h4>
+                    <div class="preset-time">2m</div>
+                </div>
+                <div class="preset-card" data-time="180">
+                    <h4>Extended</h4>
+                    <div class="preset-time">3m</div>
+                </div>
+            </div>
+
+            <div class="interpretation">
+                <h3><i class="fas fa-info-circle"></i> Recovery Time Guidelines</h3>
+                <ul>
+                    <li><strong>Strength Training:</strong> 60-90 seconds for hypertrophy, 2-3 minutes for strength</li>
+                    <li><strong>HIIT:</strong> 30-60 seconds active rest or 1:1 work-to-rest ratio</li>
+                    <li><strong>Cardio:</strong> 30-120 seconds depending on intensity</li>
+                    <li><strong>Power/Sprints:</strong> 2-5 minutes for full recovery</li>
+                    <li><strong>Endurance:</strong> 30-60 seconds active recovery</li>
+                </ul>
+            </div>
+
+            <div class="recommendations">
+                <h3><i class="fas fa-lightbulb"></i> Recovery Tips</h3>
+                <ul class="recommendation-list" id="recommendations-list">
+                    <li>Use active recovery (light movement) instead of complete rest when possible</li>
+                    <li>Stay hydrated between sets</li>
+                    <li>Focus on breathing deeply during rest periods</li>
+                    <li>Listen to your body and adjust rest times accordingly</li>
+                </ul>
+            </div>
+
+            <div class="data-actions">
+                <button id="save-btn"><i class="fas fa-save"></i> Save Current Session</button>
+                <button id="reset-btn" class="reset-btn"><i class="fas fa-redo"></i> Reset Timer</button>
+                <button id="clear-btn" class="clear-btn"><i class="fas fa-trash-alt"></i> Clear All Data</button>
+            </div>
+
+            <div class="health-tip">
+                <h3><i class="fas fa-lightbulb"></i> Fitness Recovery Tip</h3>
+                <p>Optimal rest periods improve workout performance and reduce injury risk. Too little rest leads to fatigue and poor form, while too much rest reduces workout intensity. Find your sweet spot based on your fitness goals and listen to your body's signals.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="history-tab">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;"><i class="fas fa-history"></i> Workout History</h2>
+            <div class="history-list" id="history-list">
+                <div class="no-history">No history available. Save your timer sessions to see them here.</div>
+            </div>
+            <div class="button-group" style="margin-top: 20px;">
+                <button id="export-history" class="export-btn"><i class="fas fa-file-export"></i> Export History</button>
+                <button id="clear-history" class="clear-btn"><i class="fas fa-trash-alt"></i> Clear History</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="progress-tab">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;"><i class="fas fa-chart-line"></i> Recovery Progress</h2>
+            <div class="progress-tracker">
+                <h3 class="progress-title"><i class="fas fa-tasks"></i> Your Recovery Patterns</h3>
+                <div class="progress-charts" id="progress-charts">
+                    <div class="no-history">No progress data available. Save your timer sessions to track patterns.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="resources-tab">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;"><i class="fas fa-book"></i> Fitness Resources</h2>
+            
+            <div class="interpretation">
+                <h3><i class="fas fa-info-circle"></i> Understanding Recovery</h3>
+                <p><strong>Active Recovery:</strong> Light movement during rest periods to maintain blood flow</p>
+                <p><strong>Passive Recovery:</strong> Complete rest between sets or exercises</p>
+                <p><strong>Intermittent Recovery:</strong> Alternating between high-intensity work and rest</p>
+                <p><strong>Continuous Recovery:</strong> Maintaining moderate intensity throughout workout</p>
+            </div>
+            
+            <div class="health-tip">
+                <h3><i class="fas fa-heartbeat"></i> Heart Rate Recovery</h3>
+                <ul>
+                    <li>Excellent recovery: Heart rate drops 12+ bpm in first minute</li>
+                    <li>Good recovery: Heart rate drops 8-11 bpm in first minute</li>
+                    <li>Fair recovery: Heart rate drops 5-7 bpm in first minute</li>
+                    <li>Poor recovery: Heart rate drops less than 5 bpm in first minute</li>
+                </ul>
+            </div>
+            
+            <div class="recommendations">
+                <h3><i class="fas fa-running"></i> Workout-Specific Recovery</h3>
+                <ul class="recommendation-list">
+                    <li><strong>Beginners:</strong> Start with longer rest periods and gradually decrease</li>
+                    <li><strong>Intermediate:</strong> 30-90 seconds based on exercise intensity</li>
+                    <li><strong>Advanced:</strong> 15-60 seconds with active recovery techniques</li>
+                    <li><strong>Power Athletes:</strong> 2-5 minutes for maximal effort sets</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Beep Indicator -->
+    <div class="beep-indicator" id="beep-indicator">REST!</div>
+
+    <script>
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const workoutTypeSelect = document.getElementById('workout-type');
+        const restTimeInput = document.getElementById('rest-time');
+        const setsInput = document.getElementById('sets');
+        const dateInput = document.getElementById('date');
+        const soundCheckbox = document.getElementById('sound');
+        const timerValue = document.getElementById('timer-value');
+        const timerLabel = document.getElementById('timer-label');
+        const timerStatus = document.getElementById('timer-status');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const exportHistoryBtn = document.getElementById('export-history');
+        const clearHistoryBtn = document.getElementById('clear-history');
+        const historyList = document.getElementById('history-list');
+        const recommendationsList = document.getElementById('recommendations-list');
+        const notification = document.getElementById('notification');
+        const progressCharts = document.getElementById('progress-charts');
+        const beepIndicator = document.getElementById('beep-indicator');
+        const presetCards = document.querySelectorAll('.preset-card');
+
+        // Timer variables
+        let timer;
+        let secondsLeft = 0;
+        let isRunning = false;
+        let isPaused = false;
+        let currentSet = 0;
+        let totalSets = 0;
+        let restTime = 0;
+
+        // Set default date to current time
+        window.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        });
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show active content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabName}-tab`) {
+                        content.classList.add('active');
+                        if (tabName === 'history') {
+                            loadHistory();
+                        } else if (tabName === 'progress') {
+                            loadProgressData();
+                        }
+                    }
+                });
+            });
+        });
+
+        // Load saved data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Preset card click handlers
+        presetCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const time = parseInt(card.getAttribute('data-time'));
+                restTimeInput.value = time;
+                showNotification(`Rest time set to ${time} seconds`, 'info');
+            });
+        });
+
+        // Start timer
+        startBtn.addEventListener('click', () => {
+            if (isRunning && !isPaused) {
+                showNotification('Timer is already running', 'info');
+                return;
+            }
+
+            restTime = parseInt(restTimeInput.value) || 60;
+            totalSets = parseInt(setsInput.value) || 5;
+            
+            if (restTime <= 0) {
+                showNotification('Please enter a valid rest time', 'error');
+                return;
+            }
+
+            if (!isPaused) {
+                secondsLeft = restTime;
+                currentSet = 1;
+            }
+
+            isRunning = true;
+            isPaused = false;
+            timerStatus.textContent = 'Resting';
+            timerStatus.className = 'timer-status resting';
+            timerLabel.textContent = `Set ${currentSet} of ${totalSets} - Rest Time Remaining`;
+
+            timer = setInterval(() => {
+                secondsLeft--;
+                updateTimerDisplay();
+
+                if (secondsLeft <= 0) {
+                    clearInterval(timer);
+                    playBeep();
+                    showBeepIndicator();
+                    
+                    if (currentSet < totalSets) {
+                        currentSet++;
+                        secondsLeft = restTime;
+                        timerLabel.textContent = `Set ${currentSet} of ${totalSets} - Rest Time Remaining`;
+                        timerStatus.textContent = 'Resting';
+                        timerStatus.className = 'timer-status resting';
+                        
+                        // Auto-start next set if not paused
+                        if (!isPaused) {
+                            timer = setInterval(arguments.callee, 1000);
+                        }
+                    } else {
+                        timerStatus.textContent = 'Completed';
+                        timerStatus.className = 'timer-status completed';
+                        showNotification('Workout session completed!', 'success');
+                    }
+                }
+            }, 1000);
+
+            showNotification('Timer started', 'success');
+        });
+
+        // Pause timer
+        pauseBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                showNotification('Timer is not running', 'info');
+                return;
+            }
+
+            if (isPaused) {
+                // Resume timer
+                isPaused = false;
+                timer = setInterval(() => {
+                    secondsLeft--;
+                    updateTimerDisplay();
+
+                    if (secondsLeft <= 0) {
+                        clearInterval(timer);
+                        playBeep();
+                        showBeepIndicator();
+                        
+                        if (currentSet < totalSets) {
+                            currentSet++;
+                            secondsLeft = restTime;
+                            timerLabel.textContent = `Set ${currentSet} of ${totalSets} - Rest Time Remaining`;
+                            timerStatus.textContent = 'Resting';
+                            timerStatus.className = 'timer-status resting';
+                            
+                            if (!isPaused) {
+                                timer = setInterval(arguments.callee, 1000);
+                            }
+                        } else {
+                            timerStatus.textContent = 'Completed';
+                            timerStatus.className = 'timer-status completed';
+                            showNotification('Workout session completed!', 'success');
+                        }
+                    }
+                }, 1000);
+                showNotification('Timer resumed', 'info');
+            } else {
+                // Pause timer
+                clearInterval(timer);
+                isPaused = true;
+                showNotification('Timer paused', 'info');
+            }
+        });
+
+        // Stop timer
+        stopBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                showNotification('Timer is not running', 'info');
+                return;
+            }
+
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            timerStatus.textContent = 'Stopped';
+            timerStatus.className = 'timer-status';
+            showNotification('Timer stopped', 'info');
+        });
+
+        // Reset timer
+        resetBtn.addEventListener('click', () => {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            secondsLeft = 0;
+            currentSet = 0;
+            restTimeInput.value = 60;
+            setsInput.value = 5;
+            timerValue.textContent = '01:00';
+            timerLabel.textContent = 'Rest Time Remaining';
+            timerStatus.textContent = 'Ready to Start';
+            timerStatus.className = 'timer-status';
+            showNotification('Timer reset', 'info');
+        });
+
+        // Save data to localStorage
+        saveBtn.addEventListener('click', () => {
+            const workoutType = workoutTypeSelect.value;
+            const restTime = parseInt(restTimeInput.value) || 60;
+            const sets = parseInt(setsInput.value) || 5;
+            const date = dateInput.value;
+
+            if (restTime <= 0) {
+                showNotification('Please enter a valid rest time', 'error');
+                return;
+            }
+
+            const data = {
+                workoutType: workoutType,
+                restTime: restTime,
+                sets: sets,
+                date: date,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            // Get existing history
+            let history = JSON.parse(localStorage.getItem('timerHistory')) || [];
+            history.push(data);
+            
+            // Keep only last 50 entries
+            if (history.length > 50) {
+                history = history.slice(-50);
+            }
+            
+            localStorage.setItem('timerHistory', JSON.stringify(history));
+            showNotification('Session saved successfully!', 'success');
+        });
+
+        // Clear all data from localStorage
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('timerData');
+                localStorage.removeItem('timerHistory');
+                showNotification('All data cleared successfully!', 'info');
+            }
+        });
+
+        // Export history
+        exportHistoryBtn.addEventListener('click', () => {
+            const history = JSON.parse(localStorage.getItem('timerHistory')) || [];
+            
+            if (history.length === 0) {
+                showNotification('No history to export', 'error');
+                return;
+            }
+            
+            let csvContent = 'Date,Workout Type,Rest Time,Sets\n';
+            history.forEach(entry => {
+                csvContent += `"${entry.timestamp}","${entry.workoutType || ''}",${entry.restTime},${entry.sets}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `workout_history_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showNotification('History exported successfully!', 'success');
+        });
+
+        // Clear history
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                localStorage.removeItem('timerHistory');
+                loadHistory();
+                showNotification('History cleared successfully!', 'info');
+            }
+        });
+
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const savedData = localStorage.getItem('timerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                workoutTypeSelect.value = data.workoutType || 'strength';
+                restTimeInput.value = data.restTime || 60;
+                setsInput.value = data.sets || 5;
+            }
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(secondsLeft / 60);
+            const seconds = secondsLeft % 60;
+            timerValue.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Play beep sound
+        function playBeep() {
+            if (soundCheckbox.checked) {
+                // Create audio context for beep sound
+                try {
+                    const context = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = context.createOscillator();
+                    const gainNode = context.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(context.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, context.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+                    
+                    oscillator.start(context.currentTime);
+                    oscillator.stop(context.currentTime + 0.5);
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+        }
+
+        // Show beep indicator
+        function showBeepIndicator() {
+            if (soundCheckbox.checked) {
+                beepIndicator.style.display = 'block';
+                setTimeout(() => {
+                    beepIndicator.style.display = 'none';
+                }, 1000);
+            }
+        }
+
+        // Load history into tab
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('timerHistory')) || [];
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="no-history">No history available. Save your timer sessions to see them here.</div>';
+                return;
+            }
+            
+            let historyHTML = '';
+            history.slice().reverse().forEach((entry, index) => {
+                const originalIndex = history.length - 1 - index;
+                historyHTML += `
+                    <div class="history-item">
+                        <div class="history-item-header">
+                            <span>${entry.timestamp}</span>
+                            <button class="delete-history" data-index="${originalIndex}" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
+                        </div>
+                        <div class="history-item-values">
+                            <div class="history-value">
+                                <div class="history-value-label">Workout</div>
+                                <div class="history-value-data">${entry.workoutType || 'N/A'}</div>
+                            </div>
+                            <div class="history-value">
+                                <div class="history-value-label">Rest Time</div>
+                                <div class="history-value-data">${entry.restTime || 'N/A'}s</div>
+                            </div>
+                            <div class="history-value">
+                                <div class="history-value-label">Sets</div>
+                                <div class="history-value-data">${entry.sets || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = historyHTML;
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-history').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    deleteHistoryEntry(index);
+                });
+            });
+        }
+
+        // Delete a history entry
+        function deleteHistoryEntry(index) {
+            let history = JSON.parse(localStorage.getItem('timerHistory')) || [];
+            history.splice(index, 1);
+            localStorage.setItem('timerHistory', JSON.stringify(history));
+            loadHistory();
+            showNotification('History entry deleted!', 'info');
+        }
+
+        // Load progress data
+        function loadProgressData() {
+            const history = JSON.parse(localStorage.getItem('timerHistory')) || [];
+            
+            if (history.length === 0) {
+                progressCharts.innerHTML = '<div class="no-history">No progress data available. Save your timer sessions to track patterns.</div>';
+                return;
+            }
+            
+            // Calculate averages
+            const avgRestTime = history.reduce((sum, entry) => sum + entry.restTime, 0) / history.length;
+            const avgSets = history.reduce((sum, entry) => sum + entry.sets, 0) / history.length;
+            
+            // Workout type distribution
+            const workoutTypes = {};
+            history.forEach(entry => {
+                const type = entry.workoutType || 'unknown';
+                workoutTypes[type] = (workoutTypes[type] || 0) + 1;
+            });
+            
+            // Create progress charts
+            let chartsHTML = `
+                <div class="progress-chart">
+                    <h4>Average Rest Time</h4>
+                    <div class="progress-line">
+                        <div class="progress-fill" style="width: ${Math.min(100, (avgRestTime / 120) * 100)}%"></div>
+                        <div class="progress-target" style="left: ${(60 / 120) * 100}%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>Average: ${avgRestTime.toFixed(0)} seconds</span>
+                        <span>Target: 60 seconds</span>
+                    </div>
+                </div>
+                
+                <div class="progress-chart">
+                    <h4>Average Sets per Session</h4>
+                    <div class="progress-line">
+                        <div class="progress-fill" style="width: ${Math.min(100, (avgSets / 10) * 100)}%"></div>
+                        <div class="progress-target" style="left: ${(5 / 10) * 100}%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>Average: ${avgSets.toFixed(1)}</span>
+                        <span>Target: 5 sets</span>
+                    </div>
+                </div>
+                
+                <div class="progress-chart">
+                    <h4>Workout Type Distribution</h4>
+                    <div style="padding: 10px;">
+            `;
+            
+            for (const [type, count] of Object.entries(workoutTypes)) {
+                chartsHTML += `<div style="margin: 5px 0; display: flex; align-items: center;">
+                    <div style="width: ${Math.min(100, (count / history.length) * 100)}%; height: 20px; background: #e74c3c; border-radius: 10px; margin-right: 10px;"></div>
+                    <span>${type}: ${count}</span>
+                </div>`;
+            }
+            
+            chartsHTML += `
+                    </div>
+                </div>
+            `;
+            
+            progressCharts.innerHTML = chartsHTML;
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

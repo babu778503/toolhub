@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<!-- Category: Technology -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Health Monitor</title>
+    <meta name="description" content="Monitor and track your device battery health with our easy-to-use Battery Health Monitor. Check battery capacity, cycle count, charging habits, and optimize battery performance.">
+    <meta name="keywords" content="battery health monitor, battery checker, battery capacity, battery cycle count, battery optimization, device battery, battery life, battery performance, battery diagnostics">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Desktop Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .dashboard-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card i {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .dashboard-label {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .monitor-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .monitor-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(90deg, #17a2b8 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-details {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .history-section {
+            margin-top: 40px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-header h3 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .history-item-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .history-item-distance {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .history-item-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
+        .device-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .device-type-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #e1e5e9;
+            transition: all 0.3s ease;
+        }
+
+        .device-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-type-card.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .device-type-card i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .form-group label {
+                font-size: 1rem;
+            }
+
+            .form-control {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+
+            .history-item {
+                grid-template-columns: 1fr;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .dashboard-card {
+                padding: 15px;
+            }
+
+            .dashboard-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #28a745;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .device-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .device-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .battery-indicator {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .battery-level {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .battery-low {
+            background: #dc3545;
+        }
+
+        .battery-medium {
+            background: #ffc107;
+        }
+
+        .battery-good {
+            background: #28a745;
+        }
+
+        .battery-excellent {
+            background: #17a2b8;
+        }
+
+        .battery-status {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .battery-low-text {
+            color: #dc3545;
+        }
+
+        .battery-medium-text {
+            color: #ffc107;
+        }
+
+        .battery-good-text {
+            color: #28a745;
+        }
+
+        .battery-excellent-text {
+            color: #17a2b8;
+        }
+
+        .recommendation {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .recommendation h4 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .pdf-export {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .pdf-export button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+        }
+
+        .pdf-export p {
+            margin-top: 20px;
+            color: #6c757d;
+        }
+
+        .health-meter {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .health-segment {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            margin: 0 2px;
+            border-radius: 10px;
+        }
+
+        .health-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .charging-habits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .habit-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .habit-card i {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-battery-full"></i> Battery Health Monitor</h1>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('monitor')">Monitor Health</div>
+                <div class="tab" onclick="switchTab('history')">History</div>
+                <div class="tab" onclick="switchTab('reports')">Reports</div>
+            </div>
+
+            <div id="monitor-tab" class="tab-content active">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-battery-half"></i>
+                        <div class="dashboard-value" id="currentHealth">100%</div>
+                        <div class="dashboard-label">Current Health</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-sync-alt"></i>
+                        <div class="dashboard-value" id="cycleCount">0</div>
+                        <div class="dashboard-label">Cycle Count</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-bolt"></i>
+                        <div class="dashboard-value" id="chargeLevel">0%</div>
+                        <div class="dashboard-label">Charge Level</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-history"></i>
+                        <div class="dashboard-value" id="totalReadings">0</div>
+                        <div class="dashboard-label">Total Readings</div>
+                    </div>
+                </div>
+
+                <div class="monitor-section">
+                    <div class="input-section">
+                        <h3><i class="fas fa-edit"></i> Battery Details</h3>
+                        <div class="device-info">
+                            <div class="form-group">
+                                <label for="deviceName">Device Name</label>
+                                <input type="text" id="deviceName" class="form-control" placeholder="e.g., iPhone 12, Samsung Galaxy S21">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkDate">Check Date</label>
+                                <input type="date" id="checkDate" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="designCapacity">Design Capacity (mAh)</label>
+                            <input type="number" id="designCapacity" class="form-control" placeholder="e.g., 3000, 4000" min="0" value="3000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="currentCapacity">Current Capacity (mAh)</label>
+                            <input type="number" id="currentCapacity" class="form-control" placeholder="e.g., 2800, 3500" min="0" value="2800">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="chargeLevelInput">Current Charge Level (%)</label>
+                            <input type="number" id="chargeLevelInput" class="form-control" placeholder="0-100" min="0" max="100" value="85">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Device Type</label>
+                            <div class="device-types">
+                                <div class="device-type-card" onclick="selectDeviceType('phone')" id="phone-card">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <div>Phone</div>
+                                </div>
+                                <div class="device-type-card" onclick="selectDeviceType('tablet')" id="tablet-card">
+                                    <i class="fas fa-tablet-alt"></i>
+                                    <div>Tablet</div>
+                                </div>
+                                <div class="device-type-card" onclick="selectDeviceType('laptop')" id="laptop-card">
+                                    <i class="fas fa-laptop"></i>
+                                    <div>Laptop</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedDeviceType" value="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usageNotes">Usage Notes</label>
+                            <textarea id="usageNotes" class="form-control" placeholder="Add notes about battery usage patterns..." rows="2"></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="calculateHealth()">
+                                <i class="fas fa-calculator"></i> Check Health
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearCurrent()">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                            <button class="btn btn-success" onclick="saveReading()">
+                                <i class="fas fa-save"></i> Save Reading
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3><i class="fas fa-heartbeat"></i> Health Analysis</h3>
+                        <div class="result-value" id="healthStatus">Excellent</div>
+                        <p>Battery Health</p>
+                        
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span>Health Percentage:</span>
+                                <span id="displayHealth">100%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Device:</span>
+                                <span id="displayDevice">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Capacity:</span>
+                                <span id="displayCapacity">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Charge Level:</span>
+                                <span id="displayCharge">0%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Date:</span>
+                                <span id="displayDate">-</span>
+                            </div>
+                        </div>
+
+                        <div class="battery-indicator">
+                            <div class="battery-level battery-excellent" id="batteryLevel" style="width: 100%"></div>
+                        </div>
+                        <div class="battery-status" id="batteryStatus">Excellent Health</div>
+
+                        <div class="health-meter">
+                            <div class="health-segment" id="healthSegment1"></div>
+                            <div class="health-segment" id="healthSegment2"></div>
+                            <div class="health-segment" id="healthSegment3"></div>
+                            <div class="health-segment" id="healthSegment4"></div>
+                        </div>
+                        <div class="health-labels">
+                            <span>0%</span>
+                            <span>25%</span>
+                            <span>50%</span>
+                            <span>75%</span>
+                            <span>100%</span>
+                        </div>
+
+                        <div class="recommendation">
+                            <h4><i class="fas fa-lightbulb"></i> Optimization Tips</h4>
+                            <p id="optimizationTip">Maintain charge between 20-80% for optimal battery health</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charging-habits">
+                    <div class="habit-card">
+                        <i class="fas fa-plug"></i>
+                        <div>Avoid Full Charges</div>
+                        <small>Don't charge to 100% regularly</small>
+                    </div>
+                    <div class="habit-card">
+                        <i class="fas fa-battery-empty"></i>
+                        <div>Avoid Deep Discharges</div>
+                        <small>Don't let battery drain completely</small>
+                    </div>
+                    <div class="habit-card">
+                        <i class="fas fa-thermometer-half"></i>
+                        <div>Control Temperature</div>
+                        <small>Avoid extreme heat/cold</small>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <div class="history-section">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Battery History</h3>
+                        <div class="history-controls">
+                            <select id="filterDeviceHistory" class="form-control" onchange="filterHistory()" style="width: auto;">
+                                <option value="all">All Devices</option>
+                            </select>
+                            <button class="clear-btn" onclick="clearHistory()">
+                                <i class="fas fa-trash"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <p>No battery health readings recorded yet. Start monitoring to see your history.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reports-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-file-export"></i>
+                        <div class="dashboard-value">PDF</div>
+                        <div class="dashboard-label">Export Report</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="dashboard-value">Trends</div>
+                        <div class="dashboard-label">Health</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-calendar"></i>
+                        <div class="dashboard-value" id="lastCheck">-</div>
+                        <div class="dashboard-label">Last Check</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-battery-quarter"></i>
+                        <div class="dashboard-value" id="worstHealth">100%</div>
+                        <div class="dashboard-label">Worst Health</div>
+                    </div>
+                </div>
+                <div class="pdf-export">
+                    <button class="btn btn-primary" onclick="generatePDF()">
+                        <i class="fas fa-file-pdf"></i> Generate PDF Report
+                    </button>
+                    <p>Click above to generate and download your battery health report as PDF</p>
+                </div>
+                <div class="recommendation">
+                    <h4><i class="fas fa-chart-bar"></i> Health Trends</h4>
+                    <p id="trendMessage">Track more readings to see battery health trends</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Battery reading saved successfully!</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            loadHistory();
+            updateStats();
+            populateDeviceFilter();
+            // Set today's date as default
+            document.getElementById('checkDate').valueAsDate = new Date();
+        };
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function selectDeviceType(type) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.device-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            document.getElementById(type + '-card').classList.add('selected');
+            
+            // Set hidden input value
+            document.getElementById('selectedDeviceType').value = type;
+        }
+
+        function calculateHealth() {
+            const designCapacity = parseInt(document.getElementById('designCapacity').value) || 3000;
+            const currentCapacity = parseInt(document.getElementById('currentCapacity').value) || 2800;
+            const chargeLevel = parseInt(document.getElementById('chargeLevelInput').value) || 85;
+            const deviceName = document.getElementById('deviceName').value || 'Unnamed Device';
+            const deviceType = document.getElementById('selectedDeviceType').value;
+            const checkDate = document.getElementById('checkDate').value;
+            
+            // Calculate health percentage
+            const healthPercentage = Math.min(100, Math.max(0, (currentCapacity / designCapacity) * 100));
+            
+            // Display results
+            document.getElementById('displayHealth').textContent = healthPercentage.toFixed(1) + '%';
+            document.getElementById('displayDevice').textContent = deviceName;
+            document.getElementById('displayCapacity').textContent = `${currentCapacity}/${designCapacity} mAh`;
+            document.getElementById('displayCharge').textContent = chargeLevel + '%';
+            
+            // Display date
+            if (checkDate) {
+                const dateObj = new Date(checkDate);
+                document.getElementById('displayDate').textContent = dateObj.toLocaleDateString();
+            } else {
+                document.getElementById('displayDate').textContent = new Date().toLocaleDateString();
+            }
+            
+            // Update battery indicator
+            const batteryLevel = document.getElementById('batteryLevel');
+            const batteryStatus = document.getElementById('batteryStatus');
+            const healthStatus = document.getElementById('healthStatus');
+            
+            // Update battery level bar
+            batteryLevel.style.width = healthPercentage + '%';
+            
+            // Determine health status and color
+            if (healthPercentage >= 80) {
+                batteryLevel.className = 'battery-level battery-excellent';
+                batteryStatus.textContent = 'Excellent Health';
+                batteryStatus.className = 'battery-status battery-excellent-text';
+                healthStatus.textContent = 'Excellent';
+                document.getElementById('optimizationTip').textContent = 'Your battery is in excellent condition. Continue good charging habits.';
+            } else if (healthPercentage >= 60) {
+                batteryLevel.className = 'battery-level battery-good';
+                batteryStatus.textContent = 'Good Health';
+                batteryStatus.className = 'battery-status battery-good-text';
+                healthStatus.textContent = 'Good';
+                document.getElementById('optimizationTip').textContent = 'Your battery is in good condition. Maintain charge between 20-80% for longevity.';
+            } else if (healthPercentage >= 40) {
+                batteryLevel.className = 'battery-level battery-medium';
+                batteryStatus.textContent = 'Fair Health';
+                batteryStatus.className = 'battery-status battery-medium-text';
+                healthStatus.textContent = 'Fair';
+                document.getElementById('optimizationTip').textContent = 'Battery health is declining. Avoid full charges and deep discharges.';
+            } else {
+                batteryLevel.className = 'battery-level battery-low';
+                batteryStatus.textContent = 'Poor Health';
+                batteryStatus.className = 'battery-status battery-low-text';
+                healthStatus.textContent = 'Poor';
+                document.getElementById('optimizationTip').textContent = 'Battery health is poor. Consider battery replacement soon.';
+            }
+            
+            // Update health meter segments
+            const segments = [1, 2, 3, 4].map(i => document.getElementById('healthSegment' + i));
+            segments.forEach((segment, index) => {
+                const segmentValue = (index + 1) * 25;
+                if (healthPercentage >= segmentValue) {
+                    segment.style.background = batteryLevel.style.background;
+                } else {
+                    segment.style.background = '#e9ecef';
+                }
+            });
+            
+            // Update charge level display
+            document.getElementById('chargeLevel').textContent = chargeLevel + '%';
+            
+            // Show notification
+            showNotification('Battery health analysis completed successfully!');
+        }
+
+        function saveReading() {
+            const designCapacity = parseInt(document.getElementById('designCapacity').value) || 3000;
+            const currentCapacity = parseInt(document.getElementById('currentCapacity').value) || 2800;
+            const chargeLevel = parseInt(document.getElementById('chargeLevelInput').value) || 85;
+            const deviceName = document.getElementById('deviceName').value || 'Unnamed Device';
+            const deviceType = document.getElementById('selectedDeviceType').value;
+            const usageNotes = document.getElementById('usageNotes').value;
+            const checkDate = document.getElementById('checkDate').value;
+            
+            // Calculate health percentage
+            const healthPercentage = Math.min(100, Math.max(0, (currentCapacity / designCapacity) * 100));
+            
+            const readingItem = {
+                designCapacity: designCapacity,
+                currentCapacity: currentCapacity,
+                healthPercentage: healthPercentage,
+                chargeLevel: chargeLevel,
+                device: deviceName,
+                deviceType: deviceType,
+                notes: usageNotes,
+                date: checkDate || new Date().toISOString().split('T')[0],
+                timestamp: new Date().getTime()
+            };
+            
+            // Get existing readings or initialize empty array
+            let readings = JSON.parse(localStorage.getItem('batteryHealthReadings')) || [];
+            
+            // Add new item to beginning of array
+            readings.unshift(readingItem);
+            
+            // Keep only last 100 items
+            if (readings.length > 100) {
+                readings = readings.slice(0, 100);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('batteryHealthReadings', JSON.stringify(readings));
+            
+            // Update display
+            loadHistory();
+            updateStats();
+            populateDeviceFilter();
+            
+            showNotification('Battery reading saved successfully!');
+        }
+
+        function loadHistory() {
+            const readings = JSON.parse(localStorage.getItem('batteryHealthReadings')) || [];
+            const historyList = document.getElementById('historyList');
+            
+            if (readings.length === 0) {
+                historyList.innerHTML = '<p>No battery health readings recorded yet. Start monitoring to see your history.</p>';
+                return;
+            }
+            
+            // Apply filters
+            const filterDevice = document.getElementById('filterDeviceHistory').value;
+            
+            let filteredReadings = readings;
+            if (filterDevice !== 'all') {
+                filteredReadings = filteredReadings.filter(item => item.device === filterDevice);
+            }
+            
+            if (filteredReadings.length === 0) {
+                historyList.innerHTML = '<p>No battery health readings match the selected filters.</p>';
+                return;
+            }
+            
+            let html = '';
+            const deviceIcons = {
+                'phone': 'mobile-alt',
+                'tablet': 'tablet-alt',
+                'laptop': 'laptop'
+            };
+            
+            filteredReadings.forEach(item => {
+                const dateObj = new Date(item.date);
+                let healthClass = 'battery-excellent-text';
+                let healthStatus = 'Excellent';
+                
+                if (item.healthPercentage >= 80) {
+                    healthClass = 'battery-excellent-text';
+                    healthStatus = 'Excellent';
+                } else if (item.healthPercentage >= 60) {
+                    healthClass = 'battery-good-text';
+                    healthStatus = 'Good';
+                } else if (item.healthPercentage >= 40) {
+                    healthClass = 'battery-medium-text';
+                    healthStatus = 'Fair';
+                } else {
+                    healthClass = 'battery-low-text';
+                    healthStatus = 'Poor';
+                }
+                
+                html += `
+                    <div class="history-item">
+                        <div class="history-item-content">
+                            <div>
+                                <div class="history-item-distance">
+                                    <i class="fas fa-${deviceIcons[item.deviceType] || 'mobile-alt'}"></i> 
+                                    ${item.device}
+                                </div>
+                                <div><small>${dateObj.toLocaleDateString()}</small></div>
+                            </div>
+                            <div>
+                                <div><strong>Health: ${item.healthPercentage.toFixed(1)}%</strong></div>
+                                <div><small>Capacity: ${item.currentCapacity}/${item.designCapacity} mAh</small></div>
+                            </div>
+                            <div>
+                                <div class="${healthClass}"><strong>${healthStatus}</strong></div>
+                                <div><small>Charge: ${item.chargeLevel}%</small></div>
+                            </div>
+                        </div>
+                        <button class="clear-btn" onclick="deleteReading('${item.timestamp}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+
+        function filterHistory() {
+            loadHistory();
+        }
+
+        function populateDeviceFilter() {
+            const readings = JSON.parse(localStorage.getItem('batteryHealthReadings')) || [];
+            const deviceSelect = document.getElementById('filterDeviceHistory');
+            
+            // Get unique devices
+            const devices = [...new Set(readings.map(item => item.device))];
+            
+            // Clear existing options except "All Devices"
+            deviceSelect.innerHTML = '<option value="all">All Devices</option>';
+            
+            // Add devices to select
+            devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device;
+                option.textContent = device;
+                deviceSelect.appendChild(option);
+            });
+        }
+
+        function deleteReading(timestamp) {
+            let readings = JSON.parse(localStorage.getItem('batteryHealthReadings')) || [];
+            readings = readings.filter(item => item.timestamp != timestamp);
+            localStorage.setItem('batteryHealthReadings', JSON.stringify(readings));
+            loadHistory();
+            updateStats();
+            populateDeviceFilter();
+            showNotification('Reading removed from history');
+        }
+
+        function updateStats() {
+            const readings = JSON.parse(localStorage.getItem('batteryHealthReadings')) || [];
+            
+            // Total readings
+            document.getElementById('totalReadings').textContent = readings.length;
+            
+            // Last check date
+            if (readings.length > 0) {
+                const lastCheckDate = new Date(readings[0].date);
+                document.getElementById('lastCheck').textContent = lastCheckDate.toLocaleDateString();
+            } else {
+                document.getElementById('lastCheck').textContent = '-';
+            }
+            
+            // Current health from last reading
+            if (readings.length > 0) {
+                document.getElementById('currentHealth').textContent = readings[0].healthPercentage.toFixed(1) + '%';
+                document.getElementById('chargeLevel').textContent = readings[0].chargeLevel + '%';
+                document.getElementById('cycleCount').textContent = Math.floor(readings[0].healthPercentage / 2); // Simulated cycle count
+            } else {
+                document.getElementById('currentHealth').textContent = '100%';
+                document.getElementById('chargeLevel').textContent = '0%';
+                document.getElementById('cycleCount').textContent = '0';
+            }
+            
+            // Worst health
+            if (readings.length > 0) {
+                const worstHealth = Math.min(...readings.map(item => item.healthPercentage));
+                document.getElementById('worstHealth').textContent = worstHealth.toFixed(1) + '%';
+            } else {
+                document.getElementById('worstHealth').textContent = '100%';
+            }
+            
+            // Update trend message
+            if (readings.length > 2) {
+                const recentReadings = readings.slice(0, 5);
+                const avgHealth = recentReadings.reduce((sum, item) => sum + item.healthPercentage, 0) / recentReadings.length;
+                
+                document.getElementById('trendMessage').textContent = 
+                    `Average recent health: ${avgHealth.toFixed(1)}%. ` +
+                    `Monitor for consistent readings.`;
+            } else {
+                document.getElementById('trendMessage').textContent = 
+                    'Track more readings to see battery health trends';
+            }
+        }
+
+        function clearCurrent() {
+            document.getElementById('deviceName').value = '';
+            document.getElementById('designCapacity').value = '3000';
+            document.getElementById('currentCapacity').value = '2800';
+            document.getElementById('chargeLevelInput').value = '85';
+            document.getElementById('usageNotes').value = '';
+            document.getElementById('displayHealth').textContent = '100%';
+            document.getElementById('displayDevice').textContent = '-';
+            document.getElementById('displayCapacity').textContent = '-';
+            document.getElementById('displayCharge').textContent = '0%';
+            document.getElementById('displayDate').textContent = '-';
+            document.getElementById('healthStatus').textContent = 'Excellent';
+            document.getElementById('batteryLevel').style.width = '100%';
+            document.getElementById('batteryLevel').className = 'battery-level battery-excellent';
+            document.getElementById('batteryStatus').textContent = 'Excellent Health';
+            document.getElementById('batteryStatus').className = 'battery-status battery-excellent-text';
+            document.getElementById('optimizationTip').textContent = 'Maintain charge between 20-80% for optimal battery health';
+            document.getElementById('checkDate').valueAsDate = new Date();
+            
+            // Reset device type selection
+            document.querySelectorAll('.device-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('phone-card').classList.add('selected');
+            document.getElementById('selectedDeviceType').value = 'phone';
+            
+            showNotification('Current reading cleared');
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all battery health history?')) {
+                localStorage.removeItem('batteryHealthReadings');
+                document.getElementById('historyList').innerHTML = '<p>No battery health readings recorded yet. Start monitoring to see your history.</p>';
+                updateStats();
+                populateDeviceFilter();
+                showNotification('History cleared');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data including history?')) {
+                localStorage.clear();
+                clearCurrent();
+                document.getElementById('historyList').innerHTML = '<p>No battery health readings recorded yet. Start monitoring to see your history.</p>';
+                updateStats();
+                populateDeviceFilter();
+                showNotification('All data cleared');
+            }
+        }
+
+        function generatePDF() {
+            // Check if jsPDF is loaded
+            if (typeof window.jspdf === 'undefined') {
+                showNotification('PDF library not loaded. Please try again.', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text('Battery Health Monitor Report', 105, 20, null, null, 'center');
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text('Generated on: ' + new Date().toLocaleDateString(), 105, 30, null, null, 'center');
+                
+                // Add summary statistics
+                doc.setFontSize(14);
+                doc.text('Summary Statistics', 20, 45);
+                
+                doc.setFontSize(12);
+                doc.text('Total Readings: ' + document.getElementById('totalReadings').textContent, 20, 55);
+                doc.text('Current Health: ' + document.getElementById('currentHealth').textContent, 20, 65);
+                doc.text('Cycle Count: ' + document.getElementById('cycleCount').textContent, 20, 75);
+                doc.text('Worst Health: ' + document.getElementById('worstHealth').textContent, 20, 85);
+                doc.text('Last Check: ' + document.getElementById('lastCheck').textContent, 20, 95);
+                
+                // Add battery history
+                doc.setFontSize(14);
+                doc.text('Battery History', 20, 110);
+                
+                const readings = JSON.parse(localStorage.getItem('batteryHealthReadings')) || [];
+                let yPos = 120;
+                
+                if (readings.length === 0) {
+                    doc.setFontSize(12);
+                    doc.text('No battery history available', 20, yPos);
+                } else {
+                    doc.setFontSize(10);
+                    // Add headers
+                    doc.text('Date', 20, yPos);
+                    doc.text('Device', 50, yPos);
+                    doc.text('Health %', 80, yPos);
+                    doc.text('Capacity', 100, yPos);
+                    doc.text('Charge %', 125, yPos);
+                    doc.text('Status', 145, yPos);
+                    yPos += 10;
+                    
+                    // Add battery data (limit to first 20 readings to fit on page)
+                    const readingsToShow = readings.slice(0, 20);
+                    readingsToShow.forEach(item => {
+                        if (yPos > 280) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        const dateObj = new Date(item.date);
+                        let status = 'Excellent';
+                        if (item.healthPercentage >= 80) status = 'Excellent';
+                        else if (item.healthPercentage >= 60) status = 'Good';
+                        else if (item.healthPercentage >= 40) status = 'Fair';
+                        else status = 'Poor';
+                        
+                        doc.text(dateObj.toLocaleDateString(), 20, yPos);
+                        doc.text(item.device, 50, yPos);
+                        doc.text(item.healthPercentage.toFixed(1), 80, yPos);
+                        doc.text(`${item.currentCapacity}/${item.designCapacity}`, 100, yPos);
+                        doc.text(item.chargeLevel.toString(), 125, yPos);
+                        doc.text(status, 145, yPos);
+                        yPos += 8;
+                    });
+                }
+                
+                // Save the PDF
+                doc.save('battery-health-monitor-report.pdf');
+                showNotification('PDF report generated successfully!');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showNotification('Error generating PDF. Please try again.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            if (type === 'error') {
+                notification.style.background = '#dc3545';
+            } else {
+                notification.style.background = '#28a745';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add keyboard support for Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateHealth();
+            }
+        });
+
+        // Auto-save when leaving page
+        window.addEventListener('beforeunload', function() {
+            // This ensures data is saved
+        });
+    </script>
+</body>
+</html>

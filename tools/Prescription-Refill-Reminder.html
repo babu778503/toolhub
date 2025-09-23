@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<!-- Category: Healthcare -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Prescription Refill Reminder - A user-friendly tool to track and manage your prescription refills. Never miss a medication refill with automatic reminders and notifications.">
+    <meta name="keywords" content="prescription refill reminder, medication reminder, prescription tracker, medicine reminder app, healthcare reminder tool, medication management">
+    <title>Prescription Refill Reminder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            header {
+                background: linear-gradient(90deg, #28a745, #1e7e34);
+                color: white;
+                padding: 0 20px;
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 30px auto;
+                padding: 0 20px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+
+            .card {
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                transition: transform 0.3s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            h1 {
+                font-size: 28px;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            h2 {
+                color: #28a745;
+                margin-bottom: 20px;
+                font-size: 22px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: #333;
+            }
+
+            input, select, textarea {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #e1e8ed;
+                border-radius: 8px;
+                font-size: 16px;
+                transition: border-color 0.3s;
+            }
+
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                border-color: #28a745;
+                box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+            }
+
+            button {
+                background: linear-gradient(90deg, #28a745, #1e7e34);
+                color: white;
+                border: none;
+                padding: 14px 25px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            }
+
+            .btn-secondary {
+                background: linear-gradient(90deg, #6c757d, #495057);
+            }
+
+            .btn-danger {
+                background: linear-gradient(90deg, #dc3545, #a71e2a);
+            }
+
+            .btn-warning {
+                background: linear-gradient(90deg, #ffc107, #d39e00);
+            }
+
+            .btn-info {
+                background: linear-gradient(90deg, #17a2b8, #117a8b);
+            }
+
+            .medications-list {
+                max-height: 500px;
+                overflow-y: auto;
+            }
+
+            .medication-item {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 15px;
+                border-left: 4px solid #28a745;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .medication-item:hover {
+                background: #e9f7ef;
+                transform: translateX(5px);
+            }
+
+            .medication-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .medication-name {
+                font-size: 18px;
+                font-weight: 600;
+                color: #1e7e34;
+            }
+
+            .medication-details {
+                color: #666;
+                line-height: 1.5;
+            }
+
+            .medication-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .action-btn {
+                background: none;
+                border: none;
+                color: #28a745;
+                cursor: pointer;
+                font-size: 16px;
+                padding: 5px;
+                width: auto;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .action-btn.delete {
+                color: #dc3545;
+            }
+
+            .action-btn.edit {
+                color: #17a2b8;
+            }
+
+            .action-btn.refill {
+                color: #ffc107;
+            }
+
+            .no-medications {
+                text-align: center;
+                color: #666;
+                padding: 30px;
+                font-style: italic;
+            }
+
+            .clear-data {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .stat-card {
+                background: linear-gradient(135deg, #28a745, #1e7e34);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .stat-label {
+                font-size: 14px;
+                opacity: 0.9;
+            }
+
+            .filter-section {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .filter-select {
+                flex: 1;
+            }
+
+            .search-box {
+                flex: 2;
+                position: relative;
+            }
+
+            .search-box input {
+                padding-left: 40px;
+            }
+
+            .search-box i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #666;
+            }
+
+            .reminder-section {
+                background: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            .reminder-section h3 {
+                color: #856404;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .reminder-section ul {
+                padding-left: 20px;
+            }
+
+            .reminder-section li {
+                margin-bottom: 8px;
+                color: #666;
+            }
+
+            .priority-high {
+                border-left-color: #dc3545;
+            }
+
+            .priority-medium {
+                border-left-color: #ffc107;
+            }
+
+            .priority-low {
+                border-left-color: #28a745;
+            }
+
+            .refill-soon {
+                background: #fff3cd;
+            }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            header {
+                background: linear-gradient(90deg, #28a745, #1e7e34);
+                color: white;
+                padding: 0 15px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            h1 {
+                font-size: 18px;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            .container {
+                padding: 20px 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .card {
+                background: white;
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            }
+
+            h2 {
+                color: #28a745;
+                margin-bottom: 15px;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 500;
+                color: #333;
+                font-size: 14px;
+            }
+
+            input, select, textarea {
+                width: 100%;
+                padding: 10px 12px;
+                border: 2px solid #e1e8ed;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+
+            button {
+                background: linear-gradient(90deg, #28a745, #1e7e34);
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .btn-secondary {
+                background: linear-gradient(90deg, #6c757d, #495057);
+            }
+
+            .btn-danger {
+                background: linear-gradient(90deg, #dc3545, #a71e2a);
+            }
+
+            .btn-warning {
+                background: linear-gradient(90deg, #ffc107, #d39e00);
+            }
+
+            .btn-info {
+                background: linear-gradient(90deg, #17a2b8, #117a8b);
+            }
+
+            .medications-list {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .medication-item {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 12px;
+                border-left: 3px solid #28a745;
+            }
+
+            .medication-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+            }
+
+            .medication-name {
+                font-size: 16px;
+                font-weight: 600;
+                color: #1e7e34;
+            }
+
+            .medication-details {
+                color: #666;
+                line-height: 1.4;
+                font-size: 13px;
+            }
+
+            .medication-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .action-btn {
+                background: none;
+                border: none;
+                color: #28a745;
+                cursor: pointer;
+                font-size: 14px;
+                padding: 4px;
+                width: auto;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .action-btn.delete {
+                color: #dc3545;
+            }
+
+            .action-btn.edit {
+                color: #17a2b8;
+            }
+
+            .action-btn.refill {
+                color: #ffc107;
+            }
+
+            .no-medications {
+                text-align: center;
+                color: #666;
+                padding: 20px;
+                font-style: italic;
+                font-size: 14px;
+            }
+
+            .clear-data {
+                margin-top: 15px;
+                text-align: center;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                background: linear-gradient(135deg, #28a745, #1e7e34);
+                color: white;
+                padding: 15px 10px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 3px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+                opacity: 0.9;
+            }
+
+            .filter-section {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .reminder-section {
+                background: #fff3cd;
+                border-left: 3px solid #ffc107;
+                padding: 12px;
+                border-radius: 6px;
+                margin-bottom: 15px;
+            }
+
+            .reminder-section h3 {
+                color: #856404;
+                margin-bottom: 8px;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .reminder-section ul {
+                padding-left: 15px;
+            }
+
+            .reminder-section li {
+                margin-bottom: 6px;
+                color: #666;
+                font-size: 13px;
+            }
+
+            .priority-high {
+                border-left-color: #dc3545;
+            }
+
+            .priority-medium {
+                border-left-color: #ffc107;
+            }
+
+            .priority-low {
+                border-left-color: #28a745;
+            }
+
+            .refill-soon {
+                background: #fff3cd;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(90deg, #28a745, #1e7e34);
+        }
+
+        .notification.error {
+            background: linear-gradient(90deg, #dc3545, #a71e2a);
+        }
+
+        .notification.warning {
+            background: linear-gradient(90deg, #ffc107, #d39e00);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .export-btn {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-high {
+            background: #dc3545;
+        }
+
+        .progress-medium {
+            background: #ffc107;
+        }
+
+        .progress-low {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-pills"></i> Prescription Refill Reminder</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add New Medication</h2>
+            
+            <div class="reminder-section">
+                <h3><i class="fas fa-lightbulb"></i> Refill Tips</h3>
+                <ul>
+                    <li>Set reminders a few days before you run out</li>
+                    <li>Keep pharmacy contact information handy</li>
+                    <li>Consider automatic refill programs</li>
+                </ul>
+            </div>
+            
+            <form id="medicationForm">
+                <div class="form-group">
+                    <label for="medicationName"><i class="fas fa-capsules"></i> Medication Name</label>
+                    <input type="text" id="medicationName" required placeholder="Enter medication name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dosage"><i class="fas fa-prescription-bottle"></i> Dosage</label>
+                    <input type="text" id="dosage" required placeholder="e.g., 10mg, 500mg">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pharmacy"><i class="fas fa-hospital"></i> Pharmacy</label>
+                    <input type="text" id="pharmacy" required placeholder="Pharmacy name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="refillDate"><i class="fas fa-calendar-alt"></i> Next Refill Date</label>
+                    <input type="date" id="refillDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Quantity Remaining</label>
+                    <input type="number" id="quantity" min="0" required placeholder="Number of pills/doses">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dailyDose"><i class="fas fa-clock"></i> Daily Dose</label>
+                    <input type="number" id="dailyDose" min="0" step="0.1" required placeholder="How many per day">
+                </div>
+                
+                <div class="form-group">
+                    <label for="priority"><i class="fas fa-exclamation-circle"></i> Priority</label>
+                    <select id="priority" required>
+                        <option value="low">Low - Non-essential</option>
+                        <option value="medium" selected>Medium - Important</option>
+                        <option value="high">High - Critical</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes"><i class="fas fa-sticky-note"></i> Notes (Optional)</label>
+                    <textarea id="notes" rows="2" placeholder="Special instructions or reminders"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reminderDays"><i class="fas fa-bell"></i> Reminder (days before)</label>
+                    <select id="reminderDays">
+                        <option value="0">No reminder</option>
+                        <option value="1">1 day before</option>
+                        <option value="3" selected>3 days before</option>
+                        <option value="7">1 week before</option>
+                        <option value="14">2 weeks before</option>
+                    </select>
+                </div>
+                
+                <button type="submit"><i class="fas fa-plus"></i> Add Medication</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-list"></i> Your Medications</h2>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalMedications">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="dueSoon">0</div>
+                    <div class="stat-label">Due Soon</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="critical">0</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search medications...">
+                </div>
+                <div class="filter-select">
+                    <select id="filterPriority">
+                        <option value="">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="medications-list" id="medicationsList">
+                <!-- Medications will be loaded here -->
+            </div>
+            
+            <div class="clear-data">
+                <button class="btn-danger" id="clearDataBtn"><i class="fas fa-trash-alt"></i> Clear All Data</button>
+                <button class="export-btn" id="exportBtn"><i class="fas fa-file-export"></i> Export Medications</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Medication</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editMedicationName">Medication Name</label>
+                    <input type="text" id="editMedicationName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDosage">Dosage</label>
+                    <input type="text" id="editDosage" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPharmacy">Pharmacy</label>
+                    <input type="text" id="editPharmacy" required>
+                </div>
+                <div class="form-group">
+                    <label for="editRefillDate">Next Refill Date</label>
+                    <input type="date" id="editRefillDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="editQuantity">Quantity Remaining</label>
+                    <input type="number" id="editQuantity" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDailyDose">Daily Dose</label>
+                    <input type="number" id="editDailyDose" min="0" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPriority">Priority</label>
+                    <select id="editPriority" required>
+                        <option value="low">Low - Non-essential</option>
+                        <option value="medium">Medium - Important</option>
+                        <option value="high">High - Critical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editNotes">Notes</label>
+                    <textarea id="editNotes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-info"><i class="fas fa-save"></i> Update Medication</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // DOM Elements
+        const medicationForm = document.getElementById('medicationForm');
+        const medicationsList = document.getElementById('medicationsList');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const notification = document.getElementById('notification');
+        const searchInput = document.getElementById('searchInput');
+        const filterPriority = document.getElementById('filterPriority');
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const closeModal = document.querySelector('.close-modal');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // Stats elements
+        const totalMedicationsEl = document.getElementById('totalMedications');
+        const dueSoonEl = document.getElementById('dueSoon');
+        const criticalEl = document.getElementById('critical');
+
+        // Load medications from localStorage
+        function loadMedications() {
+            const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+            displayMedications(medications);
+            updateStats(medications);
+        }
+
+        // Update statistics
+        function updateStats(medications) {
+            const now = new Date();
+            const dueSoonCount = medications.filter(med => {
+                const refillDate = new Date(med.refillDate);
+                const diffTime = refillDate - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays <= 7 && diffDays >= 0;
+            }).length;
+            
+            const criticalCount = medications.filter(med => med.priority === 'high').length;
+
+            totalMedicationsEl.textContent = medications.length;
+            dueSoonEl.textContent = dueSoonCount;
+            criticalEl.textContent = criticalCount;
+        }
+
+        // Display medications in the list
+        function displayMedications(medications) {
+            const searchTerm = searchInput.value.toLowerCase();
+            const priorityFilter = filterPriority.value;
+
+            // Filter medications
+            let filteredMedications = medications.filter(med => {
+                const matchesSearch = med.medicationName.toLowerCase().includes(searchTerm) || 
+                                    med.pharmacy.toLowerCase().includes(searchTerm) ||
+                                    med.dosage.toLowerCase().includes(searchTerm);
+                const matchesPriority = !priorityFilter || med.priority === priorityFilter;
+                return matchesSearch && matchesPriority;
+            });
+
+            if (filteredMedications.length === 0) {
+                medicationsList.innerHTML = '<div class="no-medications">No medications found</div>';
+                return;
+            }
+
+            // Sort medications by refill date (soonest first)
+            filteredMedications.sort((a, b) => new Date(a.refillDate) - new Date(b.refillDate));
+
+            medicationsList.innerHTML = filteredMedications.map(medication => {
+                const daysUntilRefill = calculateDaysUntilRefill(medication.refillDate);
+                const priorityClass = `priority-${medication.priority}`;
+                const refillSoonClass = daysUntilRefill <= 7 ? 'refill-soon' : '';
+                const progressPercentage = calculateProgressPercentage(medication.quantity, medication.dailyDose, daysUntilRefill);
+                
+                return `
+                <div class="medication-item ${priorityClass} ${refillSoonClass}">
+                    <div class="medication-header">
+                        <div class="medication-name">${medication.medicationName} (${medication.dosage})</div>
+                    </div>
+                    <div class="medication-details">
+                        <div><strong>Pharmacy:</strong> ${medication.pharmacy}</div>
+                        <div><strong>Refill Date:</strong> ${formatDate(medication.refillDate)} (${daysUntilRefill >= 0 ? daysUntilRefill + ' days' : 'Overdue'})</div>
+                        <div><strong>Remaining:</strong> ${medication.quantity} doses</div>
+                        <div><strong>Daily Dose:</strong> ${medication.dailyDose}</div>
+                        <div><strong>Priority:</strong> ${medication.priority.charAt(0).toUpperCase() + medication.priority.slice(1)}</div>
+                        ${medication.notes ? `<div><strong>Notes:</strong> ${medication.notes}</div>` : ''}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-${medication.priority}" style="width: ${progressPercentage}%"></div>
+                    </div>
+                    <div class="medication-actions">
+                        <button class="action-btn refill" data-id="${medication.id}">
+                            <i class="fas fa-sync"></i> Refilled
+                        </button>
+                        <button class="action-btn edit" data-id="${medication.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete" data-id="${medication.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+
+            // Add event listeners to action buttons
+            document.querySelectorAll('.delete').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteMedication(id);
+                });
+            });
+
+            document.querySelectorAll('.edit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    openEditModal(id);
+                });
+            });
+
+            document.querySelectorAll('.refill').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    markAsRefilled(id);
+                });
+            });
+        }
+
+        // Calculate days until refill
+        function calculateDaysUntilRefill(refillDate) {
+            const today = new Date();
+            const refill = new Date(refillDate);
+            const diffTime = refill - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        // Calculate progress percentage
+        function calculateProgressPercentage(quantity, dailyDose, daysUntilRefill) {
+            if (daysUntilRefill <= 0) return 100;
+            const totalNeeded = dailyDose * daysUntilRefill;
+            const percentage = (quantity / totalNeeded) * 100;
+            return Math.min(100, Math.max(0, percentage));
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add new medication
+        function addMedication(medication) {
+            const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+            medications.push(medication);
+            localStorage.setItem('prescriptionMedications', JSON.stringify(medications));
+            loadMedications();
+            showNotification('Medication added successfully!');
+            
+            // Set reminder if needed
+            if (medication.reminderDays && medication.reminderDays !== '0') {
+                setReminder(medication);
+            }
+        }
+
+        // Set reminder notification
+        function setReminder(medication) {
+            const reminderDays = parseInt(medication.reminderDays);
+            const refillDate = new Date(medication.refillDate);
+            const reminderDate = new Date(refillDate);
+            reminderDate.setDate(reminderDate.getDate() - reminderDays);
+            const now = new Date();
+            
+            if (reminderDate > now) {
+                const timeUntilReminder = reminderDate - now;
+                setTimeout(() => {
+                    showNotification(`Reminder: Time to refill ${medication.medicationName} at ${medication.pharmacy}`, 'warning');
+                }, timeUntilReminder);
+            }
+        }
+
+        // Delete medication
+        function deleteMedication(id) {
+            if (confirm('Are you sure you want to delete this medication?')) {
+                const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+                const updatedMedications = medications.filter(medication => medication.id !== id);
+                localStorage.setItem('prescriptionMedications', JSON.stringify(updatedMedications));
+                loadMedications();
+                showNotification('Medication deleted successfully!');
+            }
+        }
+
+        // Mark as refilled
+        function markAsRefilled(id) {
+            const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+            const medication = medications.find(med => med.id === id);
+            
+            if (medication) {
+                // Calculate new refill date (assuming 30 days supply)
+                const newRefillDate = new Date();
+                newRefillDate.setDate(newRefillDate.getDate() + 30);
+                medication.refillDate = newRefillDate.toISOString().split('T')[0];
+                
+                // Reset quantity to default (you might want to make this configurable)
+                medication.quantity = 30 * medication.dailyDose;
+                
+                localStorage.setItem('prescriptionMedications', JSON.stringify(medications));
+                loadMedications();
+                showNotification(`${medication.medicationName} marked as refilled!`);
+            }
+        }
+
+        // Open edit modal
+        function openEditModal(id) {
+            const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+            const medication = medications.find(med => med.id === id);
+            
+            if (medication) {
+                document.getElementById('editId').value = medication.id;
+                document.getElementById('editMedicationName').value = medication.medicationName;
+                document.getElementById('editDosage').value = medication.dosage;
+                document.getElementById('editPharmacy').value = medication.pharmacy;
+                document.getElementById('editRefillDate').value = medication.refillDate;
+                document.getElementById('editQuantity').value = medication.quantity;
+                document.getElementById('editDailyDose').value = medication.dailyDose;
+                document.getElementById('editPriority').value = medication.priority;
+                document.getElementById('editNotes').value = medication.notes || '';
+                
+                editModal.style.display = 'flex';
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        // Update medication
+        function updateMedication(updatedMedication) {
+            const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+            const index = medications.findIndex(med => med.id === updatedMedication.id);
+            
+            if (index !== -1) {
+                medications[index] = updatedMedication;
+                localStorage.setItem('prescriptionMedications', JSON.stringify(medications));
+                loadMedications();
+                closeEditModal();
+                showNotification('Medication updated successfully!');
+            }
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all medication data? This cannot be undone.')) {
+                localStorage.removeItem('prescriptionMedications');
+                loadMedications();
+                showNotification('All data cleared successfully!');
+            }
+        }
+
+        // Export medications
+        function exportMedications() {
+            const medications = JSON.parse(localStorage.getItem('prescriptionMedications')) || [];
+            if (medications.length === 0) {
+                showNotification('No medications to export!', 'error');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(medications, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'prescription_medications.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            showNotification('Medications exported successfully!');
+        }
+
+        // Event Listeners
+        medicationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const medicationName = document.getElementById('medicationName').value;
+            const dosage = document.getElementById('dosage').value;
+            const pharmacy = document.getElementById('pharmacy').value;
+            const refillDate = document.getElementById('refillDate').value;
+            const quantity = document.getElementById('quantity').value;
+            const dailyDose = document.getElementById('dailyDose').value;
+            const priority = document.getElementById('priority').value;
+            const notes = document.getElementById('notes').value;
+            const reminderDays = document.getElementById('reminderDays').value;
+            
+            // Validate refill date is not in the past
+            if (new Date(refillDate) < new Date()) {
+                showNotification('Please select a future refill date', 'error');
+                return;
+            }
+            
+            const newMedication = {
+                id: Date.now().toString(),
+                medicationName: medicationName,
+                dosage: dosage,
+                pharmacy: pharmacy,
+                refillDate: refillDate,
+                quantity: parseFloat(quantity),
+                dailyDose: parseFloat(dailyDose),
+                priority: priority,
+                notes: notes,
+                reminderDays: reminderDays
+            };
+            
+            addMedication(newMedication);
+            medicationForm.reset();
+        });
+
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const updatedMedication = {
+                id: document.getElementById('editId').value,
+                medicationName: document.getElementById('editMedicationName').value,
+                dosage: document.getElementById('editDosage').value,
+                pharmacy: document.getElementById('editPharmacy').value,
+                refillDate: document.getElementById('editRefillDate').value,
+                quantity: parseFloat(document.getElementById('editQuantity').value),
+                dailyDose: parseFloat(document.getElementById('editDailyDose').value),
+                priority: document.getElementById('editPriority').value,
+                notes: document.getElementById('editNotes').value
+            };
+            
+            // Validate refill date is not in the past
+            if (new Date(updatedMedication.refillDate) < new Date()) {
+                showNotification('Please select a future refill date', 'error');
+                return;
+            }
+            
+            updateMedication(updatedMedication);
+        });
+
+        clearDataBtn.addEventListener('click', clearAllData);
+        exportBtn.addEventListener('click', exportMedications);
+        closeModal.addEventListener('click', closeEditModal);
+        window.addEventListener('click', function(e) {
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        // Search and filter events
+        searchInput.addEventListener('input', loadMedications);
+        filterPriority.addEventListener('change', loadMedications);
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMedications();
+            
+            // Set min date for refill date input to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('refillDate').min = today;
+            document.getElementById('editRefillDate').min = today;
+        });
+    </script>
+</body>
+</html>

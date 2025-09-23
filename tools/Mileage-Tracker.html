@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<!-- Category: Transportation -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mileage Tracker</title>
+    <meta name="description" content="Advanced Mileage Tracker for vehicle mileage, fuel efficiency monitoring, expense tracking, business travel, and vehicle maintenance planning.">
+    <meta name="keywords" content="mileage tracker, mileage calculator, vehicle mileage, fuel efficiency, business travel tracker, expense tracking, vehicle maintenance, trip logger, odometer tracker, fuel cost calculator, mpg tracker">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Desktop Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .dashboard-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card i {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #3498db;
+            margin: 10px 0;
+        }
+
+        .dashboard-label {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .tracker-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .tracker-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #27ae60 0%, #219653 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-details {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .history-section {
+            margin-top: 40px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-header h3 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .history-item-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .history-item-distance {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 1.2rem;
+        }
+
+        .history-item-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .trip-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .trip-type-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #e1e5e9;
+            transition: all 0.3s ease;
+        }
+
+        .trip-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .trip-type-card.selected {
+            border-color: #3498db;
+            background: #ebf5fb;
+        }
+
+        .trip-type-card i {
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .form-group label {
+                font-size: 1rem;
+            }
+
+            .form-control {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+
+            .history-item {
+                grid-template-columns: 1fr;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .dashboard-card {
+                padding: 15px;
+            }
+
+            .dashboard-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #27ae60;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .fuel-efficiency {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .fuel-efficiency h4 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .vehicle-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .vehicle-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .chart-container h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .expense-calculator {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .expense-calculator h4 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .expense-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .expense-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .expense-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .maintenance-alert {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .maintenance-alert i {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-car"></i> Mileage Tracker</h1>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tracker')">Tracker</div>
+                <div class="tab" onclick="switchTab('reports')">Reports</div>
+            </div>
+
+            <div id="tracker-tab" class="tab-content active">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-road"></i>
+                        <div class="dashboard-value" id="totalMiles">0.0</div>
+                        <div class="dashboard-label">Total Miles</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-gas-pump"></i>
+                        <div class="dashboard-value" id="totalFuel">0.0</div>
+                        <div class="dashboard-label">Total Fuel (gal)</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="dashboard-value" id="avgMPG">0.0</div>
+                        <div class="dashboard-label">Avg MPG</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="dashboard-value" id="totalCost">$0.00</div>
+                        <div class="dashboard-label">Total Cost</div>
+                    </div>
+                </div>
+
+                <div class="tracker-section">
+                    <div class="input-section">
+                        <h3><i class="fas fa-edit"></i> Trip Details</h3>
+                        <div class="vehicle-info">
+                            <div class="form-group">
+                                <label for="vehicleName">Vehicle Name</label>
+                                <input type="text" id="vehicleName" class="form-control" placeholder="e.g., Work Car, Family SUV">
+                            </div>
+                            <div class="form-group">
+                                <label for="fuelType">Fuel Type</label>
+                                <select id="fuelType" class="form-control">
+                                    <option value="gasoline">Gasoline</option>
+                                    <option value="diesel">Diesel</option>
+                                    <option value="hybrid">Hybrid</option>
+                                    <option value="electric">Electric</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tripMonth">Month</label>
+                            <select id="tripMonth" class="form-control">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="startOdometer">Start Odometer (miles)</label>
+                            <input type="number" id="startOdometer" class="form-control" placeholder="Enter starting odometer reading" step="0.1" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="endOdometer">End Odometer (miles)</label>
+                            <input type="number" id="endOdometer" class="form-control" placeholder="Enter ending odometer reading" step="0.1" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fuelUsed">Fuel Used (gallons)</label>
+                            <input type="number" id="fuelUsed" class="form-control" placeholder="Enter fuel used" step="0.01" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fuelPrice">Fuel Price ($/gallon)</label>
+                            <input type="number" id="fuelPrice" class="form-control" placeholder="Enter current fuel price" step="0.01" min="0" value="3.50">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Trip Type</label>
+                            <div class="trip-types">
+                                <div class="trip-type-card" onclick="selectTripType('business')" id="business-card">
+                                    <i class="fas fa-briefcase"></i>
+                                    <div>Business</div>
+                                </div>
+                                <div class="trip-type-card" onclick="selectTripType('personal')" id="personal-card">
+                                    <i class="fas fa-user"></i>
+                                    <div>Personal</div>
+                                </div>
+                                <div class="trip-type-card" onclick="selectTripType('commute')" id="commute-card">
+                                    <i class="fas fa-home"></i>
+                                    <div>Commute</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedTripType" value="business">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tripNotes">Trip Notes</label>
+                            <textarea id="tripNotes" class="form-control" placeholder="Add notes about this trip..." rows="2"></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="calculateMileage()">
+                                <i class="fas fa-calculator"></i> Calculate
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearCurrent()">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                            <button class="btn btn-success" onclick="saveTrip()">
+                                <i class="fas fa-save"></i> Save Trip
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3><i class="fas fa-tachometer-alt"></i> Trip Results</h3>
+                        <div class="result-value" id="distanceTraveled">0.0</div>
+                        <p>Miles traveled</p>
+                        
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span>Start Odometer:</span>
+                                <span id="displayStart">0.0 mi</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>End Odometer:</span>
+                                <span id="displayEnd">0.0 mi</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Fuel Efficiency:</span>
+                                <span id="displayMPG">0.0 MPG</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Fuel Cost:</span>
+                                <span id="displayCost">$0.00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Trip Type:</span>
+                                <span id="displayType">Business</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Vehicle:</span>
+                                <span id="displayVehicle">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Month:</span>
+                                <span id="displayMonth">-</span>
+                            </div>
+                        </div>
+
+                        <div class="maintenance-alert" id="maintenanceAlert" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Maintenance Alert!</strong>
+                                <div id="maintenanceMessage">Your vehicle needs attention</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expense-calculator">
+                    <h4><i class="fas fa-calculator"></i> Expense Summary</h4>
+                    <div class="expense-details">
+                        <div class="expense-item">
+                            <div>Fuel Cost</div>
+                            <div class="expense-value" id="fuelCost">$0.00</div>
+                        </div>
+                        <div class="expense-item">
+                            <div>Tax Deductible</div>
+                            <div class="expense-value" id="taxDeductible">$0.00</div>
+                        </div>
+                        <div class="expense-item">
+                            <div>Cost per Mile</div>
+                            <div class="expense-value" id="costPerMile">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-section">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Trip History</h3>
+                        <div class="history-controls">
+                            <select id="filterType" class="form-control" onchange="filterHistory()" style="width: auto;">
+                                <option value="all">All Types</option>
+                                <option value="business">Business</option>
+                                <option value="personal">Personal</option>
+                                <option value="commute">Commute</option>
+                            </select>
+                            <select id="filterVehicle" class="form-control" onchange="filterHistory()" style="width: auto;">
+                                <option value="all">All Vehicles</option>
+                            </select>
+                            <button class="clear-btn" onclick="clearHistory()">
+                                <i class="fas fa-trash"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <p>No trips recorded yet. Start tracking to see your history.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reports-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-file-export"></i>
+                        <div class="dashboard-value">PDF</div>
+                        <div class="dashboard-label">Export Report</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="dashboard-value">Monthly</div>
+                        <div class="dashboard-label">Summary</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-business-time"></i>
+                        <div class="dashboard-value" id="businessMiles">0.0</div>
+                        <div class="dashboard-label">Business Miles</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-user-clock"></i>
+                        <div class="dashboard-value" id="personalMiles">0.0</div>
+                        <div class="dashboard-label">Personal Miles</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3><i class="fas fa-file-alt"></i> Detailed Report</h3>
+                    <div class="chart-placeholder">
+                        <button class="btn btn-primary" onclick="generatePDF()">
+                            <i class="fas fa-file-pdf"></i> Generate PDF Report
+                        </button>
+                        <p style="margin-top: 20px;">Click above to generate and download your mileage report as PDF</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Trip saved successfully!</span>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            loadHistory();
+            updateStats();
+            populateVehicleFilter();
+            // Set current month as default
+            const currentMonth = new Date().getMonth();
+            document.getElementById('tripMonth').value = currentMonth;
+        };
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function selectTripType(type) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.trip-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            document.getElementById(type + '-card').classList.add('selected');
+            
+            // Set hidden input value
+            document.getElementById('selectedTripType').value = type;
+        }
+
+        function calculateMileage() {
+            const startOdometer = parseFloat(document.getElementById('startOdometer').value);
+            const endOdometer = parseFloat(document.getElementById('endOdometer').value);
+            const fuelUsed = parseFloat(document.getElementById('fuelUsed').value);
+            const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
+            const tripType = document.getElementById('selectedTripType').value;
+            const vehicleName = document.getElementById('vehicleName').value || 'Unnamed Vehicle';
+            const tripMonth = parseInt(document.getElementById('tripMonth').value);
+            
+            if (isNaN(startOdometer) || isNaN(endOdometer)) {
+                showNotification('Please enter valid odometer readings', 'error');
+                return;
+            }
+            
+            if (startOdometer < 0 || endOdometer < 0) {
+                showNotification('Please enter positive values', 'error');
+                return;
+            }
+            
+            if (endOdometer <= startOdometer) {
+                showNotification('End odometer must be greater than start', 'error');
+                return;
+            }
+            
+            const distance = endOdometer - startOdometer;
+            let mpg = 0;
+            let fuelCost = 0;
+            let costPerMile = 0;
+            
+            if (!isNaN(fuelUsed) && fuelUsed > 0) {
+                mpg = distance / fuelUsed;
+                if (!isNaN(fuelPrice) && fuelPrice > 0) {
+                    fuelCost = fuelUsed * fuelPrice;
+                    costPerMile = fuelCost / distance;
+                }
+            }
+            
+            // Display results
+            document.getElementById('distanceTraveled').textContent = distance.toFixed(1);
+            document.getElementById('displayStart').textContent = startOdometer.toFixed(1) + ' mi';
+            document.getElementById('displayEnd').textContent = endOdometer.toFixed(1) + ' mi';
+            document.getElementById('displayMPG').textContent = (mpg > 0 ? mpg.toFixed(1) + ' MPG' : 'N/A');
+            document.getElementById('displayCost').textContent = '$' + fuelCost.toFixed(2);
+            
+            // Display month
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('displayMonth').textContent = monthNames[tripMonth];
+            
+            // Display expense summary
+            document.getElementById('fuelCost').textContent = '$' + fuelCost.toFixed(2);
+            document.getElementById('costPerMile').textContent = '$' + costPerMile.toFixed(2);
+            
+            // Tax deductible calculation (business trips only)
+            const taxDeductible = tripType === 'business' ? fuelCost : 0;
+            document.getElementById('taxDeductible').textContent = '$' + taxDeductible.toFixed(2);
+            
+            // Display trip type
+            const tripTypes = {
+                'business': 'Business',
+                'personal': 'Personal',
+                'commute': 'Commute'
+            };
+            document.getElementById('displayType').textContent = tripTypes[tripType];
+            
+            // Display vehicle
+            document.getElementById('displayVehicle').textContent = vehicleName;
+            
+            // Check for maintenance alerts
+            checkMaintenanceAlerts(distance, mpg);
+            
+            // Show notification
+            showNotification('Mileage calculated successfully!');
+        }
+
+        function checkMaintenanceAlerts(distance, mpg) {
+            const alertElement = document.getElementById('maintenanceAlert');
+            const messageElement = document.getElementById('maintenanceMessage');
+            
+            if (distance > 500) {
+                alertElement.style.display = 'flex';
+                messageElement.textContent = 'Long trip detected! Consider vehicle inspection.';
+            } else if (mpg > 0 && mpg < 15) {
+                alertElement.style.display = 'flex';
+                messageElement.textContent = 'Low fuel efficiency detected! Check tire pressure and engine.';
+            } else {
+                alertElement.style.display = 'none';
+            }
+        }
+
+        function saveTrip() {
+            const startOdometer = parseFloat(document.getElementById('startOdometer').value);
+            const endOdometer = parseFloat(document.getElementById('endOdometer').value);
+            const fuelUsed = parseFloat(document.getElementById('fuelUsed').value);
+            const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
+            const tripType = document.getElementById('selectedTripType').value;
+            const vehicleName = document.getElementById('vehicleName').value || 'Unnamed Vehicle';
+            const fuelType = document.getElementById('fuelType').value;
+            const tripNotes = document.getElementById('tripNotes').value;
+            const tripMonth = parseInt(document.getElementById('tripMonth').value);
+            
+            if (isNaN(startOdometer) || isNaN(endOdometer)) {
+                showNotification('Please calculate first', 'error');
+                return;
+            }
+            
+            const distance = endOdometer - startOdometer;
+            let mpg = 0;
+            let fuelCost = 0;
+            
+            if (!isNaN(fuelUsed) && fuelUsed > 0) {
+                mpg = distance / fuelUsed;
+                if (!isNaN(fuelPrice) && fuelPrice > 0) {
+                    fuelCost = fuelUsed * fuelPrice;
+                }
+            }
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const historyItem = {
+                start: startOdometer,
+                end: endOdometer,
+                distance: distance,
+                fuelUsed: fuelUsed,
+                fuelPrice: fuelPrice,
+                mpg: mpg,
+                fuelCost: fuelCost,
+                type: tripType,
+                vehicle: vehicleName,
+                fuelType: fuelType,
+                notes: tripNotes,
+                month: tripMonth,
+                monthName: monthNames[tripMonth],
+                date: new Date().toLocaleString(),
+                timestamp: new Date().getTime()
+            };
+            
+            // Get existing history or initialize empty array
+            let history = JSON.parse(localStorage.getItem('mileageHistory')) || [];
+            
+            // Add new item to beginning of array
+            history.unshift(historyItem);
+            
+            // Keep only last 100 items
+            if (history.length > 100) {
+                history = history.slice(0, 100);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('mileageHistory', JSON.stringify(history));
+            
+            // Update display
+            loadHistory();
+            updateStats();
+            populateVehicleFilter();
+            
+            showNotification('Trip saved successfully!');
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('mileageHistory')) || [];
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>No trips recorded yet. Start tracking to see your history.</p>';
+                return;
+            }
+            
+            // Apply filters
+            const filterType = document.getElementById('filterType').value;
+            const filterVehicle = document.getElementById('filterVehicle').value;
+            
+            let filteredHistory = history;
+            if (filterType !== 'all') {
+                filteredHistory = filteredHistory.filter(item => item.type === filterType);
+            }
+            if (filterVehicle !== 'all') {
+                filteredHistory = filteredHistory.filter(item => item.vehicle === filterVehicle);
+            }
+            
+            if (filteredHistory.length === 0) {
+                historyList.innerHTML = '<p>No trips match the selected filters.</p>';
+                return;
+            }
+            
+            let html = '';
+            const tripTypes = {
+                'business': 'Business',
+                'personal': 'Personal',
+                'commute': 'Commute'
+            };
+            
+            const typeIcons = {
+                'business': 'briefcase',
+                'personal': 'user',
+                'commute': 'home'
+            };
+            
+            filteredHistory.forEach(item => {
+                html += `
+                    <div class="history-item">
+                        <div class="history-item-content">
+                            <div>
+                                <div class="history-item-distance">
+                                    <i class="fas fa-${typeIcons[item.type]}"></i> 
+                                    ${item.distance.toFixed(1)} miles
+                                </div>
+                                <div><small>${tripTypes[item.type]} • ${item.vehicle} • ${item.monthName}</small></div>
+                            </div>
+                            <div>
+                                <div><strong>${item.start.toFixed(1)} → ${item.end.toFixed(1)} mi</strong></div>
+                                <div><small>${item.mpg > 0 ? item.mpg.toFixed(1) + ' MPG' : 'N/A'} • $${item.fuelCost.toFixed(2)}</small></div>
+                            </div>
+                            <div>
+                                <div><small>${item.date}</small></div>
+                                ${item.notes ? `<div><small>Notes: ${item.notes.substring(0, 30)}${item.notes.length > 30 ? '...' : ''}</small></div>` : ''}
+                            </div>
+                        </div>
+                        <button class="clear-btn" onclick="deleteHistoryItem('${item.timestamp}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+
+        function filterHistory() {
+            loadHistory();
+        }
+
+        function populateVehicleFilter() {
+            const history = JSON.parse(localStorage.getItem('mileageHistory')) || [];
+            const vehicleSelect = document.getElementById('filterVehicle');
+            
+            // Get unique vehicles
+            const vehicles = [...new Set(history.map(item => item.vehicle))];
+            
+            // Clear existing options except "All Vehicles"
+            vehicleSelect.innerHTML = '<option value="all">All Vehicles</option>';
+            
+            // Add vehicles to select
+            vehicles.forEach(vehicle => {
+                const option = document.createElement('option');
+                option.value = vehicle;
+                option.textContent = vehicle;
+                vehicleSelect.appendChild(option);
+            });
+        }
+
+        function deleteHistoryItem(timestamp) {
+            let history = JSON.parse(localStorage.getItem('mileageHistory')) || [];
+            history = history.filter(item => item.timestamp != timestamp);
+            localStorage.setItem('mileageHistory', JSON.stringify(history));
+            loadHistory();
+            updateStats();
+            populateVehicleFilter();
+            showNotification('Trip removed from history');
+        }
+
+        function updateStats() {
+            const history = JSON.parse(localStorage.getItem('mileageHistory')) || [];
+            
+            // Total miles
+            const totalMiles = history.reduce((sum, item) => sum + item.distance, 0);
+            document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
+            
+            // Total fuel
+            const totalFuel = history.reduce((sum, item) => {
+                return sum + (isNaN(item.fuelUsed) ? 0 : item.fuelUsed);
+            }, 0);
+            document.getElementById('totalFuel').textContent = totalFuel.toFixed(1);
+            
+            // Average MPG (only for trips with fuel data)
+            const tripsWithFuel = history.filter(item => item.mpg > 0);
+            if (tripsWithFuel.length > 0) {
+                const avgMPG = tripsWithFuel.reduce((sum, item) => sum + item.mpg, 0) / tripsWithFuel.length;
+                document.getElementById('avgMPG').textContent = avgMPG.toFixed(1);
+            } else {
+                document.getElementById('avgMPG').textContent = '0.0';
+            }
+            
+            // Total cost
+            const totalCost = history.reduce((sum, item) => {
+                return sum + (isNaN(item.fuelCost) ? 0 : item.fuelCost);
+            }, 0);
+            document.getElementById('totalCost').textContent = '$' + totalCost.toFixed(2);
+            
+            // Business miles
+            const businessMiles = history
+                .filter(item => item.type === 'business')
+                .reduce((sum, item) => sum + item.distance, 0);
+            document.getElementById('businessMiles').textContent = businessMiles.toFixed(1);
+            
+            // Personal miles
+            const personalMiles = history
+                .filter(item => item.type === 'personal')
+                .reduce((sum, item) => sum + item.distance, 0);
+            document.getElementById('personalMiles').textContent = personalMiles.toFixed(1);
+        }
+
+        function clearCurrent() {
+            document.getElementById('vehicleName').value = '';
+            document.getElementById('startOdometer').value = '';
+            document.getElementById('endOdometer').value = '';
+            document.getElementById('fuelUsed').value = '';
+            document.getElementById('fuelPrice').value = '3.50';
+            document.getElementById('tripNotes').value = '';
+            document.getElementById('distanceTraveled').textContent = '0.0';
+            document.getElementById('displayStart').textContent = '0.0 mi';
+            document.getElementById('displayEnd').textContent = '0.0 mi';
+            document.getElementById('displayMPG').textContent = '0.0 MPG';
+            document.getElementById('displayCost').textContent = '$0.00';
+            document.getElementById('fuelCost').textContent = '$0.00';
+            document.getElementById('taxDeductible').textContent = '$0.00';
+            document.getElementById('costPerMile').textContent = '$0.00';
+            document.getElementById('displayType').textContent = 'Business';
+            document.getElementById('displayVehicle').textContent = '-';
+            document.getElementById('displayMonth').textContent = '-';
+            document.getElementById('maintenanceAlert').style.display = 'none';
+            
+            // Reset trip type selection
+            document.querySelectorAll('.trip-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('business-card').classList.add('selected');
+            document.getElementById('selectedTripType').value = 'business';
+            
+            // Reset fuel type
+            document.getElementById('fuelType').value = 'gasoline';
+            
+            // Set current month as default
+            const currentMonth = new Date().getMonth();
+            document.getElementById('tripMonth').value = currentMonth;
+            
+            showNotification('Current trip cleared');
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all trip history?')) {
+                localStorage.removeItem('mileageHistory');
+                document.getElementById('historyList').innerHTML = '<p>No trips recorded yet. Start tracking to see your history.</p>';
+                updateStats();
+                populateVehicleFilter();
+                showNotification('History cleared');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data including history?')) {
+                localStorage.clear();
+                clearCurrent();
+                document.getElementById('historyList').innerHTML = '<p>No trips recorded yet. Start tracking to see your history.</p>';
+                updateStats();
+                populateVehicleFilter();
+                showNotification('All data cleared');
+            }
+        }
+
+        function generatePDF() {
+            // Check if jsPDF is loaded
+            if (typeof window.jspdf === 'undefined') {
+                showNotification('PDF library not loaded. Please try again.', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text('Mileage Tracker Report', 105, 20, null, null, 'center');
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text('Generated on: ' + new Date().toLocaleDateString(), 105, 30, null, null, 'center');
+                
+                // Add summary statistics
+                doc.setFontSize(14);
+                doc.text('Summary Statistics', 20, 45);
+                
+                doc.setFontSize(12);
+                doc.text('Total Miles: ' + document.getElementById('totalMiles').textContent, 20, 55);
+                doc.text('Total Fuel: ' + document.getElementById('totalFuel').textContent + ' gallons', 20, 65);
+                doc.text('Average MPG: ' + document.getElementById('avgMPG').textContent, 20, 75);
+                doc.text('Total Cost: ' + document.getElementById('totalCost').textContent, 20, 85);
+                doc.text('Business Miles: ' + document.getElementById('businessMiles').textContent, 20, 95);
+                doc.text('Personal Miles: ' + document.getElementById('personalMiles').textContent, 20, 105);
+                
+                // Add trip history
+                doc.setFontSize(14);
+                doc.text('Trip History', 20, 120);
+                
+                const history = JSON.parse(localStorage.getItem('mileageHistory')) || [];
+                let yPos = 130;
+                
+                if (history.length === 0) {
+                    doc.setFontSize(12);
+                    doc.text('No trip history available', 20, yPos);
+                } else {
+                    doc.setFontSize(10);
+                    // Add headers
+                    doc.text('Date', 20, yPos);
+                    doc.text('Vehicle', 50, yPos);
+                    doc.text('Miles', 80, yPos);
+                    doc.text('Type', 100, yPos);
+                    doc.text('Cost', 120, yPos);
+                    doc.text('MPG', 140, yPos);
+                    yPos += 10;
+                    
+                    // Add trip data (limit to first 20 trips to fit on page)
+                    const tripsToShow = history.slice(0, 20);
+                    tripsToShow.forEach(item => {
+                        if (yPos > 280) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        doc.text(item.date, 20, yPos);
+                        doc.text(item.vehicle, 50, yPos);
+                        doc.text(item.distance.toFixed(1), 80, yPos);
+                        doc.text(item.type.charAt(0).toUpperCase() + item.type.slice(1), 100, yPos);
+                        doc.text('$' + item.fuelCost.toFixed(2), 120, yPos);
+                        doc.text(item.mpg > 0 ? item.mpg.toFixed(1) : 'N/A', 140, yPos);
+                        yPos += 8;
+                    });
+                }
+                
+                // Save the PDF
+                doc.save('mileage-tracker-report.pdf');
+                showNotification('PDF report generated successfully!');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showNotification('Error generating PDF. Please try again.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            if (type === 'error') {
+                notification.style.background = '#e74c3c';
+            } else {
+                notification.style.background = '#27ae60';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add keyboard support for Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateMileage();
+            }
+        });
+
+        // Auto-save when leaving page
+        window.addEventListener('beforeunload', function() {
+            // This ensures data is saved
+        });
+    </script>
+</body>
+</html>

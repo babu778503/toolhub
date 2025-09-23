@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<!-- Category: Transportation -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Transit Delay Predictor</title>
+    <meta name="description" content="Predict public transit delays with our easy-to-use Public Transit Delay Predictor. Track bus and train delays, estimate arrival times, and plan your journey efficiently.">
+    <meta name="keywords" content="public transit delay predictor, transit delay calculator, bus delay tracker, train delay predictor, transit time estimator, delay forecast, public transportation, commute planner">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Desktop Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .dashboard-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card i {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .dashboard-label {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .predictor-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .predictor-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(90deg, #17a2b8 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-details {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .history-section {
+            margin-top: 40px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-header h3 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .history-item-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .history-item-distance {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .history-item-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
+        .transit-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .transit-mode-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #e1e5e9;
+            transition: all 0.3s ease;
+        }
+
+        .transit-mode-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .transit-mode-card.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .transit-mode-card i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .form-group label {
+                font-size: 1rem;
+            }
+
+            .form-control {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+
+            .history-item {
+                grid-template-columns: 1fr;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .dashboard-card {
+                padding: 15px;
+            }
+
+            .dashboard-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #28a745;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .route-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .route-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .delay-indicator {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .delay-level {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .delay-minimal {
+            background: #28a745;
+        }
+
+        .delay-moderate {
+            background: #ffc107;
+        }
+
+        .delay-significant {
+            background: #fd7e14;
+        }
+
+        .delay-severe {
+            background: #dc3545;
+        }
+
+        .delay-status {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .delay-minimal-text {
+            color: #28a745;
+        }
+
+        .delay-moderate-text {
+            color: #ffc107;
+        }
+
+        .delay-significant-text {
+            color: #fd7e14;
+        }
+
+        .delay-severe-text {
+            color: #dc3545;
+        }
+
+        .recommendation {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .recommendation h4 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .pdf-export {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .pdf-export button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+        }
+
+        .pdf-export p {
+            margin-top: 20px;
+            color: #6c757d;
+        }
+
+        .weather-conditions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .condition-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            border: 2px solid #e1e5e9;
+        }
+
+        .condition-card.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .condition-card i {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .delay-patterns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pattern-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .pattern-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .pattern-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .time-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .peak-hours {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-subway"></i> Public Transit Delay Predictor</h1>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('predictor')">Predict Delay</div>
+                <div class="tab" onclick="switchTab('history')">History</div>
+                <div class="tab" onclick="switchTab('reports')">Reports</div>
+            </div>
+
+            <div id="predictor-tab" class="tab-content active">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-clock"></i>
+                        <div class="dashboard-value" id="avgDelay">0 min</div>
+                        <div class="dashboard-label">Avg Delay</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="dashboard-value" id="totalPredictions">0</div>
+                        <div class="dashboard-label">Predictions</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="dashboard-value" id="delayIncidents">0</div>
+                        <div class="dashboard-label">Delay Incidents</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-percentage"></i>
+                        <div class="dashboard-value" id="onTimeRate">100%</div>
+                        <div class="dashboard-label">On Time</div>
+                    </div>
+                </div>
+
+                <div class="predictor-section">
+                    <div class="input-section">
+                        <h3><i class="fas fa-edit"></i> Transit Details</h3>
+                        <div class="route-info">
+                            <div class="form-group">
+                                <label for="routeNumber">Route Number/Name</label>
+                                <input type="text" id="routeNumber" class="form-control" placeholder="e.g., Route 42, Red Line">
+                            </div>
+                            <div class="form-group">
+                                <label for="destination">Destination</label>
+                                <input type="text" id="destination" class="form-control" placeholder="e.g., Downtown, Airport">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="scheduledTime">Scheduled Arrival Time</label>
+                            <input type="time" id="scheduledTime" class="form-control" value="08:30">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dayOfWeek">Day of Week</label>
+                            <select id="dayOfWeek" class="form-control">
+                                <option value="weekday" selected>Weekday</option>
+                                <option value="saturday">Saturday</option>
+                                <option value="sunday">Sunday</option>
+                                <option value="holiday">Holiday</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Transit Mode</label>
+                            <div class="transit-modes">
+                                <div class="transit-mode-card" onclick="selectTransitMode('bus')" id="bus-card">
+                                    <i class="fas fa-bus"></i>
+                                    <div>Bus</div>
+                                </div>
+                                <div class="transit-mode-card" onclick="selectTransitMode('train')" id="train-card">
+                                    <i class="fas fa-train"></i>
+                                    <div>Train</div>
+                                </div>
+                                <div class="transit-mode-card" onclick="selectTransitMode('subway')" id="subway-card">
+                                    <i class="fas fa-subway"></i>
+                                    <div>Subway</div>
+                                </div>
+                                <div class="transit-mode-card" onclick="selectTransitMode('tram')" id="tram-card">
+                                    <i class="fas fa-tram"></i>
+                                    <div>Tram</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedTransitMode" value="bus">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Weather Conditions</label>
+                            <div class="weather-conditions">
+                                <div class="condition-card" onclick="selectWeather('sunny')" id="sunny-card">
+                                    <i class="fas fa-sun"></i>
+                                    <div>Sunny</div>
+                                </div>
+                                <div class="condition-card" onclick="selectWeather('cloudy')" id="cloudy-card">
+                                    <i class="fas fa-cloud"></i>
+                                    <div>Cloudy</div>
+                                </div>
+                                <div class="condition-card" onclick="selectWeather('rainy')" id="rainy-card">
+                                    <i class="fas fa-cloud-rain"></i>
+                                    <div>Rainy</div>
+                                </div>
+                                <div class="condition-card" onclick="selectWeather('snowy')" id="snowy-card">
+                                    <i class="fas fa-snowflake"></i>
+                                    <div>Snowy</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedWeather" value="sunny">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="peakHour">Peak Hour Intensity</label>
+                            <input type="range" id="peakHour" class="time-slider" min="1" max="5" value="3">
+                            <div class="peak-hours">
+                                <span>Low</span>
+                                <span>Medium</span>
+                                <span>High</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="predictionNotes">Notes</label>
+                            <textarea id="predictionNotes" class="form-control" placeholder="Add notes about this prediction..." rows="2"></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="predictDelay()">
+                                <i class="fas fa-calculator"></i> Predict Delay
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearCurrent()">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                            <button class="btn btn-success" onclick="savePrediction()">
+                                <i class="fas fa-save"></i> Save Prediction
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3><i class="fas fa-hourglass-half"></i> Delay Prediction</h3>
+                        <div class="result-value" id="predictedDelay">0 min</div>
+                        <p>Expected Delay</p>
+                        
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span>Route:</span>
+                                <span id="displayRoute">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Mode:</span>
+                                <span id="displayMode">Bus</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Weather:</span>
+                                <span id="displayWeather">Sunny</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Scheduled:</span>
+                                <span id="displayScheduled">08:30</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Expected:</span>
+                                <span id="displayExpected">08:30</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Confidence:</span>
+                                <span id="displayConfidence">High</span>
+                            </div>
+                        </div>
+
+                        <div class="delay-indicator">
+                            <div class="delay-level delay-minimal" id="delayLevel" style="width: 20%"></div>
+                        </div>
+                        <div class="delay-status" id="delayStatus">Minimal Delay</div>
+
+                        <div class="recommendation">
+                            <h4><i class="fas fa-lightbulb"></i> Travel Advice</h4>
+                            <p id="travelAdvice">Plan to arrive 5 minutes early to account for potential delays</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <div class="history-section">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Prediction History</h3>
+                        <div class="history-controls">
+                            <select id="filterModeHistory" class="form-control" onchange="filterHistory()" style="width: auto;">
+                                <option value="all">All Modes</option>
+                                <option value="bus">Bus</option>
+                                <option value="train">Train</option>
+                                <option value="subway">Subway</option>
+                                <option value="tram">Tram</option>
+                            </select>
+                            <button class="clear-btn" onclick="clearHistory()">
+                                <i class="fas fa-trash"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <p>No delay predictions recorded yet. Start predicting to see your history.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reports-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-file-export"></i>
+                        <div class="dashboard-value">PDF</div>
+                        <div class="dashboard-label">Export Report</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="dashboard-value">Trends</div>
+                        <div class="dashboard-label">Delay</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-calendar"></i>
+                        <div class="dashboard-value" id="lastPrediction">-</div>
+                        <div class="dashboard-label">Last Prediction</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-bus"></i>
+                        <div class="dashboard-value" id="worstRoute">-</div>
+                        <div class="dashboard-label">Worst Route</div>
+                    </div>
+                </div>
+                
+                <div class="delay-patterns">
+                    <div class="pattern-card">
+                        <h4><i class="fas fa-sun"></i> Weather Impact</h4>
+                        <div class="pattern-value" id="weatherImpact">0%</div>
+                        <p>Delay Increase</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h4><i class="fas fa-clock"></i> Peak Hours</h4>
+                        <div class="pattern-value" id="peakImpact">0 min</div>
+                        <p>Avg Delay</p>
+                    </div>
+                    <div class="pattern-card">
+                        <h4><i class="fas fa-calendar-week"></i> Weekly</h4>
+                        <div class="pattern-value" id="weeklyDelays">0</div>
+                        <p>Incidents</p>
+                    </div>
+                </div>
+                
+                <div class="pdf-export">
+                    <button class="btn btn-primary" onclick="generatePDF()">
+                        <i class="fas fa-file-pdf"></i> Generate PDF Report
+                    </button>
+                    <p>Click above to generate and download your delay prediction report as PDF</p>
+                </div>
+                <div class="recommendation">
+                    <h4><i class="fas fa-chart-bar"></i> Delay Trends</h4>
+                    <p id="trendMessage">Track more predictions to see delay trends</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Delay prediction saved successfully!</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            loadHistory();
+            updateStats();
+            // Set current time as default
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 30);
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('scheduledTime').value = `${hours}:${minutes}`;
+        };
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function selectTransitMode(mode) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.transit-mode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            document.getElementById(mode + '-card').classList.add('selected');
+            
+            // Set hidden input value
+            document.getElementById('selectedTransitMode').value = mode;
+        }
+
+        function selectWeather(weather) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.condition-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            document.getElementById(weather + '-card').classList.add('selected');
+            
+            // Set hidden input value
+            document.getElementById('selectedWeather').value = weather;
+        }
+
+        function predictDelay() {
+            const routeNumber = document.getElementById('routeNumber').value || 'Unknown Route';
+            const destination = document.getElementById('destination').value || 'Unknown Destination';
+            const scheduledTime = document.getElementById('scheduledTime').value || '08:30';
+            const dayOfWeek = document.getElementById('dayOfWeek').value;
+            const transitMode = document.getElementById('selectedTransitMode').value;
+            const weather = document.getElementById('selectedWeather').value;
+            const peakHour = parseInt(document.getElementById('peakHour').value);
+            
+            // Calculate base delay based on various factors
+            let baseDelay = 0;
+            
+            // Mode factor
+            switch(transitMode) {
+                case 'bus':
+                    baseDelay = 5;
+                    break;
+                case 'train':
+                    baseDelay = 3;
+                    break;
+                case 'subway':
+                    baseDelay = 2;
+                    break;
+                case 'tram':
+                    baseDelay = 4;
+                    break;
+            }
+            
+            // Day factor
+            switch(dayOfWeek) {
+                case 'weekday':
+                    baseDelay *= 1.2;
+                    break;
+                case 'saturday':
+                    baseDelay *= 0.8;
+                    break;
+                case 'sunday':
+                    baseDelay *= 0.6;
+                    break;
+                case 'holiday':
+                    baseDelay *= 0.7;
+                    break;
+            }
+            
+            // Weather factor
+            switch(weather) {
+                case 'sunny':
+                    baseDelay *= 1.0;
+                    break;
+                case 'cloudy':
+                    baseDelay *= 1.1;
+                    break;
+                case 'rainy':
+                    baseDelay *= 1.5;
+                    break;
+                case 'snowy':
+                    baseDelay *= 2.0;
+                    break;
+            }
+            
+            // Peak hour factor
+            baseDelay *= (peakHour / 3);
+            
+            // Add some randomness for realistic prediction
+            const randomFactor = 0.8 + Math.random() * 0.4;
+            const predictedDelay = Math.round(baseDelay * randomFactor);
+            
+            // Display results
+            document.getElementById('predictedDelay').textContent = predictedDelay + ' min';
+            document.getElementById('displayRoute').textContent = routeNumber + ' → ' + destination;
+            document.getElementById('displayScheduled').textContent = scheduledTime;
+            
+            // Calculate expected arrival time
+            const [hours, minutes] = scheduledTime.split(':').map(Number);
+            const scheduledDate = new Date();
+            scheduledDate.setHours(hours, minutes, 0, 0);
+            const expectedDate = new Date(scheduledDate.getTime() + predictedDelay * 60000);
+            const expectedHours = expectedDate.getHours().toString().padStart(2, '0');
+            const expectedMinutes = expectedDate.getMinutes().toString().padStart(2, '0');
+            document.getElementById('displayExpected').textContent = `${expectedHours}:${expectedMinutes}`;
+            
+            // Display mode and weather
+            const modes = {
+                'bus': 'Bus',
+                'train': 'Train',
+                'subway': 'Subway',
+                'tram': 'Tram'
+            };
+            document.getElementById('displayMode').textContent = modes[transitMode];
+            
+            const weatherConditions = {
+                'sunny': 'Sunny',
+                'cloudy': 'Cloudy',
+                'rainy': 'Rainy',
+                'snowy': 'Snowy'
+            };
+            document.getElementById('displayWeather').textContent = weatherConditions[weather];
+            
+            // Display confidence level
+            let confidence = 'High';
+            if (predictedDelay > 15) confidence = 'Medium';
+            if (predictedDelay > 30) confidence = 'Low';
+            document.getElementById('displayConfidence').textContent = confidence;
+            
+            // Update delay indicator
+            const delayLevel = document.getElementById('delayLevel');
+            const delayStatus = document.getElementById('delayStatus');
+            
+            // Update delay level bar width
+            const percentage = Math.min(100, predictedDelay / 45 * 100);
+            delayLevel.style.width = percentage + '%';
+            
+            // Determine delay status and color
+            if (predictedDelay <= 5) {
+                delayLevel.className = 'delay-level delay-minimal';
+                delayStatus.textContent = 'Minimal Delay';
+                delayStatus.className = 'delay-status delay-minimal-text';
+                document.getElementById('travelAdvice').textContent = 'Minimal delay expected. You should arrive on time.';
+            } else if (predictedDelay <= 15) {
+                delayLevel.className = 'delay-level delay-moderate';
+                delayStatus.textContent = 'Moderate Delay';
+                delayStatus.className = 'delay-status delay-moderate-text';
+                document.getElementById('travelAdvice').textContent = 'Plan to arrive 10 minutes early to account for moderate delays.';
+            } else if (predictedDelay <= 30) {
+                delayLevel.className = 'delay-level delay-significant';
+                delayStatus.textContent = 'Significant Delay';
+                delayStatus.className = 'delay-status delay-significant-text';
+                document.getElementById('travelAdvice').textContent = 'Significant delay expected. Consider alternative transportation or leave early.';
+            } else {
+                delayLevel.className = 'delay-level delay-severe';
+                delayStatus.textContent = 'Severe Delay';
+                delayStatus.className = 'delay-status delay-severe-text';
+                document.getElementById('travelAdvice').textContent = 'Severe delay expected. Strongly recommend alternative transportation.';
+            }
+            
+            // Show notification
+            showNotification('Delay prediction calculated successfully!');
+        }
+
+        function savePrediction() {
+            const routeNumber = document.getElementById('routeNumber').value || 'Unknown Route';
+            const destination = document.getElementById('destination').value || 'Unknown Destination';
+            const scheduledTime = document.getElementById('scheduledTime').value || '08:30';
+            const dayOfWeek = document.getElementById('dayOfWeek').value;
+            const transitMode = document.getElementById('selectedTransitMode').value;
+            const weather = document.getElementById('selectedWeather').value;
+            const peakHour = parseInt(document.getElementById('peakHour').value);
+            const predictionNotes = document.getElementById('predictionNotes').value;
+            
+            // Calculate predicted delay
+            let baseDelay = 0;
+            
+            switch(transitMode) {
+                case 'bus':
+                    baseDelay = 5;
+                    break;
+                case 'train':
+                    baseDelay = 3;
+                    break;
+                case 'subway':
+                    baseDelay = 2;
+                    break;
+                case 'tram':
+                    baseDelay = 4;
+                    break;
+            }
+            
+            switch(dayOfWeek) {
+                case 'weekday':
+                    baseDelay *= 1.2;
+                    break;
+                case 'saturday':
+                    baseDelay *= 0.8;
+                    break;
+                case 'sunday':
+                    baseDelay *= 0.6;
+                    break;
+                case 'holiday':
+                    baseDelay *= 0.7;
+                    break;
+            }
+            
+            switch(weather) {
+                case 'sunny':
+                    baseDelay *= 1.0;
+                    break;
+                case 'cloudy':
+                    baseDelay *= 1.1;
+                    break;
+                case 'rainy':
+                    baseDelay *= 1.5;
+                    break;
+                case 'snowy':
+                    baseDelay *= 2.0;
+                    break;
+            }
+            
+            baseDelay *= (peakHour / 3);
+            const randomFactor = 0.8 + Math.random() * 0.4;
+            const predictedDelay = Math.round(baseDelay * randomFactor);
+            
+            const predictionItem = {
+                route: routeNumber,
+                destination: destination,
+                scheduledTime: scheduledTime,
+                delay: predictedDelay,
+                mode: transitMode,
+                weather: weather,
+                day: dayOfWeek,
+                peak: peakHour,
+                notes: predictionNotes,
+                date: new Date().toISOString().split('T')[0],
+                timestamp: new Date().getTime()
+            };
+            
+            // Get existing predictions or initialize empty array
+            let predictions = JSON.parse(localStorage.getItem('transitDelayPredictions')) || [];
+            
+            // Add new item to beginning of array
+            predictions.unshift(predictionItem);
+            
+            // Keep only last 100 items
+            if (predictions.length > 100) {
+                predictions = predictions.slice(0, 100);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('transitDelayPredictions', JSON.stringify(predictions));
+            
+            // Update display
+            loadHistory();
+            updateStats();
+            
+            showNotification('Delay prediction saved successfully!');
+        }
+
+        function loadHistory() {
+            const predictions = JSON.parse(localStorage.getItem('transitDelayPredictions')) || [];
+            const historyList = document.getElementById('historyList');
+            
+            if (predictions.length === 0) {
+                historyList.innerHTML = '<p>No delay predictions recorded yet. Start predicting to see your history.</p>';
+                return;
+            }
+            
+            // Apply filters
+            const filterMode = document.getElementById('filterModeHistory').value;
+            
+            let filteredPredictions = predictions;
+            if (filterMode !== 'all') {
+                filteredPredictions = filteredPredictions.filter(item => item.mode === filterMode);
+            }
+            
+            if (filteredPredictions.length === 0) {
+                historyList.innerHTML = '<p>No delay predictions match the selected filters.</p>';
+                return;
+            }
+            
+            let html = '';
+            const modeIcons = {
+                'bus': 'bus',
+                'train': 'train',
+                'subway': 'subway',
+                'tram': 'tram'
+            };
+            
+            const modes = {
+                'bus': 'Bus',
+                'train': 'Train',
+                'subway': 'Subway',
+                'tram': 'Tram'
+            };
+            
+            filteredPredictions.forEach(item => {
+                const dateObj = new Date(item.date);
+                let delayClass = 'delay-minimal-text';
+                let delayStatus = 'Minimal';
+                
+                if (item.delay <= 5) {
+                    delayClass = 'delay-minimal-text';
+                    delayStatus = 'Minimal';
+                } else if (item.delay <= 15) {
+                    delayClass = 'delay-moderate-text';
+                    delayStatus = 'Moderate';
+                } else if (item.delay <= 30) {
+                    delayClass = 'delay-significant-text';
+                    delayStatus = 'Significant';
+                } else {
+                    delayClass = 'delay-severe-text';
+                    delayStatus = 'Severe';
+                }
+                
+                html += `
+                    <div class="history-item">
+                        <div class="history-item-content">
+                            <div>
+                                <div class="history-item-distance">
+                                    <i class="fas fa-${modeIcons[item.mode] || 'bus'}"></i> 
+                                    ${item.delay} min
+                                </div>
+                                <div><small>${dateObj.toLocaleDateString()}</small></div>
+                            </div>
+                            <div>
+                                <div><strong>${item.route} → ${item.destination}</strong></div>
+                                <div><small>${modes[item.mode]} • ${item.scheduledTime}</small></div>
+                            </div>
+                            <div>
+                                <div class="${delayClass}"><strong>${delayStatus}</strong></div>
+                                <div><small>${item.weather} • Peak: ${item.peak}</small></div>
+                            </div>
+                        </div>
+                        <button class="clear-btn" onclick="deletePrediction('${item.timestamp}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+
+        function filterHistory() {
+            loadHistory();
+        }
+
+        function deletePrediction(timestamp) {
+            let predictions = JSON.parse(localStorage.getItem('transitDelayPredictions')) || [];
+            predictions = predictions.filter(item => item.timestamp != timestamp);
+            localStorage.setItem('transitDelayPredictions', JSON.stringify(predictions));
+            loadHistory();
+            updateStats();
+            showNotification('Prediction removed from history');
+        }
+
+        function updateStats() {
+            const predictions = JSON.parse(localStorage.getItem('transitDelayPredictions')) || [];
+            
+            // Total predictions
+            document.getElementById('totalPredictions').textContent = predictions.length;
+            
+            // Last prediction date
+            if (predictions.length > 0) {
+                const lastPredictionDate = new Date(predictions[0].date);
+                document.getElementById('lastPrediction').textContent = lastPredictionDate.toLocaleDateString();
+            } else {
+                document.getElementById('lastPrediction').textContent = '-';
+            }
+            
+            // Average delay
+            if (predictions.length > 0) {
+                const totalDelay = predictions.reduce((sum, item) => sum + item.delay, 0);
+                const avgDelay = Math.round(totalDelay / predictions.length);
+                document.getElementById('avgDelay').textContent = avgDelay + ' min';
+            } else {
+                document.getElementById('avgDelay').textContent = '0 min';
+            }
+            
+            // Delay incidents (predictions with delay > 5 minutes)
+            const delayIncidents = predictions.filter(item => item.delay > 5).length;
+            document.getElementById('delayIncidents').textContent = delayIncidents;
+            
+            // On time rate
+            if (predictions.length > 0) {
+                const onTime = predictions.filter(item => item.delay <= 5).length;
+                const onTimeRate = Math.round((onTime / predictions.length) * 100);
+                document.getElementById('onTimeRate').textContent = onTimeRate + '%';
+            } else {
+                document.getElementById('onTimeRate').textContent = '100%';
+            }
+            
+            // Worst route (highest average delay)
+            if (predictions.length > 0) {
+                const routes = {};
+                predictions.forEach(item => {
+                    const routeKey = item.route;
+                    if (!routes[routeKey]) {
+                        routes[routeKey] = { total: 0, count: 0 };
+                    }
+                    routes[routeKey].total += item.delay;
+                    routes[routeKey].count++;
+                });
+                
+                let worstRoute = '';
+                let worstDelay = 0;
+                
+                for (const [route, data] of Object.entries(routes)) {
+                    const avgDelay = data.total / data.count;
+                    if (avgDelay > worstDelay) {
+                        worstDelay = avgDelay;
+                        worstRoute = route;
+                    }
+                }
+                
+                document.getElementById('worstRoute').textContent = worstRoute || '-';
+            } else {
+                document.getElementById('worstRoute').textContent = '-';
+            }
+            
+            // Weather impact
+            const rainyPredictions = predictions.filter(item => item.weather === 'rainy');
+            if (rainyPredictions.length > 0 && predictions.length > 0) {
+                const rainyAvg = rainyPredictions.reduce((sum, item) => sum + item.delay, 0) / rainyPredictions.length;
+                const overallAvg = predictions.reduce((sum, item) => sum + item.delay, 0) / predictions.length;
+                const weatherImpact = Math.round(((rainyAvg - overallAvg) / overallAvg) * 100);
+                document.getElementById('weatherImpact').textContent = weatherImpact + '%';
+            } else {
+                document.getElementById('weatherImpact').textContent = '0%';
+            }
+            
+            // Peak hour impact
+            const peakPredictions = predictions.filter(item => item.peak >= 4);
+            if (peakPredictions.length > 0) {
+                const peakAvg = Math.round(peakPredictions.reduce((sum, item) => sum + item.delay, 0) / peakPredictions.length);
+                document.getElementById('peakImpact').textContent = peakAvg + ' min';
+            } else {
+                document.getElementById('peakImpact').textContent = '0 min';
+            }
+            
+            // Weekly delays
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const weeklyDelays = predictions.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= oneWeekAgo && item.delay > 5;
+            }).length;
+            document.getElementById('weeklyDelays').textContent = weeklyDelays;
+            
+            // Update trend message
+            if (predictions.length > 2) {
+                const recentPredictions = predictions.slice(0, 10);
+                const avgRecentDelay = Math.round(recentPredictions.reduce((sum, item) => sum + item.delay, 0) / recentPredictions.length);
+                
+                document.getElementById('trendMessage').textContent = 
+                    `Average recent delay: ${avgRecentDelay} minutes. ` +
+                    `Monitor for consistent patterns.`;
+            } else {
+                document.getElementById('trendMessage').textContent = 
+                    'Track more predictions to see delay trends';
+            }
+        }
+
+        function clearCurrent() {
+            document.getElementById('routeNumber').value = '';
+            document.getElementById('destination').value = '';
+            document.getElementById('predictionNotes').value = '';
+            document.getElementById('predictedDelay').textContent = '0 min';
+            document.getElementById('displayRoute').textContent = '-';
+            document.getElementById('displayMode').textContent = 'Bus';
+            document.getElementById('displayWeather').textContent = 'Sunny';
+            document.getElementById('displayScheduled').textContent = '08:30';
+            document.getElementById('displayExpected').textContent = '08:30';
+            document.getElementById('displayConfidence').textContent = 'High';
+            document.getElementById('delayLevel').style.width = '20%';
+            document.getElementById('delayLevel').className = 'delay-level delay-minimal';
+            document.getElementById('delayStatus').textContent = 'Minimal Delay';
+            document.getElementById('delayStatus').className = 'delay-status delay-minimal-text';
+            document.getElementById('travelAdvice').textContent = 'Plan to arrive 5 minutes early to account for potential delays';
+            document.getElementById('dayOfWeek').value = 'weekday';
+            document.getElementById('peakHour').value = 3;
+            
+            // Reset transit mode selection
+            document.querySelectorAll('.transit-mode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('bus-card').classList.add('selected');
+            document.getElementById('selectedTransitMode').value = 'bus';
+            
+            // Reset weather selection
+            document.querySelectorAll('.condition-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('sunny-card').classList.add('selected');
+            document.getElementById('selectedWeather').value = 'sunny';
+            
+            // Set current time + 30 minutes
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 30);
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('scheduledTime').value = `${hours}:${minutes}`;
+            
+            showNotification('Current prediction cleared');
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all delay prediction history?')) {
+                localStorage.removeItem('transitDelayPredictions');
+                document.getElementById('historyList').innerHTML = '<p>No delay predictions recorded yet. Start predicting to see your history.</p>';
+                updateStats();
+                showNotification('History cleared');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data including history?')) {
+                localStorage.clear();
+                clearCurrent();
+                document.getElementById('historyList').innerHTML = '<p>No delay predictions recorded yet. Start predicting to see your history.</p>';
+                updateStats();
+                showNotification('All data cleared');
+            }
+        }
+
+        function generatePDF() {
+            // Check if jsPDF is loaded
+            if (typeof window.jspdf === 'undefined') {
+                showNotification('PDF library not loaded. Please try again.', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text('Public Transit Delay Predictor Report', 105, 20, null, null, 'center');
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text('Generated on: ' + new Date().toLocaleDateString(), 105, 30, null, null, 'center');
+                
+                // Add summary statistics
+                doc.setFontSize(14);
+                doc.text('Summary Statistics', 20, 45);
+                
+                doc.setFontSize(12);
+                doc.text('Total Predictions: ' + document.getElementById('totalPredictions').textContent, 20, 55);
+                doc.text('Average Delay: ' + document.getElementById('avgDelay').textContent, 20, 65);
+                doc.text('Delay Incidents: ' + document.getElementById('delayIncidents').textContent, 20, 75);
+                doc.text('On Time Rate: ' + document.getElementById('onTimeRate').textContent, 20, 85);
+                doc.text('Last Prediction: ' + document.getElementById('lastPrediction').textContent, 20, 95);
+                
+                // Add prediction history
+                doc.setFontSize(14);
+                doc.text('Prediction History', 20, 110);
+                
+                const predictions = JSON.parse(localStorage.getItem('transitDelayPredictions')) || [];
+                let yPos = 120;
+                
+                if (predictions.length === 0) {
+                    doc.setFontSize(12);
+                    doc.text('No prediction history available', 20, yPos);
+                } else {
+                    doc.setFontSize(10);
+                    // Add headers
+                    doc.text('Date', 20, yPos);
+                    doc.text('Route', 50, yPos);
+                    doc.text('Mode', 80, yPos);
+                    doc.text('Scheduled', 100, yPos);
+                    doc.text('Delay', 120, yPos);
+                    doc.text('Weather', 140, yPos);
+                    yPos += 10;
+                    
+                    // Add prediction data (limit to first 20 predictions to fit on page)
+                    const predictionsToShow = predictions.slice(0, 20);
+                    const modes = {
+                        'bus': 'Bus',
+                        'train': 'Train',
+                        'subway': 'Subway',
+                        'tram': 'Tram'
+                    };
+                    
+                    predictionsToShow.forEach(item => {
+                        if (yPos > 280) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        const dateObj = new Date(item.date);
+                        
+                        doc.text(dateObj.toLocaleDateString(), 20, yPos);
+                        doc.text(item.route + ' → ' + item.destination, 50, yPos);
+                        doc.text(modes[item.mode], 80, yPos);
+                        doc.text(item.scheduledTime, 100, yPos);
+                        doc.text(item.delay + ' min', 120, yPos);
+                        doc.text(item.weather, 140, yPos);
+                        yPos += 8;
+                    });
+                }
+                
+                // Save the PDF
+                doc.save('public-transit-delay-predictor-report.pdf');
+                showNotification('PDF report generated successfully!');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showNotification('Error generating PDF. Please try again.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            if (type === 'error') {
+                notification.style.background = '#dc3545';
+            } else {
+                notification.style.background = '#28a745';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add keyboard support for Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                predictDelay();
+            }
+        });
+
+        // Auto-save when leaving page
+        window.addEventListener('beforeunload', function() {
+            // This ensures data is saved
+        });
+    </script>
+</body>
+</html>

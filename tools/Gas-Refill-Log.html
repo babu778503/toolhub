@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<!-- Category: Transportation -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Refill Log</title>
+    <meta name="description" content="Track your gas refills with our easy-to-use Gas Refill Log. Monitor fuel consumption, costs, vehicle efficiency, and expenses. Perfect for vehicle maintenance and budget planning.">
+    <meta name="keywords" content="gas refill log, fuel tracker, gas log, fuel consumption, vehicle maintenance, fuel efficiency, gas expense tracker, mpg calculator, vehicle fuel log">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Desktop Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffa502 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .dashboard-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #ff6b6b;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card i {
+            font-size: 2.5rem;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin: 10px 0;
+        }
+
+        .dashboard-label {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .log-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .log-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffa502 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #27ae60 0%, #219653 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-details {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .history-section {
+            margin-top: 40px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-header h3 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .history-item-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .history-item-distance {
+            font-weight: bold;
+            color: #ff6b6b;
+            font-size: 1.2rem;
+        }
+
+        .history-item-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .fuel-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .fuel-type-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #e1e5e9;
+            transition: all 0.3s ease;
+        }
+
+        .fuel-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .fuel-type-card.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .fuel-type-card i {
+            font-size: 2rem;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .form-group label {
+                font-size: 1rem;
+            }
+
+            .form-control {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+
+            .history-item {
+                grid-template-columns: 1fr;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .dashboard-card {
+                padding: 15px;
+            }
+
+            .dashboard-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #27ae60;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .vehicle-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .vehicle-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #ff6b6b;
+            border-bottom: 3px solid #ff6b6b;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-highlight {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .stats-highlight h4 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .pdf-export {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .pdf-export button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+        }
+
+        .pdf-export p {
+            margin-top: 20px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-gas-pump"></i> Gas Refill Log</h1>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('log')">Log Refill</div>
+                <div class="tab" onclick="switchTab('history')">History</div>
+                <div class="tab" onclick="switchTab('reports')">Reports</div>
+            </div>
+
+            <div id="log-tab" class="tab-content active">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-gas-pump"></i>
+                        <div class="dashboard-value" id="totalRefills">0</div>
+                        <div class="dashboard-label">Total Refills</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="dashboard-value" id="totalSpent">$0.00</div>
+                        <div class="dashboard-label">Total Spent</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="dashboard-value" id="avgMPG">0.0</div>
+                        <div class="dashboard-label">Avg MPG</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="dashboard-value" id="lastRefill">-</div>
+                        <div class="dashboard-label">Last Refill</div>
+                    </div>
+                </div>
+
+                <div class="log-section">
+                    <div class="input-section">
+                        <h3><i class="fas fa-edit"></i> Refill Details</h3>
+                        <div class="vehicle-info">
+                            <div class="form-group">
+                                <label for="vehicleName">Vehicle Name</label>
+                                <input type="text" id="vehicleName" class="form-control" placeholder="e.g., Honda Civic, Toyota Camry">
+                            </div>
+                            <div class="form-group">
+                                <label for="refillDate">Refill Date</label>
+                                <input type="date" id="refillDate" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="odometerReading">Odometer Reading (miles)</label>
+                            <input type="number" id="odometerReading" class="form-control" placeholder="Enter current odometer reading" step="0.1" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gallonsFilled">Gallons Filled</label>
+                            <input type="number" id="gallonsFilled" class="form-control" placeholder="Enter gallons filled" step="0.01" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pricePerGallon">Price per Gallon ($)</label>
+                            <input type="number" id="pricePerGallon" class="form-control" placeholder="Enter price per gallon" step="0.01" min="0" value="3.50">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Fuel Type</label>
+                            <div class="fuel-types">
+                                <div class="fuel-type-card" onclick="selectFuelType('regular')" id="regular-card">
+                                    <i class="fas fa-gas-pump"></i>
+                                    <div>Regular</div>
+                                </div>
+                                <div class="fuel-type-card" onclick="selectFuelType('premium')" id="premium-card">
+                                    <i class="fas fa-gas-pump"></i>
+                                    <div>Premium</div>
+                                </div>
+                                <div class="fuel-type-card" onclick="selectFuelType('diesel')" id="diesel-card">
+                                    <i class="fas fa-gas-pump"></i>
+                                    <div>Diesel</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedFuelType" value="regular">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="refillNotes">Notes</label>
+                            <textarea id="refillNotes" class="form-control" placeholder="Add notes about this refill..." rows="2"></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="calculateRefill()">
+                                <i class="fas fa-calculator"></i> Calculate
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearCurrent()">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                            <button class="btn btn-success" onclick="saveRefill()">
+                                <i class="fas fa-save"></i> Save Refill
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3><i class="fas fa-receipt"></i> Refill Summary</h3>
+                        <div class="result-value" id="totalCost">$0.00</div>
+                        <p>Total Cost</p>
+                        
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span>Gallons Filled:</span>
+                                <span id="displayGallons">0.00 gal</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Price per Gallon:</span>
+                                <span id="displayPrice">$0.00/gal</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Odometer:</span>
+                                <span id="displayOdometer">0.0 mi</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Fuel Type:</span>
+                                <span id="displayFuelType">Regular</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Vehicle:</span>
+                                <span id="displayVehicle">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Date:</span>
+                                <span id="displayDate">-</span>
+                            </div>
+                        </div>
+
+                        <div class="stats-highlight">
+                            <h4><i class="fas fa-star"></i> Efficiency Stats</h4>
+                            <p id="efficiencyMessage">Enter your first refill to see efficiency stats</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <div class="history-section">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Refill History</h3>
+                        <div class="history-controls">
+                            <select id="filterVehicle" class="form-control" onchange="filterHistory()" style="width: auto;">
+                                <option value="all">All Vehicles</option>
+                            </select>
+                            <select id="filterFuelType" class="form-control" onchange="filterHistory()" style="width: auto;">
+                                <option value="all">All Fuel Types</option>
+                                <option value="regular">Regular</option>
+                                <option value="premium">Premium</option>
+                                <option value="diesel">Diesel</option>
+                            </select>
+                            <button class="clear-btn" onclick="clearHistory()">
+                                <i class="fas fa-trash"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <p>No refills recorded yet. Start logging to see your history.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reports-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <div class="dashboard-card">
+                        <i class="fas fa-file-export"></i>
+                        <div class="dashboard-value">PDF</div>
+                        <div class="dashboard-label">Export Report</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-chart-bar"></i>
+                        <div class="dashboard-value">Monthly</div>
+                        <div class="dashboard-label">Trends</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="dashboard-value" id="monthlySpent">$0.00</div>
+                        <div class="dashboard-label">This Month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-gas-pump"></i>
+                        <div class="dashboard-value" id="avgPrice">$0.00</div>
+                        <div class="dashboard-label">Avg Price/Gal</div>
+                    </div>
+                </div>
+                <div class="pdf-export">
+                    <button class="btn btn-primary" onclick="generatePDF()">
+                        <i class="fas fa-file-pdf"></i> Generate PDF Report
+                    </button>
+                    <p>Click above to generate and download your gas refill report as PDF</p>
+                </div>
+                <div class="stats-highlight">
+                    <h4><i class="fas fa-chart-line"></i> Spending Trends</h4>
+                    <p id="trendMessage">Track your refills to see spending trends</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Refill saved successfully!</span>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            loadHistory();
+            updateStats();
+            populateVehicleFilter();
+            // Set today's date as default
+            document.getElementById('refillDate').valueAsDate = new Date();
+        };
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function selectFuelType(type) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.fuel-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            document.getElementById(type + '-card').classList.add('selected');
+            
+            // Set hidden input value
+            document.getElementById('selectedFuelType').value = type;
+        }
+
+        function calculateRefill() {
+            const gallonsFilled = parseFloat(document.getElementById('gallonsFilled').value);
+            const pricePerGallon = parseFloat(document.getElementById('pricePerGallon').value);
+            const odometerReading = parseFloat(document.getElementById('odometerReading').value);
+            const vehicleName = document.getElementById('vehicleName').value || 'Unnamed Vehicle';
+            const refillDate = document.getElementById('refillDate').value;
+            const fuelType = document.getElementById('selectedFuelType').value;
+            
+            if (isNaN(gallonsFilled) || isNaN(pricePerGallon)) {
+                showNotification('Please enter valid numbers for gallons and price', 'error');
+                return;
+            }
+            
+            if (gallonsFilled <= 0 || pricePerGallon <= 0) {
+                showNotification('Please enter positive values', 'error');
+                return;
+            }
+            
+            const totalCost = gallonsFilled * pricePerGallon;
+            
+            // Display results
+            document.getElementById('totalCost').textContent = '$' + totalCost.toFixed(2);
+            document.getElementById('displayGallons').textContent = gallonsFilled.toFixed(2) + ' gal';
+            document.getElementById('displayPrice').textContent = '$' + pricePerGallon.toFixed(2) + '/gal';
+            document.getElementById('displayOdometer').textContent = (odometerReading || 0).toFixed(1) + ' mi';
+            
+            // Display fuel type
+            const fuelTypes = {
+                'regular': 'Regular',
+                'premium': 'Premium',
+                'diesel': 'Diesel'
+            };
+            document.getElementById('displayFuelType').textContent = fuelTypes[fuelType];
+            
+            // Display vehicle
+            document.getElementById('displayVehicle').textContent = vehicleName;
+            
+            // Display date
+            if (refillDate) {
+                const dateObj = new Date(refillDate);
+                document.getElementById('displayDate').textContent = dateObj.toLocaleDateString();
+            } else {
+                document.getElementById('displayDate').textContent = new Date().toLocaleDateString();
+            }
+            
+            // Show efficiency stats
+            const history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+            if (history.length > 0) {
+                const lastRefill = history[0];
+                if (lastRefill.odometer && odometerReading && odometerReading > lastRefill.odometer) {
+                    const milesDriven = odometerReading - lastRefill.odometer;
+                    const mpg = milesDriven / gallonsFilled;
+                    document.getElementById('efficiencyMessage').innerHTML = 
+                        `Miles since last refill: <strong>${milesDriven.toFixed(1)}</strong><br>` +
+                        `MPG: <strong>${mpg.toFixed(1)}</strong>`;
+                } else {
+                    document.getElementById('efficiencyMessage').textContent = 'MPG will be calculated after your next refill';
+                }
+            } else {
+                document.getElementById('efficiencyMessage').textContent = 'MPG will be calculated after your next refill';
+            }
+            
+            // Show notification
+            showNotification('Refill calculated successfully!');
+        }
+
+        function saveRefill() {
+            const gallonsFilled = parseFloat(document.getElementById('gallonsFilled').value);
+            const pricePerGallon = parseFloat(document.getElementById('pricePerGallon').value);
+            const odometerReading = parseFloat(document.getElementById('odometerReading').value);
+            const vehicleName = document.getElementById('vehicleName').value || 'Unnamed Vehicle';
+            const refillDate = document.getElementById('refillDate').value;
+            const fuelType = document.getElementById('selectedFuelType').value;
+            const refillNotes = document.getElementById('refillNotes').value;
+            
+            if (isNaN(gallonsFilled) || isNaN(pricePerGallon)) {
+                showNotification('Please calculate first', 'error');
+                return;
+            }
+            
+            const totalCost = gallonsFilled * pricePerGallon;
+            
+            const historyItem = {
+                gallons: gallonsFilled,
+                price: pricePerGallon,
+                cost: totalCost,
+                odometer: odometerReading,
+                vehicle: vehicleName,
+                fuelType: fuelType,
+                notes: refillNotes,
+                date: refillDate || new Date().toISOString().split('T')[0],
+                timestamp: new Date().getTime()
+            };
+            
+            // Get existing history or initialize empty array
+            let history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+            
+            // Add new item to beginning of array
+            history.unshift(historyItem);
+            
+            // Keep only last 100 items
+            if (history.length > 100) {
+                history = history.slice(0, 100);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('gasRefillHistory', JSON.stringify(history));
+            
+            // Update display
+            loadHistory();
+            updateStats();
+            populateVehicleFilter();
+            
+            showNotification('Refill saved successfully!');
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>No refills recorded yet. Start logging to see your history.</p>';
+                return;
+            }
+            
+            // Apply filters
+            const filterVehicle = document.getElementById('filterVehicle').value;
+            const filterFuelType = document.getElementById('filterFuelType').value;
+            
+            let filteredHistory = history;
+            if (filterVehicle !== 'all') {
+                filteredHistory = filteredHistory.filter(item => item.vehicle === filterVehicle);
+            }
+            if (filterFuelType !== 'all') {
+                filteredHistory = filteredHistory.filter(item => item.fuelType === filterFuelType);
+            }
+            
+            if (filteredHistory.length === 0) {
+                historyList.innerHTML = '<p>No refills match the selected filters.</p>';
+                return;
+            }
+            
+            let html = '';
+            const fuelTypes = {
+                'regular': 'Regular',
+                'premium': 'Premium',
+                'diesel': 'Diesel'
+            };
+            
+            const fuelIcons = {
+                'regular': 'gas-pump',
+                'premium': 'gas-pump',
+                'diesel': 'gas-pump'
+            };
+            
+            filteredHistory.forEach(item => {
+                const dateObj = new Date(item.date);
+                html += `
+                    <div class="history-item">
+                        <div class="history-item-content">
+                            <div>
+                                <div class="history-item-distance">
+                                    <i class="fas fa-${fuelIcons[item.fuelType]}"></i> 
+                                    $${item.cost.toFixed(2)}
+                                </div>
+                                <div><small>${fuelTypes[item.fuelType]} • ${item.vehicle}</small></div>
+                            </div>
+                            <div>
+                                <div><strong>${item.gallons.toFixed(2)} gal @ $${item.price.toFixed(2)}/gal</strong></div>
+                                <div><small>${item.odometer ? item.odometer.toFixed(1) + ' mi' : 'N/A'} • ${dateObj.toLocaleDateString()}</small></div>
+                            </div>
+                            <div>
+                                ${item.notes ? `<div><small>Notes: ${item.notes.substring(0, 30)}${item.notes.length > 30 ? '...' : ''}</small></div>` : ''}
+                            </div>
+                        </div>
+                        <button class="clear-btn" onclick="deleteHistoryItem('${item.timestamp}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+
+        function filterHistory() {
+            loadHistory();
+        }
+
+        function populateVehicleFilter() {
+            const history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+            const vehicleSelect = document.getElementById('filterVehicle');
+            
+            // Get unique vehicles
+            const vehicles = [...new Set(history.map(item => item.vehicle))];
+            
+            // Clear existing options except "All Vehicles"
+            vehicleSelect.innerHTML = '<option value="all">All Vehicles</option>';
+            
+            // Add vehicles to select
+            vehicles.forEach(vehicle => {
+                const option = document.createElement('option');
+                option.value = vehicle;
+                option.textContent = vehicle;
+                vehicleSelect.appendChild(option);
+            });
+        }
+
+        function deleteHistoryItem(timestamp) {
+            let history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+            history = history.filter(item => item.timestamp != timestamp);
+            localStorage.setItem('gasRefillHistory', JSON.stringify(history));
+            loadHistory();
+            updateStats();
+            populateVehicleFilter();
+            showNotification('Refill removed from history');
+        }
+
+        function updateStats() {
+            const history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+            
+            // Total refills
+            document.getElementById('totalRefills').textContent = history.length;
+            
+            // Total spent
+            const totalSpent = history.reduce((sum, item) => sum + item.cost, 0);
+            document.getElementById('totalSpent').textContent = '$' + totalSpent.toFixed(2);
+            
+            // Average MPG (calculate from consecutive refills)
+            let totalMPG = 0;
+            let mpgCount = 0;
+            
+            for (let i = 0; i < history.length - 1; i++) {
+                const current = history[i];
+                const previous = history[i + 1];
+                
+                if (current.odometer && previous.odometer && current.odometer > previous.odometer && current.gallons > 0) {
+                    const milesDriven = current.odometer - previous.odometer;
+                    const mpg = milesDriven / current.gallons;
+                    totalMPG += mpg;
+                    mpgCount++;
+                }
+            }
+            
+            const avgMPG = mpgCount > 0 ? totalMPG / mpgCount : 0;
+            document.getElementById('avgMPG').textContent = avgMPG.toFixed(1);
+            
+            // Last refill date
+            if (history.length > 0) {
+                const lastRefillDate = new Date(history[0].date);
+                document.getElementById('lastRefill').textContent = lastRefillDate.toLocaleDateString();
+            } else {
+                document.getElementById('lastRefill').textContent = '-';
+            }
+            
+            // Monthly spending
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+            
+            const monthlySpent = history
+                .filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+                })
+                .reduce((sum, item) => sum + item.cost, 0);
+            
+            document.getElementById('monthlySpent').textContent = '$' + monthlySpent.toFixed(2);
+            
+            // Average price per gallon
+            if (history.length > 0) {
+                const totalGallons = history.reduce((sum, item) => sum + item.gallons, 0);
+                const avgPrice = totalGallons > 0 ? totalSpent / totalGallons : 0;
+                document.getElementById('avgPrice').textContent = '$' + avgPrice.toFixed(2);
+            } else {
+                document.getElementById('avgPrice').textContent = '$0.00';
+            }
+            
+            // Update trend message
+            if (history.length > 1) {
+                const firstRefill = new Date(history[history.length - 1].date);
+                const lastRefill = new Date(history[0].date);
+                const monthsDiff = (lastRefill.getFullYear() - firstRefill.getFullYear()) * 12 + 
+                                  (lastRefill.getMonth() - firstRefill.getMonth());
+                
+                if (monthsDiff > 0) {
+                    const avgMonthlySpent = totalSpent / monthsDiff;
+                    document.getElementById('trendMessage').textContent = 
+                        `Average monthly spending: $${avgMonthlySpent.toFixed(2)}`;
+                } else {
+                    document.getElementById('trendMessage').textContent = 'Track more refills to see trends';
+                }
+            } else {
+                document.getElementById('trendMessage').textContent = 'Track more refills to see trends';
+            }
+        }
+
+        function clearCurrent() {
+            document.getElementById('vehicleName').value = '';
+            document.getElementById('odometerReading').value = '';
+            document.getElementById('gallonsFilled').value = '';
+            document.getElementById('pricePerGallon').value = '3.50';
+            document.getElementById('refillNotes').value = '';
+            document.getElementById('totalCost').textContent = '$0.00';
+            document.getElementById('displayGallons').textContent = '0.00 gal';
+            document.getElementById('displayPrice').textContent = '$0.00/gal';
+            document.getElementById('displayOdometer').textContent = '0.0 mi';
+            document.getElementById('displayFuelType').textContent = 'Regular';
+            document.getElementById('displayVehicle').textContent = '-';
+            document.getElementById('displayDate').textContent = '-';
+            document.getElementById('efficiencyMessage').textContent = 'Enter your first refill to see efficiency stats';
+            document.getElementById('refillDate').valueAsDate = new Date();
+            
+            // Reset fuel type selection
+            document.querySelectorAll('.fuel-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('regular-card').classList.add('selected');
+            document.getElementById('selectedFuelType').value = 'regular';
+            
+            showNotification('Current refill cleared');
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all refill history?')) {
+                localStorage.removeItem('gasRefillHistory');
+                document.getElementById('historyList').innerHTML = '<p>No refills recorded yet. Start logging to see your history.</p>';
+                updateStats();
+                populateVehicleFilter();
+                showNotification('History cleared');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data including history?')) {
+                localStorage.clear();
+                clearCurrent();
+                document.getElementById('historyList').innerHTML = '<p>No refills recorded yet. Start logging to see your history.</p>';
+                updateStats();
+                populateVehicleFilter();
+                showNotification('All data cleared');
+            }
+        }
+
+        function generatePDF() {
+            // Check if jsPDF is loaded
+            if (typeof window.jspdf === 'undefined') {
+                showNotification('PDF library not loaded. Please try again.', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text('Gas Refill Log Report', 105, 20, null, null, 'center');
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text('Generated on: ' + new Date().toLocaleDateString(), 105, 30, null, null, 'center');
+                
+                // Add summary statistics
+                doc.setFontSize(14);
+                doc.text('Summary Statistics', 20, 45);
+                
+                doc.setFontSize(12);
+                doc.text('Total Refills: ' + document.getElementById('totalRefills').textContent, 20, 55);
+                doc.text('Total Spent: ' + document.getElementById('totalSpent').textContent, 20, 65);
+                doc.text('Average MPG: ' + document.getElementById('avgMPG').textContent, 20, 75);
+                doc.text('Average Price/Gal: ' + document.getElementById('avgPrice').textContent, 20, 85);
+                doc.text('This Month Spending: ' + document.getElementById('monthlySpent').textContent, 20, 95);
+                
+                // Add refill history
+                doc.setFontSize(14);
+                doc.text('Refill History', 20, 110);
+                
+                const history = JSON.parse(localStorage.getItem('gasRefillHistory')) || [];
+                let yPos = 120;
+                
+                if (history.length === 0) {
+                    doc.setFontSize(12);
+                    doc.text('No refill history available', 20, yPos);
+                } else {
+                    doc.setFontSize(10);
+                    // Add headers
+                    doc.text('Date', 20, yPos);
+                    doc.text('Vehicle', 50, yPos);
+                    doc.text('Gallons', 80, yPos);
+                    doc.text('Price/Gal', 100, yPos);
+                    doc.text('Total', 120, yPos);
+                    doc.text('Odometer', 140, yPos);
+                    yPos += 10;
+                    
+                    // Add refill data (limit to first 20 refills to fit on page)
+                    const refillsToShow = history.slice(0, 20);
+                    refillsToShow.forEach(item => {
+                        if (yPos > 280) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        const dateObj = new Date(item.date);
+                        doc.text(dateObj.toLocaleDateString(), 20, yPos);
+                        doc.text(item.vehicle, 50, yPos);
+                        doc.text(item.gallons.toFixed(2), 80, yPos);
+                        doc.text('$' + item.price.toFixed(2), 100, yPos);
+                        doc.text('$' + item.cost.toFixed(2), 120, yPos);
+                        doc.text(item.odometer ? item.odometer.toFixed(1) : 'N/A', 140, yPos);
+                        yPos += 8;
+                    });
+                }
+                
+                // Save the PDF
+                doc.save('gas-refill-log-report.pdf');
+                showNotification('PDF report generated successfully!');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showNotification('Error generating PDF. Please try again.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            if (type === 'error') {
+                notification.style.background = '#e74c3c';
+            } else {
+                notification.style.background = '#27ae60';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add keyboard support for Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateRefill();
+            }
+        });
+
+        // Auto-save when leaving page
+        window.addEventListener('beforeunload', function() {
+            // This ensures data is saved
+        });
+    </script>
+</body>
+</html>

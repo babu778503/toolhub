@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<!-- Category: Health & Fitness -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Body Measurement Tracker - A user-friendly tool to track and monitor your body measurements over time. Record weight, BMI, waist, hips, and other key metrics with charts and progress tracking.">
+    <meta name="keywords" content="body measurement tracker, weight tracker, BMI calculator, body metrics tracker, health measurement tool, fitness tracker, body composition tracker">
+    <title>Body Measurement Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            header {
+                background: linear-gradient(90deg, #e83e8c, #d63384);
+                color: white;
+                padding: 0 20px;
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 30px auto;
+                padding: 0 20px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+
+            .card {
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                transition: transform 0.3s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            h1 {
+                font-size: 28px;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            h2 {
+                color: #e83e8c;
+                margin-bottom: 20px;
+                font-size: 22px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: #333;
+            }
+
+            input, select, textarea {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #e1e8ed;
+                border-radius: 8px;
+                font-size: 16px;
+                transition: border-color 0.3s;
+            }
+
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                border-color: #e83e8c;
+                box-shadow: 0 0 0 3px rgba(232, 62, 140, 0.1);
+            }
+
+            button {
+                background: linear-gradient(90deg, #e83e8c, #d63384);
+                color: white;
+                border: none;
+                padding: 14px 25px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(232, 62, 140, 0.3);
+            }
+
+            .btn-secondary {
+                background: linear-gradient(90deg, #6c757d, #495057);
+            }
+
+            .btn-danger {
+                background: linear-gradient(90deg, #dc3545, #a71e2a);
+            }
+
+            .btn-info {
+                background: linear-gradient(90deg, #17a2b8, #117a8b);
+            }
+
+            .measurements-list {
+                max-height: 500px;
+                overflow-y: auto;
+            }
+
+            .measurement-item {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 15px;
+                border-left: 4px solid #e83e8c;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .measurement-item:hover {
+                background: #fce8f1;
+                transform: translateX(5px);
+            }
+
+            .measurement-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .measurement-date {
+                font-size: 18px;
+                font-weight: 600;
+                color: #d63384;
+            }
+
+            .measurement-details {
+                color: #666;
+                line-height: 1.5;
+            }
+
+            .measurement-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .action-btn {
+                background: none;
+                border: none;
+                color: #e83e8c;
+                cursor: pointer;
+                font-size: 16px;
+                padding: 5px;
+                width: auto;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .action-btn.delete {
+                color: #dc3545;
+            }
+
+            .action-btn.edit {
+                color: #17a2b8;
+            }
+
+            .no-measurements {
+                text-align: center;
+                color: #666;
+                padding: 30px;
+                font-style: italic;
+            }
+
+            .clear-data {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .stat-card {
+                background: linear-gradient(135deg, #e83e8c, #d63384);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .stat-label {
+                font-size: 14px;
+                opacity: 0.9;
+            }
+
+            .filter-section {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .filter-select {
+                flex: 1;
+            }
+
+            .search-box {
+                flex: 2;
+                position: relative;
+            }
+
+            .search-box input {
+                padding-left: 40px;
+            }
+
+            .search-box i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #666;
+            }
+
+            .reminder-section {
+                background: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            .reminder-section h3 {
+                color: #856404;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .reminder-section ul {
+                padding-left: 20px;
+            }
+
+            .reminder-section li {
+                margin-bottom: 8px;
+                color: #666;
+            }
+
+            .chart-container {
+                height: 300px;
+                margin: 20px 0;
+            }
+
+            .measurement-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-top: 15px;
+            }
+
+            .measurement-box {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .measurement-value {
+                font-size: 24px;
+                font-weight: bold;
+                color: #e83e8c;
+            }
+
+            .measurement-label {
+                font-size: 14px;
+                color: #666;
+                margin-top: 5px;
+            }
+
+            .bmi-indicator {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                margin-top: 10px;
+                padding: 10px;
+                border-radius: 8px;
+                background: #f8f9fa;
+            }
+
+            .bmi-value {
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .bmi-category {
+                padding: 5px 10px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .bmi-underweight {
+                background: #6c757d;
+                color: white;
+            }
+
+            .bmi-normal {
+                background: #28a745;
+                color: white;
+            }
+
+            .bmi-overweight {
+                background: #ffc107;
+                color: #212529;
+            }
+
+            .bmi-obese {
+                background: #dc3545;
+                color: white;
+            }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            header {
+                background: linear-gradient(90deg, #e83e8c, #d63384);
+                color: white;
+                padding: 0 15px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            h1 {
+                font-size: 18px;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            .container {
+                padding: 20px 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .card {
+                background: white;
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            }
+
+            h2 {
+                color: #e83e8c;
+                margin-bottom: 15px;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 500;
+                color: #333;
+                font-size: 14px;
+            }
+
+            input, select, textarea {
+                width: 100%;
+                padding: 10px 12px;
+                border: 2px solid #e1e8ed;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+
+            button {
+                background: linear-gradient(90deg, #e83e8c, #d63384);
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .btn-secondary {
+                background: linear-gradient(90deg, #6c757d, #495057);
+            }
+
+            .btn-danger {
+                background: linear-gradient(90deg, #dc3545, #a71e2a);
+            }
+
+            .btn-info {
+                background: linear-gradient(90deg, #17a2b8, #117a8b);
+            }
+
+            .measurements-list {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .measurement-item {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 12px;
+                border-left: 3px solid #e83e8c;
+            }
+
+            .measurement-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+            }
+
+            .measurement-date {
+                font-size: 16px;
+                font-weight: 600;
+                color: #d63384;
+            }
+
+            .measurement-details {
+                color: #666;
+                line-height: 1.4;
+                font-size: 13px;
+            }
+
+            .measurement-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .action-btn {
+                background: none;
+                border: none;
+                color: #e83e8c;
+                cursor: pointer;
+                font-size: 14px;
+                padding: 4px;
+                width: auto;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .action-btn.delete {
+                color: #dc3545;
+            }
+
+            .action-btn.edit {
+                color: #17a2b8;
+            }
+
+            .no-measurements {
+                text-align: center;
+                color: #666;
+                padding: 20px;
+                font-style: italic;
+                font-size: 14px;
+            }
+
+            .clear-data {
+                margin-top: 15px;
+                text-align: center;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                background: linear-gradient(135deg, #e83e8c, #d63384);
+                color: white;
+                padding: 15px 10px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 3px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+                opacity: 0.9;
+            }
+
+            .filter-section {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .reminder-section {
+                background: #fff3cd;
+                border-left: 3px solid #ffc107;
+                padding: 12px;
+                border-radius: 6px;
+                margin-bottom: 15px;
+            }
+
+            .reminder-section h3 {
+                color: #856404;
+                margin-bottom: 8px;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .reminder-section ul {
+                padding-left: 15px;
+            }
+
+            .reminder-section li {
+                margin-bottom: 6px;
+                color: #666;
+                font-size: 13px;
+            }
+
+            .chart-container {
+                height: 250px;
+                margin: 15px 0;
+            }
+
+            .measurement-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-top: 12px;
+            }
+
+            .measurement-box {
+                background: #f8f9fa;
+                padding: 12px;
+                border-radius: 6px;
+                text-align: center;
+            }
+
+            .measurement-value {
+                font-size: 20px;
+                font-weight: bold;
+                color: #e83e8c;
+            }
+
+            .measurement-label {
+                font-size: 12px;
+                color: #666;
+                margin-top: 3px;
+            }
+
+            .bmi-indicator {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+                margin-top: 10px;
+                padding: 10px;
+                border-radius: 6px;
+                background: #f8f9fa;
+                font-size: 14px;
+            }
+
+            .bmi-value {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .bmi-category {
+                padding: 3px 8px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(90deg, #28a745, #1e7e34);
+        }
+
+        .notification.error {
+            background: linear-gradient(90deg, #dc3545, #a71e2a);
+        }
+
+        .notification.warning {
+            background: linear-gradient(90deg, #ffc107, #d39e00);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .export-btn {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .unit-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .unit-btn.active {
+            border-color: #e83e8c;
+            background: #fce8f1;
+            color: #e83e8c;
+        }
+
+        .progress-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #e83e8c;
+        }
+
+        .progress-bar-container {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .weight-loss {
+            background: #28a745;
+        }
+
+        .weight-gain {
+            background: #dc3545;
+        }
+
+        .weight-neutral {
+            background: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-ruler-combined"></i> Body Measurement Tracker</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add New Measurement</h2>
+            
+            <div class="reminder-section">
+                <h3><i class="fas fa-lightbulb"></i> Measurement Tips</h3>
+                <ul>
+                    <li>Measure at the same time each day for consistency</li>
+                    <li>Take measurements on bare skin</li>
+                    <li>Track measurements weekly for best results</li>
+                </ul>
+            </div>
+            
+            <div class="unit-toggle">
+                <button class="unit-btn active" data-unit="metric">Metric (kg/cm)</button>
+                <button class="unit-btn" data-unit="imperial">Imperial (lbs/in)</button>
+            </div>
+            
+            <form id="measurementForm">
+                <div class="form-group">
+                    <label for="measurementDate"><i class="fas fa-calendar-alt"></i> Date</label>
+                    <input type="date" id="measurementDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight"><i class="fas fa-weight"></i> Weight</label>
+                    <input type="number" id="weight" step="0.1" required placeholder="Enter weight">
+                </div>
+                
+                <div class="form-group">
+                    <label for="height"><i class="fas fa-arrows-alt-v"></i> Height</label>
+                    <input type="number" id="height" step="0.1" required placeholder="Enter height">
+                </div>
+                
+                <div class="measurement-grid">
+                    <div class="form-group">
+                        <label for="waist"><i class="fas fa-circle"></i> Waist (cm)</label>
+                        <input type="number" id="waist" step="0.1" placeholder="Waist measurement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hips"><i class="fas fa-circle-notch"></i> Hips (cm)</label>
+                        <input type="number" id="hips" step="0.1" placeholder="Hips measurement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="chest"><i class="fas fa-male"></i> Chest (cm)</label>
+                        <input type="number" id="chest" step="0.1" placeholder="Chest measurement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="arms"><i class="fas fa-biceps"></i> Arms (cm)</label>
+                        <input type="number" id="arms" step="0.1" placeholder="Arms measurement">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes"><i class="fas fa-sticky-note"></i> Notes (Optional)</label>
+                    <textarea id="notes" rows="2" placeholder="Any additional notes or observations"></textarea>
+                </div>
+                
+                <button type="submit"><i class="fas fa-plus"></i> Add Measurement</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> Measurements & Progress</h2>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalMeasurements">0</div>
+                    <div class="stat-label">Entries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="currentWeight">--</div>
+                    <div class="stat-label">Current Weight</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="currentBMI">--</div>
+                    <div class="stat-label">Current BMI</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="weightChange">--</div>
+                    <div class="stat-label">Weight Change</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="weightChart"></canvas>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-title">Weight Progress</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-info">
+                    <span>Start: <span id="startWeight">--</span></span>
+                    <span>Goal: <span id="goalWeight">--</span></span>
+                </div>
+            </div>
+            
+            <div class="measurements-list" id="measurementsList">
+                <!-- Measurements will be loaded here -->
+            </div>
+            
+            <div class="clear-data">
+                <button class="btn-danger" id="clearDataBtn"><i class="fas fa-trash-alt"></i> Clear All Data</button>
+                <button class="export-btn" id="exportBtn"><i class="fas fa-file-export"></i> Export Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Measurement</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editMeasurementDate">Date</label>
+                    <input type="date" id="editMeasurementDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="editWeight">Weight</label>
+                    <input type="number" id="editWeight" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editHeight">Height</label>
+                    <input type="number" id="editHeight" step="0.1" required>
+                </div>
+                <div class="measurement-grid">
+                    <div class="form-group">
+                        <label for="editWaist">Waist (cm)</label>
+                        <input type="number" id="editWaist" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHips">Hips (cm)</label>
+                        <input type="number" id="editHips" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editChest">Chest (cm)</label>
+                        <input type="number" id="editChest" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editArms">Arms (cm)</label>
+                        <input type="number" id="editArms" step="0.1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editNotes">Notes</label>
+                    <textarea id="editNotes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-info"><i class="fas fa-save"></i> Update Measurement</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // DOM Elements
+        const measurementForm = document.getElementById('measurementForm');
+        const measurementsList = document.getElementById('measurementsList');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const notification = document.getElementById('notification');
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const closeModal = document.querySelector('.close-modal');
+        const exportBtn = document.getElementById('exportBtn');
+        const unitButtons = document.querySelectorAll('.unit-btn');
+        const weightChartCtx = document.getElementById('weightChart').getContext('2d');
+
+        // Stats elements
+        const totalMeasurementsEl = document.getElementById('totalMeasurements');
+        const currentWeightEl = document.getElementById('currentWeight');
+        const currentBMIEl = document.getElementById('currentBMI');
+        const weightChangeEl = document.getElementById('weightChange');
+        const startWeightEl = document.getElementById('startWeight');
+        const goalWeightEl = document.getElementById('goalWeight');
+        const progressBar = document.getElementById('progressBar');
+
+        // Chart variables
+        let weightChart;
+
+        // Unit system
+        let currentUnit = 'metric'; // 'metric' or 'imperial'
+
+        // Load measurements from localStorage
+        function loadMeasurements() {
+            const measurements = JSON.parse(localStorage.getItem('bodyMeasurements')) || [];
+            displayMeasurements(measurements);
+            updateStats(measurements);
+            renderChart(measurements);
+        }
+
+        // Update statistics
+        function updateStats(measurements) {
+            if (measurements.length === 0) {
+                totalMeasurementsEl.textContent = '0';
+                currentWeightEl.textContent = '--';
+                currentBMIEl.textContent = '--';
+                weightChangeEl.textContent = '--';
+                startWeightEl.textContent = '--';
+                goalWeightEl.textContent = '--';
+                return;
+            }
+
+            // Sort measurements by date
+            measurements.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            totalMeasurementsEl.textContent = measurements.length;
+            
+            // Current measurements (latest)
+            const latest = measurements[measurements.length - 1];
+            currentWeightEl.textContent = `${latest.weight} ${currentUnit === 'metric' ? 'kg' : 'lbs'}`;
+            
+            // Calculate BMI
+            const bmi = calculateBMI(latest.weight, latest.height, currentUnit);
+            currentBMIEl.textContent = bmi.toFixed(1);
+            
+            // Weight change
+            if (measurements.length > 1) {
+                const first = measurements[0];
+                const weightChange = latest.weight - first.weight;
+                const changeText = weightChange >= 0 ? `+${weightChange.toFixed(1)}` : weightChange.toFixed(1);
+                weightChangeEl.textContent = `${changeText} ${currentUnit === 'metric' ? 'kg' : 'lbs'}`;
+                weightChangeEl.style.color = weightChange > 0 ? '#dc3545' : weightChange < 0 ? '#28a745' : '#6c757d';
+                
+                // Progress bar
+                const startWeight = first.weight;
+                const currentWeight = latest.weight;
+                const goalWeight = startWeight - 5; // Example goal
+                startWeightEl.textContent = `${startWeight} ${currentUnit === 'metric' ? 'kg' : 'lbs'}`;
+                goalWeightEl.textContent = `${goalWeight} ${currentUnit === 'metric' ? 'kg' : 'lbs'}`;
+                
+                const totalChange = startWeight - goalWeight;
+                const progress = Math.max(0, Math.min(100, ((startWeight - currentWeight) / totalChange) * 100));
+                progressBar.style.width = `${progress}%`;
+                progressBar.className = 'progress-bar ' + 
+                    (currentWeight < startWeight ? 'weight-loss' : 
+                     currentWeight > startWeight ? 'weight-gain' : 'weight-neutral');
+            } else {
+                weightChangeEl.textContent = '0';
+                weightChangeEl.style.color = '#6c757d';
+                startWeightEl.textContent = `${latest.weight} ${currentUnit === 'metric' ? 'kg' : 'lbs'}`;
+                goalWeightEl.textContent = '--';
+                progressBar.style.width = '0%';
+                progressBar.className = 'progress-bar weight-neutral';
+            }
+        }
+
+        // Calculate BMI
+        function calculateBMI(weight, height, unit) {
+            if (unit === 'metric') {
+                // weight in kg, height in cm
+                return weight / ((height / 100) * (height / 100));
+            } else {
+                // weight in lbs, height in inches
+                return (weight / (height * height)) * 703;
+            }
+        }
+
+        // Get BMI category
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) return { category: 'Underweight', class: 'bmi-underweight' };
+            if (bmi < 25) return { category: 'Normal', class: 'bmi-normal' };
+            if (bmi < 30) return { category: 'Overweight', class: 'bmi-overweight' };
+            return { category: 'Obese', class: 'bmi-obese' };
+        }
+
+        // Display measurements in the list
+        function displayMeasurements(measurements) {
+            if (measurements.length === 0) {
+                measurementsList.innerHTML = '<div class="no-measurements">No measurements recorded yet</div>';
+                return;
+            }
+
+            // Sort measurements by date (newest first)
+            measurements.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            measurementsList.innerHTML = measurements.map(measurement => {
+                const bmi = calculateBMI(measurement.weight, measurement.height, currentUnit);
+                const bmiInfo = getBMICategory(bmi);
+                
+                return `
+                <div class="measurement-item">
+                    <div class="measurement-header">
+                        <div class="measurement-date">${formatDate(measurement.date)}</div>
+                    </div>
+                    <div class="measurement-details">
+                        <div><strong>Weight:</strong> ${measurement.weight} ${currentUnit === 'metric' ? 'kg' : 'lbs'}</div>
+                        <div><strong>Height:</strong> ${measurement.height} ${currentUnit === 'metric' ? 'cm' : 'in'}</div>
+                        <div class="bmi-indicator">
+                            <span class="bmi-value">BMI: ${bmi.toFixed(1)}</span>
+                            <span class="bmi-category ${bmiInfo.class}">${bmiInfo.category}</span>
+                        </div>
+                        <div class="measurement-grid">
+                            ${measurement.waist ? `<div class="measurement-box"><div class="measurement-value">${measurement.waist}</div><div class="measurement-label">Waist (cm)</div></div>` : ''}
+                            ${measurement.hips ? `<div class="measurement-box"><div class="measurement-value">${measurement.hips}</div><div class="measurement-label">Hips (cm)</div></div>` : ''}
+                            ${measurement.chest ? `<div class="measurement-box"><div class="measurement-value">${measurement.chest}</div><div class="measurement-label">Chest (cm)</div></div>` : ''}
+                            ${measurement.arms ? `<div class="measurement-box"><div class="measurement-value">${measurement.arms}</div><div class="measurement-label">Arms (cm)</div></div>` : ''}
+                        </div>
+                        ${measurement.notes ? `<div><strong>Notes:</strong> ${measurement.notes}</div>` : ''}
+                    </div>
+                    <div class="measurement-actions">
+                        <button class="action-btn edit" data-id="${measurement.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete" data-id="${measurement.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+
+            // Add event listeners to action buttons
+            document.querySelectorAll('.delete').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteMeasurement(id);
+                });
+            });
+
+            document.querySelectorAll('.edit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    openEditModal(id);
+                });
+            });
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add new measurement
+        function addMeasurement(measurement) {
+            const measurements = JSON.parse(localStorage.getItem('bodyMeasurements')) || [];
+            measurements.push(measurement);
+            localStorage.setItem('bodyMeasurements', JSON.stringify(measurements));
+            loadMeasurements();
+            showNotification('Measurement added successfully!');
+        }
+
+        // Delete measurement
+        function deleteMeasurement(id) {
+            if (confirm('Are you sure you want to delete this measurement?')) {
+                const measurements = JSON.parse(localStorage.getItem('bodyMeasurements')) || [];
+                const updatedMeasurements = measurements.filter(measurement => measurement.id !== id);
+                localStorage.setItem('bodyMeasurements', JSON.stringify(updatedMeasurements));
+                loadMeasurements();
+                showNotification('Measurement deleted successfully!');
+            }
+        }
+
+        // Open edit modal
+        function openEditModal(id) {
+            const measurements = JSON.parse(localStorage.getItem('bodyMeasurements')) || [];
+            const measurement = measurements.find(m => m.id === id);
+            
+            if (measurement) {
+                document.getElementById('editId').value = measurement.id;
+                document.getElementById('editMeasurementDate').value = measurement.date;
+                document.getElementById('editWeight').value = measurement.weight;
+                document.getElementById('editHeight').value = measurement.height;
+                document.getElementById('editWaist').value = measurement.waist || '';
+                document.getElementById('editHips').value = measurement.hips || '';
+                document.getElementById('editChest').value = measurement.chest || '';
+                document.getElementById('editArms').value = measurement.arms || '';
+                document.getElementById('editNotes').value = measurement.notes || '';
+                
+                editModal.style.display = 'flex';
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        // Update measurement
+        function updateMeasurement(updatedMeasurement) {
+            const measurements = JSON.parse(localStorage.getItem('bodyMeasurements')) || [];
+            const index = measurements.findIndex(m => m.id === updatedMeasurement.id);
+            
+            if (index !== -1) {
+                measurements[index] = updatedMeasurement;
+                localStorage.setItem('bodyMeasurements', JSON.stringify(measurements));
+                loadMeasurements();
+                closeEditModal();
+                showNotification('Measurement updated successfully!');
+            }
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all measurement data? This cannot be undone.')) {
+                localStorage.removeItem('bodyMeasurements');
+                loadMeasurements();
+                showNotification('All data cleared successfully!');
+            }
+        }
+
+        // Export measurements
+        function exportMeasurements() {
+            const measurements = JSON.parse(localStorage.getItem('bodyMeasurements')) || [];
+            if (measurements.length === 0) {
+                showNotification('No measurements to export!', 'error');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(measurements, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'body_measurements.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            showNotification('Measurements exported successfully!');
+        }
+
+        // Render chart
+        function renderChart(measurements) {
+            if (weightChart) {
+                weightChart.destroy();
+            }
+            
+            if (measurements.length === 0) {
+                return;
+            }
+            
+            // Sort measurements by date
+            measurements.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            const dates = measurements.map(m => formatDate(m.date));
+            const weights = measurements.map(m => m.weight);
+            
+            weightChart = new Chart(weightChartCtx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: `Weight (${currentUnit === 'metric' ? 'kg' : 'lbs'})`,
+                        data: weights,
+                        borderColor: '#e83e8c',
+                        backgroundColor: 'rgba(232, 62, 140, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Toggle unit system
+        function toggleUnit(unit) {
+            currentUnit = unit;
+            unitButtons.forEach(btn => {
+                if (btn.dataset.unit === unit) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Update form placeholders
+            const weightInput = document.getElementById('weight');
+            const heightInput = document.getElementById('height');
+            
+            if (unit === 'metric') {
+                weightInput.placeholder = 'Weight (kg)';
+                heightInput.placeholder = 'Height (cm)';
+            } else {
+                weightInput.placeholder = 'Weight (lbs)';
+                heightInput.placeholder = 'Height (in)';
+            }
+            
+            loadMeasurements();
+        }
+
+        // Event Listeners
+        measurementForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const measurementDate = document.getElementById('measurementDate').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const waist = document.getElementById('waist').value ? parseFloat(document.getElementById('waist').value) : null;
+            const hips = document.getElementById('hips').value ? parseFloat(document.getElementById('hips').value) : null;
+            const chest = document.getElementById('chest').value ? parseFloat(document.getElementById('chest').value) : null;
+            const arms = document.getElementById('arms').value ? parseFloat(document.getElementById('arms').value) : null;
+            const notes = document.getElementById('notes').value;
+            
+            const newMeasurement = {
+                id: Date.now().toString(),
+                date: measurementDate,
+                weight: weight,
+                height: height,
+                waist: waist,
+                hips: hips,
+                chest: chest,
+                arms: arms,
+                notes: notes
+            };
+            
+            addMeasurement(newMeasurement);
+            measurementForm.reset();
+            document.getElementById('measurementDate').value = new Date().toISOString().split('T')[0];
+        });
+
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const updatedMeasurement = {
+                id: document.getElementById('editId').value,
+                date: document.getElementById('editMeasurementDate').value,
+                weight: parseFloat(document.getElementById('editWeight').value),
+                height: parseFloat(document.getElementById('editHeight').value),
+                waist: document.getElementById('editWaist').value ? parseFloat(document.getElementById('editWaist').value) : null,
+                hips: document.getElementById('editHips').value ? parseFloat(document.getElementById('editHips').value) : null,
+                chest: document.getElementById('editChest').value ? parseFloat(document.getElementById('editChest').value) : null,
+                arms: document.getElementById('editArms').value ? parseFloat(document.getElementById('editArms').value) : null,
+                notes: document.getElementById('editNotes').value
+            };
+            
+            updateMeasurement(updatedMeasurement);
+        });
+
+        clearDataBtn.addEventListener('click', clearAllData);
+        exportBtn.addEventListener('click', exportMeasurements);
+        closeModal.addEventListener('click', closeEditModal);
+        window.addEventListener('click', function(e) {
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        // Unit toggle
+        unitButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                toggleUnit(this.dataset.unit);
+            });
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMeasurements();
+            
+            // Set today's date as default
+            document.getElementById('measurementDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('editMeasurementDate').value = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
