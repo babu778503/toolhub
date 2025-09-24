@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Category: Professional -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -113,9 +112,25 @@
         /* --- Instruction Panel Styling --- */
         .instructions-container { position: fixed; top: 20px; right: 20px; z-index: 1000; text-align: right; }
         #instructions-toggle-btn { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-color); color: white; font-size: 24px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; }
-        #instructions-box { display: none; width: 350px; padding: 20px; margin-top: 10px; background-color: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); text-align: left; }
+        #instructions-box {
+            display: none;
+            width: 350px;
+            padding: 20px;
+            margin-top: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            text-align: left;
+            max-height: 80vh; /* MODIFICATION: Set a max height */
+            overflow-y: auto; /* MODIFICATION: Add scrollbar when needed */
+        }
         #instructions-box.is-visible { display: block; }
-        
+        #instructions-box h4 { margin-top: 0; color: var(--primary-color); }
+        #instructions-box h5 { margin-bottom: 5px; margin-top: 15px; }
+        #instructions-box p, #instructions-box li { font-size: 0.95em; line-height: 1.5; }
+        #instructions-box ol { padding-left: 20px; }
+        #instructions-box code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
+
         /* --- Responsive Adjustments --- */
         @media (max-width: 768px) {
             .header-wrapper {
@@ -201,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupEventListeners() {
         tabContainer.addEventListener('click', handleTabClick);
         sheetContainer.addEventListener('input', handleSheetInput);
+        sheetContainer.addEventListener('change', handleSheetChange);
         sheetContainer.addEventListener('click', handleSheetButtonClick);
         instructionsToggleBtn.addEventListener('click', (e) => { e.stopPropagation(); instructionsBox.classList.toggle('is-visible'); });
         document.addEventListener('click', (e) => { if (!instructionsBox.contains(e.target)) instructionsBox.classList.remove('is-visible'); });
@@ -262,22 +278,26 @@ document.addEventListener('DOMContentLoaded', function() {
             switchTab(e.target.dataset.tabId);
         }
     }
+    
+    function handleSheetChange(e) {
+        const { field, brandId } = e.target.dataset;
+        if (field === 'brandName') {
+            const brand = brandsData.find(b => b.id === brandId);
+            if (brand) handleRenameBrand(brand, e.target.value);
+        }
+    }
 
     function handleSheetInput(e) {
         const { empIndex, field, brandId } = e.target.dataset;
         const brand = brandsData.find(b => b.id === brandId);
-        if (field === 'brandName') {
-            if (brand) handleRenameBrand(brand, e.target.value);
-        } else if (field === 'totalTarget' || field === 'roundingMethod') {
+        if (field === 'totalTarget' || field === 'roundingMethod') {
             if (brand) {
                 brand[field] = e.target.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value;
-                // No full re-render here, just save state. Recalculate will handle visuals.
                 saveState();
             }
         } else if (e.target.dataset.field === 'previousData') {
              const employee = employeeData[empIndex];
              if (employee) {
-                // Special handling for previousData to avoid full re-render on every keystroke
                 employee.previousData[brandId] = parseFloat(e.target.value) || 0;
                 saveState();
              }
@@ -285,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const employee = employeeData[empIndex];
             if (employee) {
                 employee[field] = e.target.value;
-                fullRenderAndCalculate(); // Re-render for name/ID changes
+                fullRenderAndCalculate(); 
             }
         }
     }
@@ -378,13 +398,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function renderInstructions() {
-        instructionsBox.innerHTML = `<h4>How to Use This Tool</h4><ol>
-            <li>Go to the <strong>Previous Data Input</strong> tab to set up employees and their data. You can also import a CSV file here.</li>
-            <li>Click <strong>+ Add Brand</strong> to create new calculation sheets for different products or categories.</li>
-            <li>On each <strong>Brand</strong> sheet, set the brand's Name, its Total Target, and a Rounding Method, then click <strong>Recalculate</strong>.</li>
-            <li>The <strong>Summary</strong> sheet shows the combined final targets from all brands for each employee.</li></ol>
-            <h5>Importing Data</h5><p>On the 'Previous Data Input' tab, click 'Import CSV'. Headers must include 'Employee Name', 'Employee ID', 'Job Place', 'Place ID', followed by brand names.</p>
-            <p><strong>Note:</strong> All your data is saved automatically in your browser.</p>`;
+        instructionsBox.innerHTML = `<h4>How to Use This Tool</h4>
+            <p>Welcome! This tool helps you automatically calculate and distribute targets to your team based on past performance. Follow these steps to get started:</p>
+            <ol>
+                <li>
+                    <strong>Set Up Your Team & Data:</strong><br>
+                    Go to the <strong>Previous Data Input</strong> tab. This is your master sheet. Here you can:
+                    <ul>
+                        <li>Add or edit employee details (Name, ID, Job Place).</li>
+                        <li>Enter the historical performance numbers for each employee under the corresponding brand column. These numbers are the basis for all calculations.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Add & Configure Brands:</strong><br>
+                    Click the green <strong>+ Add Brand</strong> button to create a new calculation sheet for a product, category, or KPI. On each brand's tab, set the following:
+                    <ul>
+                        <li><strong>Brand Name:</strong> Give your brand a clear name.</li>
+                        <li><strong>Total Target:</strong> Enter the overall goal you want to achieve for this brand (e.g., 500,000 in sales).</li>
+                        <li><strong>Rounding Method:</strong> Choose how you want the final targets to be rounded (e.g., to the nearest 100).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Calculate Targets:</strong><br>
+                    After setting the Total Target on a brand's sheet, click the blue <strong>Recalculate</strong> button. The tool will instantly:
+                    <ul>
+                        <li>Calculate each employee's percentage contribution based on their previous data.</li>
+                        <li>Distribute the Total Target according to that contribution.</li>
+                        <li>Round the numbers and automatically adjust for any small rounding differences to ensure the final total is perfect.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Review the Final Summary:</strong><br>
+                    Click the <strong>Summary</strong> tab. This sheet provides a clean, aggregated view of all the final targets assigned to each employee across all of your brands. This is your final report.
+                </li>
+            </ol>
+            <h5>Data Management (Import/Export)</h5>
+            <p><strong>Importing Data:</strong> On the <strong>Previous Data Input</strong> tab, click <code>Import CSV</code> to upload your team's data. <strong>Important:</strong> Your CSV file's headers must match this format: <code>Employee Name,ID,Job Place,Place ID,Brand A Name,Brand B Name,...</code></p>
+            <p><strong>Exporting Data:</strong> You can export the final summary report or the initial input data as a CSV file using the <code>Export</code> buttons on the respective tabs.</p>
+            <hr>
+            <p><strong>Note:</strong> Your work is saved automatically in your browser's local storage. When you close the page and come back, your data will still be here!</p>`;
     }
 
     // --- CALCULATION LOGIC ---
