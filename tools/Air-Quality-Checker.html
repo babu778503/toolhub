@@ -1,11 +1,12 @@
-<!DOCTYPE html>
 <!-- Category: Environment -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Quality Checker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="description" content="Free online air quality checker. Monitor local air quality, pollution levels, and health impacts. Essential tool for health-conscious individuals and environmental awareness.">
+    <meta name="keywords" content="air quality checker, pollution monitor, air quality index, AQI, environmental health, air pollution, air quality data, environmental monitoring, health impacts, pollution levels">
     <style>
         * {
             margin: 0;
@@ -15,7 +16,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,896 +26,626 @@
         
         .container {
             width: 100%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        /* Desktop Styles */
-        @media (min-width: 768px) {
-            .header {
-                background: linear-gradient(to right, #667eea, #764ba2);
-                color: white;
-                text-align: center;
-                padding: 25px;
-                font-size: 32px;
-                font-weight: bold;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                position: relative;
-            }
-            
-            .header::after {
-                content: '';
-                position: absolute;
-                bottom: -10px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 50px;
-                height: 3px;
-                background: #ffd700;
-                border-radius: 3px;
-            }
-        }
-        
-        /* Mobile Styles */
-        @media (max-width: 767px) {
-            .header {
-                height: 50px;
-                background: linear-gradient(to right, #667eea, #764ba2);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 20px;
-                font-weight: bold;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            }
-        }
-        
-        .aqi-display {
-            font-size: 72px;
-            text-align: center;
-            padding: 40px 20px;
-            font-weight: 700;
-            color: #333;
-            font-family: 'Courier New', monospace;
-            background: #f8f8f8;
-            margin: 20px;
+            max-width: 1000px;
+            background: white;
             border-radius: 15px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
         
-        .aqi-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
-        }
-        
-        .aqi-info {
+        header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            padding: 15px 20px;
             text-align: center;
-            padding: 10px 20px 20px;
-            font-size: 24px;
-            font-weight: 600;
-            color: #667eea;
-        }
-        
-        .controls {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            padding: 0 20px 20px;
-        }
-        
-        .btn {
-            padding: 15px 25px;
-            font-size: 18px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            display: flex;
             align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .result-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            gap: 8px;
+            background: #ffffff;
         }
         
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
         }
         
-        .check-btn {
-            background: linear-gradient(to right, #4CAF50, #2E7D32);
-            color: white;
-            flex: 1;
-        }
-        
-        .reset-btn {
-            background: linear-gradient(to right, #F44336, #D32F2F);
-            color: white;
-            flex: 1;
-        }
-        
-        .aqi-gauge {
-            padding: 0 20px 20px;
-        }
-        
-        .gauge-container {
-            position: relative;
-            height: 200px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
+        .input-group {
             margin-bottom: 20px;
         }
         
-        .gauge-bg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 0%;
-            background: linear-gradient(to top, #4CAF50, #FFC107, #F44336);
-            transition: height 1s ease;
-        }
-        
-        .gauge-scale {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 10px;
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .gauge-scale div {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .aqi-status {
-            text-align: center;
-            font-weight: bold;
-            font-size: 20px;
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 10px;
-        }
-        
-        .aqi-status.good {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-        }
-        
-        .aqi-status.moderate {
-            background: rgba(255, 193, 7, 0.2);
-            color: #FFC107;
-        }
-        
-        .aqi-status.unhealthy-sensitive {
-            background: rgba(255, 152, 0, 0.2);
-            color: #FF9800;
-        }
-        
-        .aqi-status.unhealthy {
-            background: rgba(244, 67, 54, 0.2);
-            color: #F44336;
-        }
-        
-        .aqi-status.very-unhealthy {
-            background: rgba(156, 39, 176, 0.2);
-            color: #9C27B0;
-        }
-        
-        .aqi-status.hazardous {
-            background: rgba(103, 58, 183, 0.2);
-            color: #673AB7;
-        }
-        
-        .pollutant-readings {
-            padding: 0 20px 20px;
-        }
-        
-        .pollutant-readings h3 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-        
-        .pollutants-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .pollutant-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .pollutant-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .pollutant-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .pollutant-unit {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .health-recommendations {
-            padding: 0 20px 20px;
-            background: #fff8e1;
-            margin: 0 20px 20px;
-            border-radius: 10px;
-            border-left: 4px solid #ffc107;
-        }
-        
-        .health-recommendations h3 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #667eea;
-        }
-        
-        .recommendation-list {
-            padding-left: 20px;
-        }
-        
-        .recommendation-list li {
+        label {
+            display: block;
             margin-bottom: 8px;
-            font-size: 14px;
-            color: #666;
+            font-weight: 600;
+            color: #2c3e50;
         }
         
-        .location-settings {
-            padding: 0 20px 20px;
-        }
-        
-        .location-settings h3 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-        
-        .location-input {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .location-input input {
-            flex: 1;
+        input, select {
+            width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             font-size: 16px;
+            transition: border-color 0.3s;
         }
         
-        .location-input button {
-            padding: 12px 20px;
-            background: #667eea;
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, #3498db, #2c3e50);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
         
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            background: #f0f0f0;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 0 20px 20px;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
-        .stat-box {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .history-section {
-            padding: 0 20px 20px;
-        }
-        
-        .history-section h3 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-        
-        .history-list {
-            max-height: 150px;
-            overflow-y: auto;
+        .result-box {
             background: #f8f9fa;
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .history-item {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
+        .result-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .result-item {
             display: flex;
             justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
         }
         
-        .history-item:last-child {
+        .result-item:last-child {
             border-bottom: none;
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 5px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
+        .result-label {
+            font-weight: 600;
+            color: #555;
         }
         
-        .notification.show {
-            transform: translateX(0);
+        .result-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.2rem;
         }
         
-        .notification.success {
-            background: #28a745;
+        .aqi-display {
+            text-align: center;
+            margin: 25px 0;
         }
         
-        .notification.warning {
-            background: #ffc107;
-            color: #333;
+        .aqi-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #2c3e50;
         }
         
-        .notification.error {
-            background: #dc3545;
+        .aqi-category {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 10px;
         }
         
-        @media (max-width: 480px) {
-            .aqi-display {
-                font-size: 50px;
-                padding: 30px 15px;
+        .aqi-status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .good { background-color: #4CAF50; color: white; }
+        .moderate { background-color: #FFEB3B; color: #333; }
+        .unhealthy-sensitive { background-color: #FF9800; color: white; }
+        .unhealthy { background-color: #F44336; color: white; }
+        .very-unhealthy { background-color: #9C27B0; color: white; }
+        .hazardous { background-color: #795548; color: white; }
+        
+        .data-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .data-controls button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .clear-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .summary-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eef5ff;
+            border-radius: 8px;
+        }
+        
+        .summary-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .pollutant-levels {
+            margin-top: 20px;
+        }
+        
+        .pollutant-levels h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .pollutant-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        
+        .health-advice {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .advice-good { background-color: #e8f5e9; }
+        .advice-moderate { background-color: #fff8e1; }
+        .advice-unhealthy-sensitive { background-color: #ffe0b2; }
+        .advice-unhealthy { background-color: #ffcdd2; }
+        .advice-very-unhealthy { background-color: #e1bee7; }
+        .advice-hazardous { background-color: #d7ccc8; }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
             }
             
-            .btn {
-                padding: 12px 15px;
-                font-size: 16px;
+            header {
+                height: 50px;
+                padding: 10px 15px;
             }
             
-            .controls {
+            .logo {
+                font-size: 1.4rem;
+            }
+            
+            .content {
                 flex-direction: column;
-                gap: 10px;
             }
             
-            .gauge-container {
-                height: 150px;
+            .input-section, .result-section {
+                padding: 20px;
             }
             
-            .pollutants-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-bar {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .stat-box {
-                flex: 1 0 40%;
-            }
-            
-            .location-input {
-                flex-direction: column;
-                gap: 10px;
+            h2 {
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            Air Quality Checker
-        </div>
+        <header>
+            <div class="logo">Air Quality Checker</div>
+        </header>
         
-        <div class="aqi-display" id="aqiDisplay">
-            --<span class="unit"></span>
-        </div>
-        
-        <div class="aqi-info" id="aqiInfo">
-            Checking air quality...
-        </div>
-        
-        <div class="controls">
-            <button class="btn check-btn" id="checkBtn">
-                <i class="fas fa-wind"></i> Check Air Quality
-            </button>
-            <button class="btn reset-btn" id="resetBtn">
-                <i class="fas fa-redo"></i> Reset
-            </button>
-        </div>
-        
-        <div class="aqi-gauge">
-            <div class="gauge-container">
-                <div class="gauge-bg" id="gaugeBg"></div>
-                <div class="gauge-scale">
-                    <div>500+ Hazardous</div>
-                    <div>301-500 Very Unhealthy</div>
-                    <div>201-300 Unhealthy</div>
-                    <div>151-200 Unhealthy for Sensitive</div>
-                    <div>51-150 Moderate</div>
-                    <div>0-50 Good</div>
+        <div class="content">
+            <div class="input-section">
+                <h2>Enter Location</h2>
+                
+                <div class="input-group">
+                    <label for="location">City or Zip Code</label>
+                    <input type="text" id="location" placeholder="Enter your location">
+                </div>
+                
+                <div class="input-group">
+                    <label for="pm25">PM2.5 Level (µg/m³)</label>
+                    <input type="number" id="pm25" min="0" value="15" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="pm10">PM10 Level (µg/m³)</label>
+                    <input type="number" id="pm10" min="0" value="25" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="o3">Ozone (O₃) Level (ppb)</label>
+                    <input type="number" id="o3" min="0" value="40" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="no2">Nitrogen Dioxide (NO₂) Level (ppb)</label>
+                    <input type="number" id="no2" min="0" value="30" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="so2">Sulfur Dioxide (SO₂) Level (ppb)</label>
+                    <input type="number" id="so2" min="0" value="5" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="co">Carbon Monoxide (CO) Level (ppm)</label>
+                    <input type="number" id="co" min="0" value="0.5" step="0.1">
+                </div>
+                
+                <button id="checkAirQualityBtn">Check Air Quality</button>
+                
+                <div class="data-controls">
+                    <button id="saveBtn">Save Data</button>
+                    <button id="clearBtn" class="clear-btn">Clear Data</button>
                 </div>
             </div>
-            <div class="aqi-status" id="aqiStatus">
-                Waiting for measurement...
-            </div>
-        </div>
-        
-        <div class="location-settings">
-            <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
-            <div class="location-input">
-                <input type="text" id="locationInput" placeholder="Enter city or zip code">
-                <button id="getLocationBtn">
-                    <i class="fas fa-location-arrow"></i> Get Location
-                </button>
-            </div>
-        </div>
-        
-        <div class="pollutant-readings">
-            <h3><i class="fas fa-atom"></i> Pollutant Levels</h3>
-            <div class="pollutants-grid">
-                <div class="pollutant-card">
-                    <div class="pollutant-name">PM2.5</div>
-                    <div class="pollutant-value" id="pm25Value">--</div>
-                    <div class="pollutant-unit">µg/m³</div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <h2 class="result-title">Air Quality Results</h2>
+                    
+                    <div class="aqi-display">
+                        <div class="aqi-value" id="aqiValue">42</div>
+                        <div class="aqi-category" id="aqiCategory">Good</div>
+                        <div class="aqi-status good" id="aqiStatus">Air quality is satisfactory, and air pollution poses little or no risk.</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Location:</span>
+                        <span class="result-value" id="locationResult">New York, NY</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Air Quality Index:</span>
+                        <span class="result-value" id="aqiIndex">42</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Dominant Pollutant:</span>
+                        <span class="result-value" id="dominantPollutant">PM2.5</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Last Updated:</span>
+                        <span class="result-value" id="lastUpdated">Today, 10:30 AM</span>
+                    </div>
+                    
+                    <div class="pollutant-levels">
+                        <h3>Pollutant Levels</h3>
+                        <div class="pollutant-item">
+                            <span>PM2.5:</span>
+                            <span id="pm25Result">15.0 µg/m³</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span>PM10:</span>
+                            <span id="pm10Result">25.0 µg/m³</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span>O₃:</span>
+                            <span id="o3Result">40.0 ppb</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span>NO₂:</span>
+                            <span id="no2Result">30.0 ppb</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span>SO₂:</span>
+                            <span id="so2Result">5.0 ppb</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span>CO:</span>
+                            <span id="coResult">0.5 ppm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="health-advice advice-good" id="healthAdvice">
+                        <h3>Health Recommendations</h3>
+                        <p>It's a great day to be outside! Everyone can enjoy outdoor activities without concern.</p>
+                    </div>
                 </div>
-                <div class="pollutant-card">
-                    <div class="pollutant-name">PM10</div>
-                    <div class="pollutant-value" id="pm10Value">--</div>
-                    <div class="pollutant-unit">µg/m³</div>
-                </div>
-                <div class="pollutant-card">
-                    <div class="pollutant-name">O₃</div>
-                    <div class="pollutant-value" id="o3Value">--</div>
-                    <div class="pollutant-unit">ppb</div>
-                </div>
-                <div class="pollutant-card">
-                    <div class="pollutant-name">NO₂</div>
-                    <div class="pollutant-value" id="no2Value">--</div>
-                    <div class="pollutant-unit">ppb</div>
-                </div>
-                <div class="pollutant-card">
-                    <div class="pollutant-name">SO₂</div>
-                    <div class="pollutant-value" id="so2Value">--</div>
-                    <div class="pollutant-unit">ppb</div>
-                </div>
-                <div class="pollutant-card">
-                    <div class="pollutant-name">CO</div>
-                    <div class="pollutant-value" id="coValue">--</div>
-                    <div class="pollutant-unit">ppm</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="health-recommendations">
-            <h3><i class="fas fa-heartbeat"></i> Health Recommendations</h3>
-            <ul class="recommendation-list" id="recommendationsList">
-                <li>Check air quality before going outdoors</li>
-                <li>Keep windows closed during high pollution periods</li>
-                <li>Use air purifiers with HEPA filters</li>
-                <li>Stay hydrated to help your body cope with pollutants</li>
-                <li>Avoid outdoor exercise during poor air quality</li>
-                <li>Wear N95 masks in highly polluted areas</li>
-            </ul>
-        </div>
-        
-        <div class="stats-bar">
-            <div class="stat-box">
-                <div class="stat-value" id="currentAQI">--</div>
-                <div class="stat-label">Current AQI</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="avgAQI">--</div>
-                <div class="stat-label">Avg AQI</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="worstPollutant">--</div>
-                <div class="stat-label">Worst Pollutant</div>
-            </div>
-        </div>
-        
-        <div class="history-section">
-            <h3><i class="fas fa-history"></i> Measurement History</h3>
-            <div class="history-list" id="historyList">
-                <div class="history-item">No measurements yet</div>
             </div>
         </div>
     </div>
-    
-    <div class="notification" id="notification"></div>
 
     <script>
-        // Air quality variables
-        let currentAQI = null;
-        let aqiHistory = [];
-        let currentLocation = 'Default City';
-        let pollutantLevels = {
-            pm25: null,
-            pm10: null,
-            o3: null,
-            no2: null,
-            so2: null,
-            co: null
-        };
+        // DOM Elements
+        const locationInput = document.getElementById('location');
+        const pm25Input = document.getElementById('pm25');
+        const pm10Input = document.getElementById('pm10');
+        const o3Input = document.getElementById('o3');
+        const no2Input = document.getElementById('no2');
+        const so2Input = document.getElementById('so2');
+        const coInput = document.getElementById('co');
+        const checkAirQualityBtn = document.getElementById('checkAirQualityBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const clearBtn = document.getElementById('clearBtn');
         
-        // DOM elements
-        const aqiDisplay = document.getElementById('aqiDisplay');
-        const aqiInfo = document.getElementById('aqiInfo');
-        const checkBtn = document.getElementById('checkBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const gaugeBg = document.getElementById('gaugeBg');
-        const aqiStatus = document.getElementById('aqiStatus');
-        const locationInput = document.getElementById('locationInput');
-        const getLocationBtn = document.getElementById('getLocationBtn');
-        const pm25Value = document.getElementById('pm25Value');
-        const pm10Value = document.getElementById('pm10Value');
-        const o3Value = document.getElementById('o3Value');
-        const no2Value = document.getElementById('no2Value');
-        const so2Value = document.getElementById('so2Value');
-        const coValue = document.getElementById('coValue');
-        const recommendationsList = document.getElementById('recommendationsList');
-        const currentAQIStat = document.getElementById('currentAQI');
-        const avgAQIStat = document.getElementById('avgAQI');
-        const worstPollutantStat = document.getElementById('worstPollutant');
-        const historyList = document.getElementById('historyList');
-        const notification = document.getElementById('notification');
+        const aqiValueEl = document.getElementById('aqiValue');
+        const aqiCategoryEl = document.getElementById('aqiCategory');
+        const aqiStatusEl = document.getElementById('aqiStatus');
+        const locationResultEl = document.getElementById('locationResult');
+        const aqiIndexEl = document.getElementById('aqiIndex');
+        const dominantPollutantEl = document.getElementById('dominantPollutant');
+        const lastUpdatedEl = document.getElementById('lastUpdated');
+        const pm25ResultEl = document.getElementById('pm25Result');
+        const pm10ResultEl = document.getElementById('pm10Result');
+        const o3ResultEl = document.getElementById('o3Result');
+        const no2ResultEl = document.getElementById('no2Result');
+        const so2ResultEl = document.getElementById('so2Result');
+        const coResultEl = document.getElementById('coResult');
+        const healthAdviceEl = document.getElementById('healthAdvice');
         
-        // Show notification
-        function showNotification(message, type) {
-            notification.textContent = message;
-            notification.className = `notification ${type} show`;
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const savedData = localStorage.getItem('airQualityData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                locationInput.value = data.location || '';
+                pm25Input.value = data.pm25 || '15';
+                pm10Input.value = data.pm10 || '25';
+                o3Input.value = data.o3 || '40';
+                no2Input.value = data.no2 || '30';
+                so2Input.value = data.so2 || '5';
+                coInput.value = data.co || '0.5';
+                
+                // Update results
+                checkAirQuality();
+            }
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            const data = {
+                location: locationInput.value,
+                pm25: pm25Input.value,
+                pm10: pm10Input.value,
+                o3: o3Input.value,
+                no2: no2Input.value,
+                so2: so2Input.value,
+                co: coInput.value
+            };
+            localStorage.setItem('airQualityData', JSON.stringify(data));
+            alert('Air quality data saved successfully!');
+        }
+        
+        // Clear saved data
+        function clearData() {
+            localStorage.removeItem('airQualityData');
+            locationInput.value = '';
+            pm25Input.value = '15';
+            pm10Input.value = '25';
+            o3Input.value = '40';
+            no2Input.value = '30';
+            so2Input.value = '5';
+            coInput.value = '0.5';
             
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+            // Reset results to default
+            aqiValueEl.textContent = '42';
+            aqiCategoryEl.textContent = 'Good';
+            aqiStatusEl.textContent = 'Air quality is satisfactory, and air pollution poses little or no risk.';
+            aqiStatusEl.className = 'aqi-status good';
+            locationResultEl.textContent = 'New York, NY';
+            aqiIndexEl.textContent = '42';
+            dominantPollutantEl.textContent = 'PM2.5';
+            lastUpdatedEl.textContent = new Date().toLocaleString();
+            pm25ResultEl.textContent = '15.0 µg/m³';
+            pm10ResultEl.textContent = '25.0 µg/m³';
+            o3ResultEl.textContent = '40.0 ppb';
+            no2ResultEl.textContent = '30.0 ppb';
+            so2ResultEl.textContent = '5.0 ppb';
+            coResultEl.textContent = '0.5 ppm';
+            healthAdviceEl.innerHTML = '<h3>Health Recommendations</h3><p>It\'s a great day to be outside! Everyone can enjoy outdoor activities without concern.</p>';
+            healthAdviceEl.className = 'health-advice advice-good';
+            
+            alert('All data cleared successfully!');
+        }
+        
+        // Calculate Air Quality Index
+        function calculateAQI() {
+            const pm25 = parseFloat(pm25Input.value);
+            const pm10 = parseFloat(pm10Input.value);
+            const o3 = parseFloat(o3Input.value);
+            const no2 = parseFloat(no2Input.value);
+            const so2 = parseFloat(so2Input.value);
+            const co = parseFloat(coInput.value);
+            
+            // Validate inputs
+            if (isNaN(pm25) || isNaN(pm10) || isNaN(o3) || isNaN(no2) || isNaN(so2) || isNaN(co)) {
+                alert('Please enter valid numbers for all pollutant levels');
+                return;
+            }
+            
+            // Calculate AQI for each pollutant
+            const pm25AQI = calculateAQIFromConcentration(pm25, 'pm25');
+            const pm10AQI = calculateAQIFromConcentration(pm10, 'pm10');
+            const o3AQI = calculateAQIFromConcentration(o3, 'o3');
+            const no2AQI = calculateAQIFromConcentration(no2, 'no2');
+            const so2AQI = calculateAQIFromConcentration(so2, 'so2');
+            const coAQI = calculateAQIFromConcentration(co, 'co');
+            
+            // Find the maximum AQI (worst pollutant)
+            const maxAQI = Math.max(pm25AQI, pm10AQI, o3AQI, no2AQI, so2AQI, coAQI);
+            
+            // Determine dominant pollutant
+            let dominantPollutant = 'PM2.5';
+            if (maxAQI === pm10AQI) dominantPollutant = 'PM10';
+            else if (maxAQI === o3AQI) dominantPollutant = 'O₃';
+            else if (maxAQI === no2AQI) dominantPollutant = 'NO₂';
+            else if (maxAQI === so2AQI) dominantPollutant = 'SO₂';
+            else if (maxAQI === coAQI) dominantPollutant = 'CO';
+            
+            return {
+                aqi: Math.round(maxAQI),
+                dominantPollutant: dominantPollutant
+            };
+        }
+        
+        // Calculate AQI from concentration
+        function calculateAQIFromConcentration(concentration, pollutant) {
+            // AQI breakpoints (simplified)
+            let aqi = 0;
+            
+            if (pollutant === 'pm25') {
+                if (concentration <= 12) aqi = concentration * (50 / 12);
+                else if (concentration <= 35.4) aqi = 50 + (concentration - 12.1) * (50 / 23.3);
+                else if (concentration <= 55.4) aqi = 100 + (concentration - 35.5) * (50 / 19.9);
+                else if (concentration <= 150.4) aqi = 150 + (concentration - 55.5) * (100 / 94.9);
+                else if (concentration <= 250.4) aqi = 200 + (concentration - 150.5) * (100 / 99.9);
+                else if (concentration <= 350.4) aqi = 300 + (concentration - 250.5) * (100 / 99.9);
+                else aqi = 400 + (concentration - 350.5) * (100 / 99.9);
+            }
+            else if (pollutant === 'pm10') {
+                if (concentration <= 54) aqi = concentration * (50 / 54);
+                else if (concentration <= 154) aqi = 50 + (concentration - 55) * (50 / 99);
+                else if (concentration <= 254) aqi = 100 + (concentration - 155) * (50 / 99);
+                else if (concentration <= 354) aqi = 150 + (concentration - 255) * (100 / 99);
+                else if (concentration <= 424) aqi = 200 + (concentration - 355) * (100 / 69);
+                else if (concentration <= 504) aqi = 300 + (concentration - 425) * (100 / 79);
+                else aqi = 400 + (concentration - 505) * (100 / 99);
+            }
+            else if (pollutant === 'o3') {
+                if (concentration <= 54) aqi = concentration * (50 / 54);
+                else if (concentration <= 70) aqi = 50 + (concentration - 55) * (50 / 15);
+                else if (concentration <= 85) aqi = 100 + (concentration - 71) * (50 / 14);
+                else if (concentration <= 105) aqi = 150 + (concentration - 86) * (100 / 19);
+                else if (concentration <= 200) aqi = 200 + (concentration - 106) * (100 / 94);
+                else aqi = 300 + (concentration - 201) * (100 / 99);
+            }
+            else if (pollutant === 'no2') {
+                if (concentration <= 53) aqi = concentration * (50 / 53);
+                else if (concentration <= 100) aqi = 50 + (concentration - 54) * (50 / 46);
+                else if (concentration <= 360) aqi = 100 + (concentration - 101) * (50 / 259);
+                else if (concentration <= 649) aqi = 150 + (concentration - 361) * (100 / 288);
+                else if (concentration <= 1249) aqi = 200 + (concentration - 650) * (100 / 599);
+                else aqi = 300 + (concentration - 1250) * (100 / 999);
+            }
+            else if (pollutant === 'so2') {
+                if (concentration <= 35) aqi = concentration * (50 / 35);
+                else if (concentration <= 75) aqi = 50 + (concentration - 36) * (50 / 39);
+                else if (concentration <= 185) aqi = 100 + (concentration - 76) * (50 / 109);
+                else if (concentration <= 304) aqi = 150 + (concentration - 186) * (100 / 118);
+                else if (concentration <= 604) aqi = 200 + (concentration - 305) * (100 / 299);
+                else aqi = 300 + (concentration - 605) * (100 / 399);
+            }
+            else if (pollutant === 'co') {
+                if (concentration <= 4.4) aqi = concentration * (50 / 4.4);
+                else if (concentration <= 9.4) aqi = 50 + (concentration - 4.5) * (50 / 4.9);
+                else if (concentration <= 12.4) aqi = 100 + (concentration - 9.5) * (50 / 2.9);
+                else if (concentration <= 15.4) aqi = 150 + (concentration - 12.5) * (100 / 2.9);
+                else if (concentration <= 30.4) aqi = 200 + (concentration - 15.5) * (100 / 14.9);
+                else aqi = 300 + (concentration - 30.5) * (100 / 19.9);
+            }
+            
+            return Math.min(aqi, 500); // AQI is capped at 500
+        }
+        
+        // Get AQI category and status
+        function getAQICategory(aqi) {
+            if (aqi <= 50) return { category: 'Good', status: 'Air quality is satisfactory, and air pollution poses little or no risk.', class: 'good', advice: 'It\'s a great day to be outside! Everyone can enjoy outdoor activities without concern.' };
+            if (aqi <= 100) return { category: 'Moderate', status: 'Air quality is acceptable; however, there may be a risk for some people.', class: 'moderate', advice: 'Unusually sensitive individuals may consider limiting prolonged outdoor exertion.' };
+            if (aqi <= 150) return { category: 'Unhealthy for Sensitive Groups', status: 'Members of sensitive groups may consider limiting prolonged outdoor exertion.', class: 'unhealthy-sensitive', advice: 'Sensitive groups should limit prolonged outdoor exertion. Everyone else can continue their outdoor activities.' };
+            if (aqi <= 200) return { category: 'Unhealthy', status: 'Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.', class: 'unhealthy', advice: 'Everyone should limit prolonged outdoor exertion. Sensitive groups should avoid outdoor activities.' };
+            if (aqi <= 300) return { category: 'Very Unhealthy', status: 'Health alert: everyone may experience more serious health effects.', class: 'very-unhealthy', advice: 'Everyone should avoid all outdoor exertion. Sensitive groups should remain indoors and keep windows closed.' };
+            return { category: 'Hazardous', status: 'Health warnings of emergency conditions. The entire population is likely to be affected.', class: 'hazardous', advice: 'Everyone should avoid all physical activity outdoors. People with existing health problems should remain indoors and keep windows closed.' };
         }
         
         // Check air quality
         function checkAirQuality() {
-            // Simulate checking process
-            aqiInfo.textContent = "Checking air quality...";
-            checkBtn.disabled = true;
-            checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking';
+            const location = locationInput.value || 'New York, NY';
+            const pm25 = parseFloat(pm25Input.value);
+            const pm10 = parseFloat(pm10Input.value);
+            const o3 = parseFloat(o3Input.value);
+            const no2 = parseFloat(no2Input.value);
+            const so2 = parseFloat(so2Input.value);
+            const co = parseFloat(coInput.value);
             
-            // Simulate delay for checking
-            setTimeout(() => {
-                // Generate realistic AQI and pollutant readings
-                currentAQI = Math.floor(Math.random() * 200) + 20; // 20-220
-                
-                // Generate pollutant levels based on AQI
-                const multiplier = currentAQI / 100;
-                pollutantLevels.pm25 = Math.round(15 * multiplier + Math.random() * 10);
-                pollutantLevels.pm10 = Math.round(30 * multiplier + Math.random() * 20);
-                pollutantLevels.o3 = Math.round(50 * multiplier + Math.random() * 30);
-                pollutantLevels.no2 = Math.round(20 * multiplier + Math.random() * 15);
-                pollutantLevels.so2 = Math.round(10 * multiplier + Math.random() * 5);
-                pollutantLevels.co = (0.5 * multiplier + Math.random() * 0.3).toFixed(1);
-                
-                updateDisplay();
-                updateHistory();
-                updateStats();
-                updateRecommendations();
-                
-                showNotification('Air quality checked successfully!', 'success');
-                
-                checkBtn.disabled = false;
-                checkBtn.innerHTML = '<i class="fas fa-wind"></i> Check Air Quality';
-            }, 2000);
-        }
-        
-        // Update display
-        function updateDisplay() {
-            if (currentAQI !== null) {
-                aqiDisplay.textContent = currentAQI;
-                
-                // Update gauge
-                const gaugeHeight = Math.min((currentAQI / 500) * 100, 100);
-                gaugeBg.style.height = `${gaugeHeight}%`;
-                
-                // Update status message and class
-                let statusMessage, statusClass;
-                if (currentAQI <= 50) {
-                    statusMessage = "Good - Air quality is satisfactory";
-                    statusClass = "good";
-                } else if (currentAQI <= 100) {
-                    statusMessage = "Moderate - Acceptable for most people";
-                    statusClass = "moderate";
-                } else if (currentAQI <= 150) {
-                    statusMessage = "Unhealthy for Sensitive Groups";
-                    statusClass = "unhealthy-sensitive";
-                } else if (currentAQI <= 200) {
-                    statusMessage = "Unhealthy - Everyone may begin to experience effects";
-                    statusClass = "unhealthy";
-                } else if (currentAQI <= 300) {
-                    statusMessage = "Very Unhealthy - Serious health effects expected";
-                    statusClass = "very-unhealthy";
-                } else {
-                    statusMessage = "Hazardous - Emergency conditions expected";
-                    statusClass = "hazardous";
-                }
-                
-                aqiStatus.textContent = statusMessage;
-                aqiStatus.className = `aqi-status ${statusClass}`;
-                
-                aqiInfo.textContent = `Current AQI in ${currentLocation}`;
-                
-                // Update pollutant displays
-                pm25Value.textContent = pollutantLevels.pm25;
-                pm10Value.textContent = pollutantLevels.pm10;
-                o3Value.textContent = pollutantLevels.o3;
-                no2Value.textContent = pollutantLevels.no2;
-                so2Value.textContent = pollutantLevels.so2;
-                coValue.textContent = pollutantLevels.co;
-            }
-        }
-        
-        // Update history
-        function updateHistory() {
-            if (currentAQI !== null) {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const dateString = now.toLocaleDateString([], {month: 'short', day: 'numeric'});
-                
-                aqiHistory.unshift({
-                    aqi: currentAQI,
-                    location: currentLocation,
-                    timestamp: now,
-                    pollutants: {...pollutantLevels}
-                });
-                
-                // Keep only last 10 measurements
-                if (aqiHistory.length > 10) {
-                    aqiHistory = aqiHistory.slice(0, 10);
-                }
-                
-                renderHistory();
-            }
-        }
-        
-        // Render history
-        function renderHistory() {
-            if (aqiHistory.length === 0) {
-                historyList.innerHTML = '<div class="history-item">No measurements yet</div>';
+            // Validate inputs
+            if (isNaN(pm25) || isNaN(pm10) || isNaN(o3) || isNaN(no2) || isNaN(so2) || isNaN(co)) {
+                alert('Please enter valid numbers for all pollutant levels');
                 return;
             }
             
-            historyList.innerHTML = '';
-            aqiHistory.forEach(item => {
-                const time = item.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const historyElement = document.createElement('div');
-                historyElement.className = 'history-item';
-                historyElement.innerHTML = `
-                    <span>${item.location}: AQI ${item.aqi}</span>
-                    <span>${time}</span>
-                `;
-                historyList.appendChild(historyElement);
-            });
-        }
-        
-        // Update statistics
-        function updateStats() {
-            if (aqiHistory.length === 0) {
-                currentAQIStat.textContent = '--';
-                avgAQIStat.textContent = '--';
-                worstPollutantStat.textContent = '--';
-                return;
-            }
+            // Calculate AQI
+            const { aqi, dominantPollutant } = calculateAQI();
+            const aqiInfo = getAQICategory(aqi);
             
-            currentAQIStat.textContent = currentAQI;
+            // Update results
+            aqiValueEl.textContent = aqi;
+            aqiCategoryEl.textContent = aqiInfo.category;
+            aqiStatusEl.textContent = aqiInfo.status;
+            aqiStatusEl.className = `aqi-status ${aqiInfo.class}`;
+            locationResultEl.textContent = location;
+            aqiIndexEl.textContent = aqi;
+            dominantPollutantEl.textContent = dominantPollutant;
+            lastUpdatedEl.textContent = new Date().toLocaleString();
+            pm25ResultEl.textContent = pm25.toFixed(1) + ' µg/m³';
+            pm10ResultEl.textContent = pm10.toFixed(1) + ' µg/m³';
+            o3ResultEl.textContent = o3.toFixed(1) + ' ppb';
+            no2ResultEl.textContent = no2.toFixed(1) + ' ppb';
+            so2ResultEl.textContent = so2.toFixed(1) + ' ppb';
+            coResultEl.textContent = co.toFixed(1) + ' ppm';
             
-            const aqis = aqiHistory.map(item => item.aqi);
-            const avg = Math.round(aqis.reduce((a, b) => a + b, 0) / aqis.length);
-            avgAQIStat.textContent = avg;
-            
-            // Find worst pollutant
-            let worstPollutant = 'Unknown';
-            let maxLevel = 0;
-            
-            if (pollutantLevels.pm25 > maxLevel) {
-                worstPollutant = 'PM2.5';
-                maxLevel = pollutantLevels.pm25;
-            }
-            if (pollutantLevels.pm10 > maxLevel) {
-                worstPollutant = 'PM10';
-                maxLevel = pollutantLevels.pm10;
-            }
-            if (pollutantLevels.o3 > maxLevel) {
-                worstPollutant = 'O₃';
-                maxLevel = pollutantLevels.o3;
-            }
-            if (pollutantLevels.no2 > maxLevel) {
-                worstPollutant = 'NO₂';
-                maxLevel = pollutantLevels.no2;
-            }
-            if (pollutantLevels.so2 > maxLevel) {
-                worstPollutant = 'SO₂';
-                maxLevel = pollutantLevels.so2;
-            }
-            if (pollutantLevels.co > maxLevel) {
-                worstPollutant = 'CO';
-                maxLevel = pollutantLevels.co;
-            }
-            
-            worstPollutantStat.textContent = worstPollutant;
-        }
-        
-        // Update recommendations
-        function updateRecommendations() {
-            recommendationsList.innerHTML = '';
-            
-            if (currentAQI === null) {
-                recommendationsList.innerHTML = `
-                    <li>Check air quality before going outdoors</li>
-                    <li>Keep windows closed during high pollution periods</li>
-                    <li>Use air purifiers with HEPA filters</li>
-                `;
-                return;
-            }
-            
-            let recommendations = [];
-            
-            if (currentAQI <= 50) {
-                recommendations = [
-                    "Air quality is good. Enjoy outdoor activities!",
-                    "Ideal conditions for opening windows.",
-                    "Perfect weather for exercising outdoors.",
-                    "Great time for children to play outside."
-                ];
-            } else if (currentAQI <= 100) {
-                recommendations = [
-                    "Air quality is moderate. Some people may be sensitive.",
-                    "Sensitive individuals should consider limiting prolonged outdoor exertion.",
-                    "Generally fine for most people, but watch for symptoms.",
-                    "Good time for indoor activities if you're sensitive."
-                ];
-            } else if (currentAQI <= 150) {
-                recommendations = [
-                    "Unhealthy for sensitive groups. Children and elderly should limit outdoor activity.",
-                    "People with heart or lung disease should avoid prolonged outdoor exertion.",
-                    "Consider staying indoors if you have respiratory issues.",
-                    "Wear a mask if you must go outside for extended periods."
-                ];
-            } else if (currentAQI <= 200) {
-                recommendations = [
-                    "Unhealthy for everyone. Avoid prolonged outdoor exertion.",
-                    "Everyone should limit outdoor activity, especially children and elderly.",
-                    "Keep windows closed and use air purifiers.",
-                    "Postpone outdoor exercise and strenuous activities."
-                ];
-            } else if (currentAQI <= 300) {
-                recommendations = [
-                    "Very unhealthy. Avoid all outdoor exertion.",
-                    "Stay indoors and keep windows closed.",
-                    "Use air purifiers and HVAC systems with clean filters.",
-                    "Wear N95 masks if you must go outside."
-                ];
-            } else {
-                recommendations = [
-                    "Hazardous. Everyone should avoid all outdoor exertion.",
-                    "Emergency conditions. Stay indoors with windows closed.",
-                    "Activate your emergency air filtration system.",
-                    "Seek medical attention if experiencing respiratory symptoms."
-                ];
-            }
-            
-            recommendations.forEach(rec => {
-                const li = document.createElement('li');
-                li.textContent = rec;
-                recommendationsList.appendChild(li);
-            });
-        }
-        
-        // Reset checker
-        function resetChecker() {
-            currentAQI = null;
-            aqiDisplay.textContent = '--';
-            aqiInfo.textContent = 'Ready to check air quality';
-            aqiStatus.textContent = 'Waiting for measurement...';
-            aqiStatus.className = 'aqi-status';
-            gaugeBg.style.height = '0%';
-            
-            pm25Value.textContent = '--';
-            pm10Value.textContent = '--';
-            o3Value.textContent = '--';
-            no2Value.textContent = '--';
-            so2Value.textContent = '--';
-            coValue.textContent = '--';
-            
-            showNotification('Air quality checker reset successfully', 'success');
-        }
-        
-        // Get location
-        function getLocation() {
-            const location = locationInput.value.trim();
-            if (location) {
-                currentLocation = location;
-                showNotification(`Location set to ${location}`, 'success');
-            } else {
-                showNotification('Please enter a location', 'error');
-            }
-        }
-        
-        // Save to localStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('airQualityHistory', JSON.stringify(aqiHistory));
-            localStorage.setItem('airQualityLocation', currentLocation);
-        }
-        
-        // Load from localStorage
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('airQualityHistory');
-            const savedLocation = localStorage.getItem('airQualityLocation');
-            if (saved) {
-                aqiHistory = JSON.parse(saved);
-                renderHistory();
-                updateStats();
-            }
-            if (savedLocation) {
-                currentLocation = savedLocation;
-                locationInput.value = currentLocation;
-            }
+            // Update health advice
+            healthAdviceEl.innerHTML = `<h3>Health Recommendations</h3><p>${aqiInfo.advice}</p>`;
+            healthAdviceEl.className = `health-advice advice-${aqiInfo.class}`;
         }
         
         // Event listeners
-        checkBtn.addEventListener('click', checkAirQuality);
-        resetBtn.addEventListener('click', resetChecker);
-        getLocationBtn.addEventListener('click', getLocation);
+        checkAirQualityBtn.addEventListener('click', checkAirQuality);
+        saveBtn.addEventListener('click', saveData);
+        clearBtn.addEventListener('click', clearData);
         
-        // Initialize
-        loadFromLocalStorage();
-        updateRecommendations();
-        
-        // Auto-save periodically
-        setInterval(saveToLocalStorage, 30000);
+        // Initial load
+        window.addEventListener('load', () => {
+            loadSavedData();
+            checkAirQuality();
+        });
     </script>
 </body>
 </html>
