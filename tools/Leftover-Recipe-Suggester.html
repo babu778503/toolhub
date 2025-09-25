@@ -1,0 +1,894 @@
+<!-- Category: Health -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leftover Recipe Suggester</title>
+    <meta name="description" content="Free leftover recipe suggester to transform your food scraps into delicious meals. Find creative recipes for common leftovers like chicken, rice, vegetables, and more.">
+    <meta name="keywords" content="leftover recipes, food waste reduction, leftover meal ideas, recipe suggester, meal planning, food recycling, sustainable cooking, creative recipes, food scraps">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 70px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                padding-top: 60px;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        header {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                height: 50px;
+                padding: 10px;
+            }
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #1a2a6c;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 10px;
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a2a6c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #ff7e5f;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 126, 95, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .ingredients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .ingredient-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ingredient-card:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+        }
+
+        .ingredient-name {
+            font-weight: 600;
+            color: #1a2a6c;
+        }
+
+        .ingredient-amount {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-top: 20px;
+        }
+
+        .recipe-title {
+            color: #1a2a6c;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .recipe-ingredients {
+            margin: 15px 0;
+        }
+
+        .recipe-ingredients h4 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+
+        .recipe-steps {
+            margin: 15px 0;
+        }
+
+        .recipe-steps h4 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+
+        .recipe-step {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .recipe-step:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #ff7e5f;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #8a929c);
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            color: white;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #ff7e5f;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .add-ingredient {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .add-ingredient input {
+            flex: 1;
+        }
+
+        .recipe-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff7e5f;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-title {
+            font-weight: 600;
+            color: #1a2a6c;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .ingredients-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .add-ingredient {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Leftover Recipe Suggester</h1>
+        </header>
+
+        <div class="card">
+            <h2>Available Leftovers</h2>
+            <div class="form-group">
+                <label for="ingredient1">Ingredient 1</label>
+                <select id="ingredient1">
+                    <option value="">Select ingredient</option>
+                    <option value="chicken">Chicken</option>
+                    <option value="rice">Rice</option>
+                    <option value="pasta">Pasta</option>
+                    <option value="vegetables">Mixed Vegetables</option>
+                    <option value="potatoes">Potatoes</option>
+                    <option value="bread">Bread</option>
+                    <option value="meat">Leftover Meat</option>
+                    <option value="cheese">Cheese</option>
+                    <option value="eggs">Eggs</option>
+                    <option value="fish">Fish</option>
+                    <option value="tofu">Tofu</option>
+                    <option value="beans">Beans</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ingredient2">Ingredient 2</label>
+                <select id="ingredient2">
+                    <option value="">Select ingredient</option>
+                    <option value="chicken">Chicken</option>
+                    <option value="rice">Rice</option>
+                    <option value="pasta">Pasta</option>
+                    <option value="vegetables">Mixed Vegetables</option>
+                    <option value="potatoes">Potatoes</option>
+                    <option value="bread">Bread</option>
+                    <option value="meat">Leftover Meat</option>
+                    <option value="cheese">Cheese</option>
+                    <option value="eggs">Eggs</option>
+                    <option value="fish">Fish</option>
+                    <option value="tofu">Tofu</option>
+                    <option value="beans">Beans</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ingredient3">Ingredient 3</label>
+                <select id="ingredient3">
+                    <option value="">Select ingredient</option>
+                    <option value="chicken">Chicken</option>
+                    <option value="rice">Rice</option>
+                    <option value="pasta">Pasta</option>
+                    <option value="vegetables">Mixed Vegetables</option>
+                    <option value="potatoes">Potatoes</option>
+                    <option value="bread">Bread</option>
+                    <option value="meat">Leftover Meat</option>
+                    <option value="cheese">Cheese</option>
+                    <option value="eggs">Eggs</option>
+                    <option value="fish">Fish</option>
+                    <option value="tofu">Tofu</option>
+                    <option value="beans">Beans</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="customIngredient">Or add custom ingredient:</label>
+                <div class="add-ingredient">
+                    <input type="text" id="customIngredient" placeholder="Enter custom ingredient">
+                    <button class="btn" id="addCustomBtn">Add</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="dietary">Dietary Preference</label>
+                <select id="dietary">
+                    <option value="none">None</option>
+                    <option value="vegetarian">Vegetarian</option>
+                    <option value="vegan">Vegan</option>
+                    <option value="gluten-free">Gluten-Free</option>
+                    <option value="low-carb">Low-Carb</option>
+                    <option value="keto">Keto</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Selected Ingredients</h2>
+            <div class="ingredients-grid" id="ingredientsList">
+                <p class="no-ingredients">Add ingredients to see them listed here</p>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="progress-label">
+                    <span>Ingredients Added</span>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn" id="suggestBtn"><i class="fas fa-lightbulb"></i> Suggest Recipe</button>
+                <button class="btn btn-secondary" id="saveBtn"><i class="fas fa-save"></i> Save Ingredients</button>
+                <button class="btn btn-secondary" id="loadBtn"><i class="fas fa-folder-open"></i> Load Ingredients</button>
+                <button class="btn btn-secondary" id="clearBtn"><i class="fas fa-trash"></i> Clear All</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Suggested Recipe</h2>
+            <div id="recipeContainer">
+                <p>Select ingredients and click "Suggest Recipe" to see a recipe suggestion</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Recipe Statistics</h2>
+            <div class="recipe-stats">
+                <div class="stat-card">
+                    <div class="stat-title">Ingredients Used</div>
+                    <div class="stat-value" id="ingredientsUsed">0</div>
+                    <div class="stat-label">in recipe</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Prep Time</div>
+                    <div class="stat-value" id="prepTime">0 min</div>
+                    <div class="stat-label">average</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Servings</div>
+                    <div class="stat-value" id="servings">0</div>
+                    <div class="stat-label">per recipe</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Calories</div>
+                    <div class="stat-value" id="calories">0</div>
+                    <div class="stat-label">per serving</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Use This Leftover Recipe Suggester</h3>
+            <ul>
+                <li>Select up to 3 ingredients you have left over</li>
+                <li>Or add custom ingredients using the text field</li>
+                <li>Choose your dietary preference if needed</li>
+                <li>Click "Suggest Recipe" to get a creative recipe idea</li>
+                <li>Save your ingredient list for future reference</li>
+                <li>Reduce food waste by transforming leftovers into delicious meals</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestBtn = document.getElementById('suggestBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const loadBtn = document.getElementById('loadBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const addCustomBtn = document.getElementById('addCustomBtn');
+            const ingredientsList = document.getElementById('ingredientsList');
+            const recipeContainer = document.getElementById('recipeContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            // Load saved ingredients if available
+            loadSavedIngredients();
+            
+            // Update ingredients list display
+            function updateIngredientsList() {
+                ingredientsList.innerHTML = '';
+                
+                const selectedIngredients = [
+                    document.getElementById('ingredient1').value,
+                    document.getElementById('ingredient2').value,
+                    document.getElementById('ingredient3').value
+                ];
+                
+                const customIngredients = getCustomIngredients();
+                
+                const allIngredients = [...selectedIngredients, ...customIngredients];
+                
+                const ingredientNames = {
+                    'chicken': 'Cooked Chicken',
+                    'rice': 'Cooked Rice',
+                    'pasta': 'Cooked Pasta',
+                    'vegetables': 'Mixed Vegetables',
+                    'potatoes': 'Cooked Potatoes',
+                    'bread': 'Leftover Bread',
+                    'meat': 'Leftover Meat',
+                    'cheese': 'Cheese',
+                    'eggs': 'Eggs',
+                    'fish': 'Leftover Fish',
+                    'tofu': 'Tofu',
+                    'beans': 'Beans'
+                };
+                
+                let ingredientCount = 0;
+                
+                allIngredients.forEach((ingredient, index) => {
+                    if (ingredient) {
+                        ingredientCount++;
+                        const ingredientCard = document.createElement('div');
+                        ingredientCard.className = 'ingredient-card';
+                        
+                        const displayName = ingredientNames[ingredient] || ingredient;
+                        
+                        ingredientCard.innerHTML = `
+                            <button class="remove-btn" onclick="removeIngredient(${index})">x</button>
+                            <div class="ingredient-name">${displayName}</div>
+                            <div class="ingredient-amount">Available</div>
+                        `;
+                        ingredientsList.appendChild(ingredientCard);
+                    }
+                });
+                
+                if (ingredientCount === 0) {
+                    ingredientsList.innerHTML = '<p class="no-ingredients">Add ingredients to see them listed here</p>';
+                }
+                
+                // Update progress bar
+                const progress = Math.min(100, Math.round((ingredientCount / 6) * 100));
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+            }
+            
+            // Get custom ingredients from localStorage
+            function getCustomIngredients() {
+                const saved = localStorage.getItem('customIngredients');
+                return saved ? JSON.parse(saved) : [];
+            }
+            
+            // Save custom ingredients to localStorage
+            function saveCustomIngredients(ingredients) {
+                localStorage.setItem('customIngredients', JSON.stringify(ingredients));
+            }
+            
+            // Remove ingredient by index
+            window.removeIngredient = function(index) {
+                const selectedIngredients = [
+                    document.getElementById('ingredient1').value,
+                    document.getElementById('ingredient2').value,
+                    document.getElementById('ingredient3').value
+                ];
+                
+                const customIngredients = getCustomIngredients();
+                
+                if (index < 3) {
+                    // Remove from selected ingredients
+                    if (index === 0) document.getElementById('ingredient1').value = '';
+                    if (index === 1) document.getElementById('ingredient2').value = '';
+                    if (index === 2) document.getElementById('ingredient3').value = '';
+                } else {
+                    // Remove from custom ingredients
+                    const customIndex = index - 3;
+                    customIngredients.splice(customIndex, 1);
+                    saveCustomIngredients(customIngredients);
+                }
+                
+                updateIngredientsList();
+            };
+            
+            // Add custom ingredient
+            addCustomBtn.addEventListener('click', function() {
+                const customInput = document.getElementById('customIngredient');
+                const value = customInput.value.trim();
+                
+                if (value) {
+                    const customIngredients = getCustomIngredients();
+                    customIngredients.push(value);
+                    saveCustomIngredients(customIngredients);
+                    
+                    customInput.value = '';
+                    updateIngredientsList();
+                }
+            });
+            
+            // Suggest a recipe based on ingredients
+            function suggestRecipe() {
+                const selectedIngredients = [
+                    document.getElementById('ingredient1').value,
+                    document.getElementById('ingredient2').value,
+                    document.getElementById('ingredient3').value
+                ].filter(ing => ing !== '');
+                
+                const customIngredients = getCustomIngredients();
+                const allIngredients = [...selectedIngredients, ...customIngredients];
+                
+                if (allIngredients.length === 0) {
+                    recipeContainer.innerHTML = '<p>Please select at least one ingredient to get a recipe suggestion.</p>';
+                    return;
+                }
+                
+                // Sample recipes based on ingredients
+                const recipes = {
+                    'chicken,rice': {
+                        title: 'Chicken Fried Rice',
+                        ingredients: ['Leftover chicken', 'Cooked rice', 'Mixed vegetables', 'Soy sauce', 'Scallions'],
+                        steps: [
+                            'Heat oil in a large pan or wok over medium-high heat',
+                            'Add leftover chicken and cook until heated through',
+                            'Add cooked rice and vegetables, stir-fry for 3-4 minutes',
+                            'Add soy sauce and scallions, cook for another 2 minutes',
+                            'Serve hot'
+                        ],
+                        prepTime: 15,
+                        servings: 4,
+                        calories: 350
+                    },
+                    'pasta,vegetables': {
+                        title: 'Pasta Primavera',
+                        ingredients: ['Leftover pasta', 'Mixed vegetables', 'Olive oil', 'Garlic', 'Parmesan cheese'],
+                        steps: [
+                            'Heat olive oil in a large pan over medium heat',
+                            'Add minced garlic and cook for 1 minute',
+                            'Add mixed vegetables and sauté until tender',
+                            'Add leftover pasta and toss to combine',
+                            'Add grated Parmesan cheese and serve'
+                        ],
+                        prepTime: 10,
+                        servings: 3,
+                        calories: 400
+                    },
+                    'rice,vegetables,eggs': {
+                        title: 'Vegetable Fried Rice',
+                        ingredients: ['Cooked rice', 'Mixed vegetables', 'Eggs', 'Soy sauce', 'Green onions'],
+                        steps: [
+                            'Beat eggs and scramble in a pan, set aside',
+                            'In the same pan, add vegetables and cook until tender',
+                            'Add cooked rice and stir-fry for 3-4 minutes',
+                            'Add scrambled eggs and soy sauce, mix well',
+                            'Garnish with green onions and serve'
+                        ],
+                        prepTime: 12,
+                        servings: 3,
+                        calories: 300
+                    },
+                    'bread,eggs': {
+                        title: 'French Toast',
+                        ingredients: ['Leftover bread', 'Eggs', 'Milk', 'Cinnamon', 'Maple syrup'],
+                        steps: [
+                            'Whisk eggs, milk, and cinnamon in a shallow dish',
+                            'Soak bread slices in the mixture for 1-2 minutes',
+                            'Heat butter in a pan over medium heat',
+                            'Cook bread slices until golden brown on both sides',
+                            'Serve with maple syrup'
+                        ],
+                        prepTime: 10,
+                        servings: 2,
+                        calories: 320
+                    },
+                    'chicken,vegetables': {
+                        title: 'Chicken Vegetable Soup',
+                        ingredients: ['Leftover chicken', 'Mixed vegetables', 'Vegetable broth', 'Carrots', 'Celery'],
+                        steps: [
+                            'Add vegetable broth to a large pot and bring to a boil',
+                            'Add diced carrots and celery, simmer for 5 minutes',
+                            'Add leftover chicken and mixed vegetables',
+                            'Simmer for 10-15 minutes until vegetables are tender',
+                            'Season with salt and pepper to taste'
+                        ],
+                        prepTime: 20,
+                        servings: 4,
+                        calories: 250
+                    },
+                    'potatoes,eggs': {
+                        title: 'Potato Hash',
+                        ingredients: ['Cooked potatoes', 'Eggs', 'Onions', 'Bell peppers', 'Salt and pepper'],
+                        steps: [
+                            'Dice cooked potatoes and sauté in a pan with oil',
+                            'Add diced onions and bell peppers, cook until soft',
+                            'Make wells in the hash and crack eggs into them',
+                            'Cover and cook until eggs are set',
+                            'Season with salt and pepper'
+                        ],
+                        prepTime: 15,
+                        servings: 2,
+                        calories: 380
+                    }
+                };
+                
+                // Generate a key for the recipe lookup
+                const ingredientKey = allIngredients.sort().join(',');
+                
+                // Find a matching recipe or create a generic one
+                let recipe;
+                if (recipes[ingredientKey]) {
+                    recipe = recipes[ingredientKey];
+                } else {
+                    // Create a generic recipe based on available ingredients
+                    recipe = {
+                        title: 'Creative Leftover Dish',
+                        ingredients: allIngredients.map(ing => {
+                            const names = {
+                                'chicken': 'Leftover chicken',
+                                'rice': 'Cooked rice',
+                                'pasta': 'Cooked pasta',
+                                'vegetables': 'Mixed vegetables',
+                                'potatoes': 'Cooked potatoes',
+                                'bread': 'Leftover bread',
+                                'meat': 'Leftover meat',
+                                'cheese': 'Cheese',
+                                'eggs': 'Eggs',
+                                'fish': 'Leftover fish',
+                                'tofu': 'Tofu',
+                                'beans': 'Beans'
+                            };
+                            return names[ing] || ing;
+                        }),
+                        steps: [
+                            'Combine all ingredients in a large pan or pot',
+                            'Add any seasonings or sauces you have on hand',
+                            'Cook until heated through and well combined',
+                            'Adjust seasoning to taste',
+                            'Serve hot and enjoy your creative meal!'
+                        ],
+                        prepTime: 15,
+                        servings: 3,
+                        calories: 300
+                    };
+                }
+                
+                // Display the recipe
+                recipeContainer.innerHTML = `
+                    <div class="recipe-card">
+                        <h3 class="recipe-title">${recipe.title}</h3>
+                        <div class="recipe-ingredients">
+                            <h4>Ingredients:</h4>
+                            <ul>
+                                ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="recipe-steps">
+                            <h4>Instructions:</h4>
+                            ${recipe.steps.map(step => `<div class="recipe-step">${step}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // Update statistics
+                document.getElementById('ingredientsUsed').textContent = recipe.ingredients.length;
+                document.getElementById('prepTime').textContent = `${recipe.prepTime} min`;
+                document.getElementById('servings').textContent = recipe.servings;
+                document.getElementById('calories').textContent = recipe.calories;
+            }
+            
+            // Save ingredients to localStorage
+            saveBtn.addEventListener('click', function() {
+                const ingredients = [
+                    document.getElementById('ingredient1').value,
+                    document.getElementById('ingredient2').value,
+                    document.getElementById('ingredient3').value
+                ];
+                
+                const dietary = document.getElementById('dietary').value;
+                
+                localStorage.setItem('leftoverIngredients', JSON.stringify(ingredients));
+                localStorage.setItem('leftoverDietary', dietary);
+                
+                alert('Ingredients saved successfully!');
+            });
+            
+            // Load ingredients from localStorage
+            loadBtn.addEventListener('click', loadSavedIngredients);
+            
+            function loadSavedIngredients() {
+                const savedIngredients = localStorage.getItem('leftoverIngredients');
+                const savedDietary = localStorage.getItem('leftoverDietary');
+                
+                if (savedIngredients) {
+                    const ingredients = JSON.parse(savedIngredients);
+                    document.getElementById('ingredient1').value = ingredients[0] || '';
+                    document.getElementById('ingredient2').value = ingredients[1] || '';
+                    document.getElementById('ingredient3').value = ingredients[2] || '';
+                }
+                
+                if (savedDietary) {
+                    document.getElementById('dietary').value = savedDietary;
+                }
+                
+                updateIngredientsList();
+            }
+            
+            // Clear all ingredients
+            clearBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all ingredients?')) {
+                    document.getElementById('ingredient1').value = '';
+                    document.getElementById('ingredient2').value = '';
+                    document.getElementById('ingredient3').value = '';
+                    document.getElementById('dietary').value = 'none';
+                    document.getElementById('customIngredient').value = '';
+                    
+                    localStorage.removeItem('leftoverIngredients');
+                    localStorage.removeItem('leftoverDietary');
+                    localStorage.removeItem('customIngredients');
+                    
+                    updateIngredientsList();
+                    recipeContainer.innerHTML = '<p>Select ingredients and click "Suggest Recipe" to see a recipe suggestion</p>';
+                }
+            });
+            
+            // Suggest recipe button
+            suggestBtn.addEventListener('click', suggestRecipe);
+            
+            // Update ingredients list when selections change
+            document.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', updateIngredientsList);
+            });
+            
+            // Initialize
+            updateIngredientsList();
+        });
+    </script>
+</body>
+</html>
