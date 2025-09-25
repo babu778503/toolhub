@@ -1,0 +1,774 @@
+<!-- Category: Food Service -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drink Quantity Estimator</title>
+    <meta name="description" content="Estimate drink quantities for your event with our user-friendly tool. Perfect for event planners and hosts to determine beverage needs.">
+    <meta name="keywords" content="drink estimator, beverage calculator, event planning, drink calculator, beverage quantities, event drinks, drink planning, event beverage, drink portions, drink estimation">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile header */
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #3498db, #2980b9);
+                color: white;
+                font-size: 1.2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Desktop header */
+        @media (min-width: 769px) {
+            .header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #3498db, #2980b9);
+                color: white;
+                font-size: 2rem;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 50px);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .calculate-btn {
+            background: #3498db;
+            color: white;
+            flex: 0 0 auto;
+        }
+
+        .calculate-btn:hover {
+            background: #2980b9;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #219653;
+        }
+
+        .results-section {
+            padding: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .results-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+        }
+
+        .result-value {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: #ced4da;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .drink-type-section {
+            margin-top: 15px;
+        }
+
+        .drink-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .drink-type-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drink-type-item:hover {
+            border-color: #3498db;
+            background: #f0f8ff;
+        }
+
+        .drink-type-item.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+
+        .drink-type-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .history-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid #3498db;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .history-item-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .history-delete-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .history-load-btn {
+            background: #3498db;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .additional-info {
+            background: #e0f7fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .additional-info h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .additional-info ul {
+            padding-left: 20px;
+        }
+
+        .additional-info li {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .calculate-btn {
+                width: 100%;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .drink-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Drink Quantity Estimator</div>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="instructions">
+                    <h3>How to Use:</h3>
+                    <ul>
+                        <li>Enter the number of guests attending your event</li>
+                        <li>Select the event duration (in hours)</li>
+                        <li>Choose the drink type (water, soft drinks, alcoholic)</li>
+                        <li>Click "Calculate" to see the total drink quantities needed</li>
+                    </ul>
+                </div>
+                
+                <div class="input-group">
+                    <input type="number" id="guestCount" placeholder="Number of guests..." min="1">
+                    <select id="eventDuration">
+                        <option value="">Event Duration</option>
+                        <option value="2">2 hours</option>
+                        <option value="3">3 hours</option>
+                        <option value="4">4 hours</option>
+                        <option value="5">5 hours</option>
+                        <option value="6">6 hours</option>
+                        <option value="8">8 hours</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <select id="drinkType">
+                        <option value="">Select Drink Type</option>
+                        <option value="water">Water</option>
+                        <option value="soft">Soft Drinks</option>
+                        <option value="alcoholic">Alcoholic Beverages</option>
+                        <option value="mixed">Mixed Drinks</option>
+                    </select>
+                    <button class="calculate-btn" id="calculateBtn">Calculate</button>
+                </div>
+                
+                <div class="drink-type-section">
+                    <label>Select Drink Type:</label>
+                    <div class="drink-type-grid">
+                        <div class="drink-type-item" data-type="water">
+                            <div class="drink-type-icon">💧</div>
+                            <div>Water</div>
+                        </div>
+                        <div class="drink-type-item" data-type="soft">
+                            <div class="drink-type-icon">🥤</div>
+                            <div>Soft Drinks</div>
+                        </div>
+                        <div class="drink-type-item" data-type="alcoholic">
+                            <div class="drink-type-icon">🍺</div>
+                            <div>Alcoholic</div>
+                        </div>
+                        <div class="drink-type-item" data-type="mixed">
+                            <div class="drink-type-icon">🍹</div>
+                            <div>Mixed Drinks</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <button class="export-btn" id="exportBtn">Export Results</button>
+                    <button class="clear-btn" id="clearBtn">Clear All</button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="results-header">
+                    <h2>Estimation Results</h2>
+                    <div class="results-count">Total estimations: <span id="count">0</span></div>
+                </div>
+                
+                <div class="results-container">
+                    <div class="result-item">
+                        <span class="result-label">Guests:</span>
+                        <span class="result-value" id="result-guests">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Event Duration:</span>
+                        <span class="result-value" id="result-duration">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Drink Type:</span>
+                        <span class="result-value" id="result-type">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Drinks Per Guest:</span>
+                        <span class="result-value" id="result-per-guest">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Drinks Needed:</span>
+                        <span class="result-value" id="result-total">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Additional Buffer (15%):</span>
+                        <span class="result-value" id="result-buffer">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total to Prepare:</span>
+                        <span class="result-value" id="result-final">0</span>
+                    </div>
+                </div>
+                
+                <div class="additional-info">
+                    <h3>Drink Guidelines:</h3>
+                    <ul>
+                        <li><strong>Water:</strong> 2-3 glasses per person per hour</li>
+                        <li><strong>Soft Drinks:</strong> 1-2 drinks per person per hour</li>
+                        <li><strong>Alcoholic:</strong> 1-1.5 drinks per person per hour</li>
+                        <li><strong>Mixed Drinks:</strong> 1 drink per person per hour</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>Estimation History</h2>
+                </div>
+                
+                <ul class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const guestCountInput = document.getElementById('guestCount');
+            const eventDurationSelect = document.getElementById('eventDuration');
+            const drinkTypeSelect = document.getElementById('drinkType');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const countElement = document.getElementById('count');
+            const historyList = document.getElementById('historyList');
+            
+            // Drink type items
+            const drinkTypeItems = document.querySelectorAll('.drink-type-item');
+            
+            // Result elements
+            const resultGuests = document.getElementById('result-guests');
+            const resultDuration = document.getElementById('result-duration');
+            const resultType = document.getElementById('result-type');
+            const resultPerGuest = document.getElementById('result-per-guest');
+            const resultTotal = document.getElementById('result-total');
+            const resultBuffer = document.getElementById('result-buffer');
+            const resultFinal = document.getElementById('result-final');
+            
+            // Load estimation history from localStorage
+            let estimations = JSON.parse(localStorage.getItem('drinkEstimations')) || [];
+            
+            // Calculate drink quantities
+            function calculateDrinks() {
+                const guestCount = parseInt(guestCountInput.value);
+                const eventDuration = eventDurationSelect.value;
+                const drinkType = drinkTypeSelect.value;
+                
+                if (!guestCount || !eventDuration || !drinkType) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                // Determine drinks per guest based on event duration and drink type
+                let drinksPerGuest = 1;
+                if (eventDuration == 2) {
+                    if (drinkType === 'water') drinksPerGuest = 2;
+                    else if (drinkType === 'soft') drinksPerGuest = 1;
+                    else if (drinkType === 'alcoholic') drinksPerGuest = 1;
+                    else drinksPerGuest = 1;
+                } else if (eventDuration == 3) {
+                    if (drinkType === 'water') drinksPerGuest = 3;
+                    else if (drinkType === 'soft') drinksPerGuest = 2;
+                    else if (drinkType === 'alcoholic') drinksPerGuest = 1.5;
+                    else drinksPerGuest = 1.5;
+                } else if (eventDuration == 4) {
+                    if (drinkType === 'water') drinksPerGuest = 4;
+                    else if (drinkType === 'soft') drinksPerGuest = 3;
+                    else if (drinkType === 'alcoholic') drinksPerGuest = 2;
+                    else drinksPerGuest = 2;
+                } else if (eventDuration == 5) {
+                    if (drinkType === 'water') drinksPerGuest = 5;
+                    else if (drinkType === 'soft') drinksPerGuest = 4;
+                    else if (drinkType === 'alcoholic') drinksPerGuest = 2.5;
+                    else drinksPerGuest = 2.5;
+                } else if (eventDuration == 6) {
+                    if (drinkType === 'water') drinksPerGuest = 6;
+                    else if (drinkType === 'soft') drinksPerGuest = 5;
+                    else if (drinkType === 'alcoholic') drinksPerGuest = 3;
+                    else drinksPerGuest = 3;
+                } else if (eventDuration == 8) {
+                    if (drinkType === 'water') drinksPerGuest = 8;
+                    else if (drinkType === 'soft') drinksPerGuest = 6;
+                    else if (drinkType === 'alcoholic') drinksPerGuest = 4;
+                    else drinksPerGuest = 4;
+                }
+                
+                // Calculate total drinks needed
+                const totalDrinks = Math.ceil(guestCount * drinksPerGuest);
+                
+                // Add 15% buffer
+                const buffer = Math.ceil(totalDrinks * 0.15);
+                const finalTotal = totalDrinks + buffer;
+                
+                // Update results
+                resultGuests.textContent = guestCount;
+                resultDuration.textContent = eventDuration + ' hours';
+                resultType.textContent = drinkType.charAt(0).toUpperCase() + drinkType.slice(1);
+                resultPerGuest.textContent = drinksPerGuest;
+                resultTotal.textContent = totalDrinks;
+                resultBuffer.textContent = buffer;
+                resultFinal.textContent = finalTotal;
+                
+                // Save estimation to history
+                const estimation = {
+                    id: Date.now().toString(),
+                    guestCount,
+                    eventDuration,
+                    drinkType,
+                    drinksPerGuest,
+                    totalDrinks,
+                    buffer,
+                    finalTotal,
+                    timestamp: new Date().toISOString()
+                };
+                
+                estimations.push(estimation);
+                saveToLocalStorage();
+                
+                // Update count and history
+                countElement.textContent = estimations.length;
+                renderHistory();
+            }
+            
+            // Render estimation history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (estimations.length === 0) {
+                    historyList.innerHTML = `
+                        <li class="empty-state">
+                            <div>📊</div>
+                            <h3>No estimations yet</h3>
+                            <p>Perform estimations to see them here</p>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                // Show last 5 estimations
+                const recentEstimations = estimations.slice(-5).reverse();
+                
+                recentEstimations.forEach(est => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    
+                    const date = new Date(est.timestamp);
+                    const formattedDate = date.toLocaleString();
+                    
+                    li.innerHTML = `
+                        <div class="history-item-header">
+                            <strong>${est.guestCount} guests - ${est.drinkType.charAt(0).toUpperCase() + est.drinkType.slice(1)}</strong>
+                            <small>${formattedDate}</small>
+                        </div>
+                        <div class="history-item-details">
+                            <span>Duration: ${est.eventDuration}h</span>
+                            <span>Total: ${est.finalTotal}</span>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="history-load-btn" data-id="${est.id}">Load</button>
+                            <button class="history-delete-btn" data-id="${est.id}">Delete</button>
+                        </div>
+                    `;
+                    historyList.appendChild(li);
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-load-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        loadEstimation(id);
+                    });
+                });
+                
+                document.querySelectorAll('.history-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        deleteEstimation(id);
+                    });
+                });
+            }
+            
+            // Load a specific estimation
+            function loadEstimation(id) {
+                const est = estimations.find(e => e.id === id);
+                if (!est) return;
+                
+                guestCountInput.value = est.guestCount;
+                eventDurationSelect.value = est.eventDuration;
+                drinkTypeSelect.value = est.drinkType;
+                
+                resultGuests.textContent = est.guestCount;
+                resultDuration.textContent = est.eventDuration + ' hours';
+                resultType.textContent = est.drinkType.charAt(0).toUpperCase() + est.drinkType.slice(1);
+                resultPerGuest.textContent = est.drinksPerGuest;
+                resultTotal.textContent = est.totalDrinks;
+                resultBuffer.textContent = est.buffer;
+                resultFinal.textContent = est.finalTotal;
+            }
+            
+            // Delete a specific estimation
+            function deleteEstimation(id) {
+                if (confirm('Are you sure you want to delete this estimation?')) {
+                    estimations = estimations.filter(est => est.id !== id);
+                    saveToLocalStorage();
+                    countElement.textContent = estimations.length;
+                    renderHistory();
+                }
+            }
+            
+            // Export results as CSV
+            function exportResults() {
+                if (estimations.length === 0) {
+                    alert('No estimations to export!');
+                    return;
+                }
+                
+                let csvContent = "Guests,Duration,Drink Type,Drinks Per Guest,Total Drinks,Buffer,Total to Prepare,Date\n";
+                
+                estimations.forEach(est => {
+                    const date = new Date(est.timestamp).toLocaleString();
+                    csvContent += `"${est.guestCount}","${est.eventDuration}h","${est.drinkType}","${est.drinksPerGuest}","${est.totalDrinks}","${est.buffer}","${est.finalTotal}","${date}"\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'drink_estimations.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Clear all estimations
+            function clearAll() {
+                if (estimations.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear all estimations?')) {
+                    estimations = [];
+                    saveToLocalStorage();
+                    
+                    // Clear inputs
+                    guestCountInput.value = '';
+                    eventDurationSelect.value = '';
+                    drinkTypeSelect.value = '';
+                    
+                    // Clear results
+                    resultGuests.textContent = '0';
+                    resultDuration.textContent = '-';
+                    resultType.textContent = '-';
+                    resultPerGuest.textContent = '0';
+                    resultTotal.textContent = '0';
+                    resultBuffer.textContent = '0';
+                    resultFinal.textContent = '0';
+                    
+                    // Update count and history
+                    countElement.textContent = '0';
+                    renderHistory();
+                }
+            }
+            
+            // Save estimations to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('drinkEstimations', JSON.stringify(estimations));
+            }
+            
+            // Event Listeners
+            calculateBtn.addEventListener('click', calculateDrinks);
+            clearBtn.addEventListener('click', clearAll);
+            exportBtn.addEventListener('click', exportResults);
+            
+            guestCountInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateDrinks();
+            });
+            
+            // Drink type selection
+            drinkTypeItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove selected class from all items
+                    drinkTypeItems.forEach(i => i.classList.remove('selected'));
+                    
+                    // Add selected class to clicked item
+                    item.classList.add('selected');
+                    
+                    // Update drink type select
+                    const type = item.getAttribute('data-type');
+                    drinkTypeSelect.value = type;
+                });
+            });
+            
+            // Initial render
+            countElement.textContent = estimations.length;
+            renderHistory();
+        });
+    </script>
+</body>
+</html>

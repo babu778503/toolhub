@@ -1,0 +1,857 @@
+<!-- Category: Health & Wellness -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAC (Blood Alcohol) Estimator</title>
+    <meta name="description" content="Estimate your Blood Alcohol Content (BAC) with our user-friendly tool. Understand your alcohol levels and make informed decisions.">
+    <meta name="keywords" content="BAC calculator, blood alcohol content, alcohol estimator, BAC calculator, blood alcohol, alcohol levels, drinking calculator, alcohol measurement, BAC levels, alcohol safety">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile header */
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #8e44ad, #9b59b6);
+                color: white;
+                font-size: 1.2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Desktop header */
+        @media (min-width: 769px) {
+            .header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #8e44ad, #9b59b6);
+                color: white;
+                font-size: 2rem;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 50px);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #8e44ad;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .calculate-btn {
+            background: #8e44ad;
+            color: white;
+            flex: 0 0 auto;
+        }
+
+        .calculate-btn:hover {
+            background: #7d3c98;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .export-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #2980b9;
+        }
+
+        .results-section {
+            padding: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .results-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+        }
+
+        .result-value {
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: #ced4da;
+        }
+
+        .instructions {
+            background: #f3e5f5;
+            border-left: 4px solid #8e44ad;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            color: #8e44ad;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .drink-type-section {
+            margin-top: 15px;
+        }
+
+        .drink-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .drink-type-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drink-type-item:hover {
+            border-color: #8e44ad;
+            background: #f3e5f5;
+        }
+
+        .drink-type-item.selected {
+            border-color: #8e44ad;
+            background: #f3e5f5;
+        }
+
+        .drink-type-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .bac-info {
+            background: #fff3e0;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .bac-info h3 {
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        .bac-info ul {
+            padding-left: 20px;
+        }
+
+        .bac-info li {
+            margin-bottom: 8px;
+        }
+
+        .bac-levels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+
+        .bac-level {
+            text-align: center;
+        }
+
+        .bac-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-top: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bac-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: #8e44ad;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .bac-status {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #8e44ad;
+        }
+
+        .history-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid #8e44ad;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .history-item-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .history-delete-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .history-load-btn {
+            background: #3498db;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .calculate-btn {
+                width: 100%;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .drink-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">BAC (Blood Alcohol) Estimator</div>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="instructions">
+                    <h3>How to Use:</h3>
+                    <ul>
+                        <li>Enter your weight and gender</li>
+                        <li>Specify the time since your first drink</li>
+                        <li>Enter the number of standard drinks consumed</li>
+                        <li>Click "Calculate BAC" to see your estimated BAC level</li>
+                    </ul>
+                </div>
+                
+                <div class="input-group">
+                    <input type="number" id="weight" placeholder="Weight (kg)" min="1">
+                    <select id="gender">
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <input type="number" id="hours" placeholder="Hours Since First Drink" min="0" step="0.1">
+                    <input type="number" id="drinks" placeholder="Number of Standard Drinks" min="0" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <button class="calculate-btn" id="calculateBtn">Calculate BAC</button>
+                </div>
+                
+                <div class="drink-type-section">
+                    <label>Quick Drink Types:</label>
+                    <div class="drink-type-grid">
+                        <div class="drink-type-item" data-drinks="1">
+                            <div class="drink-type-icon">🍺</div>
+                            <div>Beer (1 drink)</div>
+                        </div>
+                        <div class="drink-type-item" data-drinks="1">
+                            <div class="drink-type-icon">🍷</div>
+                            <div>Wine (1 drink)</div>
+                        </div>
+                        <div class="drink-type-item" data-drinks="1">
+                            <div class="drink-type-icon">🥃</div>
+                            <div>Spirit (1 drink)</div>
+                        </div>
+                        <div class="drink-type-item" data-drinks="2">
+                            <div class="drink-type-icon">🍺</div>
+                            <div>Beer (2 drinks)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <button class="export-btn" id="exportBtn">Export Results</button>
+                    <button class="clear-btn" id="clearBtn">Clear All</button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="results-header">
+                    <h2>Estimation Results</h2>
+                    <div class="results-count">Total estimations: <span id="count">0</span></div>
+                </div>
+                
+                <div class="results-container">
+                    <div class="result-item">
+                        <span class="result-label">Weight:</span>
+                        <span class="result-value" id="result-weight">0 kg</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Gender:</span>
+                        <span class="result-value" id="result-gender">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Time Elapsed:</span>
+                        <span class="result-value" id="result-hours">0 hours</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Drinks Consumed:</span>
+                        <span class="result-value" id="result-drinks">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Estimated BAC:</span>
+                        <span class="result-value" id="result-bac">0.00%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Legal Limit Status:</span>
+                        <span class="result-value" id="result-status">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Impairment Level:</span>
+                        <span class="result-value" id="result-impairment">-</span>
+                    </div>
+                </div>
+                
+                <div class="bac-bar">
+                    <div class="bac-indicator" id="bacIndicator"></div>
+                </div>
+                <div class="bac-status" id="bacStatus">No consumption recorded</div>
+                
+                <div class="bac-levels">
+                    <div class="bac-level">0.00</div>
+                    <div class="bac-level">0.05</div>
+                    <div class="bac-level">0.08</div>
+                    <div class="bac-level">0.15</div>
+                    <div class="bac-level">0.20</div>
+                </div>
+                
+                <div class="bac-info">
+                    <h3>BAC Level Information:</h3>
+                    <ul>
+                        <li>0.00-0.05%: Minimal impairment</li>
+                        <li>0.05-0.08%: Mild impairment, reduced coordination</li>
+                        <li>0.08-0.15%: Significant impairment, illegal to drive</li>
+                        <li>0.15-0.30%: Severe impairment, possible blackout</li>
+                        <li>0.30%+: Life-threatening, possible coma</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>Estimation History</h2>
+                </div>
+                
+                <ul class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const weightInput = document.getElementById('weight');
+            const genderSelect = document.getElementById('gender');
+            const hoursInput = document.getElementById('hours');
+            const drinksInput = document.getElementById('drinks');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const countElement = document.getElementById('count');
+            const historyList = document.getElementById('historyList');
+            
+            // Drink type items
+            const drinkTypeItems = document.querySelectorAll('.drink-type-item');
+            
+            // Result elements
+            const resultWeight = document.getElementById('result-weight');
+            const resultGender = document.getElementById('result-gender');
+            const resultHours = document.getElementById('result-hours');
+            const resultDrinks = document.getElementById('result-drinks');
+            const resultBac = document.getElementById('result-bac');
+            const resultStatus = document.getElementById('result-status');
+            const resultImpairment = document.getElementById('result-impairment');
+            
+            // BAC indicator
+            const bacIndicator = document.getElementById('bacIndicator');
+            const bacStatus = document.getElementById('bacStatus');
+            
+            // Load estimation history from localStorage
+            let estimations = JSON.parse(localStorage.getItem('bacEstimations')) || [];
+            
+            // Calculate BAC
+            function calculateBAC() {
+                const weight = parseFloat(weightInput.value);
+                const gender = genderSelect.value;
+                const hours = parseFloat(hoursInput.value);
+                const drinks = parseFloat(drinksInput.value);
+                
+                if (!weight || !gender || !hours || !drinks) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                // Calculate BAC using Widmark formula
+                // BAC = (alcohol in grams / (body weight in grams * r)) * 100 - (metabolism rate * hours)
+                // r = 0.68 for men, 0.55 for women
+                // 1 standard drink = 14g alcohol
+                // Metabolism rate = 0.015% per hour
+                
+                const r = gender === 'male' ? 0.68 : 0.55;
+                const alcoholGrams = drinks * 14;
+                const weightGrams = weight * 1000;
+                
+                let bac = (alcoholGrams / (weightGrams * r)) * 100;
+                bac = Math.max(0, bac - (0.015 * hours));
+                
+                // Ensure BAC doesn't go below 0
+                bac = Math.max(0, bac);
+                
+                // Determine status based on BAC
+                let status = '';
+                let impairment = '';
+                let bacStatusText = '';
+                
+                if (bac <= 0.02) {
+                    status = 'Safe to Drive';
+                    impairment = 'None';
+                    bacStatusText = 'Sober';
+                } else if (bac <= 0.05) {
+                    status = 'Caution';
+                    impairment = 'Mild';
+                    bacStatusText = 'Mildly Impaired';
+                } else if (bac <= 0.08) {
+                    status = 'Over Legal Limit';
+                    impairment = 'Moderate';
+                    bacStatusText = 'Impaired';
+                } else if (bac <= 0.15) {
+                    status = 'Highly Impaired';
+                    impairment = 'Severe';
+                    bacStatusText = 'Highly Impaired';
+                } else {
+                    status = 'Dangerous';
+                    impairment = 'Extreme';
+                    bacStatusText = 'Severely Impaired';
+                }
+                
+                // Update results
+                resultWeight.textContent = weight + ' kg';
+                resultGender.textContent = gender.charAt(0).toUpperCase() + gender.slice(1);
+                resultHours.textContent = hours + ' hours';
+                resultDrinks.textContent = drinks;
+                resultBac.textContent = bac.toFixed(3) + '%';
+                resultStatus.textContent = status;
+                resultImpairment.textContent = impairment;
+                
+                // Update BAC indicator
+                const widthPercentage = Math.min(bac * 500, 100); // Scale 0.20 to 100%
+                bacIndicator.style.width = widthPercentage + '%';
+                bacStatus.textContent = bacStatusText;
+                
+                // Save estimation to history
+                const estimation = {
+                    id: Date.now().toString(),
+                    weight,
+                    gender,
+                    hours,
+                    drinks,
+                    bac: bac.toFixed(3),
+                    status,
+                    impairment,
+                    timestamp: new Date().toISOString()
+                };
+                
+                estimations.push(estimation);
+                saveToLocalStorage();
+                
+                // Update count and history
+                countElement.textContent = estimations.length;
+                renderHistory();
+            }
+            
+            // Render estimation history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (estimations.length === 0) {
+                    historyList.innerHTML = `
+                        <li class="empty-state">
+                            <div>📊</div>
+                            <h3>No estimations yet</h3>
+                            <p>Perform estimations to see them here</p>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                // Show last 5 estimations
+                const recentEstimations = estimations.slice(-5).reverse();
+                
+                recentEstimations.forEach(est => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    
+                    const date = new Date(est.timestamp);
+                    const formattedDate = date.toLocaleString();
+                    
+                    li.innerHTML = `
+                        <div class="history-item-header">
+                            <strong>${est.weight}kg - ${est.gender}</strong>
+                            <small>${formattedDate}</small>
+                        </div>
+                        <div class="history-item-details">
+                            <span>BAC: ${est.bac}%</span>
+                            <span>Drinks: ${est.drinks}</span>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="history-load-btn" data-id="${est.id}">Load</button>
+                            <button class="history-delete-btn" data-id="${est.id}">Delete</button>
+                        </div>
+                    `;
+                    historyList.appendChild(li);
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-load-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        loadEstimation(id);
+                    });
+                });
+                
+                document.querySelectorAll('.history-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        deleteEstimation(id);
+                    });
+                });
+            }
+            
+            // Load a specific estimation
+            function loadEstimation(id) {
+                const est = estimations.find(e => e.id === id);
+                if (!est) return;
+                
+                weightInput.value = est.weight;
+                genderSelect.value = est.gender;
+                hoursInput.value = est.hours;
+                drinksInput.value = est.drinks;
+                
+                resultWeight.textContent = est.weight + ' kg';
+                resultGender.textContent = est.gender.charAt(0).toUpperCase() + est.gender.slice(1);
+                resultHours.textContent = est.hours + ' hours';
+                resultDrinks.textContent = est.drinks;
+                resultBac.textContent = est.bac + '%';
+                resultStatus.textContent = est.status;
+                resultImpairment.textContent = est.impairment;
+                
+                // Update BAC indicator
+                const widthPercentage = Math.min(parseFloat(est.bac) * 500, 100);
+                bacIndicator.style.width = widthPercentage + '%';
+                bacStatus.textContent = est.impairment === 'None' ? 'Sober' : est.impairment + ' Impaired';
+            }
+            
+            // Delete a specific estimation
+            function deleteEstimation(id) {
+                if (confirm('Are you sure you want to delete this estimation?')) {
+                    estimations = estimations.filter(est => est.id !== id);
+                    saveToLocalStorage();
+                    countElement.textContent = estimations.length;
+                    renderHistory();
+                    
+                    // Reset BAC indicator if no estimations left
+                    if (estimations.length === 0) {
+                        bacIndicator.style.width = '0%';
+                        bacStatus.textContent = 'No consumption recorded';
+                    }
+                }
+            }
+            
+            // Export results as CSV
+            function exportResults() {
+                if (estimations.length === 0) {
+                    alert('No estimations to export!');
+                    return;
+                }
+                
+                let csvContent = "Weight (kg),Gender,Hours,Drinks,BAC (%),Status,Impairment,Date\n";
+                
+                estimations.forEach(est => {
+                    const date = new Date(est.timestamp).toLocaleString();
+                    csvContent += `"${est.weight}","${est.gender}","${est.hours}","${est.drinks}","${est.bac}","${est.status}","${est.impairment}","${date}"\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'bac_estimations.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Clear all estimations
+            function clearAll() {
+                if (estimations.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear all estimations?')) {
+                    estimations = [];
+                    saveToLocalStorage();
+                    
+                    // Clear inputs
+                    weightInput.value = '';
+                    genderSelect.value = '';
+                    hoursInput.value = '';
+                    drinksInput.value = '';
+                    
+                    // Clear results
+                    resultWeight.textContent = '0 kg';
+                    resultGender.textContent = '-';
+                    resultHours.textContent = '0 hours';
+                    resultDrinks.textContent = '0';
+                    resultBac.textContent = '0.00%';
+                    resultStatus.textContent = '-';
+                    resultImpairment.textContent = '-';
+                    
+                    // Clear BAC indicator
+                    bacIndicator.style.width = '0%';
+                    bacStatus.textContent = 'No consumption recorded';
+                    
+                    // Update count and history
+                    countElement.textContent = '0';
+                    renderHistory();
+                }
+            }
+            
+            // Save estimations to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('bacEstimations', JSON.stringify(estimations));
+            }
+            
+            // Event Listeners
+            calculateBtn.addEventListener('click', calculateBAC);
+            clearBtn.addEventListener('click', clearAll);
+            exportBtn.addEventListener('click', exportResults);
+            
+            weightInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateBAC();
+            });
+            
+            hoursInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateBAC();
+            });
+            
+            drinksInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateBAC();
+            });
+            
+            // Drink type selection
+            drinkTypeItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove selected class from all items
+                    drinkTypeItems.forEach(i => i.classList.remove('selected'));
+                    
+                    // Add selected class to clicked item
+                    item.classList.add('selected');
+                    
+                    // Update drinks input
+                    const drinks = item.getAttribute('data-drinks');
+                    drinksInput.value = drinks;
+                });
+            });
+            
+            // Initial render
+            countElement.textContent = estimations.length;
+            renderHistory();
+        });
+    </script>
+</body>
+</html>

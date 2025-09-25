@@ -1,0 +1,787 @@
+<!-- Category: Health & Wellness -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alcohol Unit Calculator</title>
+    <meta name="description" content="Calculate alcohol units with our user-friendly tool. Perfect for tracking your alcohol consumption and making informed choices.">
+    <meta name="keywords" content="alcohol calculator, alcohol units, drink calculator, alcohol consumption, alcohol tracking, unit calculator, alcohol measurement, drink units, alcohol health, alcohol guidelines">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile header */
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #e74c3c, #c0392b);
+                color: white;
+                font-size: 1.2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Desktop header */
+        @media (min-width: 769px) {
+            .header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #e74c3c, #c0392b);
+                color: white;
+                font-size: 2rem;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 50px);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .calculate-btn {
+            background: #e74c3c;
+            color: white;
+            flex: 0 0 auto;
+        }
+
+        .calculate-btn:hover {
+            background: #c0392b;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .export-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #2980b9;
+        }
+
+        .results-section {
+            padding: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .results-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+        }
+
+        .result-value {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: #ced4da;
+        }
+
+        .instructions {
+            background: #ffebee;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .drink-type-section {
+            margin-top: 15px;
+        }
+
+        .drink-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .drink-type-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drink-type-item:hover {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+        .drink-type-item.selected {
+            border-color: #e74c3c;
+            background: #ffebee;
+        }
+
+        .drink-type-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .unit-info {
+            background: #fff3e0;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .unit-info h3 {
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        .unit-info ul {
+            padding-left: 20px;
+        }
+
+        .unit-info li {
+            margin-bottom: 8px;
+        }
+
+        .history-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .history-item-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .history-delete-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .history-load-btn {
+            background: #3498db;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #e74c3c;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .calculate-btn {
+                width: 100%;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .drink-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Alcohol Unit Calculator</div>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="instructions">
+                    <h3>How to Use:</h3>
+                    <ul>
+                        <li>Enter the volume of your drink (in ml)</li>
+                        <li>Select the alcohol percentage (ABV)</li>
+                        <li>Click "Calculate" to see the alcohol units</li>
+                    </ul>
+                </div>
+                
+                <div class="input-group">
+                    <input type="number" id="drinkVolume" placeholder="Drink Volume (ml)" min="1">
+                    <input type="number" id="alcoholPercentage" placeholder="Alcohol % (ABV)" min="0" max="100" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <button class="calculate-btn" id="calculateBtn">Calculate Units</button>
+                </div>
+                
+                <div class="drink-type-section">
+                    <label>Quick Drink Types:</label>
+                    <div class="drink-type-grid">
+                        <div class="drink-type-item" data-volume="250" data-abv="4.5">
+                            <div class="drink-type-icon">🍺</div>
+                            <div>Beer (250ml)</div>
+                        </div>
+                        <div class="drink-type-item" data-volume="175" data-abv="12.5">
+                            <div class="drink-type-icon">🍷</div>
+                            <div>Wine (175ml)</div>
+                        </div>
+                        <div class="drink-type-item" data-volume="35" data-abv="40">
+                            <div class="drink-type-icon">🥃</div>
+                            <div>Spirit (35ml)</div>
+                        </div>
+                        <div class="drink-type-item" data-volume="500" data-abv="5.5">
+                            <div class="drink-type-icon">🍺</div>
+                            <div>Beer (500ml)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <button class="export-btn" id="exportBtn">Export Results</button>
+                    <button class="clear-btn" id="clearBtn">Clear All</button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="results-header">
+                    <h2>Calculation Results</h2>
+                    <div class="results-count">Total calculations: <span id="count">0</span></div>
+                </div>
+                
+                <div class="results-container">
+                    <div class="result-item">
+                        <span class="result-label">Drink Volume:</span>
+                        <span class="result-value" id="result-volume">0 ml</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Alcohol Percentage:</span>
+                        <span class="result-value" id="result-abv">0%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Alcohol Units:</span>
+                        <span class="result-value" id="result-units">0.0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Daily Limit Status:</span>
+                        <span class="result-value" id="result-status">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Risk Level:</span>
+                        <span class="result-value" id="result-risk">-</span>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">Daily consumption: 0 units</div>
+                
+                <div class="unit-info">
+                    <h3>Alcohol Unit Information:</h3>
+                    <ul>
+                        <li>1 unit = 10ml of pure alcohol</li>
+                        <li>Recommended daily limit: 2-3 units for men, 1-2 units for women</li>
+                        <li>Weekly limit: 14 units for both men and women</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>Calculation History</h2>
+                </div>
+                
+                <ul class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const drinkVolumeInput = document.getElementById('drinkVolume');
+            const alcoholPercentageInput = document.getElementById('alcoholPercentage');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const countElement = document.getElementById('count');
+            const historyList = document.getElementById('historyList');
+            
+            // Drink type items
+            const drinkTypeItems = document.querySelectorAll('.drink-type-item');
+            
+            // Result elements
+            const resultVolume = document.getElementById('result-volume');
+            const resultAbv = document.getElementById('result-abv');
+            const resultUnits = document.getElementById('result-units');
+            const resultStatus = document.getElementById('result-status');
+            const resultRisk = document.getElementById('result-risk');
+            
+            // Progress elements
+            const progressBar = document.getElementById('progressBar');
+            const progressLabel = document.getElementById('progressLabel');
+            
+            // Load calculation history from localStorage
+            let calculations = JSON.parse(localStorage.getItem('alcoholCalculations')) || [];
+            
+            // Calculate total units for progress
+            function calculateTotalUnits() {
+                return calculations.reduce((total, calc) => total + parseFloat(calc.units), 0);
+            }
+            
+            // Update progress bar
+            function updateProgress() {
+                const totalUnits = calculateTotalUnits();
+                const maxDaily = 3; // Max for men, adjust as needed
+                const percentage = Math.min((totalUnits / maxDaily) * 100, 100);
+                
+                progressBar.style.width = `${percentage}%`;
+                progressLabel.textContent = `Daily consumption: ${totalUnits.toFixed(2)} units`;
+                
+                // Update progress bar color based on risk
+                if (percentage <= 66) {
+                    progressBar.style.background = '#2ecc71'; // Green
+                } else if (percentage <= 100) {
+                    progressBar.style.background = '#f39c12'; // Orange
+                } else {
+                    progressBar.style.background = '#e74c3c'; // Red
+                }
+            }
+            
+            // Calculate alcohol units
+            function calculateUnits() {
+                const volume = parseFloat(drinkVolumeInput.value);
+                const abv = parseFloat(alcoholPercentageInput.value);
+                
+                if (!volume || !abv) {
+                    alert('Please fill in both fields');
+                    return;
+                }
+                
+                // Calculate units: (volume in ml * abv) / 1000
+                const units = (volume * abv) / 1000;
+                
+                // Determine status based on units
+                let status = '';
+                let risk = '';
+                
+                if (units <= 1) {
+                    status = 'Low Risk';
+                    risk = 'Low';
+                } else if (units <= 2) {
+                    status = 'Moderate Risk';
+                    risk = 'Moderate';
+                } else if (units <= 3) {
+                    status = 'High Risk';
+                    risk = 'High';
+                } else {
+                    status = 'Very High Risk';
+                    risk = 'Very High';
+                }
+                
+                // Update results
+                resultVolume.textContent = volume + ' ml';
+                resultAbv.textContent = abv + '%';
+                resultUnits.textContent = units.toFixed(2);
+                resultStatus.textContent = status;
+                resultRisk.textContent = risk;
+                
+                // Save calculation to history
+                const calculation = {
+                    id: Date.now().toString(),
+                    volume,
+                    abv,
+                    units: units.toFixed(2),
+                    status,
+                    risk,
+                    timestamp: new Date().toISOString()
+                };
+                
+                calculations.push(calculation);
+                saveToLocalStorage();
+                
+                // Update count and history
+                countElement.textContent = calculations.length;
+                renderHistory();
+                
+                // Update progress
+                updateProgress();
+            }
+            
+            // Render calculation history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (calculations.length === 0) {
+                    historyList.innerHTML = `
+                        <li class="empty-state">
+                            <div>📊</div>
+                            <h3>No calculations yet</h3>
+                            <p>Perform calculations to see them here</p>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                // Show last 5 calculations
+                const recentCalculations = calculations.slice(-5).reverse();
+                
+                recentCalculations.forEach(calc => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    
+                    const date = new Date(calc.timestamp);
+                    const formattedDate = date.toLocaleString();
+                    
+                    li.innerHTML = `
+                        <div class="history-item-header">
+                            <strong>${calc.volume}ml - ${calc.abv}% ABV</strong>
+                            <small>${formattedDate}</small>
+                        </div>
+                        <div class="history-item-details">
+                            <span>Units: ${calc.units}</span>
+                            <span>Risk: ${calc.risk}</span>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="history-load-btn" data-id="${calc.id}">Load</button>
+                            <button class="history-delete-btn" data-id="${calc.id}">Delete</button>
+                        </div>
+                    `;
+                    historyList.appendChild(li);
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-load-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        loadCalculation(id);
+                    });
+                });
+                
+                document.querySelectorAll('.history-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        deleteCalculation(id);
+                    });
+                });
+            }
+            
+            // Load a specific calculation
+            function loadCalculation(id) {
+                const calc = calculations.find(c => c.id === id);
+                if (!calc) return;
+                
+                drinkVolumeInput.value = calc.volume;
+                alcoholPercentageInput.value = calc.abv;
+                
+                resultVolume.textContent = calc.volume + ' ml';
+                resultAbv.textContent = calc.abv + '%';
+                resultUnits.textContent = calc.units;
+                resultStatus.textContent = calc.status;
+                resultRisk.textContent = calc.risk;
+                
+                updateProgress();
+            }
+            
+            // Delete a specific calculation
+            function deleteCalculation(id) {
+                if (confirm('Are you sure you want to delete this calculation?')) {
+                    calculations = calculations.filter(calc => calc.id !== id);
+                    saveToLocalStorage();
+                    countElement.textContent = calculations.length;
+                    renderHistory();
+                    updateProgress();
+                }
+            }
+            
+            // Export results as CSV
+            function exportResults() {
+                if (calculations.length === 0) {
+                    alert('No calculations to export!');
+                    return;
+                }
+                
+                let csvContent = "Volume (ml),ABV (%),Units,Status,Risk,Date\n";
+                
+                calculations.forEach(calc => {
+                    const date = new Date(calc.timestamp).toLocaleString();
+                    csvContent += `"${calc.volume}","${calc.abv}","${calc.units}","${calc.status}","${calc.risk}","${date}"\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'alcohol_calculations.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Clear all calculations
+            function clearAll() {
+                if (calculations.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear all calculations?')) {
+                    calculations = [];
+                    saveToLocalStorage();
+                    
+                    // Clear inputs
+                    drinkVolumeInput.value = '';
+                    alcoholPercentageInput.value = '';
+                    
+                    // Clear results
+                    resultVolume.textContent = '0 ml';
+                    resultAbv.textContent = '0%';
+                    resultUnits.textContent = '0.0';
+                    resultStatus.textContent = '-';
+                    resultRisk.textContent = '-';
+                    
+                    // Update count and history
+                    countElement.textContent = '0';
+                    renderHistory();
+                    
+                    // Update progress
+                    updateProgress();
+                }
+            }
+            
+            // Save calculations to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('alcoholCalculations', JSON.stringify(calculations));
+            }
+            
+            // Event Listeners
+            calculateBtn.addEventListener('click', calculateUnits);
+            clearBtn.addEventListener('click', clearAll);
+            exportBtn.addEventListener('click', exportResults);
+            
+            drinkVolumeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateUnits();
+            });
+            
+            alcoholPercentageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateUnits();
+            });
+            
+            // Drink type selection
+            drinkTypeItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove selected class from all items
+                    drinkTypeItems.forEach(i => i.classList.remove('selected'));
+                    
+                    // Add selected class to clicked item
+                    item.classList.add('selected');
+                    
+                    // Update inputs
+                    const volume = item.getAttribute('data-volume');
+                    const abv = item.getAttribute('data-abv');
+                    
+                    drinkVolumeInput.value = volume;
+                    alcoholPercentageInput.value = abv;
+                });
+            });
+            
+            // Initial render
+            countElement.textContent = calculations.length;
+            renderHistory();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!-- Category: Social Events -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Guest List Maker</title>
+    <meta name="description" content="Create and manage your party guest lists with our user-friendly tool. Organize, track RSVPs, and plan your perfect event.">
+    <meta name="keywords" content="party guest list, guest list maker, event planning, party planning, rsvp tracker, guest management, event organizer, party invitations, guest count">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile header */
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #ff6b6b, #ffa502);
+                color: white;
+                font-size: 1.2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Desktop header */
+        @media (min-width: 769px) {
+            .header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #ff6b6b, #ffa502);
+                color: white;
+                font-size: 2rem;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 50px);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input, select {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .add-btn {
+            background: #ff6b6b;
+            color: white;
+            flex: 0 0 auto;
+        }
+
+        .add-btn:hover {
+            background: #ff5252;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .export-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #2980b9;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .filter-btn {
+            background: #e0e0e0;
+            color: #333;
+            padding: 8px 12px;
+        }
+
+        .filter-btn.active {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .items-section {
+            padding: 20px;
+        }
+
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .items-count {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
+
+        .item-contact {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .item-status {
+            font-size: 0.85rem;
+            color: #495057;
+            margin-top: 4px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-btn, .delete-btn, .rsvp-yes-btn, .rsvp-no-btn, .rsvp-maybe-btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .rsvp-yes-btn {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .rsvp-no-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .rsvp-maybe-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: #ced4da;
+        }
+
+        .stats-section {
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #ff6b6b;
+        }
+
+        .stat-label {
+            color: #6c757d;
+        }
+
+        .rsvp-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .rsvp-yes {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .rsvp-no {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .rsvp-maybe {
+            background: #f39c12;
+            color: white;
+        }
+
+        .rsvp-pending {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+            
+            .filters {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .item-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 12px;
+            }
+            
+            .items-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .stats-section {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Party Guest List Maker</div>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" id="guestName" placeholder="Enter guest name...">
+                    <input type="text" id="guestContact" placeholder="Phone/Email (optional)">
+                </div>
+                <div class="input-group">
+                    <select id="guestCategory">
+                        <option value="">Select Category</option>
+                        <option value="Family">Family</option>
+                        <option value="Friends">Friends</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <button class="add-btn" id="addGuestBtn">Add to List</button>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search guests...">
+                    <button class="export-btn" id="exportBtn">Export List</button>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All Guests</button>
+                    <button class="filter-btn" data-filter="Family">Family</button>
+                    <button class="filter-btn" data-filter="Friends">Friends</button>
+                    <button class="filter-btn" data-filter="Work">Work</button>
+                    <button class="filter-btn" data-filter="Other">Other</button>
+                    <button class="filter-btn" data-filter="confirmed">Confirmed</button>
+                    <button class="filter-btn" data-filter="maybe">Maybe</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn clear-btn" id="clearAllBtn">Clear All</button>
+                </div>
+            </div>
+            
+            <div class="items-section">
+                <div class="items-header">
+                    <h2>Your Guest List</h2>
+                    <div class="items-count">Total guests: <span id="count">0</span></div>
+                </div>
+                
+                <ul class="item-list" id="guestList">
+                    <!-- Guests will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <div class="stats-section">
+                <div class="stat">
+                    <div class="stat-value" id="confirmed-count">0</div>
+                    <div class="stat-label">Confirmed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="maybe-count">0</div>
+                    <div class="stat-label">Maybe</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="pending-count">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="family-count">0</div>
+                    <div class="stat-label">Family</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const guestNameInput = document.getElementById('guestName');
+            const guestContactInput = document.getElementById('guestContact');
+            const guestCategorySelect = document.getElementById('guestCategory');
+            const addGuestBtn = document.getElementById('addGuestBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const guestList = document.getElementById('guestList');
+            const countElement = document.getElementById('count');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const searchInput = document.getElementById('searchInput');
+            
+            // Stats elements
+            const confirmedCount = document.getElementById('confirmed-count');
+            const maybeCount = document.getElementById('maybe-count');
+            const pendingCount = document.getElementById('pending-count');
+            const familyCount = document.getElementById('family-count');
+            
+            // Current filter state
+            let currentFilter = 'all';
+            let currentSearch = '';
+            
+            // Load guests from localStorage on page load
+            let guests = JSON.parse(localStorage.getItem('partyGuestList')) || [];
+            
+            // Render guests based on current filter and search
+            function renderGuests() {
+                guestList.innerHTML = '';
+                
+                // Filter guests based on search
+                let filteredGuests = guests;
+                if (currentSearch) {
+                    const searchLower = currentSearch.toLowerCase();
+                    filteredGuests = filteredGuests.filter(guest => 
+                        guest.name.toLowerCase().includes(searchLower) || 
+                        guest.contact.toLowerCase().includes(searchLower)
+                    );
+                }
+                
+                // Apply category/filter
+                switch(currentFilter) {
+                    case 'confirmed':
+                        filteredGuests = filteredGuests.filter(guest => guest.rsvp === 'yes');
+                        break;
+                    case 'maybe':
+                        filteredGuests = filteredGuests.filter(guest => guest.rsvp === 'maybe');
+                        break;
+                    case 'pending':
+                        filteredGuests = filteredGuests.filter(guest => guest.rsvp === 'pending');
+                        break;
+                    case 'all':
+                        break;
+                    default:
+                        filteredGuests = filteredGuests.filter(guest => guest.category === currentFilter);
+                }
+                
+                if (filteredGuests.length === 0) {
+                    guestList.innerHTML = `
+                        <div class="empty-state">
+                            <div>🎉</div>
+                            <h3>No guests in your list</h3>
+                            <p>Add some guests to get started!</p>
+                        </div>
+                    `;
+                } else {
+                    filteredGuests.forEach((guest, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'item';
+                        
+                        let statusClass = 'rsvp-pending';
+                        let statusText = 'Pending';
+                        if (guest.rsvp === 'yes') {
+                            statusClass = 'rsvp-yes';
+                            statusText = 'Confirmed';
+                        } else if (guest.rsvp === 'no') {
+                            statusClass = 'rsvp-no';
+                            statusText = 'Declined';
+                        } else if (guest.rsvp === 'maybe') {
+                            statusClass = 'rsvp-maybe';
+                            statusText = 'Maybe';
+                        }
+                        
+                        li.innerHTML = `
+                            <div class="item-info">
+                                <div class="item-name">${guest.name}</div>
+                                <div class="item-contact">${guest.contact || 'No contact info'}</div>
+                                <div class="item-status">
+                                    <span class="rsvp-status ${statusClass}">${statusText}</span> | ${guest.category}
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="rsvp-yes-btn" data-id="${guest.id}" data-status="yes">✓</button>
+                                <button class="rsvp-maybe-btn" data-id="${guest.id}" data-status="maybe">?</button>
+                                <button class="rsvp-no-btn" data-id="${guest.id}" data-status="no">✕</button>
+                                <button class="edit-btn" data-id="${guest.id}">Edit</button>
+                                <button class="delete-btn" data-id="${guest.id}">Delete</button>
+                            </div>
+                        `;
+                        guestList.appendChild(li);
+                    });
+                    
+                    // Add event listeners to edit, delete, and RSVP buttons
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            editGuest(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            deleteGuest(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.rsvp-yes-btn, .rsvp-no-btn, .rsvp-maybe-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            const status = e.target.getAttribute('data-status');
+                            updateRSVP(id, status);
+                        });
+                    });
+                }
+                
+                // Update guest count
+                countElement.textContent = guests.length;
+                
+                // Update stats
+                updateStats();
+            }
+            
+            // Update statistics
+            function updateStats() {
+                const confirmed = guests.filter(guest => guest.rsvp === 'yes').length;
+                const maybe = guests.filter(guest => guest.rsvp === 'maybe').length;
+                const pending = guests.filter(guest => guest.rsvp === 'pending').length;
+                const family = guests.filter(guest => guest.category === 'Family').length;
+                
+                confirmedCount.textContent = confirmed;
+                maybeCount.textContent = maybe;
+                pendingCount.textContent = pending;
+                familyCount.textContent = family;
+            }
+            
+            // Add new guest to the list
+            function addGuest() {
+                const name = guestNameInput.value.trim();
+                const contact = guestContactInput.value.trim();
+                const category = guestCategorySelect.value;
+                
+                if (!name) {
+                    alert('Please enter a guest name');
+                    return;
+                }
+                
+                const newGuest = {
+                    id: Date.now().toString(),
+                    name,
+                    contact: contact || '',
+                    category: category || 'Other',
+                    rsvp: 'pending',
+                    dateAdded: new Date().toISOString()
+                };
+                
+                guests.push(newGuest);
+                saveToLocalStorage();
+                renderGuests();
+                
+                // Clear inputs
+                guestNameInput.value = '';
+                guestContactInput.value = '';
+                guestCategorySelect.value = '';
+                guestNameInput.focus();
+            }
+            
+            // Edit an existing guest
+            function editGuest(id) {
+                const guest = guests.find(guest => guest.id === id);
+                if (!guest) return;
+                
+                guestNameInput.value = guest.name;
+                guestContactInput.value = guest.contact;
+                guestCategorySelect.value = guest.category;
+                
+                // Remove the guest from the list
+                guests = guests.filter(guest => guest.id !== id);
+                
+                saveToLocalStorage();
+                renderGuests();
+            }
+            
+            // Delete a guest
+            function deleteGuest(id) {
+                if (confirm('Are you sure you want to remove this guest from your list?')) {
+                    guests = guests.filter(guest => guest.id !== id);
+                    saveToLocalStorage();
+                    renderGuests();
+                }
+            }
+            
+            // Update RSVP status
+            function updateRSVP(id, status) {
+                const guest = guests.find(guest => guest.id === id);
+                if (!guest) return;
+                
+                guest.rsvp = status;
+                saveToLocalStorage();
+                renderGuests();
+            }
+            
+            // Clear all guests
+            function clearAllGuests() {
+                if (guests.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear your entire guest list? This cannot be undone.')) {
+                    guests = [];
+                    saveToLocalStorage();
+                    renderGuests();
+                }
+            }
+            
+            // Export guest list
+            function exportGuestList() {
+                if (guests.length === 0) {
+                    alert('Your guest list is empty!');
+                    return;
+                }
+                
+                let csvContent = "Name,Contact,Category,Rsvp Status\n";
+                
+                guests.forEach(guest => {
+                    csvContent += `"${guest.name}","${guest.contact}","${guest.category}","${guest.rsvp}"\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'party_guest_list.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Save guests to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('partyGuestList', JSON.stringify(guests));
+            }
+            
+            // Set filter
+            function setFilter(filter) {
+                currentFilter = filter;
+                
+                // Update active button
+                filterButtons.forEach(btn => {
+                    if (btn.getAttribute('data-filter') === filter) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                renderGuests();
+            }
+            
+            // Event Listeners
+            addGuestBtn.addEventListener('click', addGuest);
+            
+            clearAllBtn.addEventListener('click', clearAllGuests);
+            
+            exportBtn.addEventListener('click', exportGuestList);
+            
+            guestNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addGuest();
+            });
+            
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.getAttribute('data-filter');
+                    setFilter(filter);
+                });
+            });
+            
+            searchInput.addEventListener('input', (e) => {
+                currentSearch = e.target.value;
+                renderGuests();
+            });
+            
+            // Initial render
+            renderGuests();
+        });
+    </script>
+</body>
+</html>

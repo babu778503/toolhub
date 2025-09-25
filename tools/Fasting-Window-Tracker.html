@@ -1,0 +1,804 @@
+<!-- Category: Health & Wellness -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fasting Window Tracker</title>
+    <meta name="description" content="Track your fasting windows with our user-friendly tool. Perfect for monitoring intermittent fasting progress and consistency.">
+    <meta name="keywords" content="fasting tracker, fasting window, intermittent fasting, IF tracker, fasting schedule, fasting progress, fasting app, IF window, fasting monitor, fasting log, intermittent fasting tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile header */
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #3498db, #2980b9);
+                color: white;
+                font-size: 1.2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Desktop header */
+        @media (min-width: 769px) {
+            .header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #3498db, #2980b9);
+                color: white;
+                font-size: 2rem;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 50px);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .add-btn {
+            background: #3498db;
+            color: white;
+            flex: 0 0 auto;
+        }
+
+        .add-btn:hover {
+            background: #2980b9;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #219653;
+        }
+
+        .results-section {
+            padding: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .window-list {
+            list-style: none;
+        }
+
+        .window-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s;
+        }
+
+        .window-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .window-info {
+            flex: 1;
+        }
+
+        .window-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+
+        .window-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .window-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-btn, .delete-btn, .complete-btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .complete-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: #ced4da;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .stats-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .history-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid #3498db;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .history-item-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .history-delete-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .history-load-btn {
+            background: #3498db;
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .window-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .window-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Fasting Window Tracker</div>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="instructions">
+                    <h3>How to Use:</h3>
+                    <ul>
+                        <li>Enter your fasting window details</li>
+                        <li>Click "Add Window" to track your fasting period</li>
+                        <li>View your fasting history and progress</li>
+                        <li>Monitor your consistency over time</li>
+                    </ul>
+                </div>
+                
+                <div class="input-group">
+                    <select id="fastingMethod">
+                        <option value="">Select Fasting Method</option>
+                        <option value="16:8">16:8 (16 hours fast, 8 hours eat)</option>
+                        <option value="18:6">18:6 (18 hours fast, 6 hours eat)</option>
+                        <option value="20:4">20:4 (20 hours fast, 4 hours eat)</option>
+                        <option value="24:24">24:24 (24 hours fast, 24 hours eat)</option>
+                        <option value="5:2">5:2 (5 days normal, 2 days restricted)</option>
+                    </select>
+                    <input type="date" id="startDate">
+                </div>
+                
+                <div class="input-group">
+                    <input type="time" id="startTime" placeholder="Start Time">
+                    <input type="time" id="endTime" placeholder="End Time">
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="notes" placeholder="Notes (optional)">
+                    <button class="add-btn" id="addBtn">Add Window</button>
+                </div>
+                
+                <div class="input-group">
+                    <button class="export-btn" id="exportBtn">Export Data</button>
+                    <button class="clear-btn" id="clearBtn">Clear All</button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="results-header">
+                    <h2>Fasting Windows</h2>
+                    <div class="results-count">Windows tracked: <span id="count">0</span></div>
+                </div>
+                
+                <ul class="window-list" id="windowList">
+                    <!-- Windows will be added here dynamically -->
+                </ul>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">Fasting progress: 0%</div>
+                
+                <div class="stats-section">
+                    <div class="stat">
+                        <div class="stat-value" id="totalDays">0</div>
+                        <div class="stat-label">Total Days</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="completedWindows">0</div>
+                        <div class="stat-label">Windows Completed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="avgDuration">0h</div>
+                        <div class="stat-label">Avg Duration</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="consistency">0%</div>
+                        <div class="stat-label">Consistency</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>Recent History</h2>
+                </div>
+                
+                <ul class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const fastingMethodSelect = document.getElementById('fastingMethod');
+            const startDateInput = document.getElementById('startDate');
+            const startTimeInput = document.getElementById('startTime');
+            const endTimeInput = document.getElementById('endTime');
+            const notesInput = document.getElementById('notes');
+            const addBtn = document.getElementById('addBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const countElement = document.getElementById('count');
+            const windowList = document.getElementById('windowList');
+            const historyList = document.getElementById('historyList');
+            
+            // Stats elements
+            const totalDaysElement = document.getElementById('totalDays');
+            const completedWindowsElement = document.getElementById('completedWindows');
+            const avgDurationElement = document.getElementById('avgDuration');
+            const consistencyElement = document.getElementById('consistency');
+            
+            // Progress elements
+            const progressBar = document.getElementById('progressBar');
+            const progressLabel = document.getElementById('progressLabel');
+            
+            // Load windows from localStorage
+            let windows = JSON.parse(localStorage.getItem('fastingWindows')) || [];
+            
+            // Add fasting window
+            function addWindow() {
+                const method = fastingMethodSelect.value;
+                const startDate = startDateInput.value;
+                const startTime = startTimeInput.value;
+                const endTime = endTimeInput.value;
+                const notes = notesInput.value;
+                
+                if (!method || !startDate || !startTime || !endTime) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Calculate duration in hours
+                const startDateTime = new Date(`${startDate}T${startTime}`);
+                const endDateTime = new Date(`${startDate}T${endTime}`);
+                
+                // If end time is before start time, assume it's next day
+                if (endDateTime < startDateTime) {
+                    endDateTime.setDate(endDateTime.getDate() + 1);
+                }
+                
+                const durationMs = endDateTime - startDateTime;
+                const durationHours = durationMs / (1000 * 60 * 60);
+                
+                const window = {
+                    id: Date.now().toString(),
+                    method,
+                    startDate,
+                    startTime,
+                    endTime,
+                    duration: durationHours,
+                    notes: notes || '',
+                    completed: false,
+                    timestamp: new Date().toISOString()
+                };
+                
+                windows.push(window);
+                saveToLocalStorage();
+                renderWindows();
+                renderHistory();
+                updateStats();
+                
+                // Clear inputs
+                fastingMethodSelect.value = '';
+                startDateInput.value = '';
+                startTimeInput.value = '';
+                endTimeInput.value = '';
+                notesInput.value = '';
+            }
+            
+            // Render windows
+            function renderWindows() {
+                windowList.innerHTML = '';
+                
+                if (windows.length === 0) {
+                    windowList.innerHTML = `
+                        <li class="empty-state">
+                            <div>⏱️</div>
+                            <h3>No fasting windows yet</h3>
+                            <p>Add your first fasting window to get started</p>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                windows.forEach(window => {
+                    const li = document.createElement('li');
+                    li.className = 'window-item';
+                    
+                    const startDateTime = new Date(`${window.startDate}T${window.startTime}`);
+                    const formattedDate = startDateTime.toLocaleDateString();
+                    
+                    li.innerHTML = `
+                        <div class="window-info">
+                            <div class="window-title">${window.method} - ${formattedDate}</div>
+                            <div class="window-details">
+                                ${window.startTime} - ${window.endTime} | ${window.duration.toFixed(1)}h
+                                ${window.notes ? `| ${window.notes}` : ''}
+                                ${window.completed ? ' | ✅ Completed' : ' | ⏳ Active'}
+                            </div>
+                        </div>
+                        <div class="window-actions">
+                            <button class="complete-btn" data-id="${window.id}">${window.completed ? 'Undo' : 'Complete'}</button>
+                            <button class="edit-btn" data-id="${window.id}">Edit</button>
+                            <button class="delete-btn" data-id="${window.id}">Delete</button>
+                        </div>
+                    `;
+                    windowList.appendChild(li);
+                });
+                
+                // Add event listeners to buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        editWindow(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        deleteWindow(id);
+                    });
+                });
+                
+                document.querySelectorAll('.complete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        toggleCompleteWindow(id);
+                    });
+                });
+            }
+            
+            // Render history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (windows.length === 0) {
+                    historyList.innerHTML = `
+                        <li class="empty-state">
+                            <div>📊</div>
+                            <h3>No history yet</h3>
+                            <p>Track fasting windows to see history</p>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                // Show last 5 entries
+                const recentWindows = windows.slice(-5).reverse();
+                
+                recentWindows.forEach(window => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    
+                    const startDateTime = new Date(`${window.startDate}T${window.startTime}`);
+                    const formattedDate = startDateTime.toLocaleDateString();
+                    
+                    li.innerHTML = `
+                        <div class="history-item-header">
+                            <strong>${window.method} - ${formattedDate}</strong>
+                            <small>${window.duration.toFixed(1)}h</small>
+                        </div>
+                        <div class="history-item-details">
+                            <span>${window.startTime} - ${window.endTime}</span>
+                            <span>${window.completed ? 'Completed' : 'Active'}</span>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="history-delete-btn" data-id="${window.id}">Delete</button>
+                        </div>
+                    `;
+                    historyList.appendChild(li);
+                });
+                
+                // Add event listeners to history buttons
+                document.querySelectorAll('.history-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        deleteWindow(id);
+                    });
+                });
+            }
+            
+            // Toggle window completion
+            function toggleCompleteWindow(id) {
+                const window = windows.find(w => w.id === id);
+                if (!window) return;
+                
+                window.completed = !window.completed;
+                saveToLocalStorage();
+                renderWindows();
+                renderHistory();
+                updateStats();
+            }
+            
+            // Edit window
+            function editWindow(id) {
+                const window = windows.find(w => w.id === id);
+                if (!window) return;
+                
+                fastingMethodSelect.value = window.method;
+                startDateInput.value = window.startDate;
+                startTimeInput.value = window.startTime;
+                endTimeInput.value = window.endTime;
+                notesInput.value = window.notes;
+                
+                // Remove the window from the list
+                windows = windows.filter(w => w.id !== id);
+                saveToLocalStorage();
+                renderWindows();
+                renderHistory();
+                updateStats();
+            }
+            
+            // Delete window
+            function deleteWindow(id) {
+                if (confirm('Are you sure you want to delete this fasting window?')) {
+                    windows = windows.filter(window => window.id !== id);
+                    saveToLocalStorage();
+                    renderWindows();
+                    renderHistory();
+                    updateStats();
+                }
+            }
+            
+            // Update statistics
+            function updateStats() {
+                const totalWindows = windows.length;
+                const completedWindows = windows.filter(w => w.completed).length;
+                const totalDays = [...new Set(windows.map(w => w.startDate))].length;
+                const totalDuration = windows.reduce((sum, w) => sum + w.duration, 0);
+                const avgDuration = totalWindows > 0 ? totalDuration / totalWindows : 0;
+                const consistency = totalDays > 0 ? Math.round((totalWindows / totalDays) * 100) : 0;
+                
+                countElement.textContent = totalWindows;
+                totalDaysElement.textContent = totalDays;
+                completedWindowsElement.textContent = completedWindows;
+                avgDurationElement.textContent = avgDuration.toFixed(1) + 'h';
+                consistencyElement.textContent = consistency + '%';
+                
+                // Update progress bar
+                const progress = consistency;
+                progressBar.style.width = progress + '%';
+                progressLabel.textContent = `Fasting consistency: ${progress}%`;
+            }
+            
+            // Export data as CSV
+            function exportData() {
+                if (windows.length === 0) {
+                    alert('No data to export!');
+                    return;
+                }
+                
+                let csvContent = "Method,Start Date,Start Time,End Time,Duration,Notes,Completed,Date Added\n";
+                
+                windows.forEach(window => {
+                    const dateAdded = new Date(window.timestamp).toLocaleString();
+                    csvContent += `"${window.method}","${window.startDate}","${window.startTime}","${window.endTime}","${window.duration}","${window.notes}","${window.completed ? 'Yes' : 'No'}","${dateAdded}"\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'fasting_windows.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Clear all windows
+            function clearAll() {
+                if (windows.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear all fasting windows?')) {
+                    windows = [];
+                    saveToLocalStorage();
+                    renderWindows();
+                    renderHistory();
+                    updateStats();
+                }
+            }
+            
+            // Save windows to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('fastingWindows', JSON.stringify(windows));
+            }
+            
+            // Event Listeners
+            addBtn.addEventListener('click', addWindow);
+            clearBtn.addEventListener('click', clearAll);
+            exportBtn.addEventListener('click', exportData);
+            
+            startDateInput.addEventListener('change', () => {
+                if (!startTimeInput.value) {
+                    const now = new Date();
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    startTimeInput.value = `${hours}:${minutes}`;
+                }
+            });
+            
+            // Initial render
+            renderWindows();
+            renderHistory();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

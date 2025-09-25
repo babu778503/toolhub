@@ -1,0 +1,606 @@
+<!-- Category: Environment -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wish List Manager</title>
+    <meta name="description" content="Manage your wish lists efficiently with our user-friendly tool. Save, organize, and track your desired items across all devices.">
+    <meta name="keywords" content="wish list, wish list manager, item tracker, shopping list, personal organizer, task manager, to-do list">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile header */
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                font-size: 1.2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Desktop header */
+        @media (min-width: 769px) {
+            .header {
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(to right, #4b6cb7, #182848);
+                color: white;
+                font-size: 2rem;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 50px);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input, select {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4b6cb7;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .add-btn {
+            background: #4b6cb7;
+            color: white;
+            flex: 0 0 auto;
+        }
+
+        .add-btn:hover {
+            background: #3a5795;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .filter-btn {
+            background: #e0e0e0;
+            color: #333;
+            padding: 8px 12px;
+        }
+
+        .filter-btn.active {
+            background: #4b6cb7;
+            color: white;
+        }
+
+        .items-section {
+            padding: 20px;
+        }
+
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .items-count {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4b6cb7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
+
+        .item-category {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .item-comment {
+            font-size: 0.85rem;
+            color: #495057;
+            margin-top: 4px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-btn, .delete-btn, .move-up-btn, .move-down-btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .move-up-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .move-down-btn {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: #ced4da;
+        }
+
+        .stats-section {
+            padding: 15px 20px;
+            background: #e9ecef;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #4b6cb7;
+        }
+
+        .stat-label {
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+            
+            .filters {
+                justify-content: center;
+            }
+            
+            .item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .item-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 12px;
+            }
+            
+            .items-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .stats-section {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Wish List Manager</div>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" id="itemName" placeholder="Enter item name...">
+                    <select id="itemCategory">
+                        <option value="">Select Category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Books">Books</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Home">Home</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="itemComment" placeholder="Add a comment (optional)...">
+                    <button class="add-btn" id="addItemBtn">Add to List</button>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All Items</button>
+                    <button class="filter-btn" data-filter="Electronics">Electronics</button>
+                    <button class="filter-btn" data-filter="Books">Books</button>
+                    <button class="filter-btn" data-filter="Clothing">Clothing</button>
+                    <button class="filter-btn" data-filter="Home">Home</button>
+                    <button class="filter-btn" data-filter="Other">Other</button>
+                    <button class="filter-btn clear-btn" id="clearAllBtn">Clear All</button>
+                </div>
+            </div>
+            
+            <div class="items-section">
+                <div class="items-header">
+                    <h2>Your Wish List</h2>
+                    <div class="items-count">Total items: <span id="count">0</span></div>
+                </div>
+                
+                <ul class="item-list" id="itemList">
+                    <!-- Items will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <div class="stats-section">
+                <div class="stat">
+                    <div class="stat-value" id="electronics-count">0</div>
+                    <div class="stat-label">Electronics</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="books-count">0</div>
+                    <div class="stat-label">Books</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="clothing-count">0</div>
+                    <div class="stat-label">Clothing</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="home-count">0</div>
+                    <div class="stat-label">Home</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const itemNameInput = document.getElementById('itemName');
+            const itemCategorySelect = document.getElementById('itemCategory');
+            const itemCommentInput = document.getElementById('itemComment');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+            const itemList = document.getElementById('itemList');
+            const countElement = document.getElementById('count');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            // Stats elements
+            const electronicsCount = document.getElementById('electronics-count');
+            const booksCount = document.getElementById('books-count');
+            const clothingCount = document.getElementById('clothing-count');
+            const homeCount = document.getElementById('home-count');
+            
+            // Current filter state
+            let currentFilter = 'all';
+            
+            // Load items from localStorage on page load
+            let items = JSON.parse(localStorage.getItem('wishListItems')) || [];
+            
+            // Render items based on current filter
+            function renderItems() {
+                itemList.innerHTML = '';
+                
+                const filteredItems = currentFilter === 'all' 
+                    ? items 
+                    : items.filter(item => item.category === currentFilter);
+                
+                if (filteredItems.length === 0) {
+                    itemList.innerHTML = `
+                        <div class="empty-state">
+                            <div>📋</div>
+                            <h3>No items in your wish list</h3>
+                            <p>Add some items to get started!</p>
+                        </div>
+                    `;
+                } else {
+                    filteredItems.forEach((item, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'item';
+                        li.innerHTML = `
+                            <div class="item-info">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-category">${item.category}</div>
+                                ${item.comment ? `<div class="item-comment">${item.comment}</div>` : ''}
+                            </div>
+                            <div class="item-actions">
+                                <button class="move-up-btn" data-id="${item.id}" ${index === 0 ? 'disabled' : ''}>↑</button>
+                                <button class="move-down-btn" data-id="${item.id}" ${index === filteredItems.length - 1 ? 'disabled' : ''}>↓</button>
+                                <button class="edit-btn" data-id="${item.id}">Edit</button>
+                                <button class="delete-btn" data-id="${item.id}">Delete</button>
+                            </div>
+                        `;
+                        itemList.appendChild(li);
+                    });
+                    
+                    // Add event listeners to edit, delete, move up, and move down buttons
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            editItem(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            deleteItem(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.move-up-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            moveItem(id, 'up');
+                        });
+                    });
+                    
+                    document.querySelectorAll('.move-down-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            moveItem(id, 'down');
+                        });
+                    });
+                }
+                
+                // Update item count
+                countElement.textContent = items.length;
+                
+                // Update stats
+                updateStats();
+            }
+            
+            // Update statistics
+            function updateStats() {
+                const electronics = items.filter(item => item.category === 'Electronics').length;
+                const books = items.filter(item => item.category === 'Books').length;
+                const clothing = items.filter(item => item.category === 'Clothing').length;
+                const home = items.filter(item => item.category === 'Home').length;
+                
+                electronicsCount.textContent = electronics;
+                booksCount.textContent = books;
+                clothingCount.textContent = clothing;
+                homeCount.textContent = home;
+            }
+            
+            // Add new item to the list
+            function addItem() {
+                const name = itemNameInput.value.trim();
+                const category = itemCategorySelect.value;
+                const comment = itemCommentInput.value.trim();
+                
+                if (!name) {
+                    alert('Please enter an item name');
+                    return;
+                }
+                
+                const newItem = {
+                    id: Date.now().toString(),
+                    name,
+                    category: category || 'Other',
+                    comment,
+                    dateAdded: new Date().toISOString()
+                };
+                
+                items.push(newItem);
+                saveToLocalStorage();
+                renderItems();
+                
+                // Clear inputs
+                itemNameInput.value = '';
+                itemCategorySelect.value = '';
+                itemCommentInput.value = '';
+                itemNameInput.focus();
+            }
+            
+            // Edit an existing item
+            function editItem(id) {
+                const item = items.find(item => item.id === id);
+                if (!item) return;
+                
+                itemNameInput.value = item.name;
+                itemCategorySelect.value = item.category;
+                itemCommentInput.value = item.comment || '';
+                
+                // Remove the item from the list
+                items = items.filter(item => item.id !== id);
+                
+                saveToLocalStorage();
+                renderItems();
+            }
+            
+            // Delete an item
+            function deleteItem(id) {
+                if (confirm('Are you sure you want to remove this item from your wish list?')) {
+                    items = items.filter(item => item.id !== id);
+                    saveToLocalStorage();
+                    renderItems();
+                }
+            }
+            
+            // Move item up or down in the list
+            function moveItem(id, direction) {
+                const index = items.findIndex(item => item.id === id);
+                if (index === -1) return;
+                
+                if (direction === 'up' && index > 0) {
+                    // Swap with previous item
+                    [items[index - 1], items[index]] = [items[index], items[index - 1]];
+                } else if (direction === 'down' && index < items.length - 1) {
+                    // Swap with next item
+                    [items[index], items[index + 1]] = [items[index + 1], items[index]];
+                }
+                
+                saveToLocalStorage();
+                renderItems();
+            }
+            
+            // Clear all items
+            function clearAllItems() {
+                if (items.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear your entire wish list? This cannot be undone.')) {
+                    items = [];
+                    saveToLocalStorage();
+                    renderItems();
+                }
+            }
+            
+            // Save items to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('wishListItems', JSON.stringify(items));
+            }
+            
+            // Set filter
+            function setFilter(filter) {
+                currentFilter = filter;
+                
+                // Update active button
+                filterButtons.forEach(btn => {
+                    if (btn.getAttribute('data-filter') === filter) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                renderItems();
+            }
+            
+            // Event Listeners
+            addItemBtn.addEventListener('click', addItem);
+            
+            clearAllBtn.addEventListener('click', clearAllItems);
+            
+            itemNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addItem();
+            });
+            
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.getAttribute('data-filter');
+                    setFilter(filter);
+                });
+            });
+            
+            // Initial render
+            renderItems();
+        });
+    </script>
+</body>
+</html>
