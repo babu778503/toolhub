@@ -1,0 +1,709 @@
+<!-- Category: Puzzles -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Solver Assistant</title>
+    <meta name="description" content="Get help solving puzzles with our Puzzle Solver Assistant. From crosswords to Sudoku, find solutions and strategies for your favorite puzzles.">
+    <meta name="keywords" content="puzzle solver, puzzle assistant, crossword solver, Sudoku solver, word puzzle, logic puzzle, puzzle hints, puzzle solutions">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 70px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding-top: 50px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            height: 70px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                padding: 10px 0;
+            }
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .input-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #ff8a00;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(218, 27, 96, 0.4);
+        }
+        
+        .solution-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .solution-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: #ff8a00;
+        }
+        
+        .solution-content {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            margin-top: 20px;
+        }
+        
+        .solution-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .solution-content ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        .solution-content li {
+            margin-bottom: 8px;
+        }
+        
+        .history-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .history-title {
+            margin-bottom: 20px;
+            color: #ff8a00;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .history-type {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .history-date {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.8);
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .clear-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .clear-btn {
+            background: rgba(220, 53, 69, 0.8);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .input-section, .solution-section, .history-section {
+                padding: 20px 15px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .history-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .notification {
+                top: 60px;
+                right: 10px;
+                left: 10px;
+            }
+        }
+        
+        .tools-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .tool-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .tool-card h3 {
+            color: #ff8a00;
+            margin-bottom: 15px;
+        }
+        
+        .tool-card p {
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .tool-card button {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Puzzle Solver Assistant</h1>
+    </div>
+    
+    <div class="notification" id="notification">
+        Solution generated successfully!
+    </div>
+    
+    <div class="container">
+        <div class="input-section">
+            <h2>Enter Your Puzzle</h2>
+            <div class="form-group">
+                <label for="puzzle-type">Puzzle Type</label>
+                <select id="puzzle-type">
+                    <option value="crossword">Crossword</option>
+                    <option value="sudoku">Sudoku</option>
+                    <option value="word-search">Word Search</option>
+                    <option value="riddle">Riddle</option>
+                    <option value="logic">Logic Puzzle</option>
+                    <option value="math">Math Puzzle</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="puzzle-description">Puzzle Description</label>
+                <textarea id="puzzle-description" placeholder="Describe your puzzle or enter the details..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="puzzle-hint">Hint (optional)</label>
+                <input type="text" id="puzzle-hint" placeholder="Any hints you have...">
+            </div>
+            <button id="solve-puzzle">Get Solution</button>
+        </div>
+        
+        <div class="solution-section">
+            <h2 class="solution-title">Puzzle Solution</h2>
+            <div id="solution-content" class="solution-content">
+                <p>Your solution will appear here after you submit a puzzle.</p>
+                <p>Select a puzzle type and describe your puzzle to get started.</p>
+            </div>
+        </div>
+        
+        <div class="history-section">
+            <h2 class="history-title">Puzzle History</h2>
+            <div id="history-container"></div>
+            <div class="clear-section">
+                <button id="clear-history" class="clear-btn">Clear History</button>
+            </div>
+        </div>
+        
+        <div class="tools-section">
+            <h2>Additional Puzzle Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Word Finder</h3>
+                    <p>Find words that match a specific pattern or contain certain letters</p>
+                    <input type="text" id="word-pattern" placeholder="Enter pattern (e.g. h?llo)">
+                    <button id="find-words">Find Words</button>
+                    <div id="word-results" style="margin-top: 10px;"></div>
+                </div>
+                <div class="tool-card">
+                    <h3>Number Sequence Solver</h3>
+                    <p>Solve number sequences and find the next number</p>
+                    <input type="text" id="number-sequence" placeholder="Enter sequence (e.g. 2,4,6,8)">
+                    <button id="solve-sequence">Solve Sequence</button>
+                    <div id="sequence-result" style="margin-top: 10px;"></div>
+                </div>
+                <div class="tool-card">
+                    <h3>Logic Puzzle Helper</h3>
+                    <p>Get hints for logic puzzles</p>
+                    <textarea id="logic-puzzle" placeholder="Describe the logic puzzle..."></textarea>
+                    <button id="get-logic-hint">Get Hint</button>
+                    <div id="logic-hint" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const puzzleTypeSelect = document.getElementById('puzzle-type');
+            const puzzleDescriptionInput = document.getElementById('puzzle-description');
+            const puzzleHintInput = document.getElementById('puzzle-hint');
+            const solvePuzzleBtn = document.getElementById('solve-puzzle');
+            const solutionContent = document.getElementById('solution-content');
+            const historyContainer = document.getElementById('history-container');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            const notification = document.getElementById('notification');
+            
+            // Additional tools
+            const wordPatternInput = document.getElementById('word-pattern');
+            const findWordsBtn = document.getElementById('find-words');
+            const wordResults = document.getElementById('word-results');
+            const numberSequenceInput = document.getElementById('number-sequence');
+            const solveSequenceBtn = document.getElementById('solve-sequence');
+            const sequenceResult = document.getElementById('sequence-result');
+            const logicPuzzleInput = document.getElementById('logic-puzzle');
+            const getLogicHintBtn = document.getElementById('get-logic-hint');
+            const logicHint = document.getElementById('logic-hint');
+            
+            // Load puzzle history from localStorage
+            let puzzleHistory = JSON.parse(localStorage.getItem('puzzleHistory')) || [];
+            
+            // Initialize the app
+            renderHistoryList();
+            
+            // Solve puzzle event
+            solvePuzzleBtn.addEventListener('click', function() {
+                const type = puzzleTypeSelect.value;
+                const description = puzzleDescriptionInput.value.trim();
+                
+                if (!description) {
+                    alert('Please enter a puzzle description');
+                    return;
+                }
+                
+                const solution = generateSolution(type, description);
+                
+                // Display solution
+                solutionContent.innerHTML = solution;
+                
+                // Add to history
+                const historyItem = {
+                    id: Date.now(),
+                    type: type,
+                    description: description,
+                    solution: solution,
+                    date: new Date().toISOString()
+                };
+                
+                puzzleHistory.unshift(historyItem);
+                saveHistory();
+                renderHistoryList();
+                
+                // Show notification
+                showNotification('Solution generated successfully!');
+            });
+            
+            // Clear history
+            clearHistoryBtn.addEventListener('click', function() {
+                if (puzzleHistory.length === 0) {
+                    alert('No history to clear');
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to clear all puzzle history?')) {
+                    puzzleHistory = [];
+                    saveHistory();
+                    renderHistoryList();
+                    showNotification('History cleared!');
+                }
+            });
+            
+            // Word finder
+            findWordsBtn.addEventListener('click', function() {
+                const pattern = wordPatternInput.value.trim();
+                if (!pattern) {
+                    wordResults.innerHTML = '<p style="color: #ff8a00;">Please enter a pattern</p>';
+                    return;
+                }
+                
+                // Simple pattern matching (for demonstration)
+                const words = ['hello', 'world', 'puzzle', 'solver', 'assistant', 'help', 'find', 'pattern'];
+                const results = words.filter(word => {
+                    if (pattern.includes('?')) {
+                        // Simple pattern matching with ? as wildcard
+                        const regex = new RegExp('^' + pattern.replace(/\?/g, '.') + '$', 'i');
+                        return regex.test(word);
+                    } else {
+                        return word.toLowerCase().includes(pattern.toLowerCase());
+                    }
+                });
+                
+                wordResults.innerHTML = `
+                    <p style="color: #ff8a00;">Found ${results.length} word(s):</p>
+                    <ul>${results.map(word => `<li>${word}</li>`).join('')}</ul>
+                `;
+            });
+            
+            // Number sequence solver
+            solveSequenceBtn.addEventListener('click', function() {
+                const sequence = numberSequenceInput.value.trim();
+                if (!sequence) {
+                    sequenceResult.innerHTML = '<p style="color: #ff8a00;">Please enter a sequence</p>';
+                    return;
+                }
+                
+                // Parse sequence
+                const numbers = sequence.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+                
+                if (numbers.length < 2) {
+                    sequenceResult.innerHTML = '<p style="color: #ff8a00;">Please enter at least 2 numbers</p>';
+                    return;
+                }
+                
+                // Simple pattern detection
+                let nextNumber = 'Unknown';
+                let pattern = 'Unknown';
+                
+                // Check for arithmetic sequence
+                const diff = numbers[1] - numbers[0];
+                const isArithmetic = numbers.every((num, i) => i === 0 || num - numbers[i-1] === diff);
+                
+                if (isArithmetic) {
+                    nextNumber = numbers[numbers.length - 1] + diff;
+                    pattern = `Arithmetic (add ${diff})`;
+                } else {
+                    // Check for geometric sequence
+                    if (numbers[0] !== 0) {
+                        const ratio = numbers[1] / numbers[0];
+                        const isGeometric = numbers.every((num, i) => i === 0 || Math.abs((num / numbers[i-1]) - ratio) < 0.001);
+                        
+                        if (isGeometric) {
+                            nextNumber = numbers[numbers.length - 1] * ratio;
+                            pattern = `Geometric (multiply by ${ratio})`;
+                        }
+                    }
+                }
+                
+                sequenceResult.innerHTML = `
+                    <p style="color: #ff8a00;">Pattern: ${pattern}</p>
+                    <p>Next number: ${nextNumber}</p>
+                `;
+            });
+            
+            // Logic puzzle helper
+            getLogicHintBtn.addEventListener('click', function() {
+                const puzzle = logicPuzzleInput.value.trim();
+                if (!puzzle) {
+                    logicHint.innerHTML = '<p style="color: #ff8a00;">Please describe the logic puzzle</p>';
+                    return;
+                }
+                
+                // Generate a generic hint for logic puzzles
+                const hints = [
+                    "Try making a table or grid to visualize the relationships",
+                    "Look for statements that are definitively true or false",
+                    "Eliminate possibilities that contradict known facts",
+                    "Start with the most constrained elements first",
+                    "Look for unique characteristics that apply to only one item",
+                    "Use process of elimination to narrow down options"
+                ];
+                
+                const randomHint = hints[Math.floor(Math.random() * hints.length)];
+                
+                logicHint.innerHTML = `
+                    <p style="color: #ff8a00;">Hint:</p>
+                    <p>${randomHint}</p>
+                `;
+            });
+            
+            // Save history to localStorage
+            function saveHistory() {
+                localStorage.setItem('puzzleHistory', JSON.stringify(puzzleHistory));
+            }
+            
+            // Render history list
+            function renderHistoryList() {
+                historyContainer.innerHTML = '';
+                
+                if (puzzleHistory.length === 0) {
+                    historyContainer.innerHTML = '<p style="text-align: center; color: #aaa;">No puzzle history yet</p>';
+                    return;
+                }
+                
+                puzzleHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    
+                    const date = new Date(item.date).toLocaleString();
+                    
+                    historyItem.innerHTML = `
+                        <div class="history-header">
+                            <div class="history-type">${item.type.charAt(0).toUpperCase() + item.type.slice(1)} Puzzle</div>
+                            <div class="history-date">${date}</div>
+                        </div>
+                        <div class="history-description">
+                            <p><strong>Problem:</strong> ${item.description.substring(0, 60)}${item.description.length > 60 ? '...' : ''}</p>
+                        </div>
+                        <div class="history-actions">
+                            <button class="delete-btn" data-id="${item.id}">Delete</button>
+                        </div>
+                    `;
+                    
+                    historyContainer.appendChild(historyItem);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        puzzleHistory = puzzleHistory.filter(item => item.id !== id);
+                        saveHistory();
+                        renderHistoryList();
+                        showNotification('Puzzle removed from history!');
+                    });
+                });
+            }
+            
+            // Generate solution based on puzzle type
+            function generateSolution(type, description) {
+                switch(type) {
+                    case 'crossword':
+                        return `
+                            <p><strong>Crossword Solution:</strong></p>
+                            <p>For crosswords, try these strategies:</p>
+                            <ul>
+                                <li>Start with clues that have the most letters</li>
+                                <li>Look for common crossword words (like "ERA", "ERA", "ORE")</li>
+                                <li>Fill in the shorter words first</li>
+                                <li>Use the crossing letters to help solve intersecting clues</li>
+                            </ul>
+                            <p><strong>Hint for your clue:</strong> ${description}</p>
+                            <p>Consider common patterns and letter frequencies.</p>
+                        `;
+                        
+                    case 'sudoku':
+                        return `
+                            <p><strong>Sudoku Solution Strategy:</strong></p>
+                            <p>Follow these steps:</p>
+                            <ul>
+                                <li>Look for rows, columns, or 3x3 boxes with the most numbers filled in</li>
+                                <li>Use the process of elimination to determine possible numbers for each cell</li>
+                                <li>Look for "naked singles" (cells with only one possible number)</li>
+                                <li>Apply the "hidden single" technique</li>
+                            </ul>
+                            <p><strong>For your puzzle:</strong> Focus on the area with the most filled cells first.</p>
+                        `;
+                        
+                    case 'word-search':
+                        return `
+                            <p><strong>Word Search Strategy:</strong></p>
+                            <p>Here's how to approach word searches:</p>
+                            <ul>
+                                <li>Circle the words you find to avoid double-counting</li>
+                                <li>Look for the first letter of each word in the list</li>
+                                <li>Check all 8 directions (horizontal, vertical, diagonal)</li>
+                                <li>Words can be backwards too!</li>
+                            </ul>
+                            <p><strong>For your puzzle:</strong> Start with the longest words first, as they're easier to spot.</p>
+                        `;
+                        
+                    case 'riddle':
+                        return `
+                            <p><strong>Riddle Solution:</strong></p>
+                            <p>Riddles often use wordplay or metaphors. Consider:</p>
+                            <ul>
+                                <li>What the words literally mean</li>
+                                <li>What they might symbolically represent</li>
+                                <li>Common associations with the words used</li>
+                                <li>Double meanings or puns</li>
+                            </ul>
+                            <p><strong>Your riddle:</strong> ${description}</p>
+                            <p>Think outside the box and consider multiple meanings!</p>
+                        `;
+                        
+                    case 'logic':
+                        return `
+                            <p><strong>Logic Puzzle Strategy:</strong></p>
+                            <p>For logic puzzles:</p>
+                            <ul>
+                                <li>Create a grid to track possibilities</li>
+                                <li>Mark what's impossible with X</li>
+                                <li>Mark what's certain with O</li>
+                                <li>Use the process of elimination</li>
+                            </ul>
+                            <p><strong>For your puzzle:</strong> ${description}</p>
+                            <p>Start with the most definitive clues.</p>
+                        `;
+                        
+                    case 'math':
+                        return `
+                            <p><strong>Math Puzzle Solution:</strong></p>
+                            <p>For math puzzles:</p>
+                            <ul>
+                                <li>Identify the pattern or rule</li>
+                                <li>Look for arithmetic or geometric sequences</li>
+                                <li>Consider factors, multiples, or prime numbers</li>
+                                <li>Try working backwards from the answer</li>
+                            </ul>
+                            <p><strong>Your problem:</strong> ${description}</p>
+                            <p>Apply the appropriate mathematical operations.</p>
+                        `;
+                        
+                    default:
+                        return `
+                            <p><strong>Solution:</strong></p>
+                            <p>For your ${type} puzzle:</p>
+                            <p>${description}</p>
+                            <p>Consider the specific strategies for this puzzle type.</p>
+                        `;
+                }
+            }
+            
+            // Show notification
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

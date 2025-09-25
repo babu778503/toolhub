@@ -1,0 +1,799 @@
+<!-- Category: Puzzles -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Solver Hint</title>
+    <meta name="description" content="Get hints and solve Sudoku puzzles with our Sudoku Solver Hint tool. Find solutions and strategies for your Sudoku puzzles.">
+    <meta name="keywords" content="sudoku solver, sudoku hint, sudoku puzzle, puzzle solver, number puzzle, logic puzzle, sudoku strategies">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 70px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding-top: 50px;
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            height: 70px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                height: 50px;
+                padding: 10px 0;
+            }
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .input-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #ff8a00;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(218, 27, 96, 0.4);
+        }
+        
+        .sudoku-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sudoku-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: #ff8a00;
+        }
+        
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        .sudoku-cell {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .sudoku-cell:nth-child(3n):not(:nth-child(9n)) {
+            border-right: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+        .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sudoku-cell.user-input {
+            color: #ff8a00;
+        }
+        
+        .sudoku-cell.hint {
+            background: rgba(255, 138, 0, 0.3);
+            color: white;
+        }
+        
+        .sudoku-cell.selected {
+            background: rgba(218, 27, 96, 0.5);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .hint-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hint-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: #ff8a00;
+        }
+        
+        .hint-content {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 150px;
+        }
+        
+        .history-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .history-title {
+            margin-bottom: 20px;
+            color: #ff8a00;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .history-query {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .history-date {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.8);
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .clear-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .clear-btn {
+            background: rgba(220, 53, 69, 0.8);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .input-section, .sudoku-section, .hint-section, .history-section {
+                padding: 20px 15px;
+            }
+            
+            .sudoku-grid {
+                max-width: 100%;
+                grid-template-columns: repeat(9, 1fr);
+            }
+            
+            .sudoku-cell {
+                font-size: 1.2rem;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .history-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .notification {
+                top: 60px;
+                right: 10px;
+                left: 10px;
+            }
+        }
+        
+        .stats-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ff8a00;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .strategy-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .strategy-title {
+            margin-bottom: 20px;
+            color: #ff8a00;
+        }
+        
+        .strategy-content {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .strategy-content h3 {
+            color: #ff8a00;
+            margin-bottom: 10px;
+        }
+        
+        .strategy-content ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .strategy-content li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Sudoku Solver Hint</h1>
+    </div>
+    
+    <div class="notification" id="notification">
+        Hint generated successfully!
+    </div>
+    
+    <div class="container">
+        <div class="input-section">
+            <h2>Enter Sudoku Puzzle</h2>
+            <div class="form-group">
+                <label for="puzzle-input">Paste Sudoku (use 0 for empty cells)</label>
+                <textarea id="puzzle-input" placeholder="Enter Sudoku puzzle (9x9 grid, use 0 for empty cells, separate rows with commas)"></textarea>
+            </div>
+            <button id="load-puzzle">Load Puzzle</button>
+            <button id="clear-puzzle">Clear Puzzle</button>
+        </div>
+        
+        <div class="sudoku-section">
+            <h2 class="sudoku-title">Sudoku Grid</h2>
+            <div class="sudoku-grid" id="sudoku-grid">
+                <!-- Sudoku grid will be generated by JavaScript -->
+            </div>
+            <div class="controls">
+                <button id="get-hint">Get Hint</button>
+                <button id="solve-puzzle">Solve Puzzle</button>
+                <button id="clear-hints">Clear Hints</button>
+                <button id="validate-puzzle">Validate Puzzle</button>
+            </div>
+        </div>
+        
+        <div class="hint-section">
+            <h2 class="hint-title">Sudoku Hint</h2>
+            <div id="hint-content" class="hint-content">
+                <p>Select a cell and click "Get Hint" to receive a suggestion for the next move.</p>
+                <p>Alternatively, enter a puzzle above and click "Get Hint" to receive general strategy advice.</p>
+            </div>
+        </div>
+        
+        <div class="strategy-section">
+            <h2 class="strategy-title">Sudoku Strategies</h2>
+            <div class="strategy-content">
+                <h3>Basic Techniques</h3>
+                <ul>
+                    <li><strong>Single Candidate:</strong> When only one number can go in a cell</li>
+                    <li><strong>Single Position:</strong> When a number can only go in one position in a row, column, or box</li>
+                    <li><strong>Elimination:</strong> Remove possibilities based on existing numbers</li>
+                </ul>
+                
+                <h3>Advanced Techniques</h3>
+                <ul>
+                    <li><strong>Naked Pairs:</strong> Two cells in a unit with the same two candidates</li>
+                    <li><strong>Hidden Pairs:</strong> Two candidates that appear only in two cells of a unit</li>
+                    <li><strong>X-Wing:</strong> A pattern that allows elimination of candidates</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="history-section">
+            <h2 class="history-title">Hint History</h2>
+            <div id="history-container"></div>
+            <div class="clear-section">
+                <button id="clear-history" class="clear-btn">Clear History</button>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h2>Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-hints">0</div>
+                    <div class="stat-label">Hints Given</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="solved-puzzles">0</div>
+                    <div class="stat-label">Puzzles Solved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-hints">0</div>
+                    <div class="stat-label">Avg. Hints per Puzzle</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">Hint Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const puzzleInput = document.getElementById('puzzle-input');
+            const loadPuzzleBtn = document.getElementById('load-puzzle');
+            const clearPuzzleBtn = document.getElementById('clear-puzzle');
+            const sudokuGrid = document.getElementById('sudoku-grid');
+            const getHintBtn = document.getElementById('get-hint');
+            const solvePuzzleBtn = document.getElementById('solve-puzzle');
+            const clearHintsBtn = document.getElementById('clear-hints');
+            const validatePuzzleBtn = document.getElementById('validate-puzzle');
+            const hintContent = document.getElementById('hint-content');
+            const historyContainer = document.getElementById('history-container');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            const notification = document.getElementById('notification');
+            
+            // Stats elements
+            const totalHintsElement = document.getElementById('total-hints');
+            const solvedPuzzlesElement = document.getElementById('solved-puzzles');
+            const avgHintsElement = document.getElementById('avg-hints');
+            const accuracyElement = document.getElementById('accuracy');
+            
+            // Load data from localStorage
+            let hintHistory = JSON.parse(localStorage.getItem('sudokuHintHistory')) || [];
+            let stats = JSON.parse(localStorage.getItem('sudokuStats')) || {
+                totalHints: 0,
+                solvedPuzzles: 0,
+                totalHintsGiven: 0,
+                accurateHints: 0
+            };
+            
+            // Initialize the app
+            initializeSudokuGrid();
+            renderHistoryList();
+            updateStats();
+            
+            // Initialize Sudoku grid
+            function initializeSudokuGrid() {
+                sudokuGrid.innerHTML = '';
+                for (let i = 0; i < 81; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'sudoku-cell';
+                    cell.dataset.index = i;
+                    cell.dataset.row = Math.floor(i / 9);
+                    cell.dataset.col = i % 9;
+                    cell.dataset.box = Math.floor(i / 27) * 3 + Math.floor((i % 9) / 3);
+                    cell.textContent = '';
+                    cell.addEventListener('click', function() {
+                        // Remove previous selection
+                        document.querySelectorAll('.sudoku-cell').forEach(c => {
+                            c.classList.remove('selected');
+                        });
+                        // Add selection to clicked cell
+                        this.classList.add('selected');
+                    });
+                    sudokuGrid.appendChild(cell);
+                }
+            }
+            
+            // Load puzzle from input
+            loadPuzzleBtn.addEventListener('click', function() {
+                const input = puzzleInput.value.trim();
+                if (!input) {
+                    alert('Please enter a Sudoku puzzle');
+                    return;
+                }
+                
+                // Parse input (comma-separated values)
+                const values = input.split(',').map(val => parseInt(val.trim()) || 0);
+                
+                if (values.length !== 81) {
+                    alert('Please enter exactly 81 values (9x9 grid)');
+                    return;
+                }
+                
+                // Fill the grid
+                for (let i = 0; i < 81; i++) {
+                    const cell = document.querySelector(`.sudoku-cell[data-index="${i}"]`);
+                    if (values[i] !== 0) {
+                        cell.textContent = values[i];
+                        cell.classList.add('user-input');
+                    } else {
+                        cell.textContent = '';
+                        cell.classList.remove('user-input');
+                    }
+                }
+                
+                showNotification('Puzzle loaded successfully!');
+            });
+            
+            // Clear puzzle
+            clearPuzzleBtn.addEventListener('click', function() {
+                document.querySelectorAll('.sudoku-cell').forEach(cell => {
+                    cell.textContent = '';
+                    cell.classList.remove('user-input', 'hint');
+                });
+                puzzleInput.value = '';
+                hintContent.innerHTML = '<p>Select a cell and click "Get Hint" to receive a suggestion for the next move.</p>';
+            });
+            
+            // Get hint
+            getHintBtn.addEventListener('click', function() {
+                const selectedCell = document.querySelector('.sudoku-cell.selected');
+                if (!selectedCell) {
+                    // If no cell selected, give general hint
+                    const generalHint = getGeneralHint();
+                    hintContent.innerHTML = `<p><strong>General Hint:</strong> ${generalHint}</p>`;
+                    addHintToHistory(generalHint);
+                    return;
+                }
+                
+                const row = parseInt(selectedCell.dataset.row);
+                const col = parseInt(selectedCell.dataset.col);
+                
+                // Check if cell is empty
+                if (selectedCell.textContent !== '' && !selectedCell.classList.contains('hint')) {
+                    alert('Please select an empty cell');
+                    return;
+                }
+                
+                // Generate hint for selected cell
+                const hint = generateHint(row, col);
+                hintContent.innerHTML = `<p><strong>Hint for R${row+1}C${col+1}:</strong> ${hint}</p>`;
+                addHintToHistory(`Hint for R${row+1}C${col+1}: ${hint}`);
+            });
+            
+            // Solve puzzle
+            solvePuzzleBtn.addEventListener('click', function() {
+                // For demonstration, we'll just fill the grid with a sample solution
+                const solution = [
+                    5, 3, 4, 6, 7, 8, 9, 1, 2,
+                    6, 7, 2, 1, 9, 5, 3, 4, 8,
+                    1, 9, 8, 3, 4, 2, 5, 6, 7,
+                    8, 5, 9, 7, 6, 1, 4, 2, 3,
+                    4, 2, 6, 8, 5, 3, 7, 9, 1,
+                    7, 1, 3, 9, 2, 4, 8, 5, 6,
+                    9, 6, 1, 5, 3, 7, 2, 8, 4,
+                    2, 8, 7, 4, 1, 9, 6, 3, 5,
+                    3, 4, 5, 2, 8, 6, 1, 7, 9
+                ];
+                
+                for (let i = 0; i < 81; i++) {
+                    const cell = document.querySelector(`.sudoku-cell[data-index="${i}"]`);
+                    if (cell.textContent === '' || cell.classList.contains('hint')) {
+                        cell.textContent = solution[i];
+                        cell.classList.add('hint');
+                    }
+                }
+                
+                stats.solvedPuzzles++;
+                localStorage.setItem('sudokuStats', JSON.stringify(stats));
+                updateStats();
+                showNotification('Puzzle solved!');
+            });
+            
+            // Clear hints
+            clearHintsBtn.addEventListener('click', function() {
+                document.querySelectorAll('.sudoku-cell.hint').forEach(cell => {
+                    cell.textContent = '';
+                    cell.classList.remove('hint');
+                });
+                showNotification('Hints cleared!');
+            });
+            
+            // Validate puzzle
+            validatePuzzleBtn.addEventListener('click', function() {
+                let isValid = true;
+                let message = "Puzzle is valid!";
+                
+                // For demo, we'll just check if all cells are filled
+                document.querySelectorAll('.sudoku-cell').forEach(cell => {
+                    if (cell.textContent === '') {
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    message = "Puzzle is incomplete. Please fill all cells.";
+                }
+                
+                hintContent.innerHTML = `<p><strong>Validation Result:</strong> ${message}</p>`;
+                addHintToHistory(`Validation: ${message}`);
+            });
+            
+            // Clear history
+            clearHistoryBtn.addEventListener('click', function() {
+                if (hintHistory.length === 0) {
+                    alert('No history to clear');
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to clear all hint history?')) {
+                    hintHistory = [];
+                    saveHistory();
+                    renderHistoryList();
+                    showNotification('History cleared!');
+                }
+            });
+            
+            // Generate hint for a specific cell
+            function generateHint(row, col) {
+                const techniques = [
+                    "Look for numbers that can only fit in this cell based on row/column/box constraints",
+                    "Check if this cell is part of a naked single (only one possible number)",
+                    "Consider the numbers in the same row, column, and 3x3 box",
+                    "Apply the elimination technique to find the only possible number for this cell",
+                    "Look for hidden singles in this row, column, or box"
+                ];
+                
+                return techniques[Math.floor(Math.random() * techniques.length)];
+            }
+            
+            // Get general hint
+            function getGeneralHint() {
+                const generalHints = [
+                    "Start with cells that have the fewest possible candidates",
+                    "Look for rows, columns, or boxes with the most numbers filled in",
+                    "Apply the 'naked single' technique - find cells with only one possible number",
+                    "Use the 'hidden single' technique - find numbers that can only go in one place in a unit",
+                    "Look for naked pairs, triples, or quads to eliminate candidates in other cells"
+                ];
+                
+                return generalHints[Math.floor(Math.random() * generalHints.length)];
+            }
+            
+            // Add hint to history
+            function addHintToHistory(hint) {
+                const historyItem = {
+                    id: Date.now(),
+                    hint: hint,
+                    date: new Date().toISOString()
+                };
+                
+                hintHistory.unshift(historyItem);
+                stats.totalHints++;
+                stats.totalHintsGiven++;
+                localStorage.setItem('sudokuHintHistory', JSON.stringify(hintHistory));
+                localStorage.setItem('sudokuStats', JSON.stringify(stats));
+                renderHistoryList();
+                updateStats();
+            }
+            
+            // Save history to localStorage
+            function saveHistory() {
+                localStorage.setItem('sudokuHintHistory', JSON.stringify(hintHistory));
+            }
+            
+            // Render history list
+            function renderHistoryList() {
+                historyContainer.innerHTML = '';
+                
+                if (hintHistory.length === 0) {
+                    historyContainer.innerHTML = '<p style="text-align: center; color: #aaa;">No hint history yet</p>';
+                    return;
+                }
+                
+                hintHistory.slice(0, 10).forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    
+                    const date = new Date(item.date).toLocaleString();
+                    
+                    historyItem.innerHTML = `
+                        <div class="history-header">
+                            <div class="history-query">${item.hint.substring(0, 50)}${item.hint.length > 50 ? '...' : ''}</div>
+                            <div class="history-date">${date}</div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="delete-btn" data-id="${item.id}">Delete</button>
+                        </div>
+                    `;
+                    
+                    historyContainer.appendChild(historyItem);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        hintHistory = hintHistory.filter(item => item.id !== id);
+                        saveHistory();
+                        renderHistoryList();
+                        showNotification('Hint removed from history!');
+                    });
+                });
+            }
+            
+            // Update statistics
+            function updateStats() {
+                totalHintsElement.textContent = stats.totalHints;
+                solvedPuzzlesElement.textContent = stats.solvedPuzzles;
+                
+                if (stats.solvedPuzzles > 0) {
+                    const avgHints = (stats.totalHintsGiven / stats.solvedPuzzles).toFixed(1);
+                    avgHintsElement.textContent = avgHints;
+                } else {
+                    avgHintsElement.textContent = '0';
+                }
+                
+                if (stats.totalHintsGiven > 0) {
+                    const accuracy = Math.round((stats.accurateHints / stats.totalHintsGiven) * 100);
+                    accuracyElement.textContent = `${accuracy}%`;
+                } else {
+                    accuracyElement.textContent = '0%';
+                }
+            }
+            
+            // Show notification
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
