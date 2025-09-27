@@ -1,0 +1,896 @@
+<!-- Category: Technology -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptop Overheating Alert</title>
+    <meta name="description" content="Monitor laptop temperature with our Laptop Overheating Alert. Get real-time alerts when your laptop gets too hot.">
+    <meta name="keywords" content="laptop overheating alert, laptop temperature monitor, laptop cooling, laptop heat warning, cpu temperature, gpu temperature, laptop fan control, thermal management, laptop cooling pad, computer temperature">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e74c3c, #f39c12, #e74c3c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .alert-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #e74c3c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #monitor-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        #monitor-btn:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #clear-btn {
+            background: linear-gradient(to right, #7f8c8d, #34495e);
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background: linear-gradient(to right, #34495e, #7f8c8d);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #e74c3c;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .temperature-display {
+            font-size: 3.5rem;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #e74c3c;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .temperature-status {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 30px;
+        }
+        
+        .normal-temp {
+            color: #27ae60;
+        }
+        
+        .warning-temp {
+            color: #f39c12;
+        }
+        
+        .danger-temp {
+            color: #e74c3c;
+        }
+        
+        .critical-temp {
+            color: #c0392b;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .temp-visual {
+            width: 100%;
+            height: 40px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .temp-fill {
+            height: 100%;
+            background: #27ae60;
+            width: 0%;
+            transition: width 0.5s ease, background 0.5s ease;
+        }
+        
+        .temp-level {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .info-section {
+            background: #fdebd0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        
+        .additional-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .additional-options h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .option-col {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .sensor-readings {
+            list-style-type: none;
+            margin-top: 20px;
+        }
+        
+        .sensor-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sensor-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .sensor-temp {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .notification-settings {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .notification-settings h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group label {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .alert-container {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .option-row {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile header height */
+            header {
+                height: 50px;
+                padding: 10px 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin: 0;
+            }
+            
+            /* Remove side padding for mobile to eliminate blank space */
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .alert-container {
+                padding: 20px 10px;
+                margin: 15px 0;
+                width: 100%;
+            }
+            
+            .input-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn-group {
+                margin-top: 15px;
+            }
+            
+            .result-container {
+                margin: 20px 0;
+                padding: 15px 10px;
+            }
+            
+            .info-section {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .additional-options {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .notification-settings {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .temperature-display {
+                font-size: 2.5rem;
+                min-height: 80px;
+                padding: 15px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Laptop Overheating Alert</h1>
+        </header>
+        
+        <div class="alert-container">
+            <div class="input-group">
+                <label for="laptop-model">Laptop Model</label>
+                <select id="laptop-model">
+                    <option value="dell">Dell</option>
+                    <option value="hp">HP</option>
+                    <option value="lenovo">Lenovo</option>
+                    <option value="apple">Apple MacBook</option>
+                    <option value="asus">ASUS</option>
+                    <option value="acer">Acer</option>
+                    <option value="msi">MSI</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="cpu-temp">Current CPU Temperature (°C)</label>
+                <input type="number" id="cpu-temp" value="45" min="20" max="120" step="1">
+            </div>
+            
+            <div class="input-group">
+                <label for="gpu-temp">Current GPU Temperature (°C)</label>
+                <input type="number" id="gpu-temp" value="40" min="20" max="120" step="1">
+            </div>
+            
+            <div class="input-group">
+                <label for="ambient-temp">Ambient Temperature (°C)</label>
+                <input type="number" id="ambient-temp" value="25" min="0" max="50" step="1">
+            </div>
+            
+            <div class="input-group">
+                <label for="monitoring-interval">Monitoring Interval (seconds)</label>
+                <input type="number" id="monitoring-interval" value="30" min="5" max="300" step="5">
+            </div>
+            
+            <div class="additional-options">
+                <h3>Alert Settings</h3>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="cpu-threshold">CPU Alert Threshold (°C)</label>
+                        <input type="number" id="cpu-threshold" value="80" min="50" max="100" step="1">
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="gpu-threshold">GPU Alert Threshold (°C)</label>
+                        <input type="number" id="gpu-threshold" value="75" min="50" max="100" step="1">
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="alert-type">Alert Type</label>
+                        <select id="alert-type">
+                            <option value="sound">Sound Alert</option>
+                            <option value="visual">Visual Alert</option>
+                            <option value="both" selected>Both</option>
+                            <option value="notification">System Notification</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="cooling-method">Preferred Cooling Method</label>
+                        <select id="cooling-method">
+                            <option value="fans">Fan Control</option>
+                            <option value="cooling-pad">Cooling Pad</option>
+                            <option value="shutdown">Automatic Shutdown</option>
+                            <option value="hibernate">Hibernate</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="alert-volume">Alert Volume</label>
+                        <select id="alert-volume">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="repeat-alert">Repeat Alert Every (minutes)</label>
+                        <input type="number" id="repeat-alert" value="5" min="1" max="60" step="1">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="monitor-btn">Start Monitoring</button>
+                <button id="clear-btn">Clear Data</button>
+            </div>
+            
+            <div class="result-container" id="result-container">
+                <h2 class="result-title">Temperature Monitoring</h2>
+                
+                <div class="temperature-display" id="temperature-display">
+                    CPU: 45°C | GPU: 40°C
+                </div>
+                
+                <div class="temperature-status" id="temperature-status">
+                    Normal Operating Temperatures
+                </div>
+                
+                <div class="temp-visual">
+                    <div class="temp-fill" id="temp-fill"></div>
+                    <div class="temp-level" id="temp-level">Average: 42.5°C</div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="highest-temp">45°C</div>
+                        <div class="stat-label">Highest Recorded</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lowest-temp">40°C</div>
+                        <div class="stat-label">Lowest Recorded</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="average-temp">42.5°C</div>
+                        <div class="stat-label">Average Temperature</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="monitoring-time">0:00</div>
+                        <div class="stat-label">Monitoring Time</div>
+                    </div>
+                </div>
+                
+                <ul class="sensor-readings" id="sensor-readings">
+                    <li class="sensor-item">
+                        <div class="sensor-name">CPU Core 1</div>
+                        <div class="sensor-temp" id="cpu-core1">45°C</div>
+                    </li>
+                    <li class="sensor-item">
+                        <div class="sensor-name">CPU Core 2</div>
+                        <div class="sensor-temp" id="cpu-core2">44°C</div>
+                    </li>
+                    <li class="sensor-item">
+                        <div class="sensor-name">GPU Core</div>
+                        <div class="sensor-temp" id="gpu-core">40°C</div>
+                    </li>
+                    <li class="sensor-item">
+                        <div class="sensor-name">System Board</div>
+                        <div class="sensor-temp" id="system-board">38°C</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="notification-settings">
+                <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="overheat-notification" checked> Overheating Notifications
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="warning-notification" checked> Warning Alerts
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="critical-notification" checked> Critical Temperature Alerts
+                    </label>
+                </div>
+                <button id="save-notifications"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+            
+            <div class="info-section">
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Select your laptop model and current temperatures</li>
+                    <li>Set temperature thresholds for CPU and GPU</li>
+                    <li>Choose alert type and cooling method preferences</li>
+                    <li>Click "Start Monitoring" to begin temperature tracking</li>
+                    <li>Receive alerts when temperatures exceed safe levels</li>
+                    <li>Take action to prevent laptop damage</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data from localStorage
+            loadSavedData();
+            
+            // Monitor button event listener
+            document.getElementById('monitor-btn').addEventListener('click', startMonitoring);
+            
+            // Clear button event listener
+            document.getElementById('clear-btn').addEventListener('click', clearData);
+            
+            // Save notifications button
+            document.getElementById('save-notifications').addEventListener('click', saveNotificationSettings);
+        });
+        
+        let monitoringInterval = null;
+        let startTime = null;
+        let highestTemp = 0;
+        let lowestTemp = 100;
+        let totalTemps = 0;
+        let tempReadings = 0;
+        let monitoringActive = false;
+        let cpuTemp = 45;
+        let gpuTemp = 40;
+        let ambientTemp = 25;
+        
+        function startMonitoring() {
+            // Get input values
+            const laptopModel = document.getElementById('laptop-model').value;
+            cpuTemp = parseInt(document.getElementById('cpu-temp').value) || 45;
+            gpuTemp = parseInt(document.getElementById('gpu-temp').value) || 40;
+            ambientTemp = parseInt(document.getElementById('ambient-temp').value) || 25;
+            const monitoringIntervalSec = parseInt(document.getElementById('monitoring-interval').value) || 30;
+            const cpuThreshold = parseInt(document.getElementById('cpu-threshold').value) || 80;
+            const gpuThreshold = parseInt(document.getElementById('gpu-threshold').value) || 75;
+            const alertType = document.getElementById('alert-type').value;
+            const coolingMethod = document.getElementById('cooling-method').value;
+            const alertVolume = document.getElementById('alert-volume').value;
+            const repeatAlert = parseInt(document.getElementById('repeat-alert').value) || 5;
+            
+            // Initialize monitoring
+            highestTemp = Math.max(cpuTemp, gpuTemp);
+            lowestTemp = Math.min(cpuTemp, gpuTemp);
+            totalTemps = cpuTemp + gpuTemp;
+            tempReadings = 2;
+            startTime = new Date();
+            monitoringActive = true;
+            
+            // Start monitoring interval
+            startMonitoringInterval(monitoringIntervalSec);
+            
+            // Show result container
+            document.getElementById('result-container').style.display = 'block';
+            
+            // Update display
+            updateTemperatureDisplay();
+            
+            // Show notification if enabled
+            if (document.getElementById('overheat-notification').checked) {
+                alert('Temperature monitoring started!');
+            }
+        }
+        
+        function startMonitoringInterval(intervalSeconds) {
+            // Clear any existing interval
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+            }
+            
+            // Update display immediately
+            updateTemperatureDisplay();
+            
+            // Start monitoring interval
+            monitoringInterval = setInterval(updateTemperatureDisplay, intervalSeconds * 1000);
+        }
+        
+        function updateTemperatureDisplay() {
+            if (!monitoringActive) return;
+            
+            // Simulate temperature changes
+            simulateTemperatureChange();
+            
+            // Update temperature display
+            document.getElementById('temperature-display').textContent = 
+                `CPU: ${cpuTemp}°C | GPU: ${gpuTemp}°C`;
+            
+            // Update temperature status
+            const statusElement = document.getElementById('temperature-status');
+            const avgTemp = (cpuTemp + gpuTemp) / 2;
+            
+            if (avgTemp > 85) {
+                statusElement.textContent = 'CRITICAL: Immediate Action Required!';
+                statusElement.className = 'temperature-status critical-temp';
+                triggerAlert('critical');
+            } else if (avgTemp > 75) {
+                statusElement.textContent = 'DANGER: High Temperature!';
+                statusElement.className = 'temperature-status danger-temp';
+                triggerAlert('danger');
+            } else if (avgTemp > 65) {
+                statusElement.textContent = 'WARNING: Elevated Temperature';
+                statusElement.className = 'temperature-status warning-temp';
+                triggerAlert('warning');
+            } else {
+                statusElement.textContent = 'Normal Operating Temperatures';
+                statusElement.className = 'temperature-status normal-temp';
+            }
+            
+            // Update temperature visual
+            const tempFill = document.getElementById('temp-fill');
+            const tempLevel = document.getElementById('temp-level');
+            const avgPercentage = Math.min(100, (avgTemp / 100) * 100);
+            
+            tempFill.style.width = `${avgPercentage}%`;
+            tempLevel.textContent = `Average: ${avgTemp.toFixed(1)}°C`;
+            
+            // Update temperature fill color based on level
+            if (avgTemp > 80) {
+                tempFill.style.background = '#e74c3c'; // Red
+            } else if (avgTemp > 65) {
+                tempFill.style.background = '#f39c12'; // Orange
+            } else {
+                tempFill.style.background = '#27ae60'; // Green
+            }
+            
+            // Update individual sensor readings
+            document.getElementById('cpu-core1').textContent = `${cpuTemp}°C`;
+            document.getElementById('cpu-core2').textContent = `${cpuTemp - 1}°C`;
+            document.getElementById('gpu-core').textContent = `${gpuTemp}°C`;
+            document.getElementById('system-board').textContent = `${ambientTemp + 10}°C`;
+            
+            // Update stats
+            updateStats();
+            
+            // Update monitoring time
+            updateMonitoringTime();
+        }
+        
+        function simulateTemperatureChange() {
+            // Simulate realistic temperature fluctuations
+            const fluctuation = (Math.random() - 0.5) * 2; // Random fluctuation between -1 and 1
+            
+            // CPU temperature tends to be higher than GPU
+            cpuTemp = Math.max(30, Math.min(95, cpuTemp + fluctuation + 0.2));
+            gpuTemp = Math.max(30, Math.min(90, gpuTemp + fluctuation));
+            
+            // Ambient temperature affects overall system
+            ambientTemp = Math.max(15, Math.min(40, ambientTemp + (fluctuation * 0.1)));
+            
+            // Update stats
+            highestTemp = Math.max(highestTemp, cpuTemp, gpuTemp);
+            lowestTemp = Math.min(lowestTemp, cpuTemp, gpuTemp);
+            totalTemps += cpuTemp + gpuTemp;
+            tempReadings += 2;
+        }
+        
+        function updateStats() {
+            const avgTemp = totalTemps / tempReadings;
+            
+            document.getElementById('highest-temp').textContent = `${highestTemp.toFixed(1)}°C`;
+            document.getElementById('lowest-temp').textContent = `${lowestTemp.toFixed(1)}°C`;
+            document.getElementById('average-temp').textContent = `${avgTemp.toFixed(1)}°C`;
+        }
+        
+        function updateMonitoringTime() {
+            if (!startTime) return;
+            
+            const currentTime = new Date();
+            const elapsedTime = Math.floor((currentTime - startTime) / 1000); // in seconds
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            
+            document.getElementById('monitoring-time').textContent = 
+                `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+        
+        function triggerAlert(alertLevel) {
+            const cpuThreshold = parseInt(document.getElementById('cpu-threshold').value) || 80;
+            const gpuThreshold = parseInt(document.getElementById('gpu-threshold').value) || 75;
+            
+            // Check if thresholds are exceeded
+            if (cpuTemp > cpuThreshold || gpuTemp > gpuThreshold) {
+                // Show notification if enabled
+                if (document.getElementById('overheat-notification').checked) {
+                    alert(`ALERT: ${alertLevel.toUpperCase()} Temperature Detected!\nCPU: ${cpuTemp}°C | GPU: ${gpuTemp}°C`);
+                }
+                
+                // Play sound if enabled
+                if (document.getElementById('alert-type').value !== 'visual') {
+                    playAlertSound(alertLevel);
+                }
+            }
+        }
+        
+        function playAlertSound(alertLevel) {
+            // In a real app, this would play an actual sound
+            console.log(`Playing ${alertLevel} alert sound`);
+        }
+        
+        function saveNotificationSettings() {
+            const notifications = {
+                overheat: document.getElementById('overheat-notification').checked,
+                warning: document.getElementById('warning-notification').checked,
+                critical: document.getElementById('critical-notification').checked
+            };
+            
+            // In a real app, this would save to localStorage or a server
+            alert('Notification settings saved!');
+        }
+        
+        function saveData() {
+            // Data is saved when monitoring starts
+        }
+        
+        function loadSavedData() {
+            // Load saved data from localStorage
+        }
+        
+        function clearData() {
+            // Clear form
+            document.getElementById('laptop-model').value = 'dell';
+            document.getElementById('cpu-temp').value = '45';
+            document.getElementById('gpu-temp').value = '40';
+            document.getElementById('ambient-temp').value = '25';
+            document.getElementById('monitoring-interval').value = '30';
+            document.getElementById('cpu-threshold').value = '80';
+            document.getElementById('gpu-threshold').value = '75';
+            document.getElementById('alert-type').value = 'both';
+            document.getElementById('cooling-method').value = 'fans';
+            document.getElementById('alert-volume').value = 'medium';
+            document.getElementById('repeat-alert').value = '5';
+            
+            // Stop monitoring if active
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+            }
+            
+            monitoringActive = false;
+            
+            // Hide result container
+            document.getElementById('result-container').style.display = 'none';
+            
+            // Reset temperature display
+            document.getElementById('temperature-display').textContent = 'CPU: 45°C | GPU: 40°C';
+            document.getElementById('temperature-status').textContent = 'Normal Operating Temperatures';
+            document.getElementById('temperature-status').className = 'temperature-status normal-temp';
+            
+            // Reset temperature visual
+            document.getElementById('temp-fill').style.width = '0%';
+            document.getElementById('temp-level').textContent = 'Average: 42.5°C';
+            document.getElementById('temp-fill').style.background = '#27ae60';
+            
+            // Reset stats
+            document.getElementById('highest-temp').textContent = '45°C';
+            document.getElementById('lowest-temp').textContent = '40°C';
+            document.getElementById('average-temp').textContent = '42.5°C';
+            document.getElementById('monitoring-time').textContent = '0:00';
+            
+            // Reset sensor readings
+            document.getElementById('cpu-core1').textContent = '45°C';
+            document.getElementById('cpu-core2').textContent = '44°C';
+            document.getElementById('gpu-core').textContent = '40°C';
+            document.getElementById('system-board').textContent = '38°C';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,772 @@
+<!-- Category: Utilities -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Pool Scheduler</title>
+    <meta name="description" content="Plan and organize car pools with our Car Pool Scheduler. Coordinate drivers, passengers, and routes efficiently for shared transportation.">
+    <meta name="keywords" content="car pool scheduler, carpooling, ride sharing, carpool scheduler, carpool organizer, shared transportation, ride sharing app, carpool planning, carpool management, commute sharing">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #3498db, #8e44ad, #3498db);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scheduler-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #schedule-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        
+        #schedule-btn:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #clear-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .schedule-list {
+            list-style-type: none;
+        }
+        
+        .schedule-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .schedule-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .schedule-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .info-section {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        
+        .additional-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .additional-options h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .option-col {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .capacity-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .detail-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .detail-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .detail-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+            margin: 5px 0;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .passenger-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .passenger-tag {
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .scheduler-container {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .option-row {
+                flex-direction: column;
+            }
+            
+            .capacity-details {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile header height */
+            header {
+                height: 50px;
+                padding: 10px 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin: 0;
+            }
+            
+            /* Remove side padding for mobile to eliminate blank space */
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .scheduler-container {
+                padding: 20px 10px;
+                margin: 15px 0;
+                width: 100%;
+            }
+            
+            .input-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn-group {
+                margin-top: 15px;
+            }
+            
+            .result-container {
+                margin: 20px 0;
+                padding: 15px 10px;
+            }
+            
+            .info-section {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .additional-options {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Car Pool Scheduler</h1>
+        </header>
+        
+        <div class="scheduler-container">
+            <div class="input-group">
+                <label for="route-name">Route Name</label>
+                <input type="text" id="route-name" placeholder="Enter route name (e.g., Downtown to Airport)">
+            </div>
+            
+            <div class="input-group">
+                <label for="driver-name">Driver Name</label>
+                <input type="text" id="driver-name" placeholder="Enter driver's name">
+            </div>
+            
+            <div class="input-group">
+                <label for="driver-phone">Driver Phone</label>
+                <input type="text" id="driver-phone" placeholder="Enter driver's phone number">
+            </div>
+            
+            <div class="input-group">
+                <label for="departure-time">Departure Time</label>
+                <input type="time" id="departure-time" value="08:00">
+            </div>
+            
+            <div class="input-group">
+                <label for="departure-date">Departure Date</label>
+                <input type="date" id="departure-date">
+            </div>
+            
+            <div class="input-group">
+                <label for="pickup-location">Pickup Location</label>
+                <input type="text" id="pickup-location" placeholder="Enter pickup location">
+            </div>
+            
+            <div class="input-group">
+                <label for="dropoff-location">Drop-off Location</label>
+                <input type="text" id="dropoff-location" placeholder="Enter drop-off location">
+            </div>
+            
+            <div class="input-group">
+                <label for="passenger-list">Passenger List (comma separated)</label>
+                <textarea id="passenger-list" placeholder="Enter passenger names separated by commas"></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="max-passengers">Maximum Passengers</label>
+                <input type="number" id="max-passengers" value="4" min="1" max="8" step="1">
+            </div>
+            
+            <div class="additional-options">
+                <h3>Additional Options</h3>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="car-type">Car Type</label>
+                        <select id="car-type">
+                            <option value="sedan">Sedan (4 passengers)</option>
+                            <option value="suv">SUV (6 passengers)</option>
+                            <option value="van">Van (8 passengers)</option>
+                            <option value="truck">Truck (2 passengers)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="cost-sharing">Cost Sharing ($)</label>
+                        <input type="number" id="cost-sharing" value="10" min="0" step="0.5">
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="route-type">Route Type</label>
+                        <select id="route-type">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="one-time">One-time</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="recurring-days">Recurring Days</label>
+                        <select id="recurring-days">
+                            <option value="mon-fri">Monday to Friday</option>
+                            <option value="tue-thu">Tuesday, Thursday</option>
+                            <option value="mon-wed-fri">Monday, Wednesday, Friday</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="car-plate">Car Plate Number</label>
+                        <input type="text" id="car-plate" placeholder="Enter car plate number">
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="special-notes">Special Notes</label>
+                        <input type="text" id="special-notes" placeholder="Any special instructions">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="schedule-btn">Schedule Car Pool</button>
+                <button id="clear-btn">Clear Data</button>
+            </div>
+            
+            <div class="result-container" id="result-container">
+                <h2 class="result-title">Scheduled Car Pools</h2>
+                <ul class="schedule-list" id="schedule-list">
+                    <!-- Scheduled items will appear here -->
+                </ul>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-scheduled">0</div>
+                        <div class="stat-label">Total Scheduled</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-passengers">0</div>
+                        <div class="stat-label">Total Passengers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-drivers">0</div>
+                        <div class="stat-label">Total Drivers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-cost">0</div>
+                        <div class="stat-label">Total Cost Saved</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Enter route details including pickup and drop-off locations</li>
+                    <li>Specify driver information and departure time</li>
+                    <li>Add passenger names and maximum capacity</li>
+                    <li>Set additional options like cost sharing and route type</li>
+                    <li>Click "Schedule Car Pool" to add to your schedule</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data from localStorage
+            loadSavedData();
+            
+            // Schedule button event listener
+            document.getElementById('schedule-btn').addEventListener('click', scheduleCarPool);
+            
+            // Clear button event listener
+            document.getElementById('clear-btn').addEventListener('click', clearData);
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('departure-date').value = today;
+        });
+        
+        function scheduleCarPool() {
+            // Get input values
+            const routeName = document.getElementById('route-name').value || 'Unnamed Route';
+            const driverName = document.getElementById('driver-name').value || 'Driver';
+            const driverPhone = document.getElementById('driver-phone').value || 'N/A';
+            const departureTime = document.getElementById('departure-time').value || '08:00';
+            const departureDate = document.getElementById('departure-date').value || new Date().toISOString().split('T')[0];
+            const pickupLocation = document.getElementById('pickup-location').value || 'Pickup Location';
+            const dropoffLocation = document.getElementById('dropoff-location').value || 'Drop-off Location';
+            const passengerList = document.getElementById('passenger-list').value || 'No passengers';
+            const maxPassengers = document.getElementById('max-passengers').value || 4;
+            const carType = document.getElementById('car-type').value;
+            const costSharing = document.getElementById('cost-sharing').value || 0;
+            const routeType = document.getElementById('route-type').value;
+            const recurringDays = document.getElementById('recurring-days').value;
+            const carPlate = document.getElementById('car-plate').value || 'N/A';
+            const specialNotes = document.getElementById('special-notes').value || 'None';
+            
+            // Parse passenger list
+            const passengers = passengerList.split(',').map(p => p.trim()).filter(p => p !== '');
+            
+            // Create schedule object
+            const schedule = {
+                id: Date.now(), // Unique ID for deletion
+                routeName: routeName,
+                driverName: driverName,
+                driverPhone: driverPhone,
+                departureTime: departureTime,
+                departureDate: departureDate,
+                pickupLocation: pickupLocation,
+                dropoffLocation: dropoffLocation,
+                passengers: passengers,
+                maxPassengers: maxPassengers,
+                carType: carType,
+                costSharing: costSharing,
+                routeType: routeType,
+                recurringDays: recurringDays,
+                carPlate: carPlate,
+                specialNotes: specialNotes
+            };
+            
+            // Load existing schedules from localStorage
+            let schedules = JSON.parse(localStorage.getItem('carPoolSchedules')) || [];
+            
+            // Add new schedule
+            schedules.push(schedule);
+            
+            // Save to localStorage
+            localStorage.setItem('carPoolSchedules', JSON.stringify(schedules));
+            
+            // Display schedules
+            displaySchedules(schedules);
+            
+            // Clear form
+            document.getElementById('route-name').value = '';
+            document.getElementById('driver-name').value = '';
+            document.getElementById('driver-phone').value = '';
+            document.getElementById('pickup-location').value = '';
+            document.getElementById('dropoff-location').value = '';
+            document.getElementById('passenger-list').value = '';
+            document.getElementById('max-passengers').value = '4';
+            document.getElementById('car-plate').value = '';
+            document.getElementById('special-notes').value = '';
+        }
+        
+        function displaySchedules(schedules) {
+            const scheduleList = document.getElementById('schedule-list');
+            scheduleList.innerHTML = '';
+            
+            // Calculate totals
+            let totalScheduled = 0;
+            let totalPassengers = 0;
+            let totalDrivers = new Set();
+            let totalCost = 0;
+            
+            schedules.forEach((schedule, index) => {
+                const scheduleItem = document.createElement('li');
+                scheduleItem.className = 'schedule-item';
+                
+                // Format date
+                const date = new Date(schedule.departureDate);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                // Create passenger tags
+                const passengerTags = schedule.passengers.map(passenger => 
+                    `<span class="passenger-tag">${passenger}</span>`
+                ).join('');
+                
+                scheduleItem.innerHTML = `
+                    <button class="delete-btn" data-id="${schedule.id}">×</button>
+                    <div class="schedule-header">
+                        <div>${schedule.routeName}</div>
+                        <div>${formattedDate} at ${schedule.departureTime}</div>
+                    </div>
+                    <div>Driver: ${schedule.driverName} (${schedule.driverPhone})</div>
+                    <div>From: ${schedule.pickupLocation} → To: ${schedule.dropoffLocation}</div>
+                    <div>Passengers: ${schedule.passengers.length} / ${schedule.maxPassengers}</div>
+                    <div class="passenger-list">${passengerTags}</div>
+                    <div class="schedule-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Car Type</span>
+                            <span class="detail-value">${schedule.carType}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Cost Sharing</span>
+                            <span class="detail-value">$${schedule.costSharing}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Route Type</span>
+                            <span class="detail-value">${schedule.routeType}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Car Plate</span>
+                            <span class="detail-value">${schedule.carPlate}</span>
+                        </div>
+                    </div>
+                    ${schedule.specialNotes !== 'None' ? `<div><strong>Notes:</strong> ${schedule.specialNotes}</div>` : ''}
+                `;
+                
+                scheduleList.appendChild(scheduleItem);
+                
+                // Add event listener to delete button
+                scheduleItem.querySelector('.delete-btn').addEventListener('click', function() {
+                    deleteSchedule(this.dataset.id);
+                });
+                
+                // Update totals
+                totalScheduled++;
+                totalPassengers += schedule.passengers.length;
+                totalDrivers.add(schedule.driverName);
+                totalCost += schedule.costSharing * schedule.passengers.length;
+            });
+            
+            // Update totals display
+            document.getElementById('total-scheduled').textContent = totalScheduled;
+            document.getElementById('total-passengers').textContent = totalPassengers;
+            document.getElementById('total-drivers').textContent = totalDrivers.size;
+            document.getElementById('total-cost').textContent = `$${totalCost.toFixed(2)}`;
+            
+            // Show result container
+            document.getElementById('result-container').style.display = 'block';
+        }
+        
+        function deleteSchedule(id) {
+            let schedules = JSON.parse(localStorage.getItem('carPoolSchedules')) || [];
+            
+            // Filter out the schedule with the given ID
+            schedules = schedules.filter(schedule => schedule.id != id);
+            
+            // Save updated schedules
+            localStorage.setItem('carPoolSchedules', JSON.stringify(schedules));
+            
+            // Refresh display
+            displaySchedules(schedules);
+        }
+        
+        function saveData() {
+            // Data is saved when scheduling
+        }
+        
+        function loadSavedData() {
+            const schedules = JSON.parse(localStorage.getItem('carPoolSchedules')) || [];
+            if (schedules.length > 0) {
+                displaySchedules(schedules);
+            }
+        }
+        
+        function clearData() {
+            // Clear form
+            document.getElementById('route-name').value = '';
+            document.getElementById('driver-name').value = '';
+            document.getElementById('driver-phone').value = '';
+            document.getElementById('departure-time').value = '08:00';
+            document.getElementById('departure-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('pickup-location').value = '';
+            document.getElementById('dropoff-location').value = '';
+            document.getElementById('passenger-list').value = '';
+            document.getElementById('max-passengers').value = '4';
+            document.getElementById('car-type').value = 'sedan';
+            document.getElementById('cost-sharing').value = '10';
+            document.getElementById('route-type').value = 'daily';
+            document.getElementById('recurring-days').value = 'mon-fri';
+            document.getElementById('car-plate').value = '';
+            document.getElementById('special-notes').value = '';
+            
+            // Clear schedules from localStorage
+            localStorage.removeItem('carPoolSchedules');
+            
+            // Hide result container
+            document.getElementById('result-container').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

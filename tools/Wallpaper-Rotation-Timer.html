@@ -1,0 +1,1288 @@
+<!-- Category: Utilities -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallpaper Rotation Timer</title>
+    <meta name="description" content="Automate wallpaper rotation with our Wallpaper Rotation Timer. Schedule desktop backgrounds to change automatically at set intervals.">
+    <meta name="keywords" content="wallpaper rotation timer, wallpaper changer, automatic wallpaper, desktop wallpaper, background changer, wallpaper scheduler, rotating wallpapers, dynamic wallpapers, wallpaper automation, background rotation, desktop background, wallpaper manager">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #34495e, #2c3e50, #34495e);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timer-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #rotate-btn {
+            background: linear-gradient(to right, #34495e, #2c3e50);
+            color: white;
+        }
+        
+        #rotate-btn:hover {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #clear-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #34495e;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .rotation-display {
+            font-size: 1.8rem;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #34495e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .rotation-visual {
+            width: 100%;
+            height: 50px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .rotation-fill {
+            height: 100%;
+            background: #34495e;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .rotation-level {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .info-section {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        
+        .additional-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .additional-options h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .option-col {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .capacity-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .detail-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .detail-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .detail-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .rotation-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .status-active {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .status-inactive {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .status-pending {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .wallpaper-preview {
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: white;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-image {
+            width: 100%;
+            max-width: 300px;
+            height: 150px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .preview-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .preview-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .prev-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .next-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .shuffle-btn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            color: white;
+        }
+        
+        .preview-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .notification-settings {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .notification-settings h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group label {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .timer-container {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .option-row {
+                flex-direction: column;
+            }
+            
+            .capacity-details {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile header height */
+            header {
+                height: 50px;
+                padding: 10px 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin: 0;
+            }
+            
+            /* Remove side padding for mobile to eliminate blank space */
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .timer-container {
+                padding: 20px 10px;
+                margin: 15px 0;
+                width: 100%;
+            }
+            
+            .input-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn-group {
+                margin-top: 15px;
+            }
+            
+            .result-container {
+                margin: 20px 0;
+                padding: 15px 10px;
+            }
+            
+            .info-section {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .additional-options {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .capacity-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .notification-settings {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .setting-group {
+                margin-bottom: 10px;
+            }
+            
+            .setting-group label {
+                margin-bottom: 5px;
+                gap: 8px;
+            }
+            
+            .setting-group input {
+                margin-right: 8px;
+            }
+            
+            .wallpaper-preview {
+                padding: 15px 10px;
+                margin: 15px 0;
+                min-height: 150px;
+            }
+            
+            .preview-image {
+                max-width: 100%;
+                height: 120px;
+                margin: 10px 0;
+            }
+            
+            .preview-controls {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            
+            .preview-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .rotation-display {
+                font-size: 1.5rem;
+                min-height: 80px;
+                padding: 15px;
+            }
+            
+            .rotation-visual {
+                height: 40px;
+                margin: 15px 0;
+            }
+            
+            .rotation-level {
+                font-size: 0.9rem;
+            }
+            
+            .detail-card {
+                padding: 12px 10px;
+                margin-bottom: 10px;
+            }
+            
+            .detail-value {
+                font-size: 1.5rem;
+                margin: 3px 0;
+            }
+            
+            .detail-label {
+                font-size: 0.8rem;
+            }
+            
+            .stat-card {
+                padding: 12px 10px;
+                margin-bottom: 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+                margin: 3px 0;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            .info-section ul {
+                padding-left: 15px;
+            }
+            
+            .info-section li {
+                margin-bottom: 5px;
+                font-size: 0.9rem;
+            }
+            
+            .additional-options h3, .notification-settings h3, .info-section h3 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+            
+            .option-row {
+                margin-bottom: 10px;
+            }
+            
+            .option-col {
+                margin-bottom: 10px;
+            }
+            
+            label {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+            
+            input, select, textarea {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .result-title {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+            
+            .rotation-status {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+                margin-top: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Wallpaper Rotation Timer</h1>
+        </header>
+        
+        <div class="timer-container">
+            <div class="input-group">
+                <label for="rotation-interval">Rotation Interval</label>
+                <select id="rotation-interval">
+                    <option value="30">30 Seconds</option>
+                    <option value="60">1 Minute</option>
+                    <option value="300">5 Minutes</option>
+                    <option value="600">10 Minutes</option>
+                    <option value="1800">30 Minutes</option>
+                    <option value="3600" selected>1 Hour</option>
+                    <option value="7200">2 Hours</option>
+                    <option value="14400">4 Hours</option>
+                    <option value="28800">8 Hours</option>
+                    <option value="43200">12 Hours</option>
+                    <option value="86400">24 Hours</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="wallpaper-source">Wallpaper Source</label>
+                <select id="wallpaper-source">
+                    <option value="local">Local Files</option>
+                    <option value="online">Online Gallery</option>
+                    <option value="folder" selected>Folder Path</option>
+                    <option value="unsplash">Unsplash API</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="folder-path">Folder Path</label>
+                <input type="text" id="folder-path" placeholder="Enter folder path containing wallpapers">
+            </div>
+            
+            <div class="input-group">
+                <label for="file-types">File Types</label>
+                <select id="file-types" multiple>
+                    <option value="jpg" selected>JPG</option>
+                    <option value="png" selected>PNG</option>
+                    <option value="gif">GIF</option>
+                    <option value="bmp">BMP</option>
+                    <option value="webp">WEBP</option>
+                </select>
+            </div>
+            
+            <div class="additional-options">
+                <h3>Additional Options</h3>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="rotation-order">Rotation Order</label>
+                        <select id="rotation-order">
+                            <option value="sequential">Sequential</option>
+                            <option value="random" selected>Random</option>
+                            <option value="alphabetical">Alphabetical</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="display-mode">Display Mode</label>
+                        <select id="display-mode">
+                            <option value="fill">Fill Screen</option>
+                            <option value="fit" selected>Fit to Screen</option>
+                            <option value="stretch">Stretch</option>
+                            <option value="center">Center</option>
+                            <option value="tile">Tile</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="transition-effect">Transition Effect</label>
+                        <select id="transition-effect">
+                            <option value="none">None</option>
+                            <option value="fade" selected>Fade</option>
+                            <option value="slide">Slide</option>
+                            <option value="flip">Flip</option>
+                            <option value="cube">Cube</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="transition-duration">Transition Duration (seconds)</label>
+                        <input type="number" id="transition-duration" value="2" min="0" max="10" step="0.5">
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="shuffle-mode">Shuffle Mode</label>
+                        <select id="shuffle-mode">
+                            <option value="once">Once</option>
+                            <option value="repeat" selected>Repeat</option>
+                            <option value="no-repeat">No Repeat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="exclude-files">Exclude Files (comma separated)</label>
+                        <input type="text" id="exclude-files" placeholder="Enter filenames to exclude">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="rotate-btn">Start Rotation</button>
+                <button id="clear-btn">Clear Data</button>
+            </div>
+            
+            <div class="wallpaper-preview">
+                <h3>Wallpaper Preview</h3>
+                <div class="preview-image" id="preview-image">
+                    Current Wallpaper
+                </div>
+                <div class="preview-controls">
+                    <button class="preview-btn prev-btn" id="prev-btn">Previous</button>
+                    <button class="preview-btn shuffle-btn" id="shuffle-btn">Shuffle</button>
+                    <button class="preview-btn next-btn" id="next-btn">Next</button>
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-container">
+                <h2 class="result-title">Rotation Status</h2>
+                
+                <div class="rotation-display" id="rotation-display">
+                    Rotation Active: Next change in 01:00:00
+                </div>
+                
+                <div class="rotation-visual">
+                    <div class="rotation-fill" id="rotation-fill"></div>
+                    <div class="rotation-level" id="rotation-level">0%</div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-wallpapers">0</div>
+                        <div class="stat-label">Total Wallpapers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-wallpaper">0</div>
+                        <div class="stat-label">Current Wallpaper</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="next-change">01:00:00</div>
+                        <div class="stat-label">Next Change</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="rotation-status">Active</div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                </div>
+                
+                <div class="capacity-details">
+                    <div class="detail-card">
+                        <div class="detail-value" id="interval-value">1 Hour</div>
+                        <div class="detail-label">Rotation Interval</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-value" id="order-value">Random</div>
+                        <div class="detail-label">Rotation Order</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-value" id="effect-value">Fade</div>
+                        <div class="detail-label">Transition Effect</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-value" id="mode-value">Fit to Screen</div>
+                        <div class="detail-label">Display Mode</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="notification-settings">
+                <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="rotation-notification" checked> Rotation Notifications
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="change-notification" checked> Wallpaper Change Alerts
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="error-notification" checked> Error Notifications
+                    </label>
+                </div>
+                <button id="save-notifications"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+            
+            <div class="info-section">
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Select rotation interval and wallpaper source</li>
+                    <li>Specify folder path and supported file types</li>
+                    <li>Choose rotation order and display mode</li>
+                    <li>Set transition effects and duration</li>
+                    <li>Click "Start Rotation" to begin automatic wallpaper changes</li>
+                    <li>Use preview controls to manually navigate wallpapers</li>
+                    <li>Receive notifications for wallpaper changes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data from localStorage
+            loadSavedData();
+            
+            // Rotate button event listener
+            document.getElementById('rotate-btn').addEventListener('click', startRotation);
+            
+            // Clear button event listener
+            document.getElementById('clear-btn').addEventListener('click', clearData);
+            
+            // Preview controls event listeners
+            document.getElementById('prev-btn').addEventListener('click', showPreviousWallpaper);
+            document.getElementById('next-btn').addEventListener('click', showNextWallpaper);
+            document.getElementById('shuffle-btn').addEventListener('click', shuffleWallpapers);
+            
+            // Save notifications button
+            document.getElementById('save-notifications').addEventListener('click', saveNotificationSettings);
+            
+            // Initialize preview
+            updatePreview();
+        });
+        
+        let rotationInterval = null;
+        let timeLeft = 3600; // in seconds (1 hour default)
+        let totalWallpapers = 0;
+        let currentWallpaperIndex = 0;
+        let rotationActive = false;
+        let wallpapers = [];
+        let rotationOrder = 'random';
+        let displayMode = 'fit';
+        let transitionEffect = 'fade';
+        let transitionDuration = 2;
+        let shuffleMode = 'repeat';
+        let excludeFiles = [];
+        let wallpaperSource = 'folder';
+        let fileTypes = ['jpg', 'png'];
+        let folderPath = '';
+        let rotationIntervalValue = 3600; // in seconds
+        
+        function startRotation() {
+            // Get input values
+            rotationIntervalValue = parseInt(document.getElementById('rotation-interval').value) || 3600;
+            wallpaperSource = document.getElementById('wallpaper-source').value;
+            folderPath = document.getElementById('folder-path').value || '/Users/username/Pictures/Wallpapers';
+            fileTypes = Array.from(document.getElementById('file-types').selectedOptions).map(option => option.value);
+            rotationOrder = document.getElementById('rotation-order').value;
+            displayMode = document.getElementById('display-mode').value;
+            transitionEffect = document.getElementById('transition-effect').value;
+            transitionDuration = parseFloat(document.getElementById('transition-duration').value) || 2;
+            shuffleMode = document.getElementById('shuffle-mode').value;
+            excludeFiles = document.getElementById('exclude-files').value.split(',').map(file => file.trim()).filter(file => file !== '');
+            
+            // Initialize wallpapers
+            wallpapers = generateWallpaperList(folderPath, fileTypes, excludeFiles);
+            totalWallpapers = wallpapers.length;
+            currentWallpaperIndex = 0;
+            timeLeft = rotationIntervalValue;
+            rotationActive = true;
+            
+            // Start rotation timer
+            startRotationTimer();
+            
+            // Show result container
+            document.getElementById('result-container').style.display = 'block';
+            
+            // Update display
+            updateRotationDisplay();
+            
+            // Show notification if enabled
+            if (document.getElementById('rotation-notification').checked) {
+                alert('Wallpaper rotation started!');
+            }
+            
+            // Save settings
+            saveSettings();
+        }
+        
+        function generateWallpaperList(folderPath, fileTypes, excludeFiles) {
+            // In a real app, this would read from the filesystem
+            // For this demo, we'll generate sample wallpapers
+            const wallpapers = [];
+            const sampleNames = [
+                'Mountain Landscape', 'Ocean Sunset', 'Forest Path', 'City Skyline', 
+                'Desert Dunes', 'Northern Lights', 'Tropical Beach', 'Autumn Leaves',
+                'Winter Wonderland', 'Spring Blossoms', 'Urban Art', 'Abstract Design',
+                'Galaxy Background', 'Minimalist Pattern', 'Vintage Texture', 'Modern Architecture'
+            ];
+            
+            for (let i = 0; i < 20; i++) {
+                const fileType = fileTypes[Math.floor(Math.random() * fileTypes.length)];
+                const fileName = `${sampleNames[Math.floor(Math.random() * sampleNames.length)]}_${i}.${fileType}`;
+                
+                // Skip excluded files
+                if (!excludeFiles.includes(fileName)) {
+                    wallpapers.push({
+                        id: i,
+                        name: fileName,
+                        path: `${folderPath}/${fileName}`,
+                        type: fileType,
+                        size: Math.floor(Math.random() * 5000) + 1000, // KB
+                        dimensions: `${Math.floor(Math.random() * 2000) + 1000}x${Math.floor(Math.random() * 2000) + 1000}`
+                    });
+                }
+            }
+            
+            // Apply rotation order
+            if (rotationOrder === 'alphabetical') {
+                wallpapers.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (rotationOrder === 'random') {
+                shuffleArray(wallpapers);
+            }
+            
+            return wallpapers;
+        }
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        function startRotationTimer() {
+            // Clear any existing timer
+            if (rotationInterval) {
+                clearInterval(rotationInterval);
+            }
+            
+            // Update display immediately
+            updateRotationDisplay();
+            
+            // Start timer interval
+            rotationInterval = setInterval(updateRotationDisplay, 1000);
+        }
+        
+        function updateRotationDisplay() {
+            if (!rotationActive) return;
+            
+            // Decrement time left
+            timeLeft--;
+            
+            // Format time display
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            
+            const timeDisplay = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update display elements
+            document.getElementById('rotation-display').textContent = 
+                `Rotation Active: Next change in ${timeDisplay}`;
+            
+            document.getElementById('next-change').textContent = timeDisplay;
+            
+            // Update progress bar
+            const progressPercent = ((rotationIntervalValue - timeLeft) / rotationIntervalValue) * 100;
+            document.getElementById('rotation-fill').style.width = `${progressPercent}%`;
+            document.getElementById('rotation-level').textContent = `${Math.round(progressPercent)}%`;
+            
+            // Update current wallpaper info
+            if (wallpapers.length > 0) {
+                document.getElementById('current-wallpaper').textContent = 
+                    `${currentWallpaperIndex + 1}/${wallpapers.length}`;
+                
+                // Update preview
+                updatePreview(wallpapers[currentWallpaperIndex]);
+            }
+            
+            // When time is up, change wallpaper
+            if (timeLeft <= 0) {
+                changeWallpaper();
+                timeLeft = rotationIntervalValue; // Reset timer
+                
+                // Show notification if enabled
+                if (document.getElementById('change-notification').checked) {
+                    const currentWallpaper = wallpapers[currentWallpaperIndex];
+                    alert(`Wallpaper changed to: ${currentWallpaper.name}`);
+                }
+            }
+        }
+        
+        function changeWallpaper() {
+            // Move to next wallpaper based on rotation order
+            if (rotationOrder === 'sequential') {
+                currentWallpaperIndex = (currentWallpaperIndex + 1) % wallpapers.length;
+            } else if (rotationOrder === 'random') {
+                currentWallpaperIndex = Math.floor(Math.random() * wallpapers.length);
+            } else {
+                // Alphabetical order
+                currentWallpaperIndex = (currentWallpaperIndex + 1) % wallpapers.length;
+            }
+            
+            // Update preview
+            updatePreview(wallpapers[currentWallpaperIndex]);
+            
+            // Apply transition effect
+            applyTransitionEffect();
+        }
+        
+        function applyTransitionEffect() {
+            const previewImage = document.getElementById('preview-image');
+            
+            // Apply transition effect based on selection
+            switch(transitionEffect) {
+                case 'fade':
+                    previewImage.style.opacity = '0';
+                    setTimeout(() => {
+                        previewImage.style.opacity = '1';
+                    }, transitionDuration * 500);
+                    break;
+                case 'slide':
+                    previewImage.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        previewImage.style.transform = 'translateX(0)';
+                    }, transitionDuration * 500);
+                    break;
+                case 'flip':
+                    previewImage.style.transform = 'rotateY(180deg)';
+                    setTimeout(() => {
+                        previewImage.style.transform = 'rotateY(0)';
+                    }, transitionDuration * 500);
+                    break;
+                case 'cube':
+                    previewImage.style.transform = 'rotateX(90deg)';
+                    setTimeout(() => {
+                        previewImage.style.transform = 'rotateX(0)';
+                    }, transitionDuration * 500);
+                    break;
+                default:
+                    // No effect
+                    break;
+            }
+        }
+        
+        function updatePreview(wallpaper) {
+            const previewImage = document.getElementById('preview-image');
+            
+            if (wallpaper) {
+                previewImage.textContent = wallpaper.name;
+                previewImage.style.background = getRandomGradient();
+            } else {
+                previewImage.textContent = 'Current Wallpaper';
+                previewImage.style.background = 'linear-gradient(45deg, #3498db, #9b59b6)';
+            }
+        }
+        
+        function getRandomGradient() {
+            const colors = [
+                ['#3498db', '#9b59b6'],
+                ['#2ecc71', '#3498db'],
+                ['#e74c3c', '#f39c12'],
+                ['#9b59b6', '#34495e'],
+                ['#1abc9c', '#3498db'],
+                ['#f39c12', '#e74c3c']
+            ];
+            
+            const randomColors = colors[Math.floor(Math.random() * colors.length)];
+            return `linear-gradient(45deg, ${randomColors[0]}, ${randomColors[1]})`;
+        }
+        
+        function showPreviousWallpaper() {
+            if (wallpapers.length === 0) return;
+            
+            currentWallpaperIndex = (currentWallpaperIndex - 1 + wallpapers.length) % wallpapers.length;
+            updatePreview(wallpapers[currentWallpaperIndex]);
+            applyTransitionEffect();
+        }
+        
+        function showNextWallpaper() {
+            if (wallpapers.length === 0) return;
+            
+            currentWallpaperIndex = (currentWallpaperIndex + 1) % wallpapers.length;
+            updatePreview(wallpapers[currentWallpaperIndex]);
+            applyTransitionEffect();
+        }
+        
+        function shuffleWallpapers() {
+            if (wallpapers.length === 0) return;
+            
+            shuffleArray(wallpapers);
+            currentWallpaperIndex = 0;
+            updatePreview(wallpapers[currentWallpaperIndex]);
+            applyTransitionEffect();
+            
+            // Show notification if enabled
+            if (document.getElementById('rotation-notification').checked) {
+                alert('Wallpapers shuffled!');
+            }
+        }
+        
+        function saveNotificationSettings() {
+            const notifications = {
+                rotation: document.getElementById('rotation-notification').checked,
+                change: document.getElementById('change-notification').checked,
+                error: document.getElementById('error-notification').checked
+            };
+            
+            // In a real app, this would save to localStorage or a server
+            alert('Notification settings saved!');
+        }
+        
+        function saveSettings() {
+            const settings = {
+                rotationInterval: rotationIntervalValue,
+                wallpaperSource: wallpaperSource,
+                folderPath: folderPath,
+                fileTypes: fileTypes,
+                rotationOrder: rotationOrder,
+                displayMode: displayMode,
+                transitionEffect: transitionEffect,
+                transitionDuration: transitionDuration,
+                shuffleMode: shuffleMode,
+                excludeFiles: excludeFiles
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('wallpaperRotationSettings', JSON.stringify(settings));
+        }
+        
+        function loadSavedData() {
+            // Load settings from localStorage
+            const savedSettings = JSON.parse(localStorage.getItem('wallpaperRotationSettings')) || {};
+            
+            if (Object.keys(savedSettings).length > 0) {
+                document.getElementById('rotation-interval').value = savedSettings.rotationInterval || 3600;
+                document.getElementById('wallpaper-source').value = savedSettings.wallpaperSource || 'folder';
+                document.getElementById('folder-path').value = savedSettings.folderPath || '';
+                document.getElementById('rotation-order').value = savedSettings.rotationOrder || 'random';
+                document.getElementById('display-mode').value = savedSettings.displayMode || 'fit';
+                document.getElementById('transition-effect').value = savedSettings.transitionEffect || 'fade';
+                document.getElementById('transition-duration').value = savedSettings.transitionDuration || 2;
+                document.getElementById('shuffle-mode').value = savedSettings.shuffleMode || 'repeat';
+                document.getElementById('exclude-files').value = savedSettings.excludeFiles?.join(', ') || '';
+                
+                // Update file types selection
+                const fileTypesSelect = document.getElementById('file-types');
+                fileTypesSelect.value = '';
+                if (savedSettings.fileTypes) {
+                    savedSettings.fileTypes.forEach(type => {
+                        const option = fileTypesSelect.querySelector(`option[value="${type}"]`);
+                        if (option) option.selected = true;
+                    });
+                }
+            }
+            
+            // Load history from localStorage
+            const history = JSON.parse(localStorage.getItem('wallpaperRotationHistory')) || [];
+            if (history.length > 0) {
+                // Display last history item
+                const lastHistory = history[history.length - 1];
+                document.getElementById('total-wallpapers').textContent = lastHistory.totalWallpapers || 0;
+                document.getElementById('current-wallpaper').textContent = lastHistory.currentWallpaper || 0;
+                document.getElementById('next-change').textContent = lastHistory.nextChange || '01:00:00';
+                document.getElementById('rotation-status').textContent = lastHistory.rotationStatus || 'Active';
+                document.getElementById('interval-value').textContent = lastHistory.intervalValue || '1 Hour';
+                document.getElementById('order-value').textContent = lastHistory.orderValue || 'Random';
+                document.getElementById('effect-value').textContent = lastHistory.effectValue || 'Fade';
+                document.getElementById('mode-value').textContent = lastHistory.modeValue || 'Fit to Screen';
+                
+                // Show result container
+                document.getElementById('result-container').style.display = 'block';
+            }
+        }
+        
+        function clearData() {
+            // Clear form
+            document.getElementById('rotation-interval').value = '3600';
+            document.getElementById('wallpaper-source').value = 'folder';
+            document.getElementById('folder-path').value = '';
+            document.getElementById('rotation-order').value = 'random';
+            document.getElementById('display-mode').value = 'fit';
+            document.getElementById('transition-effect').value = 'fade';
+            document.getElementById('transition-duration').value = '2';
+            document.getElementById('shuffle-mode').value = 'repeat';
+            document.getElementById('exclude-files').value = '';
+            
+            // Reset file types selection
+            const fileTypesSelect = document.getElementById('file-types');
+            fileTypesSelect.value = '';
+            fileTypesSelect.querySelector('option[value="jpg"]').selected = true;
+            fileTypesSelect.querySelector('option[value="png"]').selected = true;
+            
+            // Stop rotation if active
+            if (rotationInterval) {
+                clearInterval(rotationInterval);
+            }
+            
+            rotationActive = false;
+            timeLeft = 3600;
+            totalWallpapers = 0;
+            currentWallpaperIndex = 0;
+            wallpapers = [];
+            rotationOrder = 'random';
+            displayMode = 'fit';
+            transitionEffect = 'fade';
+            transitionDuration = 2;
+            shuffleMode = 'repeat';
+            excludeFiles = [];
+            wallpaperSource = 'folder';
+            fileTypes = ['jpg', 'png'];
+            folderPath = '';
+            rotationIntervalValue = 3600;
+            
+            // Hide result container
+            document.getElementById('result-container').style.display = 'none';
+            
+            // Reset rotation display
+            document.getElementById('rotation-display').textContent = 'Rotation Active: Next change in 01:00:00';
+            document.getElementById('next-change').textContent = '01:00:00';
+            document.getElementById('rotation-fill').style.width = '0%';
+            document.getElementById('rotation-level').textContent = '0%';
+            document.getElementById('total-wallpapers').textContent = '0';
+            document.getElementById('current-wallpaper').textContent = '0';
+            document.getElementById('rotation-status').textContent = 'Active';
+            document.getElementById('interval-value').textContent = '1 Hour';
+            document.getElementById('order-value').textContent = 'Random';
+            document.getElementById('effect-value').textContent = 'Fade';
+            document.getElementById('mode-value').textContent = 'Fit to Screen';
+            
+            // Reset preview
+            updatePreview();
+            
+            // Clear localStorage
+            localStorage.removeItem('wallpaperRotationSettings');
+            localStorage.removeItem('wallpaperRotationHistory');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!-- Category: Productivity -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Click Counter</title>
+    <meta name="description" content="Track mouse clicks with our Mouse Click Counter. Count left, right, and double clicks to analyze productivity.">
+    <meta name="keywords" content="mouse click counter, click counter, mouse tracking, productivity tool, click tracking, mouse activity, computer usage, click analysis, mouse statistics, productivity measurement">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #3498db, #8e44ad, #3498db);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .counter-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #start-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        
+        #start-btn:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #clear-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .click-display {
+            font-size: 5rem;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #3498db;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .click-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .click-type {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .click-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3498db;
+            margin: 5px 0;
+        }
+        
+        .click-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .info-section {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        
+        .additional-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .additional-options h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .option-col {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .click-area {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .click-area h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .click-target {
+            background: #3498db;
+            color: white;
+            border-radius: 8px;
+            padding: 50px;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .click-target:hover {
+            background: #2980b9;
+        }
+        
+        .click-target:active {
+            transform: scale(0.98);
+            background: #2c3e50;
+        }
+        
+        .notification-settings {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .notification-settings h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group label {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .counter-container {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .option-row {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile header height */
+            header {
+                height: 50px;
+                padding: 10px 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin: 0;
+            }
+            
+            /* Remove side padding for mobile to eliminate blank space */
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .counter-container {
+                padding: 20px 10px;
+                margin: 15px 0;
+                width: 100%;
+            }
+            
+            .input-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn-group {
+                margin-top: 15px;
+            }
+            
+            .result-container {
+                margin: 20px 0;
+                padding: 15px 10px;
+            }
+            
+            .info-section {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .additional-options {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .click-display {
+                font-size: 3.5rem;
+                min-height: 120px;
+                padding: 15px;
+            }
+            
+            .notification-settings {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .click-target {
+                padding: 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mouse Click Counter</h1>
+        </header>
+        
+        <div class="counter-container">
+            <div class="input-group">
+                <label for="tracking-mode">Tracking Mode</label>
+                <select id="tracking-mode">
+                    <option value="clicks">Click Tracking</option>
+                    <option value="duration">Duration Tracking</option>
+                    <option value="pattern">Pattern Analysis</option>
+                    <option value="heatmap">Heatmap Recording</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="click-types">Click Types to Track</label>
+                <select id="click-types" multiple>
+                    <option value="left" selected>Left Click</option>
+                    <option value="right" selected>Right Click</option>
+                    <option value="double" selected>Double Click</option>
+                    <option value="scroll" selected>Scroll Wheel</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="tracking-duration">Tracking Duration (minutes)</label>
+                <input type="number" id="tracking-duration" value="10" min="1" max="120" step="1">
+            </div>
+            
+            <div class="additional-options">
+                <h3>Additional Options</h3>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="auto-save">Auto Save Interval (seconds)</label>
+                        <input type="number" id="auto-save" value="30" min="5" max="300" step="5">
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="notification-type">Notification Type</label>
+                        <select id="notification-type">
+                            <option value="sound">Sound Alert</option>
+                            <option value="visual">Visual Alert</option>
+                            <option value="both">Both</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="click-sensitivity">Click Sensitivity</label>
+                        <select id="click-sensitivity">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="export-format">Export Format</label>
+                        <select id="export-format">
+                            <option value="csv">CSV</option>
+                            <option value="json">JSON</option>
+                            <option value="txt">Text</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="start-btn">Start Tracking</button>
+                <button id="clear-btn">Clear Data</button>
+            </div>
+            
+            <div class="click-area">
+                <h3>Click Tracking Area</h3>
+                <div class="click-target" id="click-target">
+                    Click Here to Track<br>
+                    <small>Or click anywhere on page</small>
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-container">
+                <h2 class="result-title">Tracking Results</h2>
+                
+                <div class="click-display" id="click-display">
+                    0
+                </div>
+                
+                <div class="click-types">
+                    <div class="click-type">
+                        <div class="click-value" id="left-clicks">0</div>
+                        <div class="click-label">Left Clicks</div>
+                    </div>
+                    <div class="click-type">
+                        <div class="click-value" id="right-clicks">0</div>
+                        <div class="click-label">Right Clicks</div>
+                    </div>
+                    <div class="click-type">
+                        <div class="click-value" id="double-clicks">0</div>
+                        <div class="click-label">Double Clicks</div>
+                    </div>
+                    <div class="click-type">
+                        <div class="click-value" id="scroll-clicks">0</div>
+                        <div class="click-label">Scroll Events</div>
+                    </div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-clicks">0</div>
+                        <div class="stat-label">Total Clicks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cps">0.00</div>
+                        <div class="stat-label">Clicks Per Second</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="accuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="time-left">0:00</div>
+                        <div class="stat-label">Time Left</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="notification-settings">
+                <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="click-notification" checked> Click Notifications
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="milestone-notification" checked> Milestone Alerts
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="time-notification" checked> Time Remaining Alerts
+                    </label>
+                </div>
+                <button id="save-notifications"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+            
+            <div class="info-section">
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Select tracking mode and click types to monitor</li>
+                    <li>Set tracking duration and sensitivity level</li>
+                    <li>Click "Start Tracking" to begin counting</li>
+                    <li>Click anywhere on the page to register clicks</li>
+                    <li>View real-time click statistics</li>
+                    <li>Export results in various formats</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data from localStorage
+            loadSavedData();
+            
+            // Start button event listener
+            document.getElementById('start-btn').addEventListener('click', startTracking);
+            
+            // Clear button event listener
+            document.getElementById('clear-btn').addEventListener('click', clearData);
+            
+            // Save notifications button
+            document.getElementById('save-notifications').addEventListener('click', saveNotificationSettings);
+            
+            // Click target event listener
+            document.getElementById('click-target').addEventListener('click', handleClick);
+            document.addEventListener('click', handleClick);
+            document.addEventListener('contextmenu', handleRightClick);
+            document.addEventListener('dblclick', handleDoubleClick);
+            document.addEventListener('wheel', handleScroll);
+        });
+        
+        let totalClicks = 0;
+        let leftClicks = 0;
+        let rightClicks = 0;
+        let doubleClicks = 0;
+        let scrollEvents = 0;
+        let startTime = null;
+        let timerInterval = null;
+        let totalTestTime = 0;
+        let trackingActive = false;
+        let lastClickTime = 0;
+        let clickTimeout = null;
+        
+        function startTracking() {
+            // Get input values
+            const trackingMode = document.getElementById('tracking-mode').value;
+            const clickTypes = Array.from(document.getElementById('click-types').selectedOptions).map(option => option.value);
+            const trackingDuration = document.getElementById('tracking-duration').value;
+            const autoSave = document.getElementById('auto-save').value;
+            const notificationType = document.getElementById('notification-type').value;
+            const clickSensitivity = document.getElementById('click-sensitivity').value;
+            const exportFormat = document.getElementById('export-format').value;
+            
+            // Initialize tracking
+            totalClicks = 0;
+            leftClicks = 0;
+            rightClicks = 0;
+            doubleClicks = 0;
+            scrollEvents = 0;
+            totalTestTime = parseInt(trackingDuration) * 60; // Convert to seconds
+            startTime = new Date();
+            trackingActive = true;
+            
+            // Start timer
+            startTimer();
+            
+            // Show result container
+            document.getElementById('result-container').style.display = 'block';
+            
+            // Update display
+            updateDisplay();
+            
+            // Show notification if enabled
+            if (document.getElementById('click-notification').checked) {
+                alert('Click tracking started!');
+            }
+        }
+        
+        function handleClick(event) {
+            if (!trackingActive) return;
+            
+            // Prevent right click context menu for tracking purposes
+            if (event.button === 2) {
+                event.preventDefault();
+                return;
+            }
+            
+            // Increment left clicks
+            leftClicks++;
+            totalClicks++;
+            
+            // Update display
+            updateDisplay();
+            
+            // Handle double click detection
+            const currentTime = new Date().getTime();
+            if (currentTime - lastClickTime < 300) { // 300ms threshold for double click
+                doubleClicks++;
+                updateDisplay();
+            }
+            lastClickTime = currentTime;
+        }
+        
+        function handleRightClick(event) {
+            if (!trackingActive) return;
+            
+            event.preventDefault(); // Prevent context menu
+            
+            // Increment right clicks
+            rightClicks++;
+            totalClicks++;
+            
+            // Update display
+            updateDisplay();
+        }
+        
+        function handleDoubleClick(event) {
+            if (!trackingActive) return;
+            
+            // Increment double clicks
+            doubleClicks++;
+            totalClicks++;
+            
+            // Update display
+            updateDisplay();
+        }
+        
+        function handleScroll(event) {
+            if (!trackingActive) return;
+            
+            // Increment scroll events
+            scrollEvents++;
+            
+            // Update display
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            document.getElementById('click-display').textContent = totalClicks;
+            document.getElementById('left-clicks').textContent = leftClicks;
+            document.getElementById('right-clicks').textContent = rightClicks;
+            document.getElementById('double-clicks').textContent = doubleClicks;
+            document.getElementById('scroll-clicks').textContent = scrollEvents;
+            
+            // Calculate clicks per second
+            if (startTime) {
+                const elapsedSeconds = (new Date() - startTime) / 1000;
+                const cps = elapsedSeconds > 0 ? (totalClicks / elapsedSeconds).toFixed(2) : 0;
+                document.getElementById('cps').textContent = cps;
+            }
+            
+            // Calculate accuracy
+            const totalAnswered = leftClicks + rightClicks + doubleClicks;
+            const accuracy = totalAnswered > 0 ? Math.round((totalClicks / totalAnswered) * 100) : 0;
+            document.getElementById('accuracy').textContent = `${accuracy}%`;
+            
+            // Update total clicks
+            document.getElementById('total-clicks').textContent = totalClicks;
+        }
+        
+        function startTimer() {
+            // Clear any existing timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Update time display immediately
+            updateTimeDisplay();
+            
+            // Start timer interval
+            timerInterval = setInterval(updateTimeDisplay, 1000);
+        }
+        
+        function updateTimeDisplay() {
+            if (!startTime) return;
+            
+            const currentTime = new Date();
+            const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+            const timeLeft = Math.max(0, totalTestTime - elapsedTime);
+            
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            document.getElementById('time-left').textContent = 
+                `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            // End tracking if time is up
+            if (timeLeft <= 0) {
+                endTracking();
+            }
+        }
+        
+        function endTracking() {
+            // Clear timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            trackingActive = false;
+            
+            // Show final results
+            document.getElementById('click-display').textContent = 'Tracking Complete!';
+            
+            // Save to history
+            saveToHistory({
+                date: new Date().toLocaleString(),
+                totalClicks: totalClicks,
+                leftClicks: leftClicks,
+                rightClicks: rightClicks,
+                doubleClicks: doubleClicks,
+                scrollEvents: scrollEvents,
+                duration: totalTestTime
+            });
+            
+            // Show notification if enabled
+            if (document.getElementById('click-notification').checked) {
+                alert(`Tracking completed! Total clicks: ${totalClicks}`);
+            }
+        }
+        
+        function saveToHistory(session) {
+            // Load existing history from localStorage
+            let history = JSON.parse(localStorage.getItem('clickHistory')) || [];
+            
+            // Add new session to the beginning of the array
+            history.unshift(session);
+            
+            // Keep only the last 10 items
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('clickHistory', JSON.stringify(history));
+        }
+        
+        function saveNotificationSettings() {
+            const notifications = {
+                click: document.getElementById('click-notification').checked,
+                milestone: document.getElementById('milestone-notification').checked,
+                time: document.getElementById('time-notification').checked
+            };
+            
+            // In a real app, this would save to localStorage or a server
+            alert('Notification settings saved!');
+        }
+        
+        function saveData() {
+            // Data is saved when completing tracking
+        }
+        
+        function loadSavedData() {
+            const history = JSON.parse(localStorage.getItem('clickHistory')) || [];
+            if (history.length > 0) {
+                // Display last session data
+                const lastSession = history[0];
+                totalClicks = lastSession.totalClicks;
+                leftClicks = lastSession.leftClicks;
+                rightClicks = lastSession.rightClicks;
+                doubleClicks = lastSession.doubleClicks;
+                scrollEvents = lastSession.scrollEvents;
+                updateDisplay();
+            }
+        }
+        
+        function clearData() {
+            // Clear form
+            document.getElementById('tracking-mode').value = 'clicks';
+            document.getElementById('tracking-duration').value = '10';
+            document.getElementById('auto-save').value = '30';
+            document.getElementById('notification-type').value = 'sound';
+            document.getElementById('click-sensitivity').value = 'medium';
+            document.getElementById('export-format').value = 'csv';
+            
+            // Reset tracking state
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            trackingActive = false;
+            totalClicks = 0;
+            leftClicks = 0;
+            rightClicks = 0;
+            doubleClicks = 0;
+            scrollEvents = 0;
+            
+            // Hide result container
+            document.getElementById('result-container').style.display = 'none';
+            
+            // Reset display
+            document.getElementById('click-display').textContent = '0';
+            document.getElementById('left-clicks').textContent = '0';
+            document.getElementById('right-clicks').textContent = '0';
+            document.getElementById('double-clicks').textContent = '0';
+            document.getElementById('scroll-clicks').textContent = '0';
+            document.getElementById('total-clicks').textContent = '0';
+            document.getElementById('cps').textContent = '0.00';
+            document.getElementById('accuracy').textContent = '0%';
+            document.getElementById('time-left').textContent = '0:00';
+            
+            // Clear history
+            localStorage.removeItem('clickHistory');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,868 @@
+<!-- Category: Technology -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Life Estimator</title>
+    <meta name="description" content="Estimate battery life with our Battery Life Estimator. Calculate how long your devices will last on a charge.">
+    <meta name="keywords" content="battery life estimator, battery life calculator, battery life prediction, device battery life, laptop battery life, phone battery life, battery duration, power consumption, battery health, energy efficiency">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50, #3498db, #2c3e50);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .estimator-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #2c3e50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #estimate-btn {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+            color: white;
+        }
+        
+        #estimate-btn:hover {
+            background: linear-gradient(to right, #34495e, #2c3e50);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #clear-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #2c3e50;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .battery-display {
+            font-size: 1.8rem;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #2c3e50;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .battery-visual {
+            width: 100%;
+            height: 40px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .battery-fill {
+            height: 100%;
+            background: #27ae60;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        
+        .battery-level {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .info-section {
+            background: #e8f6f3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        
+        .additional-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .additional-options h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .option-col {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .device-list {
+            list-style-type: none;
+            margin-top: 20px;
+        }
+        
+        .device-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .device-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .notification-settings {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .notification-settings h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .setting-group label {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .estimator-container {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .option-row {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile header height */
+            header {
+                height: 50px;
+                padding: 10px 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin: 0;
+            }
+            
+            /* Remove side padding for mobile to eliminate blank space */
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .estimator-container {
+                padding: 20px 10px;
+                margin: 15px 0;
+                width: 100%;
+            }
+            
+            .input-group {
+                margin-bottom: 15px;
+            }
+            
+            .btn-group {
+                margin-top: 15px;
+            }
+            
+            .result-container {
+                margin: 20px 0;
+                padding: 15px 10px;
+            }
+            
+            .info-section {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .additional-options {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .notification-settings {
+                padding: 15px 10px;
+                margin: 20px 0;
+            }
+            
+            .battery-display {
+                font-size: 1.5rem;
+                padding: 15px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Battery Life Estimator</h1>
+        </header>
+        
+        <div class="estimator-container">
+            <div class="input-group">
+                <label for="device-type">Device Type</label>
+                <select id="device-type">
+                    <option value="laptop">Laptop</option>
+                    <option value="smartphone">Smartphone</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="smartwatch">Smartwatch</option>
+                    <option value="wireless-headphones">Wireless Headphones</option>
+                    <option value="camera">Digital Camera</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="battery-capacity">Battery Capacity (mAh)</label>
+                <input type="number" id="battery-capacity" value="5000" min="100" max="100000" step="100">
+            </div>
+            
+            <div class="input-group">
+                <label for="usage-pattern">Usage Pattern</label>
+                <select id="usage-pattern">
+                    <option value="light">Light Usage (Email, Web Browsing)</option>
+                    <option value="moderate" selected>Moderate Usage (Video Streaming, Social Media)</option>
+                    <option value="heavy">Heavy Usage (Gaming, Video Editing)</option>
+                    <option value="mixed">Mixed Usage</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="screen-on-time">Screen On Time (hours/day)</label>
+                <input type="number" id="screen-on-time" value="8" min="0" max="24" step="0.5">
+            </div>
+            
+            <div class="additional-options">
+                <h3>Additional Options</h3>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="battery-health">Battery Health (%)</label>
+                        <input type="number" id="battery-health" value="100" min="1" max="100" step="1">
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="brightness-level">Brightness Level (%)</label>
+                        <input type="number" id="brightness-level" value="70" min="1" max="100" step="1">
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="wifi-enabled">WiFi Enabled</label>
+                        <select id="wifi-enabled">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="bluetooth-enabled">Bluetooth Enabled</label>
+                        <select id="bluetooth-enabled">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <div class="option-col">
+                        <label for="location-services">Location Services</label>
+                        <select id="location-services">
+                            <option value="high">High Accuracy</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="low">Low Power</option>
+                            <option value="off">Off</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-col">
+                        <label for="background-apps">Background Apps</label>
+                        <select id="background-apps">
+                            <option value="few">Few Apps</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="many">Many Apps</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="estimate-btn">Estimate Battery Life</button>
+                <button id="clear-btn">Clear Data</button>
+            </div>
+            
+            <div class="result-container" id="result-container">
+                <h2 class="result-title">Battery Life Estimate</h2>
+                
+                <div class="battery-display" id="battery-display">
+                    0 hours
+                </div>
+                
+                <div class="battery-visual">
+                    <div class="battery-fill" id="battery-fill"></div>
+                    <div class="battery-level" id="battery-level">0%</div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="estimated-hours">0</div>
+                        <div class="stat-label">Estimated Hours</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="estimated-days">0</div>
+                        <div class="stat-label">Estimated Days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="power-consumption">0</div>
+                        <div class="stat-label">Power Consumption (mA)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="efficiency">0%</div>
+                        <div class="stat-label">Efficiency</div>
+                    </div>
+                </div>
+                
+                <ul class="device-list" id="device-list">
+                    <!-- Device estimates will appear here -->
+                </ul>
+            </div>
+            
+            <div class="notification-settings">
+                <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="estimate-notification" checked> Estimate Ready Notifications
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="low-battery-notification" checked> Low Battery Alerts
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="optimization-notification" checked> Optimization Tips
+                    </label>
+                </div>
+                <button id="save-notifications"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+            
+            <div class="info-section">
+                <h3>How It Works</h3>
+                <ul>
+                    <li>Select your device type and battery capacity</li>
+                    <li>Specify your usage pattern and screen time</li>
+                    <li>Adjust additional settings like brightness and connectivity</li>
+                    <li>Click "Estimate Battery Life" to see predictions</li>
+                    <li>View detailed breakdown of battery consumption</li>
+                    <li>Get tips to extend battery life</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data from localStorage
+            loadSavedData();
+            
+            // Estimate button event listener
+            document.getElementById('estimate-btn').addEventListener('click', estimateBatteryLife);
+            
+            // Clear button event listener
+            document.getElementById('clear-btn').addEventListener('click', clearData);
+            
+            // Save notifications button
+            document.getElementById('save-notifications').addEventListener('click', saveNotificationSettings);
+        });
+        
+        function estimateBatteryLife() {
+            // Get input values
+            const deviceType = document.getElementById('device-type').value;
+            const batteryCapacity = parseInt(document.getElementById('battery-capacity').value) || 5000;
+            const usagePattern = document.getElementById('usage-pattern').value;
+            const screenOnTime = parseFloat(document.getElementById('screen-on-time').value) || 8;
+            const batteryHealth = parseInt(document.getElementById('battery-health').value) || 100;
+            const brightnessLevel = parseInt(document.getElementById('brightness-level').value) || 70;
+            const wifiEnabled = document.getElementById('wifi-enabled').value;
+            const bluetoothEnabled = document.getElementById('bluetooth-enabled').value;
+            const locationServices = document.getElementById('location-services').value;
+            const backgroundApps = document.getElementById('background-apps').value;
+            
+            // Calculate power consumption based on device type and usage pattern
+            let baseConsumption = 0;
+            let efficiency = 100;
+            
+            // Base consumption by device type
+            switch(deviceType) {
+                case 'laptop':
+                    baseConsumption = 5000; // 5W average
+                    break;
+                case 'smartphone':
+                    baseConsumption = 1500; // 1.5W average
+                    break;
+                case 'tablet':
+                    baseConsumption = 2500; // 2.5W average
+                    break;
+                case 'smartwatch':
+                    baseConsumption = 50; // 0.05W average
+                    break;
+                case 'wireless-headphones':
+                    baseConsumption = 100; // 0.1W average
+                    break;
+                case 'camera':
+                    baseConsumption = 800; // 0.8W average
+                    break;
+                default:
+                    baseConsumption = 1500;
+            }
+            
+            // Adjust for usage pattern
+            switch(usagePattern) {
+                case 'light':
+                    baseConsumption *= 0.7;
+                    break;
+                case 'moderate':
+                    baseConsumption *= 1.0;
+                    break;
+                case 'heavy':
+                    baseConsumption *= 1.5;
+                    break;
+                case 'mixed':
+                    baseConsumption *= 1.2;
+                    break;
+            }
+            
+            // Adjust for screen on time and brightness
+            baseConsumption += (screenOnTime * 200 * (brightnessLevel / 100));
+            
+            // Adjust for connectivity
+            if (wifiEnabled === 'yes') baseConsumption += 300;
+            if (bluetoothEnabled === 'yes') baseConsumption += 100;
+            
+            // Adjust for location services
+            switch(locationServices) {
+                case 'high':
+                    baseConsumption += 400;
+                    break;
+                case 'balanced':
+                    baseConsumption += 200;
+                    break;
+                case 'low':
+                    baseConsumption += 100;
+                    break;
+            }
+            
+            // Adjust for background apps
+            switch(backgroundApps) {
+                case 'few':
+                    baseConsumption += 200;
+                    break;
+                case 'moderate':
+                    baseConsumption += 500;
+                    break;
+                case 'many':
+                    baseConsumption += 800;
+                    break;
+            }
+            
+            // Adjust for battery health
+            baseConsumption = baseConsumption * (100 / batteryHealth);
+            
+            // Calculate estimated hours
+            const estimatedHours = batteryCapacity / (baseConsumption / 1000);
+            const estimatedDays = estimatedHours / 24;
+            const powerConsumption = Math.round(baseConsumption);
+            efficiency = Math.min(100, Math.round(100 - ((baseConsumption - 1500) / 30)));
+            
+            // Display results
+            document.getElementById('battery-display').textContent = 
+                `${estimatedHours.toFixed(1)} hours`;
+            
+            // Update battery visual
+            const batteryFill = document.getElementById('battery-fill');
+            const batteryLevel = document.getElementById('battery-level');
+            
+            // Calculate battery level percentage (for visual display)
+            const batteryLevelPercent = Math.min(100, Math.round((estimatedHours / 24) * 100));
+            batteryFill.style.width = `${batteryLevelPercent}%`;
+            batteryLevel.textContent = `${batteryLevelPercent}%`;
+            
+            // Change color based on battery level
+            if (batteryLevelPercent > 50) {
+                batteryFill.style.background = '#27ae60'; // Green
+            } else if (batteryLevelPercent > 20) {
+                batteryFill.style.background = '#f39c12'; // Orange
+            } else {
+                batteryFill.style.background = '#e74c3c'; // Red
+            }
+            
+            // Update stats
+            document.getElementById('estimated-hours').textContent = estimatedHours.toFixed(1);
+            document.getElementById('estimated-days').textContent = estimatedDays.toFixed(2);
+            document.getElementById('power-consumption').textContent = powerConsumption;
+            document.getElementById('efficiency').textContent = `${efficiency}%`;
+            
+            // Display device estimates
+            displayDeviceEstimates(deviceType, estimatedHours, powerConsumption);
+            
+            // Show result container
+            document.getElementById('result-container').style.display = 'block';
+            
+            // Show notification if enabled
+            if (document.getElementById('estimate-notification').checked) {
+                alert(`Battery life estimated: ${estimatedHours.toFixed(1)} hours`);
+            }
+            
+            // Save to history
+            saveToHistory({
+                date: new Date().toLocaleString(),
+                deviceType: deviceType,
+                batteryCapacity: batteryCapacity,
+                estimatedHours: estimatedHours,
+                powerConsumption: powerConsumption,
+                efficiency: efficiency
+            });
+        }
+        
+        function displayDeviceEstimates(deviceType, estimatedHours, powerConsumption) {
+            const deviceList = document.getElementById('device-list');
+            deviceList.innerHTML = '';
+            
+            // Sample device estimates
+            const deviceEstimates = [
+                { name: "Web Browsing", hours: estimatedHours * 0.8, power: powerConsumption * 0.8 },
+                { name: "Video Streaming", hours: estimatedHours * 0.6, power: powerConsumption },
+                { name: "Gaming", hours: estimatedHours * 0.4, power: powerConsumption * 1.5 },
+                { name: "Music Playback", hours: estimatedHours * 1.2, power: powerConsumption * 0.6 },
+                { name: "Standby", hours: estimatedHours * 2, power: powerConsumption * 0.3 }
+            ];
+            
+            deviceEstimates.forEach(estimate => {
+                const deviceItem = document.createElement('li');
+                deviceItem.className = 'device-item';
+                
+                deviceItem.innerHTML = `
+                    <div class="device-header">
+                        <div>${estimate.name}</div>
+                        <div>${estimate.hours.toFixed(1)} hours</div>
+                    </div>
+                    <div class="device-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Power Consumption</span>
+                            <span class="detail-value">${Math.round(estimate.power)} mA</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Battery Used</span>
+                            <span class="detail-value">${Math.min(100, Math.round(100 / (estimate.hours / 24)))}%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Efficiency</span>
+                            <span class="detail-value">${Math.min(100, Math.round(100 - ((estimate.power - 1500) / 30)))}%</span>
+                        </div>
+                    </div>
+                `;
+                
+                deviceList.appendChild(deviceItem);
+            });
+        }
+        
+        function saveToHistory(estimation) {
+            // Load existing history from localStorage
+            let history = JSON.parse(localStorage.getItem('batteryHistory')) || [];
+            
+            // Add new estimation to the beginning of the array
+            history.unshift(estimation);
+            
+            // Keep only the last 5 items
+            if (history.length > 5) {
+                history = history.slice(0, 5);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('batteryHistory', JSON.stringify(history));
+        }
+        
+        function saveNotificationSettings() {
+            const notifications = {
+                estimate: document.getElementById('estimate-notification').checked,
+                lowBattery: document.getElementById('low-battery-notification').checked,
+                optimization: document.getElementById('optimization-notification').checked
+            };
+            
+            // In a real app, this would save to localStorage or a server
+            alert('Notification settings saved!');
+        }
+        
+        function saveData() {
+            // Data is saved when estimating battery life
+        }
+        
+        function loadSavedData() {
+            const history = JSON.parse(localStorage.getItem('batteryHistory')) || [];
+            if (history.length > 0) {
+                // Display last estimation data
+                const lastEstimation = history[0];
+                document.getElementById('device-type').value = lastEstimation.deviceType;
+                document.getElementById('battery-capacity').value = lastEstimation.batteryCapacity;
+                document.getElementById('estimated-hours').textContent = lastEstimation.estimatedHours.toFixed(1);
+                document.getElementById('power-consumption').textContent = lastEstimation.powerConsumption;
+                document.getElementById('efficiency').textContent = `${lastEstimation.efficiency}%`;
+                document.getElementById('result-container').style.display = 'block';
+            }
+        }
+        
+        function clearData() {
+            // Clear form
+            document.getElementById('device-type').value = 'laptop';
+            document.getElementById('battery-capacity').value = '5000';
+            document.getElementById('usage-pattern').value = 'moderate';
+            document.getElementById('screen-on-time').value = '8';
+            document.getElementById('battery-health').value = '100';
+            document.getElementById('brightness-level').value = '70';
+            document.getElementById('wifi-enabled').value = 'yes';
+            document.getElementById('bluetooth-enabled').value = 'yes';
+            document.getElementById('location-services').value = 'balanced';
+            document.getElementById('background-apps').value = 'moderate';
+            
+            // Hide result container
+            document.getElementById('result-container').style.display = 'none';
+            
+            // Reset battery visual
+            document.getElementById('battery-fill').style.width = '0%';
+            document.getElementById('battery-level').textContent = '0%';
+            
+            // Clear history
+            localStorage.removeItem('batteryHistory');
+        }
+    </script>
+</body>
+</html>
