@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Label Generator</title>
+    <meta name="description" content="Generate return shipping labels for packages. Create printable return labels for USPS, FedEx, UPS, and other carriers.">
+    <meta name="keywords" content="return label generator, return shipping label, return label maker, shipping label generator, return label tool, printable return label">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .label-preview {
+            background: #ffffff;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .label-header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .label-header h3 {
+            color: #34495e;
+            font-size: 1.4rem;
+        }
+        
+        .label-content {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .address-section {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .address-section h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #f1f3f4;
+            padding-bottom: 5px;
+        }
+        
+        .address-section p {
+            margin: 5px 0;
+            color: #34495e;
+        }
+        
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            background: #f1f3f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            border-radius: 4px;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .carrier-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .carrier-info h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Return Label Generator</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="carrier">Carrier</label>
+                    <select id="carrier">
+                        <option value="usps">USPS</option>
+                        <option value="fedex">FedEx</option>
+                        <option value="ups">UPS</option>
+                        <option value="dhl">DHL</option>
+                        <option value="amazon">Amazon</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="return-zip">Return ZIP Code</label>
+                        <input type="text" id="return-zip" placeholder="e.g. 90210" maxlength="5" value="90210">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="package-weight">Package Weight (lbs)</label>
+                        <input type="number" id="package-weight" placeholder="Enter weight" min="0.1" step="0.1" value="2">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="return-address">Return Address</label>
+                    <textarea id="return-address" placeholder="Enter return address">123 Main Street
+Los Angeles, CA 90210</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="shipping-address">Shipping Address</label>
+                    <textarea id="shipping-address" placeholder="Enter shipping address">456 Oak Avenue
+New York, NY 10001</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="service-type">Service Type</label>
+                    <select id="service-type">
+                        <option value="ground">Ground (3-5 days)</option>
+                        <option value="express">Express (1-2 days)</option>
+                        <option value="overnight">Overnight (1 day)</option>
+                    </select>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-zip="90210" data-weight="1" data-service="ground">Standard Return</button>
+                    <button class="preset-btn" data-zip="10001" data-weight="3" data-service="express">Express Return</button>
+                    <button class="preset-btn" data-zip="60601" data-weight="5" data-service="ground">Heavy Item</button>
+                </div>
+                
+                <button class="btn-generate" id="generate">Generate Label</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Return Label Information</div>
+                    <div class="info-content">
+                        <p>Generate return shipping labels with all necessary information. Print and attach to your package before shipping.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Required Information</h4>
+                                <p>Return address<br>
+                                Package weight<br>
+                                Service type<br>
+                                Carrier selection</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Label Contents</h4>
+                                <p>Tracking number<br>
+                                QR code<br>
+                                Address labels<br>
+                                Service details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Return Label Preview</div>
+                    
+                    <div class="label-preview">
+                        <div class="label-header">
+                            <h3>RETURN LABEL</h3>
+                            <p>Tracking: <span id="tracking-number">R123456789US</span></p>
+                        </div>
+                        
+                        <div class="label-content">
+                            <div class="address-section">
+                                <h4>Return To:</h4>
+                                <p id="return-address-preview">123 Main Street<br>
+                                Los Angeles, CA 90210</p>
+                            </div>
+                            
+                            <div class="address-section">
+                                <h4>From:</h4>
+                                <p id="shipping-address-preview">456 Oak Avenue<br>
+                                New York, NY 10001</p>
+                            </div>
+                        </div>
+                        
+                        <div class="qr-code">
+                            QR Code
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 15px;">
+                            <p>Service: <span id="service-type-preview">Ground</span></p>
+                            <p>Weight: <span id="weight-preview">2.0 lbs</span></p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-generate" id="print">Print Label</button>
+                    
+                    <div class="carrier-info">
+                        <h4>Carrier Information</h4>
+                        <p>Carrier: <span id="carrier-preview">USPS</span></p>
+                        <p>Estimated Delivery: <span id="delivery-preview">3-5 days</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate');
+            const printBtn = document.getElementById('print');
+            const clearBtn = document.getElementById('clear');
+            const carrierSelect = document.getElementById('carrier');
+            const returnZipInput = document.getElementById('return-zip');
+            const packageWeightInput = document.getElementById('package-weight');
+            const returnAddressInput = document.getElementById('return-address');
+            const shippingAddressInput = document.getElementById('shipping-address');
+            const serviceTypeSelect = document.getElementById('service-type');
+            
+            const trackingNumberEl = document.getElementById('tracking-number');
+            const returnAddressPreviewEl = document.getElementById('return-address-preview');
+            const shippingAddressPreviewEl = document.getElementById('shipping-address-preview');
+            const serviceTypePreviewEl = document.getElementById('service-type-preview');
+            const weightPreviewEl = document.getElementById('weight-preview');
+            const carrierPreviewEl = document.getElementById('carrier-preview');
+            const deliveryPreviewEl = document.getElementById('delivery-preview');
+            
+            // Load saved data
+            loadSavedData();
+            
+            generateBtn.addEventListener('click', generateLabel);
+            printBtn.addEventListener('click', printLabel);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const zip = this.getAttribute('data-zip');
+                    const weight = this.getAttribute('data-weight');
+                    const service = this.getAttribute('data-service');
+                    
+                    returnZipInput.value = zip;
+                    packageWeightInput.value = weight;
+                    serviceTypeSelect.value = service;
+                    
+                    generateLabel();
+                });
+            });
+            
+            // Initial generation
+            generateLabel();
+            
+            function generateLabel() {
+                // Get input values
+                const carrier = carrierSelect.value;
+                const returnZip = returnZipInput.value || '90210';
+                const packageWeight = parseFloat(packageWeightInput.value) || 1;
+                const returnAddress = returnAddressInput.value || '123 Main Street\nLos Angeles, CA 90210';
+                const shippingAddress = shippingAddressInput.value || '456 Oak Avenue\nNew York, NY 10001';
+                const serviceType = serviceTypeSelect.value;
+                
+                // Generate tracking number
+                const trackingNumber = `R${Math.floor(100000000 + Math.random() * 900000000)}${carrier.toUpperCase().substring(0, 2)}`;
+                
+                // Update preview
+                trackingNumberEl.textContent = trackingNumber;
+                returnAddressPreviewEl.textContent = returnAddress.replace(/\n/g, '<br>');
+                shippingAddressPreviewEl.textContent = shippingAddress.replace(/\n/g, '<br>');
+                
+                // Format service type
+                let serviceText = 'Ground';
+                if (serviceType === 'express') serviceText = 'Express';
+                else if (serviceType === 'overnight') serviceText = 'Overnight';
+                serviceTypePreviewEl.textContent = serviceText;
+                
+                weightPreviewEl.textContent = `${packageWeight.toFixed(1)} lbs`;
+                
+                // Format carrier name
+                let carrierName = 'USPS';
+                switch(carrier) {
+                    case 'fedex':
+                        carrierName = 'FedEx';
+                        break;
+                    case 'ups':
+                        carrierName = 'UPS';
+                        break;
+                    case 'dhl':
+                        carrierName = 'DHL';
+                        break;
+                    case 'amazon':
+                        carrierName = 'Amazon';
+                        break;
+                }
+                carrierPreviewEl.textContent = carrierName;
+                
+                // Set delivery estimate
+                let deliveryEstimate = '3-5 days';
+                if (serviceType === 'express') deliveryEstimate = '1-2 days';
+                else if (serviceType === 'overnight') deliveryEstimate = '1 day';
+                deliveryPreviewEl.textContent = deliveryEstimate;
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function printLabel() {
+                // In a real application, this would print the label
+                alert('Label printed successfully! In a real application, this would print the label.');
+            }
+            
+            function saveData() {
+                const data = {
+                    carrier: carrierSelect.value,
+                    returnZip: returnZipInput.value,
+                    packageWeight: packageWeightInput.value,
+                    returnAddress: returnAddressInput.value,
+                    shippingAddress: shippingAddressInput.value,
+                    serviceType: serviceTypeSelect.value
+                };
+                localStorage.setItem('returnLabelData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('returnLabelData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    carrierSelect.value = data.carrier || 'usps';
+                    returnZipInput.value = data.returnZip || '90210';
+                    packageWeightInput.value = data.packageWeight || '2';
+                    returnAddressInput.value = data.returnAddress || '123 Main Street\nLos Angeles, CA 90210';
+                    shippingAddressInput.value = data.shippingAddress || '456 Oak Avenue\nNew York, NY 10001';
+                    serviceTypeSelect.value = data.serviceType || 'ground';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                carrierSelect.value = 'usps';
+                returnZipInput.value = '90210';
+                packageWeightInput.value = '2';
+                returnAddressInput.value = '123 Main Street\nLos Angeles, CA 90210';
+                shippingAddressInput.value = '456 Oak Avenue\nNew York, NY 10001';
+                serviceTypeSelect.value = 'ground';
+                
+                // Reset results
+                trackingNumberEl.textContent = 'R123456789US';
+                returnAddressPreviewEl.textContent = '123 Main Street<br>Los Angeles, CA 90210';
+                shippingAddressPreviewEl.textContent = '456 Oak Avenue<br>New York, NY 10001';
+                serviceTypePreviewEl.textContent = 'Ground';
+                weightPreviewEl.textContent = '2.0 lbs';
+                carrierPreviewEl.textContent = 'USPS';
+                deliveryPreviewEl.textContent = '3-5 days';
+                
+                // Remove saved data
+                localStorage.removeItem('returnLabelData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [carrierSelect, returnZipInput, packageWeightInput, returnAddressInput, 
+             shippingAddressInput, serviceTypeSelect].forEach(input => {
+                input.addEventListener('input', generateLabel);
+            });
+        });
+    </script>
+</body>
+</html>

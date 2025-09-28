@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Transport Pass Advisor</title>
+    <meta name="description" content="Find the best local transport passes for your city visits. Compare prices and benefits of different transit options.">
+    <meta name="keywords" content="local transport pass advisor, public transport passes, transit passes, transportation cards, city travel passes, metro passes">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-advice {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-advice:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-advice:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .pass-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .pass-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .pass-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .pass-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .pass-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .pass-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .pass-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pass-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .pass-price {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .pass-recommended {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        
+        .pass-good {
+            color: #f57c00;
+            font-weight: 600;
+        }
+        
+        .pass-limited {
+            color: #c62828;
+            font-weight: 600;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .pass-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .pass-info h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .savings-calculator {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff8e1;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #34495e;
+        }
+        
+        .savings-calculator span {
+            color: #2e7d32;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Local Transport Pass Advisor</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="city">City</label>
+                        <select id="city">
+                            <option value="new-york">New York City</option>
+                            <option value="london">London</option>
+                            <option value="paris">Paris</option>
+                            <option value="tokyo">Tokyo</option>
+                            <option value="berlin">Berlin</option>
+                            <option value="sydney">Sydney</option>
+                            <option value="singapore">Singapore</option>
+                            <option value="san-francisco">San Francisco</option>
+                            <option value="barcelona">Barcelona</option>
+                            <option value="rome">Rome</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="duration">Visit Duration</label>
+                        <select id="duration">
+                            <option value="1">1 Day</option>
+                            <option value="2">2 Days</option>
+                            <option value="3">3 Days</option>
+                            <option value="4" selected>4 Days</option>
+                            <option value="5">5 Days</option>
+                            <option value="6">6 Days</option>
+                            <option value="7">7 Days</option>
+                            <option value="week-plus">1 Week+</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="travel-frequency">Travel Frequency</label>
+                        <select id="travel-frequency">
+                            <option value="occasional">Occasional (1-2 trips/day)</option>
+                            <option value="moderate" selected>Moderate (3-5 trips/day)</option>
+                            <option value="frequent">Frequent (6+ trips/day)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="budget">Budget ($)</label>
+                        <input type="number" id="budget" placeholder="Enter budget" min="0" step="1" value="50">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="transport-types">Preferred Transport Types</label>
+                    <select id="transport-types" multiple>
+                        <option value="subway" selected>Subway/Metro</option>
+                        <option value="bus" selected>Bus</option>
+                        <option value="tram">Tram/Light Rail</option>
+                        <option value="train">Regional Train</option>
+                        <option value="ferry">Ferry/Water Taxi</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="special-needs">Special Needs</label>
+                    <textarea id="special-needs" placeholder="Accessibility requirements, family travel, etc.">Traveling with children (ages 5 and 8). Need family-friendly transport options with stroller accessibility.</textarea>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="start-date">Start Date</label>
+                        <input type="date" id="start-date" value="2023-07-15">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="end-date">End Date</label>
+                        <input type="date" id="end-date" value="2023-07-19">
+                    </div>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-city="new-york" data-duration="4" data-frequency="moderate">NYC Trip</button>
+                    <button class="preset-btn" data-city="london" data-duration="5" data-frequency="frequent">London Trip</button>
+                    <button class="preset-btn" data-city="paris" data-duration="3" data-frequency="moderate">Paris Trip</button>
+                </div>
+                
+                <button class="btn-advice" id="get-advice">Get Pass Advice</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Transport Pass Information</div>
+                    <div class="info-content">
+                        <p>Find the most cost-effective transport passes for your city visit based on travel frequency and duration.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Pass Types</h4>
+                                <p>Single Journey<br>
+                                Day Pass<br>
+                                Weekly Pass<br>
+                                Monthly Pass</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Savings Tips</h4>
+                                <p>Buy in advance<br>
+                                Family discounts<br>
+                                Off-peak rates<br>
+                                Multi-day passes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Recommended Pass</div>
+                    
+                    <div class="savings-calculator">
+                        Potential Savings: <span id="savings-display">$25.00</span>
+                    </div>
+                    
+                    <div class="pass-card">
+                        <h4>Best Option for Your Trip</h4>
+                        <p>City: <span id="city-display">New York City</span></p>
+                        <p>Duration: <span id="duration-display">4 Days</span></p>
+                        <p>Frequency: <span id="frequency-display">Moderate</span></p>
+                        <p>Recommended Pass: <span id="pass-display">7-Day Unlimited MetroCard</span></p>
+                        <p>Cost: <span id="cost-display">$33.00</span></p>
+                    </div>
+                    
+                    <div class="pass-info">
+                        <h4>Pass Benefits</h4>
+                        <div class="pass-item">
+                            <span class="pass-name">Unlimited Rides:</span>
+                            <span class="pass-price pass-recommended">✓ Included</span>
+                        </div>
+                        <div class="pass-item">
+                            <span class="pass-name">Free Transfers:</span>
+                            <span class="pass-price pass-recommended">✓ Within 2 hours</span>
+                        </div>
+                        <div class="pass-item">
+                            <span class="pass-name">Family Discount:</span>
+                            <span class="pass-price pass-good">✓ Children under 12 free</span>
+                        </div>
+                        <div class="pass-item">
+                            <span class="pass-name">Airport Access:</span>
+                            <span class="pass-price pass-limited">✗ Extra fare required</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pass-list">
+                        <h3>Alternative Passes</h3>
+                        
+                        <div class="pass-item">
+                            <span class="pass-name">Single Ride ($2.75)</span>
+                            <span class="pass-price">$11.00 for 4 days</span>
+                        </div>
+                        
+                        <div class="pass-item">
+                            <span class="pass-name">1-Day Unlimited ($33)</span>
+                            <span class="pass-price pass-recommended">Recommended</span>
+                        </div>
+                        
+                        <div class="pass-item">
+                            <span class="pass-name">7-Day Unlimited ($33)</span>
+                            <span class="pass-price pass-recommended">Best Value</span>
+                        </div>
+                        
+                        <div class="pass-item">
+                            <span class="pass-name">30-Day Unlimited ($127)</span>
+                            <span class="pass-price pass-limited">Not cost-effective</span>
+                        </div>
+                        
+                        <div class="pass-item">
+                            <span class="pass-name">Express Bus ($6.75)</span>
+                            <span class="pass-price">$27.00 for 4 days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const getAdviceBtn = document.getElementById('get-advice');
+            const clearBtn = document.getElementById('clear');
+            const citySelect = document.getElementById('city');
+            const durationSelect = document.getElementById('duration');
+            const travelFrequencySelect = document.getElementById('travel-frequency');
+            const budgetInput = document.getElementById('budget');
+            const transportTypesSelect = document.getElementById('transport-types');
+            const specialNeedsInput = document.getElementById('special-needs');
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            
+            const savingsDisplayEl = document.getElementById('savings-display');
+            const cityDisplayEl = document.getElementById('city-display');
+            const durationDisplayEl = document.getElementById('duration-display');
+            const frequencyDisplayEl = document.getElementById('frequency-display');
+            const passDisplayEl = document.getElementById('pass-display');
+            const costDisplayEl = document.getElementById('cost-display');
+            
+            // Load saved data
+            loadSavedData();
+            
+            getAdviceBtn.addEventListener('click', getAdvice);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const city = this.getAttribute('data-city');
+                    const duration = this.getAttribute('data-duration');
+                    const frequency = this.getAttribute('data-frequency');
+                    
+                    citySelect.value = city;
+                    durationSelect.value = duration;
+                    travelFrequencySelect.value = frequency;
+                    
+                    getAdvice();
+                });
+            });
+            
+            // Initial setup
+            getAdvice();
+            
+            function getAdvice() {
+                // Get input values
+                const city = citySelect.value;
+                const duration = durationSelect.value;
+                const travelFrequency = travelFrequencySelect.value;
+                const budget = parseFloat(budgetInput.value) || 50;
+                const transportTypes = Array.from(transportTypesSelect.selectedOptions).map(option => option.value);
+                const specialNeeds = specialNeedsInput.value;
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                
+                // Update display
+                cityDisplayEl.textContent = getCityName(city);
+                durationDisplayEl.textContent = duration === 'week-plus' ? '1 Week+' : duration + ' Days';
+                frequencyDisplayEl.textContent = travelFrequency.charAt(0).toUpperCase() + travelFrequency.slice(1);
+                
+                // Get transport pass recommendation
+                const recommendation = getPassRecommendation(city, duration, travelFrequency, budget);
+                
+                passDisplayEl.textContent = recommendation.pass;
+                costDisplayEl.textContent = '$' + recommendation.cost.toFixed(2);
+                savingsDisplayEl.textContent = '$' + recommendation.savings.toFixed(2);
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function getCityName(cityCode) {
+                const cities = {
+                    'new-york': 'New York City',
+                    'london': 'London',
+                    'paris': 'Paris',
+                    'tokyo': 'Tokyo',
+                    'berlin': 'Berlin',
+                    'sydney': 'Sydney',
+                    'singapore': 'Singapore',
+                    'san-francisco': 'San Francisco',
+                    'barcelona': 'Barcelona',
+                    'rome': 'Rome'
+                };
+                return cities[cityCode] || cityCode.toUpperCase();
+            }
+            
+            function getPassRecommendation(city, duration, frequency, budget) {
+                // Comprehensive transport pass database
+                const recommendations = {
+                    'new-york': {
+                        '1': {
+                            'occasional': { pass: 'Single Ride ($2.75)', cost: 2.75, savings: 0 },
+                            'moderate': { pass: 'Single Ride ($2.75)', cost: 2.75, savings: 0 },
+                            'frequent': { pass: 'Single Ride ($2.75)', cost: 2.75, savings: 0 }
+                        },
+                        '3': {
+                            'occasional': { pass: 'Single Ride ($2.75)', cost: 8.25, savings: 2 },
+                            'moderate': { pass: '1-Day Unlimited ($33)', cost: 33, savings: 5 },
+                            'frequent': { pass: '1-Day Unlimited ($33)', cost: 33, savings: 10 }
+                        },
+                        '4': {
+                            'occasional': { pass: '1-Day Unlimited ($33)', cost: 33, savings: 5 },
+                            'moderate': { pass: '7-Day Unlimited ($33)', cost: 33, savings: 25 },
+                            'frequent': { pass: '7-Day Unlimited ($33)', cost: 33, savings: 35 }
+                        },
+                        '7': {
+                            'occasional': { pass: '7-Day Unlimited ($33)', cost: 33, savings: 10 },
+                            'moderate': { pass: '7-Day Unlimited ($33)', cost: 33, savings: 30 },
+                            'frequent': { pass: '7-Day Unlimited ($33)', cost: 33, savings: 50 }
+                        }
+                    },
+                    'london': {
+                        '1': {
+                            'occasional': { pass: 'Pay as you go', cost: 5, savings: 0 },
+                            'moderate': { pass: 'Pay as you go', cost: 15, savings: 2 },
+                            'frequent': { pass: '1-Day Travelcard', cost: 14.40, savings: 5 }
+                        },
+                        '4': {
+                            'occasional': { pass: '1-Day Travelcard', cost: 14.40, savings: 5 },
+                            'moderate': { pass: '7-Day Travelcard Zones 1-2', cost: 38.40, savings: 25 },
+                            'frequent': { pass: '7-Day Travelcard Zones 1-2', cost: 38.40, savings: 40 }
+                        },
+                        '7': {
+                            'occasional': { pass: '7-Day Travelcard Zones 1-2', cost: 38.40, savings: 10 },
+                            'moderate': { pass: '7-Day Travelcard Zones 1-2', cost: 38.40, savings: 35 },
+                            'frequent': { pass: '7-Day Travelcard Zones 1-2', cost: 38.40, savings: 60 }
+                        }
+                    },
+                    'paris': {
+                        '1': {
+                            'occasional': { pass: 'Ticket t+', cost: 2.10, savings: 0 },
+                            'moderate': { pass: 'Ticket t+', cost: 6.30, savings: 2 },
+                            'frequent': { pass: '1-Day Navigo Easy', cost: 8.20, savings: 5 }
+                        },
+                        '4': {
+                            'occasional': { pass: '1-Day Navigo Easy', cost: 8.20, savings: 5 },
+                            'moderate': { pass: 'Navigo Découverte (Weekly)', cost: 24.30, savings: 20 },
+                            'frequent': { pass: 'Navigo Découverte (Weekly)', cost: 24.30, savings: 35 }
+                        },
+                        '7': {
+                            'occasional': { pass: 'Navigo Découverte (Weekly)', cost: 24.30, savings: 10 },
+                            'moderate': { pass: 'Navigo Découverte (Weekly)', cost: 24.30, savings: 30 },
+                            'frequent': { pass: 'Navigo Découverte (Weekly)', cost: 24.30, savings: 50 }
+                        }
+                    }
+                };
+                
+                // Return default if not found
+                if (recommendations[city] && recommendations[city][duration] && recommendations[city][duration][frequency]) {
+                    return recommendations[city][duration][frequency];
+                }
+                
+                // Default recommendation
+                return {
+                    pass: 'Pay as you go',
+                    cost: 10,
+                    savings: 0
+                };
+            }
+            
+            function saveData() {
+                const data = {
+                    city: citySelect.value,
+                    duration: durationSelect.value,
+                    travelFrequency: travelFrequencySelect.value,
+                    budget: budgetInput.value,
+                    transportTypes: Array.from(transportTypesSelect.selectedOptions).map(option => option.value),
+                    specialNeeds: specialNeedsInput.value,
+                    startDate: startDateInput.value,
+                    endDate: endDateInput.value
+                };
+                localStorage.setItem('transportPassData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('transportPassData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    citySelect.value = data.city || 'new-york';
+                    durationSelect.value = data.duration || '4';
+                    travelFrequencySelect.value = data.travelFrequency || 'moderate';
+                    budgetInput.value = data.budget || '50';
+                    
+                    // Restore selected transport types
+                    if (data.transportTypes) {
+                        Array.from(transportTypesSelect.options).forEach(option => {
+                            option.selected = data.transportTypes.includes(option.value);
+                        });
+                    }
+                    
+                    specialNeedsInput.value = data.specialNeeds || 'Traveling with children (ages 5 and 8). Need family-friendly transport options with stroller accessibility.';
+                    startDateInput.value = data.startDate || '2023-07-15';
+                    endDateInput.value = data.endDate || '2023-07-19';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                citySelect.value = 'new-york';
+                durationSelect.value = '4';
+                travelFrequencySelect.value = 'moderate';
+                budgetInput.value = '50';
+                specialNeedsInput.value = 'Traveling with children (ages 5 and 8). Need family-friendly transport options with stroller accessibility.';
+                startDateInput.value = '2023-07-15';
+                endDateInput.value = '2023-07-19';
+                
+                // Reset transport types
+                Array.from(transportTypesSelect.options).forEach(option => {
+                    option.selected = ['subway', 'bus'].includes(option.value);
+                });
+                
+                // Reset results
+                savingsDisplayEl.textContent = '$0.00';
+                cityDisplayEl.textContent = 'New York City';
+                durationDisplayEl.textContent = '4 Days';
+                frequencyDisplayEl.textContent = 'Moderate';
+                passDisplayEl.textContent = '7-Day Unlimited MetroCard';
+                costDisplayEl.textContent = '$33.00';
+                
+                // Remove saved data
+                localStorage.removeItem('transportPassData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [citySelect, durationSelect, travelFrequencySelect, budgetInput, 
+             specialNeedsInput, startDateInput, endDateInput].forEach(input => {
+                input.addEventListener('input', getAdvice);
+            });
+            
+            // Add event listener for transport types
+            transportTypesSelect.addEventListener('change', getAdvice);
+        });
+    </script>
+</body>
+</html>

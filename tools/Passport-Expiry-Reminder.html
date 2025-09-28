@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport Expiry Reminder</title>
+    <meta name="description" content="Never let your passport expire unexpectedly. Set reminders for passport renewal before international travel.">
+    <meta name="keywords" content="passport expiry reminder, passport renewal reminder, passport expiration date, travel passport, passport validity checker, passport alert">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-check {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-check:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .passport-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .passport-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .passport-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .expiry-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .expiry-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .expiry-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .expiry-item:last-child {
+            border-bottom: none;
+        }
+        
+        .expiry-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .expiry-date {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .status-expired {
+            color: #c62828;
+            font-weight: 600;
+        }
+        
+        .status-warning {
+            color: #f57c00;
+            font-weight: 600;
+        }
+        
+        .status-safe {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .reminder-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .reminder-info h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .countdown {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #34495e;
+            margin: 15px 0;
+        }
+        
+        .countdown-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-label {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #34495e;
+            border-bottom: 3px solid #34495e;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .notification-settings {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .notification-settings h4 {
+            margin-bottom: 10px;
+            color: #f57f17;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Passport Expiry Reminder</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="tabs">
+                    <div class="tab active" data-tab="details">Passport Details</div>
+                    <div class="tab" data-tab="notifications">Notifications</div>
+                    <div class="tab" data-tab="family">Family Members</div>
+                </div>
+                
+                <div class="tab-content active" id="details-tab">
+                    <div class="input-group">
+                        <label for="passport-holder">Passport Holder Name</label>
+                        <input type="text" id="passport-holder" placeholder="Enter full name" value="John Smith">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="passport-number">Passport Number</label>
+                        <input type="text" id="passport-number" placeholder="Enter passport number" value="P12345678">
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="issue-date">Issue Date</label>
+                            <input type="date" id="issue-date" value="2018-06-15">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="expiry-date">Expiry Date</label>
+                            <input type="date" id="expiry-date" value="2028-06-15">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="nationality">Nationality</label>
+                        <select id="nationality">
+                            <option value="us">United States</option>
+                            <option value="ca">Canada</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="de">Germany</option>
+                            <option value="fr">France</option>
+                            <option value="jp">Japan</option>
+                            <option value="au">Australia</option>
+                            <option value="cn">China</option>
+                            <option value="in">India</option>
+                            <option value="br">Brazil</option>
+                            <option value="mx">Mexico</option>
+                            <option value="th">Thailand</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="visa-details">Visa Details</label>
+                        <textarea id="visa-details" placeholder="Enter visa information">Schengen Visa: Valid until 2025-12-31
+UK Visa: Valid until 2026-06-30</textarea>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="notifications-tab">
+                    <div class="input-group">
+                        <label for="reminder-frequency">Reminder Frequency</label>
+                        <select id="reminder-frequency">
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily" selected>Daily</option>
+                            <option value="none">No Reminders</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="notification-method">Notification Method</label>
+                        <select id="notification-method">
+                            <option value="email">Email</option>
+                            <option value="sms">SMS</option>
+                            <option value="push">Push Notification</option>
+                            <option value="all">All Methods</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="email-address">Email Address</label>
+                        <input type="email" id="email-address" placeholder="Enter email for notifications" value="john.smith@example.com">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="phone-number">Phone Number</label>
+                        <input type="tel" id="phone-number" placeholder="Enter phone for SMS alerts" value="+1 (555) 123-4567">
+                    </div>
+                    
+                    <div class="notification-settings">
+                        <h4>Advanced Notification Settings</h4>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="notify-1-year" checked> Notify 1 year before expiry
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="notify-6-months" checked> Notify 6 months before expiry
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="notify-3-months" checked> Notify 3 months before expiry
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="notify-1-month" checked> Notify 1 month before expiry
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="family-tab">
+                    <div class="input-group">
+                        <label for="family-members">Family Members</label>
+                        <textarea id="family-members" placeholder="Enter family members with passports">Jane Smith (Wife) - P98765432 - Expires: 2029-03-10
+Robert Smith (Son) - P56473829 - Expires: 2030-11-22
+Emily Smith (Daughter) - P10293847 - Expires: 2031-07-05</textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="shared-reminders">Shared Reminders</label>
+                        <select id="shared-reminders">
+                            <option value="all">Remind for all family members</option>
+                            <option value="specific">Remind for specific members</option>
+                            <option value="none">No shared reminders</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-name="Jane Doe" data-number="P98765432" data-issue="2019-03-10" data-expiry="2029-03-10">Family Member</button>
+                    <button class="preset-btn" data-name="Robert Johnson" data-number="P56473829" data-issue="2020-11-22" data-expiry="2030-11-22">Business Partner</button>
+                    <button class="preset-btn" data-name="Emily Wilson" data-number="P10293847" data-issue="2021-07-05" data-expiry="2031-07-05">Child</button>
+                </div>
+                
+                <button class="btn-check" id="check-expiry">Check Expiry</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Passport Expiry Information</div>
+                    <div class="info-content">
+                        <p>Most countries require your passport to be valid for at least 6 months beyond your travel dates.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Renewal Timeline</h4>
+                                <p>Standard: 9-11 months<br>
+                                Expedited: 6-8 months<br>
+                                Emergency: 3-5 months<br>
+                                Last Resort: 1-2 months</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Requirements</h4>
+                                <p>Photo ID<br>
+                                Application Form<br>
+                                Passport Photos<br>
+                                Processing Fee</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Passport Expiry Status</div>
+                    
+                    <div class="countdown" id="countdown">0</div>
+                    <div class="countdown-label">Days Until Expiry</div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar" style="width: 75%;"></div>
+                    </div>
+                    <div class="progress-label" id="progress-label">75% of passport life remaining</div>
+                    
+                    <div class="passport-card">
+                        <h4>Passport Details</h4>
+                        <p>Name: <span id="holder-name-display">John Smith</span></p>
+                        <p>Passport #: <span id="passport-number-display">P12345678</span></p>
+                        <p>Issue Date: <span id="issue-date-display">June 15, 2018</span></p>
+                        <p>Expiry Date: <span id="expiry-date-display">June 15, 2028</span></p>
+                        <p>Nationality: <span id="nationality-display">United States</span></p>
+                    </div>
+                    
+                    <div class="reminder-info">
+                        <h4>Reminders & Notifications</h4>
+                        <div class="expiry-item">
+                            <span class="expiry-name">Reminder Frequency:</span>
+                            <span class="expiry-date" id="reminder-display">Daily</span>
+                        </div>
+                        <div class="expiry-item">
+                            <span class="expiry-name">Notification Method:</span>
+                            <span class="expiry-date" id="notification-display">Email</span>
+                        </div>
+                        <div class="expiry-item">
+                            <span class="expiry-name">Renewal Recommendation:</span>
+                            <span class="expiry-date status-safe" id="renewal-display">No immediate action required</span>
+                        </div>
+                    </div>
+                    
+                    <div class="expiry-list">
+                        <h3>Family Members</h3>
+                        
+                        <div class="expiry-item">
+                            <span class="expiry-name">John Smith</span>
+                            <span class="expiry-date status-safe">1826 days</span>
+                        </div>
+                        
+                        <div class="expiry-item">
+                            <span class="expiry-name">Jane Smith</span>
+                            <span class="expiry-date status-warning">456 days</span>
+                        </div>
+                        
+                        <div class="expiry-item">
+                            <span class="expiry-name">Robert Smith</span>
+                            <span class="expiry-date status-safe">1234 days</span>
+                        </div>
+                        
+                        <div class="expiry-item">
+                            <span class="expiry-name">Emily Smith</span>
+                            <span class="expiry-date status-safe">1567 days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkExpiryBtn = document.getElementById('check-expiry');
+            const clearBtn = document.getElementById('clear');
+            const passportHolderInput = document.getElementById('passport-holder');
+            const passportNumberInput = document.getElementById('passport-number');
+            const issueDateInput = document.getElementById('issue-date');
+            const expiryDateInput = document.getElementById('expiry-date');
+            const nationalitySelect = document.getElementById('nationality');
+            const visaDetailsInput = document.getElementById('visa-details');
+            const reminderFrequencySelect = document.getElementById('reminder-frequency');
+            const notificationMethodSelect = document.getElementById('notification-method');
+            const emailAddressInput = document.getElementById('email-address');
+            const phoneNumberInput = document.getElementById('phone-number');
+            const familyMembersInput = document.getElementById('family-members');
+            const sharedRemindersSelect = document.getElementById('shared-reminders');
+            
+            const countdownEl = document.getElementById('countdown');
+            const progressBarEl = document.getElementById('progress-bar');
+            const progressLabelEl = document.getElementById('progress-label');
+            const holderNameDisplayEl = document.getElementById('holder-name-display');
+            const passportNumberDisplayEl = document.getElementById('passport-number-display');
+            const issueDateDisplayEl = document.getElementById('issue-date-display');
+            const expiryDateDisplayEl = document.getElementById('expiry-date-display');
+            const nationalityDisplayEl = document.getElementById('nationality-display');
+            const reminderDisplayEl = document.getElementById('reminder-display');
+            const notificationDisplayEl = document.getElementById('notification-display');
+            const renewalDisplayEl = document.getElementById('renewal-display');
+            
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Load saved data
+            loadSavedData();
+            
+            checkExpiryBtn.addEventListener('click', checkExpiry);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const number = this.getAttribute('data-number');
+                    const issue = this.getAttribute('data-issue');
+                    const expiry = this.getAttribute('data-expiry');
+                    
+                    passportHolderInput.value = name;
+                    passportNumberInput.value = number;
+                    issueDateInput.value = issue;
+                    expiryDateInput.value = expiry;
+                    
+                    checkExpiry();
+                });
+            });
+            
+            // Initial setup
+            checkExpiry();
+            
+            function checkExpiry() {
+                // Get input values
+                const holderName = passportHolderInput.value || 'John Smith';
+                const passportNumber = passportNumberInput.value || 'P12345678';
+                const issueDate = issueDateInput.value || '2018-06-15';
+                const expiryDate = expiryDateInput.value || '2028-06-15';
+                const nationality = nationalitySelect.value;
+                const visaDetails = visaDetailsInput.value;
+                const reminderFrequency = reminderFrequencySelect.value;
+                const notificationMethod = notificationMethodSelect.value;
+                const emailAddress = emailAddressInput.value;
+                const phoneNumber = phoneNumberInput.value;
+                const familyMembers = familyMembersInput.value;
+                const sharedReminders = sharedRemindersSelect.value;
+                
+                // Calculate days until expiry
+                const today = new Date();
+                const issue = new Date(issueDate);
+                const expiry = new Date(expiryDate);
+                const timeDiff = expiry.getTime() - today.getTime();
+                const daysUntilExpiry = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                // Calculate total passport life in days
+                const totalLife = (expiry.getTime() - issue.getTime()) / (1000 * 3600 * 24);
+                const elapsedLife = totalLife - daysUntilExpiry;
+                const percentageRemaining = (daysUntilExpiry / totalLife) * 100;
+                
+                // Format dates
+                const formattedIssueDate = formatDate(issueDate);
+                const formattedExpiryDate = formatDate(expiryDate);
+                
+                // Update display
+                countdownEl.textContent = daysUntilExpiry;
+                progressBarEl.style.width = `${Math.min(100, Math.max(0, percentageRemaining))}%`;
+                progressLabelEl.textContent = `${percentageRemaining.toFixed(1)}% of passport life remaining`;
+                
+                holderNameDisplayEl.textContent = holderName;
+                passportNumberDisplayEl.textContent = passportNumber;
+                issueDateDisplayEl.textContent = formattedIssueDate;
+                expiryDateDisplayEl.textContent = formattedExpiryDate;
+                nationalityDisplayEl.textContent = getCountryName(nationality);
+                reminderDisplayEl.textContent = reminderFrequency.charAt(0).toUpperCase() + reminderFrequency.slice(1);
+                notificationDisplayEl.textContent = notificationMethod.charAt(0).toUpperCase() + notificationMethod.slice(1);
+                
+                // Update renewal recommendation
+                let renewalMessage = 'No immediate action required';
+                let renewalClass = 'status-safe';
+                
+                if (daysUntilExpiry < 0) {
+                    renewalMessage = 'PASSPORT EXPIRED!';
+                    renewalClass = 'status-expired';
+                } else if (daysUntilExpiry < 30) {
+                    renewalMessage = 'Renew immediately!';
+                    renewalClass = 'status-expired';
+                } else if (daysUntilExpiry < 180) {
+                    renewalMessage = 'Renew soon (within 6 months)';
+                    renewalClass = 'status-warning';
+                } else if (daysUntilExpiry < 365) {
+                    renewalMessage = 'Consider renewal (within year)';
+                    renewalClass = 'status-warning';
+                }
+                
+                renewalDisplayEl.textContent = renewalMessage;
+                renewalDisplayEl.className = 'expiry-date ' + renewalClass;
+                
+                // Update countdown color
+                if (daysUntilExpiry < 0) {
+                    countdownEl.style.color = '#c62828';
+                } else if (daysUntilExpiry < 180) {
+                    countdownEl.style.color = '#f57c00';
+                } else {
+                    countdownEl.style.color = '#2e7d32';
+                }
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            function getCountryName(countryCode) {
+                const countries = {
+                    'us': 'United States',
+                    'ca': 'Canada',
+                    'uk': 'United Kingdom',
+                    'de': 'Germany',
+                    'fr': 'France',
+                    'jp': 'Japan',
+                    'au': 'Australia',
+                    'cn': 'China',
+                    'in': 'India',
+                    'br': 'Brazil',
+                    'mx': 'Mexico',
+                    'th': 'Thailand'
+                };
+                return countries[countryCode] || countryCode.toUpperCase();
+            }
+            
+            function saveData() {
+                const data = {
+                    holderName: passportHolderInput.value,
+                    passportNumber: passportNumberInput.value,
+                    issueDate: issueDateInput.value,
+                    expiryDate: expiryDateInput.value,
+                    nationality: nationalitySelect.value,
+                    visaDetails: visaDetailsInput.value,
+                    reminderFrequency: reminderFrequencySelect.value,
+                    notificationMethod: notificationMethodSelect.value,
+                    emailAddress: emailAddressInput.value,
+                    phoneNumber: phoneNumberInput.value,
+                    familyMembers: familyMembersInput.value,
+                    sharedReminders: sharedRemindersSelect.value
+                };
+                localStorage.setItem('passportExpiryData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('passportExpiryData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    passportHolderInput.value = data.holderName || 'John Smith';
+                    passportNumberInput.value = data.passportNumber || 'P12345678';
+                    issueDateInput.value = data.issueDate || '2018-06-15';
+                    expiryDateInput.value = data.expiryDate || '2028-06-15';
+                    nationalitySelect.value = data.nationality || 'us';
+                    visaDetailsInput.value = data.visaDetails || 'Schengen Visa: Valid until 2025-12-31\nUK Visa: Valid until 2026-06-30';
+                    reminderFrequencySelect.value = data.reminderFrequency || 'daily';
+                    notificationMethodSelect.value = data.notificationMethod || 'email';
+                    emailAddressInput.value = data.emailAddress || 'john.smith@example.com';
+                    phoneNumberInput.value = data.phoneNumber || '+1 (555) 123-4567';
+                    familyMembersInput.value = data.familyMembers || 'Jane Smith (Wife) - P98765432 - Expires: 2029-03-10\nRobert Smith (Son) - P56473829 - Expires: 2030-11-22\nEmily Smith (Daughter) - P10293847 - Expires: 2031-07-05';
+                    sharedRemindersSelect.value = data.sharedReminders || 'all';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                passportHolderInput.value = 'John Smith';
+                passportNumberInput.value = 'P12345678';
+                issueDateInput.value = '2018-06-15';
+                expiryDateInput.value = '2028-06-15';
+                nationalitySelect.value = 'us';
+                visaDetailsInput.value = 'Schengen Visa: Valid until 2025-12-31\nUK Visa: Valid until 2026-06-30';
+                reminderFrequencySelect.value = 'daily';
+                notificationMethodSelect.value = 'email';
+                emailAddressInput.value = 'john.smith@example.com';
+                phoneNumberInput.value = '+1 (555) 123-4567';
+                familyMembersInput.value = 'Jane Smith (Wife) - P98765432 - Expires: 2029-03-10\nRobert Smith (Son) - P56473829 - Expires: 2030-11-22\nEmily Smith (Daughter) - P10293847 - Expires: 2031-07-05';
+                sharedRemindersSelect.value = 'all';
+                
+                // Reset results
+                countdownEl.textContent = '0';
+                progressBarEl.style.width = '75%';
+                progressLabelEl.textContent = '75% of passport life remaining';
+                holderNameDisplayEl.textContent = 'John Smith';
+                passportNumberDisplayEl.textContent = 'P12345678';
+                issueDateDisplayEl.textContent = 'June 15, 2018';
+                expiryDateDisplayEl.textContent = 'June 15, 2028';
+                nationalityDisplayEl.textContent = 'United States';
+                reminderDisplayEl.textContent = 'Daily';
+                notificationDisplayEl.textContent = 'Email';
+                renewalDisplayEl.textContent = 'No immediate action required';
+                renewalDisplayEl.className = 'expiry-date status-safe';
+                countdownEl.style.color = '#2e7d32';
+                
+                // Remove saved data
+                localStorage.removeItem('passportExpiryData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [passportHolderInput, passportNumberInput, issueDateInput, 
+             expiryDateInput, nationalitySelect, visaDetailsInput, 
+             reminderFrequencySelect, notificationMethodSelect, 
+             emailAddressInput, phoneNumberInput, familyMembersInput, 
+             sharedRemindersSelect].forEach(input => {
+                input.addEventListener('input', checkExpiry);
+            });
+        });
+    </script>
+</body>
+</html>

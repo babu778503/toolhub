@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal Expiry Alert</title>
+    <meta name="description" content="Set alerts for deal and coupon expiry dates. Never miss out on time-sensitive offers with our expiry notification system.">
+    <meta name="keywords" content="deal expiry alert, coupon expiry tracker, deal reminder, expiry notification, deal alert system, coupon tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-set {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-set:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-set:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .alert-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .alert-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .alert-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .deal-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .deal-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .deal-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .deal-item:last-child {
+            border-bottom: none;
+        }
+        
+        .deal-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .deal-expiry {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .days-left {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .days-left-urgent {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .days-left-warning {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+        
+        .days-left-safe {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Deal Expiry Alert</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="deal-name">Deal Name</label>
+                    <input type="text" id="deal-name" placeholder="Enter deal name" value="Black Friday Sale">
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="expiry-date">Expiry Date</label>
+                        <input type="date" id="expiry-date">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="reminder-days">Reminder Days</label>
+                        <select id="reminder-days">
+                            <option value="1">1 day before</option>
+                            <option value="3">3 days before</option>
+                            <option value="7" selected>7 days before</option>
+                            <option value="14">14 days before</option>
+                            <option value="30">30 days before</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="deal-description">Deal Description</label>
+                    <textarea id="deal-description" placeholder="Enter deal details">50% off all electronics during Black Friday weekend. Limited time offer, valid until Sunday.</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="deal-value">Deal Value ($)</label>
+                    <input type="number" id="deal-value" placeholder="Enter estimated value" min="0" value="200">
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-name="Cyber Monday" data-value="300">Cyber Monday</button>
+                    <button class="preset-btn" data-name="End of Season" data-value="150">Seasonal Sale</button>
+                    <button class="preset-btn" data-name="Flash Sale" data-value="50">Flash Deal</button>
+                </div>
+                
+                <button class="btn-set" id="set-alert">Set Expiry Alert</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Deal Alert Information</div>
+                    <div class="info-content">
+                        <p>Set alerts for important deals and never miss an expiry date. Get notified before your favorite offers expire.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Alert Types</h4>
+                                <p>1 day reminder<br>
+                                3 day reminder<br>
+                                7 day reminder<br>
+                                14 day reminder</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Deal Categories</h4>
+                                <p>Electronics<br>
+                                Clothing<br>
+                                Travel<br>
+                                Food & Dining</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Active Alerts</div>
+                    
+                    <div class="alert-card">
+                        <h4>Black Friday Sale</h4>
+                        <p>Expires: <span id="expiry-date-display">-</span></p>
+                        <p>Value: $<span id="deal-value-display">200</span></p>
+                        <p>Alert: <span id="reminder-days-display">7</span> days before</p>
+                    </div>
+                    
+                    <div class="deal-list">
+                        <h3>Upcoming Expiries</h3>
+                        
+                        <div class="deal-item">
+                            <span class="deal-name">Cyber Monday</span>
+                            <div>
+                                <span class="deal-expiry">Dec 1, 2023</span>
+                                <span class="days-left days-left-urgent">2 days</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deal-item">
+                            <span class="deal-name">End of Season</span>
+                            <div>
+                                <span class="deal-expiry">Dec 15, 2023</span>
+                                <span class="days-left days-left-warning">16 days</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deal-item">
+                            <span class="deal-name">Flash Sale</span>
+                            <div>
+                                <span class="deal-expiry">Jan 5, 2024</span>
+                                <span class="days-left days-left-safe">37 days</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deal-item">
+                            <span class="deal-name">New Year Offer</span>
+                            <div>
+                                <span class="deal-expiry">Jan 15, 2024</span>
+                                <span class="days-left days-left-safe">47 days</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const setAlertBtn = document.getElementById('set-alert');
+            const clearBtn = document.getElementById('clear');
+            const dealNameInput = document.getElementById('deal-name');
+            const expiryDateInput = document.getElementById('expiry-date');
+            const reminderDaysSelect = document.getElementById('reminder-days');
+            const dealDescriptionInput = document.getElementById('deal-description');
+            const dealValueInput = document.getElementById('deal-value');
+            
+            const expiryDateDisplayEl = document.getElementById('expiry-date-display');
+            const dealValueDisplayEl = document.getElementById('deal-value-display');
+            const reminderDaysDisplayEl = document.getElementById('reminder-days-display');
+            
+            // Set default expiry date to next week
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            expiryDateInput.value = nextWeek.toISOString().split('T')[0];
+            
+            // Load saved data
+            loadSavedData();
+            
+            setAlertBtn.addEventListener('click', setAlert);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const value = this.getAttribute('data-value');
+                    
+                    dealNameInput.value = name;
+                    dealValueInput.value = value;
+                    
+                    setAlert();
+                });
+            });
+            
+            // Initial setup
+            setAlert();
+            
+            function setAlert() {
+                // Get input values
+                const dealName = dealNameInput.value || 'New Deal';
+                const expiryDate = expiryDateInput.value ? new Date(expiryDateInput.value) : new Date();
+                const reminderDays = parseInt(reminderDaysSelect.value) || 7;
+                const dealValue = parseFloat(dealValueInput.value) || 0;
+                
+                // Format expiry date
+                const formattedExpiry = expiryDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                // Update display
+                expiryDateDisplayEl.textContent = formattedExpiry;
+                dealValueDisplayEl.textContent = dealValue.toFixed(2);
+                reminderDaysDisplayEl.textContent = reminderDays;
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function saveData() {
+                const data = {
+                    dealName: dealNameInput.value,
+                    expiryDate: expiryDateInput.value,
+                    reminderDays: reminderDaysSelect.value,
+                    dealDescription: dealDescriptionInput.value,
+                    dealValue: dealValueInput.value
+                };
+                localStorage.setItem('dealExpiryData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('dealExpiryData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    dealNameInput.value = data.dealName || 'Black Friday Sale';
+                    expiryDateInput.value = data.expiryDate || new Date().toISOString().split('T')[0];
+                    reminderDaysSelect.value = data.reminderDays || '7';
+                    dealDescriptionInput.value = data.dealDescription || '50% off all electronics during Black Friday weekend. Limited time offer, valid until Sunday.';
+                    dealValueInput.value = data.dealValue || '200';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                dealNameInput.value = 'Black Friday Sale';
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                expiryDateInput.value = nextWeek.toISOString().split('T')[0];
+                reminderDaysSelect.value = '7';
+                dealDescriptionInput.value = '50% off all electronics during Black Friday weekend. Limited time offer, valid until Sunday.';
+                dealValueInput.value = '200';
+                
+                // Reset results
+                expiryDateDisplayEl.textContent = '-';
+                dealValueDisplayEl.textContent = '200.00';
+                reminderDaysDisplayEl.textContent = '7';
+                
+                // Remove saved data
+                localStorage.removeItem('dealExpiryData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [dealNameInput, expiryDateInput, reminderDaysSelect, dealValueInput].forEach(input => {
+                input.addEventListener('input', setAlert);
+            });
+        });
+    </script>
+</body>
+</html>

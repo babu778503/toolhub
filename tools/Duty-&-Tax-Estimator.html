@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duty & Tax Estimator</title>
+    <meta name="description" content="Estimate customs duties and taxes for international shipments. Calculate import fees for packages and goods.">
+    <meta name="keywords" content="duty estimator, tax estimator, customs calculator, import duty calculator, tax calculator, international shipping fees">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-estimate {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-estimate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-estimate:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .result-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #34495e;
+            margin: 15px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .tax-breakdown {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .tax-breakdown h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .tax-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tax-item:last-child {
+            border-bottom: none;
+        }
+        
+        .tax-label {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .tax-value {
+            color: #34495e;
+            font-weight: 600;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .duty-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .duty-info h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Duty & Tax Estimator</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="origin-country">Origin Country</label>
+                        <select id="origin-country">
+                            <option value="us">United States</option>
+                            <option value="ca">Canada</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="de">Germany</option>
+                            <option value="fr">France</option>
+                            <option value="jp">Japan</option>
+                            <option value="au">Australia</option>
+                            <option value="cn">China</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="destination-country">Destination Country</label>
+                        <select id="destination-country">
+                            <option value="us">United States</option>
+                            <option value="ca">Canada</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="de">Germany</option>
+                            <option value="fr">France</option>
+                            <option value="jp">Japan</option>
+                            <option value="au">Australia</option>
+                            <option value="cn">China</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="declared-value">Declared Value ($)</label>
+                    <input type="number" id="declared-value" placeholder="Enter declared value" min="0" value="100">
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="product-category">Product Category</label>
+                        <select id="product-category">
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="books">Books</option>
+                            <option value="food">Food & Beverages</option>
+                            <option value="jewelry">Jewelry</option>
+                            <option value="furniture">Furniture</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" placeholder="Enter weight" min="0.1" step="0.1" value="2">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="tax-rate">Tax Rate (%)</label>
+                    <input type="number" id="tax-rate" placeholder="Enter tax rate" min="0" max="100" step="0.1" value="10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="duty-rate">Duty Rate (%)</label>
+                    <input type="number" id="duty-rate" placeholder="Enter duty rate" min="0" max="100" step="0.1" value="5">
+                </div>
+                
+                <div class="input-group">
+                    <label for="shipping-cost">Shipping Cost ($)</label>
+                    <input type="number" id="shipping-cost" placeholder="Enter shipping cost" min="0" value="25">
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-origin="cn" data-dest="us" data-value="150" data-category="electronics">Electronics from China</button>
+                    <button class="preset-btn" data-origin="de" data-dest="uk" data-value="75" data-category="clothing">Clothing from Germany</button>
+                    <button class="preset-btn" data-origin="jp" data-dest="ca" data-value="200" data-category="jewelry">Jewelry from Japan</button>
+                </div>
+                
+                <button class="btn-estimate" id="estimate">Estimate Duty & Tax</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Duty & Tax Information</div>
+                    <div class="info-content">
+                        <p>Estimate customs duties and taxes for international shipments based on value, weight, and destination.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Duty Rates by Category</h4>
+                                <p>Electronics: 0-25%<br>
+                                Clothing: 0-15%<br>
+                                Books: 0%<br>
+                                Food: 0-10%</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Tax Considerations</h4>
+                                <p>VAT<br>
+                                Sales Tax<br>
+                                Harmonized Tax<br>
+                                Import Fees</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Estimated Duty & Tax</div>
+                    <div class="result-value" id="total-cost">$0.00</div>
+                    <div class="result-subtitle">Based on entered specifications</div>
+                    
+                    <div class="tax-breakdown">
+                        <h3>Cost Breakdown</h3>
+                        
+                        <div class="tax-item">
+                            <span class="tax-label">Declared Value:</span>
+                            <span class="tax-value" id="declared-value-display">$100.00</span>
+                        </div>
+                        
+                        <div class="tax-item">
+                            <span class="tax-label">Duty Amount:</span>
+                            <span class="tax-value" id="duty-amount">$0.00</span>
+                        </div>
+                        
+                        <div class="tax-item">
+                            <span class="tax-label">Tax Amount:</span>
+                            <span class="tax-value" id="tax-amount">$0.00</span>
+                        </div>
+                        
+                        <div class="tax-item">
+                            <span class="tax-label">Processing Fee:</span>
+                            <span class="tax-value" id="processing-fee">$0.00</span>
+                        </div>
+                        
+                        <div class="tax-item">
+                            <span class="tax-label">Total Duty & Tax:</span>
+                            <span class="tax-value" id="total-duty-tax">$0.00</span>
+                        </div>
+                        
+                        <div class="tax-item" style="border-top: 1px solid #dee2e6; margin-top: 10px; padding-top: 15px;">
+                            <span class="tax-label">Total with Shipping:</span>
+                            <span class="tax-value" id="final-cost">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="duty-info">
+                        <h4>Customs Information</h4>
+                        <div class="tax-item">
+                            <span class="tax-label">Origin:</span>
+                            <span class="tax-value" id="origin-display">China</span>
+                        </div>
+                        <div class="tax-item">
+                            <span class="tax-label">Destination:</span>
+                            <span class="tax-value" id="destination-display">United States</span>
+                        </div>
+                        <div class="tax-item">
+                            <span class="tax-label">Category:</span>
+                            <span class="tax-value" id="category-display">Electronics</span>
+                        </div>
+                        <div class="tax-item">
+                            <span class="tax-label">Tax Rate:</span>
+                            <span class="tax-value" id="tax-rate-display">10%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const estimateBtn = document.getElementById('estimate');
+            const clearBtn = document.getElementById('clear');
+            const originCountrySelect = document.getElementById('origin-country');
+            const destinationCountrySelect = document.getElementById('destination-country');
+            const declaredValueInput = document.getElementById('declared-value');
+            const productCategorySelect = document.getElementById('product-category');
+            const weightInput = document.getElementById('weight');
+            const taxRateInput = document.getElementById('tax-rate');
+            const dutyRateInput = document.getElementById('duty-rate');
+            const shippingCostInput = document.getElementById('shipping-cost');
+            
+            const totalCostEl = document.getElementById('total-cost');
+            const declaredValueDisplayEl = document.getElementById('declared-value-display');
+            const dutyAmountEl = document.getElementById('duty-amount');
+            const taxAmountEl = document.getElementById('tax-amount');
+            const processingFeeEl = document.getElementById('processing-fee');
+            const totalDutyTaxEl = document.getElementById('total-duty-tax');
+            const finalCostEl = document.getElementById('final-cost');
+            const originDisplayEl = document.getElementById('origin-display');
+            const destinationDisplayEl = document.getElementById('destination-display');
+            const categoryDisplayEl = document.getElementById('category-display');
+            const taxRateDisplayEl = document.getElementById('tax-rate-display');
+            
+            // Load saved data
+            loadSavedData();
+            
+            estimateBtn.addEventListener('click', estimateDutyTax);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const origin = this.getAttribute('data-origin');
+                    const dest = this.getAttribute('data-dest');
+                    const value = this.getAttribute('data-value');
+                    const category = this.getAttribute('data-category');
+                    
+                    originCountrySelect.value = origin;
+                    destinationCountrySelect.value = dest;
+                    declaredValueInput.value = value;
+                    productCategorySelect.value = category;
+                    
+                    estimateDutyTax();
+                });
+            });
+            
+            // Initial calculation
+            estimateDutyTax();
+            
+            function estimateDutyTax() {
+                // Get input values
+                const originCountry = originCountrySelect.value;
+                const destinationCountry = destinationCountrySelect.value;
+                const declaredValue = parseFloat(declaredValueInput.value) || 0;
+                const productCategory = productCategorySelect.value;
+                const weight = parseFloat(weightInput.value) || 1;
+                const taxRate = parseFloat(taxRateInput.value) || 0;
+                const dutyRate = parseFloat(dutyRateInput.value) || 0;
+                const shippingCost = parseFloat(shippingCostInput.value) || 0;
+                
+                // Calculate duty amount (based on declared value and duty rate)
+                const dutyAmount = declaredValue * (dutyRate / 100);
+                
+                // Calculate tax amount (based on declared value plus duty)
+                const taxableValue = declaredValue + dutyAmount;
+                const taxAmount = taxableValue * (taxRate / 100);
+                
+                // Calculate processing fee (flat rate)
+                const processingFee = 5.00;
+                
+                // Calculate total duty and tax
+                const totalDutyTax = dutyAmount + taxAmount + processingFee;
+                
+                // Calculate final cost (duty + tax + processing fee + shipping)
+                const finalCost = totalDutyTax + shippingCost;
+                
+                // Update display
+                declaredValueDisplayEl.textContent = `$${declaredValue.toFixed(2)}`;
+                dutyAmountEl.textContent = `$${dutyAmount.toFixed(2)}`;
+                taxAmountEl.textContent = `$${taxAmount.toFixed(2)}`;
+                processingFeeEl.textContent = `$${processingFee.toFixed(2)}`;
+                totalDutyTaxEl.textContent = `$${totalDutyTax.toFixed(2)}`;
+                totalCostEl.textContent = `$${finalCost.toFixed(2)}`;
+                finalCostEl.textContent = `$${finalCost.toFixed(2)}`;
+                
+                // Update customs information
+                originDisplayEl.textContent = getCountryName(originCountry);
+                destinationDisplayEl.textContent = getCountryName(destinationCountry);
+                categoryDisplayEl.textContent = productCategory.charAt(0).toUpperCase() + productCategory.slice(1);
+                taxRateDisplayEl.textContent = `${taxRate}%`;
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function getCountryName(countryCode) {
+                const countries = {
+                    'us': 'United States',
+                    'ca': 'Canada',
+                    'uk': 'United Kingdom',
+                    'de': 'Germany',
+                    'fr': 'France',
+                    'jp': 'Japan',
+                    'au': 'Australia',
+                    'cn': 'China'
+                };
+                return countries[countryCode] || countryCode.toUpperCase();
+            }
+            
+            function saveData() {
+                const data = {
+                    originCountry: originCountrySelect.value,
+                    destinationCountry: destinationCountrySelect.value,
+                    declaredValue: declaredValueInput.value,
+                    productCategory: productCategorySelect.value,
+                    weight: weightInput.value,
+                    taxRate: taxRateInput.value,
+                    dutyRate: dutyRateInput.value,
+                    shippingCost: shippingCostInput.value
+                };
+                localStorage.setItem('dutyTaxData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('dutyTaxData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    originCountrySelect.value = data.originCountry || 'cn';
+                    destinationCountrySelect.value = data.destinationCountry || 'us';
+                    declaredValueInput.value = data.declaredValue || '100';
+                    productCategorySelect.value = data.productCategory || 'electronics';
+                    weightInput.value = data.weight || '2';
+                    taxRateInput.value = data.taxRate || '10';
+                    dutyRateInput.value = data.dutyRate || '5';
+                    shippingCostInput.value = data.shippingCost || '25';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                originCountrySelect.value = 'cn';
+                destinationCountrySelect.value = 'us';
+                declaredValueInput.value = '100';
+                productCategorySelect.value = 'electronics';
+                weightInput.value = '2';
+                taxRateInput.value = '10';
+                dutyRateInput.value = '5';
+                shippingCostInput.value = '25';
+                
+                // Reset results
+                totalCostEl.textContent = '$0.00';
+                declaredValueDisplayEl.textContent = '$100.00';
+                dutyAmountEl.textContent = '$0.00';
+                taxAmountEl.textContent = '$0.00';
+                processingFeeEl.textContent = '$5.00';
+                totalDutyTaxEl.textContent = '$0.00';
+                finalCostEl.textContent = '$0.00';
+                originDisplayEl.textContent = 'China';
+                destinationDisplayEl.textContent = 'United States';
+                categoryDisplayEl.textContent = 'Electronics';
+                taxRateDisplayEl.textContent = '10%';
+                
+                // Remove saved data
+                localStorage.removeItem('dutyTaxData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [originCountrySelect, destinationCountrySelect, declaredValueInput, 
+             productCategorySelect, weightInput, taxRateInput, dutyRateInput, 
+             shippingCostInput].forEach(input => {
+                input.addEventListener('input', estimateDutyTax);
+            });
+        });
+    </script>
+</body>
+</html>

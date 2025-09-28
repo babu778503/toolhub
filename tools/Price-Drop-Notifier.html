@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Drop Notifier</title>
+    <meta name="description" content="Get notified when product prices drop. Track items and receive alerts when they reach your target price.">
+    <meta name="keywords" content="price drop notifier, price tracker, price alert, product price monitor, price drop alert, shopping deal tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-set {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-set:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-set:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .notification-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .notification-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .notification-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .product-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .product-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .product-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .product-price {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .price-change {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .price-drop {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .price-rise {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .price-history {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .price-history h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .history-price {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Price Drop Notifier</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="product-name">Product Name</label>
+                    <input type="text" id="product-name" placeholder="Enter product name" value="Wireless Headphones">
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="current-price">Current Price ($)</label>
+                        <input type="number" id="current-price" placeholder="Enter current price" min="0" step="0.01" value="150.00">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="target-price">Target Price ($)</label>
+                        <input type="number" id="target-price" placeholder="Enter target price" min="0" step="0.01" value="120.00">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="product-url">Product URL</label>
+                    <input type="url" id="product-url" placeholder="Enter product URL" value="https://example.com/product">
+                </div>
+                
+                <div class="input-group">
+                    <label for="notification-method">Notification Method</label>
+                    <select id="notification-method">
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="push">Push Notification</option>
+                        <option value="both">Email & Push</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="price-drop">Price Drop Threshold (%)</label>
+                    <select id="price-drop">
+                        <option value="5">5% drop</option>
+                        <option value="10" selected>10% drop</option>
+                        <option value="15">15% drop</option>
+                        <option value="20">20% drop</option>
+                        <option value="25">25% drop</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="monitoring-period">Monitoring Period</label>
+                    <select id="monitoring-period">
+                        <option value="30">30 days</option>
+                        <option value="60" selected>60 days</option>
+                        <option value="90">90 days</option>
+                        <option value="180">180 days</option>
+                        <option value="365">1 year</option>
+                    </select>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-name="Laptop" data-current="999" data-target="850">Laptop</button>
+                    <button class="preset-btn" data-name="Smartphone" data-current="799" data-target="650">Smartphone</button>
+                    <button class="preset-btn" data-name="Camera" data-current="499" data-target="400">Camera</button>
+                </div>
+                
+                <button class="btn-set" id="set-notifier">Set Price Alert</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Price Alert Information</div>
+                    <div class="info-content">
+                        <p>Track product prices and get notified when they drop to your target price. Never miss a deal again!</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Alert Types</h4>
+                                <p>Target price<br>
+                                Percentage drop<br>
+                                Price history<br>
+                                Daily updates</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Notification Methods</h4>
+                                <p>Email alerts<br>
+                                SMS messages<br>
+                                Push notifications<br>
+                                In-app alerts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Active Price Alerts</div>
+                    
+                    <div class="notification-card">
+                        <h4>Wireless Headphones</h4>
+                        <p>Current: $<span id="current-price-display">150.00</span></p>
+                        <p>Target: $<span id="target-price-display">120.00</span></p>
+                        <p>Threshold: <span id="threshold-display">10</span>% drop</p>
+                        <p>Monitoring: <span id="monitoring-display">60</span> days</p>
+                    </div>
+                    
+                    <div class="price-history">
+                        <h4>Price History</h4>
+                        <div class="history-item">
+                            <span class="history-date">Today</span>
+                            <span class="history-price">$150.00</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-date">2 days ago</span>
+                            <span class="history-price">$155.00</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-date">1 week ago</span>
+                            <span class="history-price">$160.00</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-date">2 weeks ago</span>
+                            <span class="history-price">$158.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-list">
+                        <h3>Tracked Products</h3>
+                        
+                        <div class="product-item">
+                            <span class="product-name">Wireless Headphones</span>
+                            <div>
+                                <span class="product-price">$150.00</span>
+                                <span class="price-change price-drop">-5%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <span class="product-name">Gaming Mouse</span>
+                            <div>
+                                <span class="product-price">$75.99</span>
+                                <span class="price-change price-rise">+2%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <span class="product-name">External SSD</span>
+                            <div>
+                                <span class="product-price">$129.00</span>
+                                <span class="price-change price-drop">-12%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <span class="product-name">Smart Watch</span>
+                            <div>
+                                <span class="product-price">$299.99</span>
+                                <span class="price-change price-drop">-8%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const setNotifierBtn = document.getElementById('set-notifier');
+            const clearBtn = document.getElementById('clear');
+            const productNameInput = document.getElementById('product-name');
+            const currentPriceInput = document.getElementById('current-price');
+            const targetPriceInput = document.getElementById('target-price');
+            const productUrlInput = document.getElementById('product-url');
+            const notificationMethodSelect = document.getElementById('notification-method');
+            const priceDropSelect = document.getElementById('price-drop');
+            const monitoringPeriodSelect = document.getElementById('monitoring-period');
+            
+            const currentPriceDisplayEl = document.getElementById('current-price-display');
+            const targetPriceDisplayEl = document.getElementById('target-price-display');
+            const thresholdDisplayEl = document.getElementById('threshold-display');
+            const monitoringDisplayEl = document.getElementById('monitoring-display');
+            
+            // Load saved data
+            loadSavedData();
+            
+            setNotifierBtn.addEventListener('click', setNotifier);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const current = this.getAttribute('data-current');
+                    const target = this.getAttribute('data-target');
+                    
+                    productNameInput.value = name;
+                    currentPriceInput.value = current;
+                    targetPriceInput.value = target;
+                    
+                    setNotifier();
+                });
+            });
+            
+            // Initial setup
+            setNotifier();
+            
+            function setNotifier() {
+                // Get input values
+                const productName = productNameInput.value || 'New Product';
+                const currentPrice = parseFloat(currentPriceInput.value) || 0;
+                const targetPrice = parseFloat(targetPriceInput.value) || 0;
+                const notificationMethod = notificationMethodSelect.value;
+                const priceDropThreshold = parseInt(priceDropSelect.value) || 10;
+                const monitoringPeriod = parseInt(monitoringPeriodSelect.value) || 60;
+                
+                // Update display
+                currentPriceDisplayEl.textContent = currentPrice.toFixed(2);
+                targetPriceDisplayEl.textContent = targetPrice.toFixed(2);
+                thresholdDisplayEl.textContent = priceDropThreshold;
+                monitoringDisplayEl.textContent = monitoringPeriod;
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function saveData() {
+                const data = {
+                    productName: productNameInput.value,
+                    currentPrice: currentPriceInput.value,
+                    targetPrice: targetPriceInput.value,
+                    productUrl: productUrlInput.value,
+                    notificationMethod: notificationMethodSelect.value,
+                    priceDropThreshold: priceDropSelect.value,
+                    monitoringPeriod: monitoringPeriodSelect.value
+                };
+                localStorage.setItem('priceDropData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('priceDropData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    productNameInput.value = data.productName || 'Wireless Headphones';
+                    currentPriceInput.value = data.currentPrice || '150.00';
+                    targetPriceInput.value = data.targetPrice || '120.00';
+                    productUrlInput.value = data.productUrl || 'https://example.com/product';
+                    notificationMethodSelect.value = data.notificationMethod || 'email';
+                    priceDropSelect.value = data.priceDropThreshold || '10';
+                    monitoringPeriodSelect.value = data.monitoringPeriod || '60';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                productNameInput.value = 'Wireless Headphones';
+                currentPriceInput.value = '150.00';
+                targetPriceInput.value = '120.00';
+                productUrlInput.value = 'https://example.com/product';
+                notificationMethodSelect.value = 'email';
+                priceDropSelect.value = '10';
+                monitoringPeriodSelect.value = '60';
+                
+                // Reset results
+                currentPriceDisplayEl.textContent = '150.00';
+                targetPriceDisplayEl.textContent = '120.00';
+                thresholdDisplayEl.textContent = '10';
+                monitoringDisplayEl.textContent = '60';
+                
+                // Remove saved data
+                localStorage.removeItem('priceDropData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [productNameInput, currentPriceInput, targetPriceInput, priceDropSelect, monitoringPeriodSelect].forEach(input => {
+                input.addEventListener('input', setNotifier);
+            });
+        });
+    </script>
+</body>
+</html>

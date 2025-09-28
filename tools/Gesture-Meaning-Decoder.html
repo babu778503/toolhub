@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Meaning Decoder</title>
+    <meta name="description" content="Decode hand gestures and body language from different cultures. Understand non-verbal communication signals.">
+    <meta name="keywords" content="gesture meaning decoder, body language, hand gestures, cultural gestures, non-verbal communication, gesture interpretation">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-decode {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-decode:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-decode:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .gesture-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .gesture-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .gesture-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .meaning-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .meaning-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .meaning-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .meaning-item:last-child {
+            border-bottom: none;
+        }
+        
+        .meaning-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .meaning-description {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .gesture-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .gesture-info h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .gesture-image {
+            width: 100%;
+            height: 150px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            font-size: 3rem;
+        }
+        
+        .meaning-positive {
+            color: #2e7d32;
+        }
+        
+        .meaning-negative {
+            color: #c62828;
+        }
+        
+        .meaning-neutral {
+            color: #f57c00;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gesture Meaning Decoder</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="gesture-type">Gesture Type</label>
+                    <select id="gesture-type">
+                        <option value="hand">Hand Gestures</option>
+                        <option value="body">Body Language</option>
+                        <option value="facial">Facial Expressions</option>
+                        <option value="eye">Eye Contact</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="culture">Culture/Region</label>
+                        <select id="culture">
+                            <option value="western">Western (US/EU)</option>
+                            <option value="middle-eastern">Middle Eastern</option>
+                            <option value="east-asian">East Asian</option>
+                            <option value="south-asian">South Asian</option>
+                            <option value="latin-american">Latin American</option>
+                            <option value="african">African</option>
+                            <option value="mediterranean">Mediterranean</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="context">Context</label>
+                        <select id="context">
+                            <option value="business">Business</option>
+                            <option value="social" selected>Social</option>
+                            <option value="religious">Religious</option>
+                            <option value="casual">Casual</option>
+                            <option value="formal">Formal</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="specific-gesture">Specific Gesture</label>
+                    <select id="specific-gesture">
+                        <option value="thumbs-up">Thumbs Up</option>
+                        <option value="ok-sign">OK Sign</option>
+                        <option value="victory-sign">Victory Sign</option>
+                        <option value="peace-sign">Peace Sign</option>
+                        <option value="pointing">Pointing</option>
+                        <option value="crossed-arms">Crossed Arms</option>
+                        <option value="eye-contact">Direct Eye Contact</option>
+                        <option value="nodding">Nodding</option>
+                        <option value="bowing">Bowing</option>
+                        <option value="handshake">Handshake</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="description">Gesture Description</label>
+                    <textarea id="description" placeholder="Describe the gesture in detail">Showing the thumb pointing upward with the fist closed, commonly known as thumbs up.</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="situation">Situation Context</label>
+                    <textarea id="situation" placeholder="Describe the situation where the gesture was observed">During a business meeting, the client showed a thumbs up after reviewing our proposal.</textarea>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-gesture="thumbs-up" data-culture="western" data-context="business">Thumbs Up (US)</button>
+                    <button class="preset-btn" data-gesture="ok-sign" data-culture="east-asian" data-context="social">OK Sign (Asia)</button>
+                    <button class="preset-btn" data-gesture="victory-sign" data-culture="middle-eastern" data-context="formal">Victory Sign (ME)</button>
+                </div>
+                
+                <button class="btn-decode" id="decode-meaning">Decode Meaning</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Gesture Interpretation Guide</div>
+                    <div class="info-content">
+                        <p>Understanding non-verbal communication is crucial for effective cross-cultural interactions.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Positive Gestures</h4>
+                                <p>Thumbs Up<br>
+                                Nodding<br>
+                                Handshake<br>
+                                Smile</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Negative Gestures</h4>
+                                <p>Finger Pointing<br>
+                                Thumbs Down<br>
+                                Eye Rolling<br>
+                                Crossed Arms</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Gesture Interpretation</div>
+                    
+                    <div class="gesture-image" id="gesture-image">👍</div>
+                    
+                    <div class="gesture-card">
+                        <h4>Gesture Analysis</h4>
+                        <p>Gesture: <span id="gesture-display">Thumbs Up</span></p>
+                        <p>Culture: <span id="culture-display">Western (US/EU)</span></p>
+                        <p>Context: <span id="context-display">Business</span></p>
+                        <p>Meaning: <span id="meaning-display">Approval/Agreement</span></p>
+                    </div>
+                    
+                    <div class="gesture-info">
+                        <h4>Interpretation Details</h4>
+                        <div class="meaning-item">
+                            <span class="meaning-name">Primary Meaning:</span>
+                            <span class="meaning-description meaning-positive" id="primary-meaning-display">Approval/Agreement</span>
+                        </div>
+                        <div class="meaning-item">
+                            <span class="meaning-name">Secondary Meaning:</span>
+                            <span class="meaning-description meaning-neutral" id="secondary-meaning-display">Number One</span>
+                        </div>
+                        <div class="meaning-item">
+                            <span class="meaning-name">Cultural Sensitivity:</span>
+                            <span class="meaning-description meaning-positive" id="sensitivity-display">Low Risk</span>
+                        </div>
+                        <div class="meaning-item">
+                            <span class="meaning-name">Appropriateness:</span>
+                            <span class="meaning-description meaning-positive" id="appropriateness-display">Appropriate</span>
+                        </div>
+                    </div>
+                    
+                    <div class="meaning-list">
+                        <h3>Alternative Interpretations</h3>
+                        
+                        <div class="meaning-item">
+                            <span class="meaning-name">Western Culture:</span>
+                            <span class="meaning-description meaning-positive">Good Job/Approval</span>
+                        </div>
+                        
+                        <div class="meaning-item">
+                            <span class="meaning-name">Middle East:</span>
+                            <span class="meaning-description meaning-negative">Offensive</span>
+                        </div>
+                        
+                        <div class="meaning-item">
+                            <span class="meaning-name">East Asia:</span>
+                            <span class="meaning-description meaning-neutral">Number Four</span>
+                        </div>
+                        
+                        <div class="meaning-item">
+                            <span class="meaning-name">Latin America:</span>
+                            <span class="meaning-description meaning-positive">Great/Excellent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const decodeMeaningBtn = document.getElementById('decode-meaning');
+            const clearBtn = document.getElementById('clear');
+            const gestureTypeSelect = document.getElementById('gesture-type');
+            const cultureSelect = document.getElementById('culture');
+            const contextSelect = document.getElementById('context');
+            const specificGestureSelect = document.getElementById('specific-gesture');
+            const descriptionInput = document.getElementById('description');
+            const situationInput = document.getElementById('situation');
+            
+            const gestureImageEl = document.getElementById('gesture-image');
+            const gestureDisplayEl = document.getElementById('gesture-display');
+            const cultureDisplayEl = document.getElementById('culture-display');
+            const contextDisplayEl = document.getElementById('context-display');
+            const meaningDisplayEl = document.getElementById('meaning-display');
+            const primaryMeaningDisplayEl = document.getElementById('primary-meaning-display');
+            const secondaryMeaningDisplayEl = document.getElementById('secondary-meaning-display');
+            const sensitivityDisplayEl = document.getElementById('sensitivity-display');
+            const appropriatenessDisplayEl = document.getElementById('appropriateness-display');
+            
+            // Load saved data
+            loadSavedData();
+            
+            decodeMeaningBtn.addEventListener('click', decodeMeaning);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const gesture = this.getAttribute('data-gesture');
+                    const culture = this.getAttribute('data-culture');
+                    const context = this.getAttribute('data-context');
+                    
+                    specificGestureSelect.value = gesture;
+                    cultureSelect.value = culture;
+                    contextSelect.value = context;
+                    
+                    decodeMeaning();
+                });
+            });
+            
+            // Initial setup
+            decodeMeaning();
+            
+            function decodeMeaning() {
+                // Get input values
+                const gestureType = gestureTypeSelect.value;
+                const culture = cultureSelect.value;
+                const context = contextSelect.value;
+                const specificGesture = specificGestureSelect.value;
+                const description = descriptionInput.value;
+                const situation = situationInput.value;
+                
+                // Update display
+                gestureDisplayEl.textContent = getGestureName(specificGesture);
+                cultureDisplayEl.textContent = getCultureName(culture);
+                contextDisplayEl.textContent = context.charAt(0).toUpperCase() + context.slice(1);
+                
+                // Get gesture meaning based on culture and context
+                const meaning = getGestureMeaning(specificGesture, culture, context);
+                meaningDisplayEl.textContent = meaning.primary;
+                
+                // Update gesture image
+                gestureImageEl.textContent = getGestureEmoji(specificGesture);
+                
+                // Update detailed meanings
+                primaryMeaningDisplayEl.textContent = meaning.primary;
+                secondaryMeaningDisplayEl.textContent = meaning.secondary;
+                sensitivityDisplayEl.textContent = meaning.sensitivity;
+                appropriatenessDisplayEl.textContent = meaning.appropriateness;
+                
+                // Apply color coding
+                primaryMeaningDisplayEl.className = 'meaning-description ' + getMeaningClass(meaning.primary);
+                secondaryMeaningDisplayEl.className = 'meaning-description ' + getMeaningClass(meaning.secondary);
+                sensitivityDisplayEl.className = 'meaning-description ' + getMeaningClass(meaning.sensitivity);
+                appropriatenessDisplayEl.className = 'meaning-description ' + getMeaningClass(meaning.appropriateness);
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function getGestureName(gestureCode) {
+                const gestures = {
+                    'thumbs-up': 'Thumbs Up',
+                    'ok-sign': 'OK Sign',
+                    'victory-sign': 'Victory Sign',
+                    'peace-sign': 'Peace Sign',
+                    'pointing': 'Pointing',
+                    'crossed-arms': 'Crossed Arms',
+                    'eye-contact': 'Direct Eye Contact',
+                    'nodding': 'Nodding',
+                    'bowing': 'Bowing',
+                    'handshake': 'Handshake'
+                };
+                return gestures[gestureCode] || gestureCode;
+            }
+            
+            function getCultureName(cultureCode) {
+                const cultures = {
+                    'western': 'Western (US/EU)',
+                    'middle-eastern': 'Middle Eastern',
+                    'east-asian': 'East Asian',
+                    'south-asian': 'South Asian',
+                    'latin-american': 'Latin American',
+                    'african': 'African',
+                    'mediterranean': 'Mediterranean'
+                };
+                return cultures[cultureCode] || cultureCode;
+            }
+            
+            function getGestureEmoji(gestureCode) {
+                const emojis = {
+                    'thumbs-up': '👍',
+                    'ok-sign': '👌',
+                    'victory-sign': '✌️',
+                    'peace-sign': '✌️',
+                    'pointing': '👉',
+                    'crossed-arms': '💪',
+                    'eye-contact': '👁️',
+                    'nodding': '👍',
+                    'bowing': '🙇',
+                    'handshake': '🤝'
+                };
+                return emojis[gestureCode] || '✋';
+            }
+            
+            function getGestureMeaning(gesture, culture, context) {
+                // Comprehensive gesture meanings database
+                const meanings = {
+                    'thumbs-up': {
+                        'western': {
+                            'business': { primary: 'Approval/Agreement', secondary: 'Number One', sensitivity: 'Low Risk', appropriateness: 'Appropriate' },
+                            'social': { primary: 'Good Job/Approval', secondary: 'Great', sensitivity: 'Low Risk', appropriateness: 'Appropriate' },
+                            'formal': { primary: 'Approval', secondary: 'Number One', sensitivity: 'Low Risk', appropriateness: 'Appropriate' }
+                        },
+                        'middle-eastern': {
+                            'business': { primary: 'Offensive', secondary: 'Insult', sensitivity: 'High Risk', appropriateness: 'Inappropriate' },
+                            'social': { primary: 'Offensive', secondary: 'Insult', sensitivity: 'High Risk', appropriateness: 'Inappropriate' },
+                            'formal': { primary: 'Offensive', secondary: 'Insult', sensitivity: 'High Risk', appropriateness: 'Inappropriate' }
+                        },
+                        'east-asian': {
+                            'business': { primary: 'Number Four', secondary: 'Approval', sensitivity: 'Medium Risk', appropriateness: 'Neutral' },
+                            'social': { primary: 'Number Four', secondary: 'Approval', sensitivity: 'Medium Risk', appropriateness: 'Neutral' },
+                            'formal': { primary: 'Number Four', secondary: 'Approval', sensitivity: 'Medium Risk', appropriateness: 'Neutral' }
+                        }
+                    },
+                    'ok-sign': {
+                        'western': {
+                            'business': { primary: 'Okay/Good', secondary: 'Zero', sensitivity: 'Low Risk', appropriateness: 'Appropriate' },
+                            'social': { primary: 'Okay/Good', secondary: 'Zero', sensitivity: 'Low Risk', appropriateness: 'Appropriate' },
+                            'formal': { primary: 'Okay/Good', secondary: 'Zero', sensitivity: 'Low Risk', appropriateness: 'Appropriate' }
+                        },
+                        'middle-eastern': {
+                            'business': { primary: 'Offensive', secondary: 'Insult', sensitivity: 'High Risk', appropriateness: 'Inappropriate' },
+                            'social': { primary: 'Offensive', secondary: 'Insult', sensitivity: 'High Risk', appropriateness: 'Inappropriate' },
+                            'formal': { primary: 'Offensive', secondary: 'Insult', sensitivity: 'High Risk', appropriateness: 'Inappropriate' }
+                        },
+                        'east-asian': {
+                            'business': { primary: 'Money', secondary: 'Zero', sensitivity: 'Medium Risk', appropriateness: 'Neutral' },
+                            'social': { primary: 'Money', secondary: 'Zero', sensitivity: 'Medium Risk', appropriateness: 'Neutral' },
+                            'formal': { primary: 'Money', secondary: 'Zero', sensitivity: 'Medium Risk', appropriateness: 'Neutral' }
+                        }
+                    }
+                };
+                
+                // Return default if not found
+                if (meanings[gesture] && meanings[gesture][culture] && meanings[gesture][culture][context]) {
+                    return meanings[gesture][culture][context];
+                }
+                
+                // Default meaning
+                return {
+                    primary: 'Approval/Agreement',
+                    secondary: 'General Positive Signal',
+                    sensitivity: 'Low Risk',
+                    appropriateness: 'Generally Appropriate'
+                };
+            }
+            
+            function getMeaningClass(meaning) {
+                if (meaning.includes('Positive') || meaning.includes('Approval') || meaning.includes('Good') || meaning.includes('Low Risk') || meaning.includes('Appropriate')) {
+                    return 'meaning-positive';
+                } else if (meaning.includes('Negative') || meaning.includes('Offensive') || meaning.includes('High Risk') || meaning.includes('Inappropriate')) {
+                    return 'meaning-negative';
+                } else {
+                    return 'meaning-neutral';
+                }
+            }
+            
+            function saveData() {
+                const data = {
+                    gestureType: gestureTypeSelect.value,
+                    culture: cultureSelect.value,
+                    context: contextSelect.value,
+                    specificGesture: specificGestureSelect.value,
+                    description: descriptionInput.value,
+                    situation: situationInput.value
+                };
+                localStorage.setItem('gestureDecoderData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('gestureDecoderData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    gestureTypeSelect.value = data.gestureType || 'hand';
+                    cultureSelect.value = data.culture || 'western';
+                    contextSelect.value = data.context || 'business';
+                    specificGestureSelect.value = data.specificGesture || 'thumbs-up';
+                    descriptionInput.value = data.description || 'Showing the thumb pointing upward with the fist closed, commonly known as thumbs up.';
+                    situationInput.value = data.situation || 'During a business meeting, the client showed a thumbs up after reviewing our proposal.';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                gestureTypeSelect.value = 'hand';
+                cultureSelect.value = 'western';
+                contextSelect.value = 'business';
+                specificGestureSelect.value = 'thumbs-up';
+                descriptionInput.value = 'Showing the thumb pointing upward with the fist closed, commonly known as thumbs up.';
+                situationInput.value = 'During a business meeting, the client showed a thumbs up after reviewing our proposal.';
+                
+                // Reset results
+                gestureImageEl.textContent = '👍';
+                gestureDisplayEl.textContent = 'Thumbs Up';
+                cultureDisplayEl.textContent = 'Western (US/EU)';
+                contextDisplayEl.textContent = 'Business';
+                meaningDisplayEl.textContent = 'Approval/Agreement';
+                primaryMeaningDisplayEl.textContent = 'Approval/Agreement';
+                secondaryMeaningDisplayEl.textContent = 'Number One';
+                sensitivityDisplayEl.textContent = 'Low Risk';
+                appropriatenessDisplayEl.textContent = 'Appropriate';
+                
+                // Apply default color coding
+                primaryMeaningDisplayEl.className = 'meaning-description meaning-positive';
+                secondaryMeaningDisplayEl.className = 'meaning-description meaning-neutral';
+                sensitivityDisplayEl.className = 'meaning-description meaning-positive';
+                appropriatenessDisplayEl.className = 'meaning-description meaning-positive';
+                
+                // Remove saved data
+                localStorage.removeItem('gestureDecoderData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [gestureTypeSelect, cultureSelect, contextSelect, 
+             specificGestureSelect, descriptionInput, situationInput].forEach(input => {
+                input.addEventListener('input', decodeMeaning);
+            });
+        });
+    </script>
+</body>
+</html>

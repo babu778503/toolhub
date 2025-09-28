@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Route Planner</title>
+    <meta name="description" content="Plan bus routes for your journey. Find the best bus connections and travel times between locations.">
+    <meta name="keywords" content="bus route planner, bus schedule, public transport planner, bus connections, route finder, transit planner">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-plan {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-plan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-plan:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .route-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .route-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .route-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .route-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .route-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .route-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .route-item:last-child {
+            border-bottom: none;
+        }
+        
+        .route-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .route-time {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .route-best {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        
+        .route-alternative {
+            color: #f57c00;
+            font-weight: 600;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .route-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .route-info h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .route-steps {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff8e1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .route-steps h4 {
+            margin-bottom: 8px;
+            color: #f57f17;
+        }
+        
+        .step-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        
+        .step-time {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .step-action {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bus Route Planner</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="origin">Starting Point</label>
+                        <input type="text" id="origin" placeholder="Enter starting location" value="Central Station">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="destination">Destination</label>
+                        <input type="text" id="destination" placeholder="Enter destination" value="University Campus">
+                    </div>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="travel-date">Travel Date</label>
+                        <input type="date" id="travel-date" value="2023-07-15">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="travel-time">Departure Time</label>
+                        <select id="travel-time">
+                            <option value="morning">Morning (6AM-12PM)</option>
+                            <option value="afternoon" selected>Afternoon (12PM-6PM)</option>
+                            <option value="evening">Evening (6PM-12AM)</option>
+                            <option value="night">Night (12AM-6AM)</option>
+                            <option value="now">Leave Now</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="city">City/Region</label>
+                    <select id="city">
+                        <option value="new-york">New York</option>
+                        <option value="london">London</option>
+                        <option value="paris">Paris</option>
+                        <option value="tokyo">Tokyo</option>
+                        <option value="berlin">Berlin</option>
+                        <option value="sydney">Sydney</option>
+                        <option value="san-francisco">San Francisco</option>
+                        <option value="barcelona">Barcelona</option>
+                        <option value="rome">Rome</option>
+                        <option value="custom" selected>Custom Location</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="passengers">Passengers</label>
+                        <select id="passengers">
+                            <option value="1">1 Person</option>
+                            <option value="2">2 People</option>
+                            <option value="3">3 People</option>
+                            <option value="4" selected>4 People</option>
+                            <option value="5">5+ People</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="accessibility">Accessibility</label>
+                        <select id="accessibility">
+                            <option value="none">None Required</option>
+                            <option value="wheelchair">Wheelchair Accessible</option>
+                            <option value="mobility">Mobility Assistance</option>
+                            <option value="visual">Visual Impairment Support</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="preferences">Preferences</label>
+                    <select id="preferences">
+                        <option value="fastest">Fastest Route</option>
+                        <option value="fewest-transfers" selected>Fewest Transfers</option>
+                        <option value="least-walking">Least Walking</option>
+                        <option value="eco-friendly">Eco-Friendly</option>
+                        <option value="cheapest">Cheapest Option</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="special-requirements">Special Requirements</label>
+                    <textarea id="special-requirements" placeholder="Bicycles, strollers, pets, etc.">Traveling with two children (ages 5 and 8) and stroller. Need family-friendly bus options.</textarea>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-origin="Airport Terminal" data-destination="City Center">Airport to City</button>
+                    <button class="preset-btn" data-origin="Train Station" data-destination="Hotel District">Station to Hotel</button>
+                    <button class="preset-btn" data-origin="Shopping Mall" data-destination="Residential Area">Mall to Residential</button>
+                </div>
+                
+                <button class="btn-plan" id="plan-route">Plan Route</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Bus Route Information</div>
+                    <div class="info-content">
+                        <p>Plan efficient bus routes for your journey. Find the best connections and travel times between locations.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Route Types</h4>
+                                <p>Direct Routes<br>
+                                Transfer Routes<br>
+                                Express Buses<br>
+                                Local Buses</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Planning Tips</h4>
+                                <p>Allow extra time<br>
+                                Check real-time updates<br>
+                                Consider alternatives<br>
+                                Account for transfers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Route Plan</div>
+                    
+                    <div class="route-card">
+                        <h4>Journey Summary</h4>
+                        <p>From: <span id="origin-display">Central Station</span></p>
+                        <p>To: <span id="destination-display">University Campus</span></p>
+                        <p>Date: <span id="date-display">July 15, 2023</span></p>
+                        <p>Departure: <span id="time-display">Afternoon</span></p>
+                        <p>City: <span id="city-display">Custom Location</span></p>
+                    </div>
+                    
+                    <div class="route-info">
+                        <h4>Best Route</h4>
+                        <div class="route-item">
+                            <span class="route-name">Route 102 → Route 25A</span>
+                            <span class="route-time route-best">35 min</span>
+                        </div>
+                        <div class="route-item">
+                            <span class="route-name">Express Route 500</span>
+                            <span class="route-time route-alternative">25 min</span>
+                        </div>
+                        <div class="route-item">
+                            <span class="route-name">Route 7 → Route 15</span>
+                            <span class="route-time route-alternative">42 min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="route-steps">
+                        <h4>Step-by-Step Instructions</h4>
+                        <div class="step-item">
+                            <span class="step-time">2:15 PM</span>
+                            <span class="step-action">Board Route 102 at Central Station (Platform 3)</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-time">2:30 PM</span>
+                            <span class="step-action">Transfer to Route 25A at Main Square</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-time">2:50 PM</span>
+                            <span class="step-action">Arrive at University Campus</span>
+                        </div>
+                    </div>
+                    
+                    <div class="route-list">
+                        <h3>Alternative Routes</h3>
+                        
+                        <div class="route-item">
+                            <span class="route-name">Route 102 → Route 25A</span>
+                            <span class="route-time">35 min (1 transfer)</span>
+                        </div>
+                        
+                        <div class="route-item">
+                            <span class="route-name">Express Route 500</span>
+                            <span class="route-time route-best">25 min (Direct)</span>
+                        </div>
+                        
+                        <div class="route-item">
+                            <span class="route-name">Route 7 → Route 15</span>
+                            <span class="route-time">42 min (2 transfers)</span>
+                        </div>
+                        
+                        <div class="route-item">
+                            <span class="route-name">Route 33 → Route 42</span>
+                            <span class="route-time">50 min (2 transfers)</span>
+                        </div>
+                        
+                        <div class="route-item">
+                            <span class="route-name">Night Route N1</span>
+                            <span class="route-time">65 min (1 transfer)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const planRouteBtn = document.getElementById('plan-route');
+            const clearBtn = document.getElementById('clear');
+            const originInput = document.getElementById('origin');
+            const destinationInput = document.getElementById('destination');
+            const travelDateInput = document.getElementById('travel-date');
+            const travelTimeSelect = document.getElementById('travel-time');
+            const citySelect = document.getElementById('city');
+            const passengersSelect = document.getElementById('passengers');
+            const accessibilitySelect = document.getElementById('accessibility');
+            const preferencesSelect = document.getElementById('preferences');
+            const specialRequirementsInput = document.getElementById('special-requirements');
+            
+            const originDisplayEl = document.getElementById('origin-display');
+            const destinationDisplayEl = document.getElementById('destination-display');
+            const dateDisplayEl = document.getElementById('date-display');
+            const timeDisplayEl = document.getElementById('time-display');
+            const cityDisplayEl = document.getElementById('city-display');
+            
+            // Load saved data
+            loadSavedData();
+            
+            planRouteBtn.addEventListener('click', planRoute);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const origin = this.getAttribute('data-origin');
+                    const destination = this.getAttribute('data-destination');
+                    
+                    originInput.value = origin;
+                    destinationInput.value = destination;
+                    
+                    planRoute();
+                });
+            });
+            
+            // Initial setup
+            planRoute();
+            
+            function planRoute() {
+                // Get input values
+                const origin = originInput.value || 'Central Station';
+                const destination = destinationInput.value || 'University Campus';
+                const travelDate = travelDateInput.value || '2023-07-15';
+                const travelTime = travelTimeSelect.value;
+                const city = citySelect.value;
+                const passengers = passengersSelect.value;
+                const accessibility = accessibilitySelect.value;
+                const preferences = preferencesSelect.value;
+                const specialRequirements = specialRequirementsInput.value;
+                
+                // Update display
+                originDisplayEl.textContent = origin;
+                destinationDisplayEl.textContent = destination;
+                dateDisplayEl.textContent = formatDate(travelDate);
+                timeDisplayEl.textContent = travelTime.charAt(0).toUpperCase() + travelTime.slice(1);
+                cityDisplayEl.textContent = getCityName(city);
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            function getCityName(cityCode) {
+                const cities = {
+                    'new-york': 'New York',
+                    'london': 'London',
+                    'paris': 'Paris',
+                    'tokyo': 'Tokyo',
+                    'berlin': 'Berlin',
+                    'sydney': 'Sydney',
+                    'san-francisco': 'San Francisco',
+                    'barcelona': 'Barcelona',
+                    'rome': 'Rome',
+                    'custom': 'Custom Location'
+                };
+                return cities[cityCode] || cityCode.toUpperCase();
+            }
+            
+            function saveData() {
+                const data = {
+                    origin: originInput.value,
+                    destination: destinationInput.value,
+                    travelDate: travelDateInput.value,
+                    travelTime: travelTimeSelect.value,
+                    city: citySelect.value,
+                    passengers: passengersSelect.value,
+                    accessibility: accessibilitySelect.value,
+                    preferences: preferencesSelect.value,
+                    specialRequirements: specialRequirementsInput.value
+                };
+                localStorage.setItem('busRouteData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('busRouteData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    originInput.value = data.origin || 'Central Station';
+                    destinationInput.value = data.destination || 'University Campus';
+                    travelDateInput.value = data.travelDate || '2023-07-15';
+                    travelTimeSelect.value = data.travelTime || 'afternoon';
+                    citySelect.value = data.city || 'custom';
+                    passengersSelect.value = data.passengers || '4';
+                    accessibilitySelect.value = data.accessibility || 'none';
+                    preferencesSelect.value = data.preferences || 'fewest-transfers';
+                    specialRequirementsInput.value = data.specialRequirements || 'Traveling with two children (ages 5 and 8) and stroller. Need family-friendly bus options.';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                originInput.value = 'Central Station';
+                destinationInput.value = 'University Campus';
+                travelDateInput.value = '2023-07-15';
+                travelTimeSelect.value = 'afternoon';
+                citySelect.value = 'custom';
+                passengersSelect.value = '4';
+                accessibilitySelect.value = 'none';
+                preferencesSelect.value = 'fewest-transfers';
+                specialRequirementsInput.value = 'Traveling with two children (ages 5 and 8) and stroller. Need family-friendly bus options.';
+                
+                // Reset results
+                originDisplayEl.textContent = 'Central Station';
+                destinationDisplayEl.textContent = 'University Campus';
+                dateDisplayEl.textContent = 'July 15, 2023';
+                timeDisplayEl.textContent = 'Afternoon';
+                cityDisplayEl.textContent = 'Custom Location';
+                
+                // Remove saved data
+                localStorage.removeItem('busRouteData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [originInput, destinationInput, travelDateInput, travelTimeSelect, 
+             citySelect, passengersSelect, accessibilitySelect, 
+             preferencesSelect, specialRequirementsInput].forEach(input => {
+                input.addEventListener('input', planRoute);
+            });
+        });
+    </script>
+</body>
+</html>

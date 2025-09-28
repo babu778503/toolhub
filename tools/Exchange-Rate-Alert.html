@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Rate Alert</title>
+    <meta name="description" content="Set alerts for exchange rate changes. Monitor currency pairs and get notified when they reach your target rate.">
+    <meta name="keywords" content="exchange rate alert, currency alert, forex alert, exchange rate monitor, currency tracker, forex tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-set {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-set:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-set:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .alert-card {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .alert-card h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .alert-card p {
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .rate-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .rate-list h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .rate-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .rate-item:last-child {
+            border-bottom: none;
+        }
+        
+        .currency-pair {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .exchange-rate {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        .rate-change {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .rate-up {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .rate-down {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        .rate-history {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .rate-history h4 {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .history-rate {
+            color: #34495e;
+            font-weight: 500;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Exchange Rate Alert</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="currency-pair">Currency Pair</label>
+                    <select id="currency-pair">
+                        <option value="USD-EUR">USD to EUR</option>
+                        <option value="USD-GBP">USD to GBP</option>
+                        <option value="USD-JPY">USD to JPY</option>
+                        <option value="EUR-GBP">EUR to GBP</option>
+                        <option value="EUR-JPY">EUR to JPY</option>
+                        <option value="GBP-JPY">GBP to JPY</option>
+                        <option value="USD-CAD">USD to CAD</option>
+                        <option value="USD-AUD">USD to AUD</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="current-rate">Current Rate</label>
+                        <input type="number" id="current-rate" placeholder="Enter current rate" min="0" step="0.0001" value="0.85">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="target-rate">Target Rate</label>
+                        <input type="number" id="target-rate" placeholder="Enter target rate" min="0" step="0.0001" value="0.80">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="notification-method">Notification Method</label>
+                    <select id="notification-method">
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="push">Push Notification</option>
+                        <option value="both">Email & Push</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="rate-change">Rate Change Threshold (%)</label>
+                    <select id="rate-change">
+                        <option value="0.5">0.5% change</option>
+                        <option value="1.0">1.0% change</option>
+                        <option value="2.0" selected>2.0% change</option>
+                        <option value="3.0">3.0% change</option>
+                        <option value="5.0">5.0% change</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="monitoring-period">Monitoring Period</label>
+                    <select id="monitoring-period">
+                        <option value="1">1 day</option>
+                        <option value="7">7 days</option>
+                        <option value="30" selected>30 days</option>
+                        <option value="90">90 days</option>
+                        <option value="365">1 year</option>
+                    </select>
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-pair="USD-EUR" data-current="0.85" data-target="0.80">USD/EUR</button>
+                    <button class="preset-btn" data-pair="USD-GBP" data-current="0.75" data-target="0.70">USD/GBP</button>
+                    <button class="preset-btn" data-pair="EUR-JPY" data-current="140.00" data-target="135.00">EUR/JPY</button>
+                </div>
+                
+                <button class="btn-set" id="set-alert">Set Exchange Alert</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Exchange Rate Information</div>
+                    <div class="info-content">
+                        <p>Monitor currency pairs and get notified when exchange rates reach your target values.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Alert Types</h4>
+                                <p>Target rate<br>
+                                Percentage change<br>
+                                Daily updates<br>
+                                Historical data</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Notification Methods</h4>
+                                <p>Email alerts<br>
+                                SMS messages<br>
+                                Push notifications<br>
+                                In-app alerts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Active Exchange Alerts</div>
+                    
+                    <div class="alert-card">
+                        <h4>USD to EUR</h4>
+                        <p>Current Rate: <span id="current-rate-display">0.8500</span></p>
+                        <p>Target Rate: <span id="target-rate-display">0.8000</span></p>
+                        <p>Threshold: <span id="threshold-display">2.0</span>% change</p>
+                        <p>Monitoring: <span id="monitoring-display">30</span> days</p>
+                    </div>
+                    
+                    <div class="rate-history">
+                        <h4>Rate History</h4>
+                        <div class="history-item">
+                            <span class="history-date">Today</span>
+                            <span class="history-rate">0.8500</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-date">Yesterday</span>
+                            <span class="history-rate">0.8485</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-date">2 days ago</span>
+                            <span class="history-rate">0.8510</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-date">1 week ago</span>
+                            <span class="history-rate">0.8450</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rate-list">
+                        <h3>Tracked Currency Pairs</h3>
+                        
+                        <div class="rate-item">
+                            <span class="currency-pair">USD/EUR</span>
+                            <div>
+                                <span class="exchange-rate">0.8500</span>
+                                <span class="rate-change rate-down">-0.2%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="rate-item">
+                            <span class="currency-pair">USD/GBP</span>
+                            <div>
+                                <span class="exchange-rate">0.7500</span>
+                                <span class="rate-change rate-up">+0.1%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="rate-item">
+                            <span class="currency-pair">EUR/JPY</span>
+                            <div>
+                                <span class="exchange-rate">140.00</span>
+                                <span class="rate-change rate-up">+0.5%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="rate-item">
+                            <span class="currency-pair">USD/CAD</span>
+                            <div>
+                                <span class="exchange-rate">1.2500</span>
+                                <span class="rate-change rate-down">-0.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const setAlertBtn = document.getElementById('set-alert');
+            const clearBtn = document.getElementById('clear');
+            const currencyPairSelect = document.getElementById('currency-pair');
+            const currentRateInput = document.getElementById('current-rate');
+            const targetRateInput = document.getElementById('target-rate');
+            const notificationMethodSelect = document.getElementById('notification-method');
+            const rateChangeSelect = document.getElementById('rate-change');
+            const monitoringPeriodSelect = document.getElementById('monitoring-period');
+            
+            const currentRateDisplayEl = document.getElementById('current-rate-display');
+            const targetRateDisplayEl = document.getElementById('target-rate-display');
+            const thresholdDisplayEl = document.getElementById('threshold-display');
+            const monitoringDisplayEl = document.getElementById('monitoring-display');
+            
+            // Load saved data
+            loadSavedData();
+            
+            setAlertBtn.addEventListener('click', setAlert);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const pair = this.getAttribute('data-pair');
+                    const current = this.getAttribute('data-current');
+                    const target = this.getAttribute('data-target');
+                    
+                    currencyPairSelect.value = pair;
+                    currentRateInput.value = current;
+                    targetRateInput.value = target;
+                    
+                    setAlert();
+                });
+            });
+            
+            // Initial setup
+            setAlert();
+            
+            function setAlert() {
+                // Get input values
+                const currencyPair = currencyPairSelect.value;
+                const currentRate = parseFloat(currentRateInput.value) || 0;
+                const targetRate = parseFloat(targetRateInput.value) || 0;
+                const notificationMethod = notificationMethodSelect.value;
+                const rateChangeThreshold = parseFloat(rateChangeSelect.value) || 2.0;
+                const monitoringPeriod = parseInt(monitoringPeriodSelect.value) || 30;
+                
+                // Update display
+                const pairDisplay = currencyPair.replace('-', '/');
+                document.querySelector('.alert-card h4').textContent = pairDisplay;
+                currentRateDisplayEl.textContent = currentRate.toFixed(4);
+                targetRateDisplayEl.textContent = targetRate.toFixed(4);
+                thresholdDisplayEl.textContent = rateChangeThreshold;
+                monitoringDisplayEl.textContent = monitoringPeriod;
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function saveData() {
+                const data = {
+                    currencyPair: currencyPairSelect.value,
+                    currentRate: currentRateInput.value,
+                    targetRate: targetRateInput.value,
+                    notificationMethod: notificationMethodSelect.value,
+                    rateChangeThreshold: rateChangeSelect.value,
+                    monitoringPeriod: monitoringPeriodSelect.value
+                };
+                localStorage.setItem('exchangeRateData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('exchangeRateData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    currencyPairSelect.value = data.currencyPair || 'USD-EUR';
+                    currentRateInput.value = data.currentRate || '0.85';
+                    targetRateInput.value = data.targetRate || '0.80';
+                    notificationMethodSelect.value = data.notificationMethod || 'email';
+                    rateChangeSelect.value = data.rateChangeThreshold || '2.0';
+                    monitoringPeriodSelect.value = data.monitoringPeriod || '30';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                currencyPairSelect.value = 'USD-EUR';
+                currentRateInput.value = '0.85';
+                targetRateInput.value = '0.80';
+                notificationMethodSelect.value = 'email';
+                rateChangeSelect.value = '2.0';
+                monitoringPeriodSelect.value = '30';
+                
+                // Reset results
+                currentRateDisplayEl.textContent = '0.8500';
+                targetRateDisplayEl.textContent = '0.8000';
+                thresholdDisplayEl.textContent = '2.0';
+                monitoringDisplayEl.textContent = '30';
+                
+                // Remove saved data
+                localStorage.removeItem('exchangeRateData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [currencyPairSelect, currentRateInput, targetRateInput, rateChangeSelect, monitoringPeriodSelect].forEach(input => {
+                input.addEventListener('input', setAlert);
+            });
+        });
+    </script>
+</body>
+</html>

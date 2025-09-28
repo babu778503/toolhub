@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<!-- Category: Travel Tools -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delay Compensation Checker - Travel Planning Tool</title>
+    <meta name="description" content="Check your eligibility for flight delay compensation with our easy-to-use delay compensation checker. Calculate your compensation amount based on EU261 and other regulations.">
+    <meta name="keywords" content="delay compensation checker, flight delay compensation, EU261 compensation, flight delay calculator, travel compensation tool, flight disruption compensation, airline compensation">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #ffcc00, #ff9500);
+            border-radius: 2px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #ffcc00;
+            font-size: 1.1rem;
+        }
+        
+        input, select {
+            padding: 14px 15px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+        }
+        
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .option-group label:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ffcc00, #ff9500);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 204, 0, 0.5);
+        }
+        
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result h3 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .compensation-amount {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #4cff00;
+            text-shadow: 0 0 10px rgba(76, 255, 0, 0.5);
+        }
+        
+        .eligibility-status {
+            font-size: 1.4rem;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .eligibility-yes {
+            color: #4cff00;
+        }
+        
+        .eligibility-no {
+            color: #ff4c4c;
+        }
+        
+        .compensation-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .compensation-details h4 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .compensation-details ul {
+            padding-left: 20px;
+        }
+        
+        .compensation-details li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .info-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        .info-section h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .data-management {
+            background: rgba(150, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .data-management h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .data-actions button {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .data-actions .clear-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff4757);
+        }
+        
+        .data-actions .save-btn {
+            background: linear-gradient(to right, #2ed573, #1dd1a1);
+        }
+        
+        .data-status {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .regulation-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 100, 255, 0.2);
+            border-radius: 8px;
+        }
+        
+        .regulation-info h3 {
+            color: #4cc9f0;
+            margin-bottom: 10px;
+        }
+        
+        .regulation-info p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #ffcc00, #ff9500);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-label {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .compensation-breakdown {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .compensation-breakdown h4 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .breakdown-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #4cff00;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .additional-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .claim-status {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 150, 0, 0.2);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Header Height */
+        @media (max-width: 768px) {
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem; /* Reduced font size for one line */
+                margin: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .container {
+                padding: 15px 0;
+                margin: 0;
+                width: 100%;
+                border-radius: 0;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            .result {
+                padding: 20px 15px;
+            }
+            
+            .compensation-amount {
+                font-size: 2rem;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                margin: 0;
+                width: 100%;
+                padding: 15px 0;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Delay Compensation Checker</h1>
+        </header>
+        
+        <div class="input-group">
+            <label for="airline">Airline:</label>
+            <select id="airline">
+                <option value="">Select Airline</option>
+                <option value="american">American Airlines</option>
+                <option value="delta">Delta Air Lines</option>
+                <option value="united">United Airlines</option>
+                <option value="southwest">Southwest Airlines</option>
+                <option value="jetblue">JetBlue Airways</option>
+                <option value="alaska">Alaska Airlines</option>
+                <option value="spirit">Spirit Airlines</option>
+                <option value="frontier">Frontier Airlines</option>
+                <option value="lufthansa">Lufthansa</option>
+                <option value="air-france">Air France</option>
+                <option value="klm">KLM</option>
+                <option value="iberia">Iberia</option>
+                <option value="ryanair">Ryanair</option>
+                <option value="easyjet">EasyJet</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="flight-number">Flight Number:</label>
+            <input type="text" id="flight-number" placeholder="e.g., AA1234">
+        </div>
+        
+        <div class="input-group">
+            <label for="origin-airport">Origin Airport:</label>
+            <input type="text" id="origin-airport" placeholder="Airport code (e.g., JFK)">
+        </div>
+        
+        <div class="input-group">
+            <label for="destination-airport">Destination Airport:</label>
+            <input type="text" id="destination-airport" placeholder="Airport code (e.g., LAX)">
+        </div>
+        
+        <div class="input-group">
+            <label for="departure-date">Departure Date:</label>
+            <input type="date" id="departure-date">
+        </div>
+        
+        <div class="input-group">
+            <label for="scheduled-departure">Scheduled Departure Time:</label>
+            <input type="time" id="scheduled-departure">
+        </div>
+        
+        <div class="input-group">
+            <label for="actual-departure">Actual Departure Time:</label>
+            <input type="time" id="actual-departure">
+        </div>
+        
+        <div class="input-group">
+            <label for="delay-duration">Delay Duration (minutes):</label>
+            <input type="number" id="delay-duration" min="0" max="1440" placeholder="Enter delay in minutes">
+        </div>
+        
+        <div class="input-group">
+            <label for="reason">Delay Reason:</label>
+            <select id="reason">
+                <option value="">Select Reason</option>
+                <option value="weather">Weather Conditions</option>
+                <option value="technical">Technical Issues</option>
+                <option value="crew">Crew Issues</option>
+                <option value="air-traffic">Air Traffic Control</option>
+                <option value="security">Security Issues</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label>Flight Type:</label>
+            <div class="options">
+                <div class="option-group">
+                    <label>
+                        <input type="radio" name="flight-type" value="domestic" checked> 
+                        <span>Domestic</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="flight-type" value="international"> 
+                        <span>International</span>
+                    </label>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="eu-flight"> EU Flight (EU261)
+                    </label>
+                    <label>
+                        <input type="checkbox" id="first-class"> First/Business Class
+                    </label>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="cancellation"> Flight Cancellation
+                    </label>
+                    <label>
+                        <input type="checkbox" id="overbooking"> Overbooking
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="passenger-count">Number of Passengers:</label>
+            <input type="number" id="passenger-count" min="1" max="10" value="1">
+        </div>
+        
+        <div class="input-group">
+            <label for="ticket-price">Ticket Price (€):</label>
+            <input type="number" id="ticket-price" min="0" placeholder="Enter ticket price">
+        </div>
+        
+        <button id="check-compensation">Check Compensation Eligibility</button>
+        
+        <div class="result" id="result">
+            <h3>Compensation Analysis</h3>
+            <div class="eligibility-status" id="eligibility-status">Eligibility status will appear here</div>
+            <div class="compensation-amount" id="compensation-amount">€0</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-label" id="progress-label">Processing...</div>
+            
+            <div class="compensation-breakdown">
+                <h4>Compensation Breakdown:</h4>
+                <div class="breakdown-item">
+                    <span>Base Compensation:</span>
+                    <span id="base-amount">€0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Passenger Multiplier:</span>
+                    <span id="passenger-multiplier">x1</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Class Adjustment:</span>
+                    <span id="class-adjustment">€0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Special Circumstances:</span>
+                    <span id="circumstances-adjustment">€0</span>
+                </div>
+                <div class="breakdown-total">
+                    <span>Total Compensation:</span>
+                    <span id="total-amount">€0</span>
+                </div>
+            </div>
+            
+            <div class="compensation-details">
+                <h4>Compensation Details:</h4>
+                <ul id="compensation-details">
+                    <li>Eligibility criteria not yet analyzed</li>
+                </ul>
+            </div>
+            
+            <div class="claim-status" id="claim-status">
+                <p>Eligibility for compensation depends on various factors including airline, route, delay duration, and reason.</p>
+            </div>
+            
+            <div class="additional-info" id="additional-info">
+                <p>Remember to keep your boarding pass and flight documentation for any compensation claim.</p>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>Compensation Guidelines:</h3>
+            <ul>
+                <li>EU261 regulation applies to flights departing from EU airports or operated by EU airlines</li>
+                <li>Compensation amounts vary based on flight distance and delay duration</li>
+                <li>Delays under 3 hours typically do not qualify for compensation under EU261</li>
+                <li>Compensation may not be available if delay was caused by extraordinary circumstances</li>
+                <li>Claims must typically be filed within 2 years of the flight</li>
+                <li>First/Business class passengers may receive higher compensation</li>
+            </ul>
+        </div>
+        
+        <div class="regulation-info">
+            <h3>Regulation Information:</h3>
+            <p><strong>EU261/2004</strong> - European regulation providing compensation for flight delays, cancellations, and denied boarding.</p>
+            <p><strong>US DOT</strong> - Department of Transportation rules for flight delays and cancellations in the US.</p>
+            <p><strong>Montreal Convention</strong> - International treaty covering airline liability for delays.</p>
+        </div>
+        
+        <div class="data-management">
+            <h3>Data Management</h3>
+            <div class="data-actions">
+                <button class="save-btn" id="save-data">Save Current Data</button>
+                <button class="clear-btn" id="clear-data">Clear Saved Data</button>
+            </div>
+            <div class="data-status" id="data-status">
+                No saved data found
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('check-compensation').addEventListener('click', function() {
+            const airline = document.getElementById('airline').value;
+            const flightNumber = document.getElementById('flight-number').value;
+            const originAirport = document.getElementById('origin-airport').value;
+            const destinationAirport = document.getElementById('destination-airport').value;
+            const departureDate = document.getElementById('departure-date').value;
+            const scheduledDeparture = document.getElementById('scheduled-departure').value;
+            const actualDeparture = document.getElementById('actual-departure').value;
+            const delayDuration = parseInt(document.getElementById('delay-duration').value) || 0;
+            const reason = document.getElementById('reason').value;
+            const flightType = document.querySelector('input[name="flight-type"]:checked').value;
+            const isEuFlight = document.getElementById('eu-flight').checked;
+            const isFirstClass = document.getElementById('first-class').checked;
+            const isCancellation = document.getElementById('cancellation').checked;
+            const isOverbooking = document.getElementById('overbooking').checked;
+            const passengerCount = parseInt(document.getElementById('passenger-count').value) || 1;
+            const ticketPrice = parseFloat(document.getElementById('ticket-price').value) || 0;
+            
+            if (!airline || !flightNumber || !originAirport || !destinationAirport || !departureDate || delayDuration <= 0) {
+                alert('Please fill in all required fields including delay duration');
+                return;
+            }
+            
+            // Calculate compensation based on various factors
+            let baseCompensation = 0;
+            let eligibility = false;
+            let eligibilityText = '';
+            let details = [];
+            let progress = 0;
+            
+            // Calculate distance for EU261 compensation
+            const distance = calculateDistance(originAirport, destinationAirport);
+            
+            // EU261 compensation rules
+            if (isEuFlight) {
+                if (delayDuration >= 180) { // 3 hours or more
+                    if (distance <= 1500) {
+                        baseCompensation = 250;
+                        details.push('Distance under 1500km: €250 compensation');
+                    } else if (distance <= 3500) {
+                        baseCompensation = 400;
+                        details.push('Distance 1500-3500km: €400 compensation');
+                    } else {
+                        baseCompensation = 600;
+                        details.push('Distance over 3500km: €600 compensation');
+                    }
+                    eligibility = true;
+                    eligibilityText = 'ELIGIBLE';
+                    progress = 100;
+                } else {
+                    eligibilityText = 'NOT ELIGIBLE';
+                    details.push('Delay under 3 hours does not qualify under EU261');
+                    progress = 30;
+                }
+            } else {
+                // Non-EU compensation rules
+                if (delayDuration >= 120) { // 2 hours or more
+                    if (flightType === 'international') {
+                        baseCompensation = 500; // Placeholder amount
+                        details.push('International flight delay: $500 compensation');
+                    } else {
+                        baseCompensation = 250; // Placeholder amount
+                        details.push('Domestic flight delay: $250 compensation');
+                    }
+                    eligibility = true;
+                    eligibilityText = 'ELIGIBLE';
+                    progress = 100;
+                } else {
+                    eligibilityText = 'NOT ELIGIBLE';
+                    details.push('Delay under 2 hours may not qualify for compensation');
+                    progress = 30;
+                }
+            }
+            
+            // Adjust for special conditions
+            if (isCancellation) {
+                details.push('Flight cancellation may increase compensation amount');
+                progress = Math.min(100, progress + 20);
+            }
+            
+            if (isOverbooking) {
+                details.push('Overbooking may increase compensation amount');
+                progress = Math.min(100, progress + 15);
+            }
+            
+            // Adjust for passenger count
+            const passengerMultiplier = passengerCount;
+            
+            // Adjust for class
+            let classAdjustment = 0;
+            if (isFirstClass) {
+                classAdjustment = Math.round(baseCompensation * 0.25); // 25% more for first class
+                details.push('First/Business class adjustment: +€' + classAdjustment);
+            }
+            
+            // Adjust for ticket price (if significant)
+            let circumstancesAdjustment = 0;
+            if (ticketPrice > 500) {
+                circumstancesAdjustment = Math.round(baseCompensation * 0.1); // 10% more for expensive tickets
+                details.push('High ticket price adjustment: +€' + circumstancesAdjustment);
+            }
+            
+            // Calculate final compensation
+            let totalCompensation = baseCompensation * passengerMultiplier + classAdjustment + circumstancesAdjustment;
+            
+            // Update the result display
+            document.getElementById('eligibility-status').textContent = eligibilityText;
+            document.getElementById('eligibility-status').className = `eligibility-status ${eligibility ? 'eligibility-yes' : 'eligibility-no'}`;
+            document.getElementById('compensation-amount').textContent = `${totalCompensation ? '€' + totalCompensation : '€0'}`;
+            
+            // Update breakdown
+            document.getElementById('base-amount').textContent = '€' + baseCompensation;
+            document.getElementById('passenger-multiplier').textContent = 'x' + passengerMultiplier;
+            document.getElementById('class-adjustment').textContent = isFirstClass ? '+€' + classAdjustment : '€0';
+            document.getElementById('circumstances-adjustment').textContent = ticketPrice > 500 ? '+€' + circumstancesAdjustment : '€0';
+            document.getElementById('total-amount').textContent = '€' + totalCompensation;
+            
+            // Update progress bar
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-label').textContent = progress + '% eligibility';
+            
+            // Update details list
+            const detailsList = document.getElementById('compensation-details');
+            detailsList.innerHTML = '';
+            details.forEach(detail => {
+                const li = document.createElement('li');
+                li.textContent = detail;
+                detailsList.appendChild(li);
+            });
+            
+            // Update claim status
+            const claimStatus = document.getElementById('claim-status');
+            if (eligibility) {
+                claimStatus.innerHTML = '<p>You are eligible for compensation! Contact your airline or use a compensation service to file a claim.</p>';
+            } else {
+                claimStatus.innerHTML = '<p>You may not be eligible for compensation based on current information. Consider consulting with a compensation expert.</p>';
+            }
+            
+            // Update additional info
+            document.getElementById('additional-info').innerHTML = '<p>Keep your boarding pass and flight documentation for any compensation claim. File your claim within the required time frame.</p>';
+            
+            document.getElementById('result').style.display = 'block';
+        });
+        
+        // Simple distance calculation function (placeholder)
+        function calculateDistance(origin, destination) {
+            // In a real implementation, this would use actual airport coordinates
+            // For demo purposes, return a random distance
+            return Math.floor(Math.random() * 3000) + 500; // Between 500-3500 km
+        }
+        
+        // Data management
+        document.getElementById('save-data').addEventListener('click', function() {
+            const data = {
+                airline: document.getElementById('airline').value,
+                flightNumber: document.getElementById('flight-number').value,
+                originAirport: document.getElementById('origin-airport').value,
+                destinationAirport: document.getElementById('destination-airport').value,
+                departureDate: document.getElementById('departure-date').value,
+                scheduledDeparture: document.getElementById('scheduled-departure').value,
+                actualDeparture: document.getElementById('actual-departure').value,
+                delayDuration: document.getElementById('delay-duration').value,
+                reason: document.getElementById('reason').value,
+                flightType: document.querySelector('input[name="flight-type"]:checked').value,
+                euFlight: document.getElementById('eu-flight').checked,
+                firstClass: document.getElementById('first-class').checked,
+                cancellation: document.getElementById('cancellation').checked,
+                overbooking: document.getElementById('overbooking').checked,
+                passengerCount: document.getElementById('passenger-count').value,
+                ticketPrice: document.getElementById('ticket-price').value
+            };
+            
+            localStorage.setItem('delayCompensationData', JSON.stringify(data));
+            document.getElementById('data-status').textContent = 'Data saved successfully!';
+            
+            setTimeout(() => {
+                document.getElementById('data-status').textContent = 'Data saved on: ' + new Date().toLocaleString();
+            }, 2000);
+        });
+        
+        document.getElementById('clear-data').addEventListener('click', function() {
+            localStorage.removeItem('delayCompensationData');
+            document.getElementById('data-status').textContent = 'Saved data cleared!';
+            
+            // Reset form
+            document.getElementById('airline').value = '';
+            document.getElementById('flight-number').value = '';
+            document.getElementById('origin-airport').value = '';
+            document.getElementById('destination-airport').value = '';
+            document.getElementById('departure-date').value = '';
+            document.getElementById('scheduled-departure').value = '';
+            document.getElementById('actual-departure').value = '';
+            document.getElementById('delay-duration').value = '';
+            document.getElementById('reason').value = '';
+            document.querySelector('input[name="flight-type"][value="domestic"]').checked = true;
+            document.getElementById('eu-flight').checked = false;
+            document.getElementById('first-class').checked = false;
+            document.getElementById('cancellation').checked = false;
+            document.getElementById('overbooking').checked = false;
+            document.getElementById('passenger-count').value = '1';
+            document.getElementById('ticket-price').value = '';
+            
+            setTimeout(() => {
+                document.getElementById('data-status').textContent = 'No saved data found';
+            }, 2000);
+        });
+        
+        function loadData() {
+            const savedData = localStorage.getItem('delayCompensationData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                document.getElementById('airline').value = data.airline || '';
+                document.getElementById('flight-number').value = data.flightNumber || '';
+                document.getElementById('origin-airport').value = data.originAirport || '';
+                document.getElementById('destination-airport').value = data.destinationAirport || '';
+                document.getElementById('departure-date').value = data.departureDate || '';
+                document.getElementById('scheduled-departure').value = data.scheduledDeparture || '';
+                document.getElementById('actual-departure').value = data.actualDeparture || '';
+                document.getElementById('delay-duration').value = data.delayDuration || '';
+                document.getElementById('reason').value = data.reason || '';
+                
+                if (data.flightType) {
+                    document.querySelector(`input[name="flight-type"][value="${data.flightType}"]`).checked = true;
+                }
+                
+                document.getElementById('eu-flight').checked = data.euFlight || false;
+                document.getElementById('first-class').checked = data.firstClass || false;
+                document.getElementById('cancellation').checked = data.cancellation || false;
+                document.getElementById('overbooking').checked = data.overbooking || false;
+                document.getElementById('passenger-count').value = data.passengerCount || '1';
+                document.getElementById('ticket-price').value = data.ticketPrice || '';
+                
+                document.getElementById('data-status').textContent = 'Data loaded from: ' + new Date().toLocaleString();
+            }
+        }
+        
+        // Load saved data on page load
+        window.addEventListener('load', function() {
+            loadData();
+        });
+        
+        // Set default date to today
+        document.getElementById('departure-date').valueAsDate = new Date();
+    </script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package Weight Estimator</title>
+    <meta name="description" content="Estimate package weight for shipping, moving, and logistics. Calculate weight based on dimensions and materials.">
+    <meta name="keywords" content="package weight estimator, shipping weight calculator, package weight calculator, weight estimation tool, shipping calculator, package dimensions">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .result-section {
+                margin-top: 0;
+                margin-left: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #34495e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-row .input-group {
+            flex: 1;
+        }
+        
+        .btn-estimate {
+            background: linear-gradient(90deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-estimate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.4);
+        }
+        
+        .btn-estimate:active {
+            transform: translateY(0);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+        
+        .result-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .result-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #34495e;
+            margin: 15px 0;
+        }
+        
+        .result-subtitle {
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        
+        .info-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .info-content {
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-card h4 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        .weight-breakdown {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .weight-breakdown h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .weight-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .weight-item:last-child {
+            border-bottom: none;
+        }
+        
+        .weight-label {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .weight-value {
+            color: #34495e;
+            font-weight: 600;
+        }
+        
+        .preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #d1ecf1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #a3d5db;
+        }
+        
+        /* Remove side margins for mobile users */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .input-section {
+                padding: 15px;
+            }
+            
+            .result-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            header {
+                padding: 15px 15px;
+            }
+            
+            /* One line header for mobile */
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Package Weight Estimator</h1>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="length">Length (inches)</label>
+                    <input type="number" id="length" placeholder="Enter length" min="0.1" step="0.1" value="12">
+                </div>
+                
+                <div class="input-group">
+                    <label for="width">Width (inches)</label>
+                    <input type="number" id="width" placeholder="Enter width" min="0.1" step="0.1" value="8">
+                </div>
+                
+                <div class="input-group">
+                    <label for="height">Height (inches)</label>
+                    <input type="number" id="height" placeholder="Enter height" min="0.1" step="0.1" value="6">
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="unit">Unit</label>
+                        <select id="unit">
+                            <option value="in">Inches</option>
+                            <option value="cm">Centimeters</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="material">Material</label>
+                        <select id="material">
+                            <option value="0.035">Cardboard (0.035 lbs/in³)</option>
+                            <option value="0.025">Light Cardboard (0.025 lbs/in³)</option>
+                            <option value="0.050">Wood (0.050 lbs/in³)</option>
+                            <option value="0.010">Plastic (0.010 lbs/in³)</option>
+                            <option value="0.008">Foam (0.008 lbs/in³)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="contents">Contents Density</label>
+                    <select id="contents">
+                        <option value="0.010">Light (0.010 lbs/in³)</option>
+                        <option value="0.025" selected>Medium (0.025 lbs/in³)</option>
+                        <option value="0.050">Heavy (0.050 lbs/in³)</option>
+                        <option value="0.080">Very Heavy (0.080 lbs/in³)</option>
+                        <option value="0.100">Extremely Dense (0.100 lbs/in³)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="padding">Padding Weight (lbs)</label>
+                    <input type="number" id="padding" placeholder="Enter padding weight" min="0" step="0.1" value="0.5">
+                </div>
+                
+                <div class="preset-btns">
+                    <button class="preset-btn" data-length="12" data-width="8" data-height="6" data-material="0.035" data-contents="0.025">Small Box</button>
+                    <button class="preset-btn" data-length="20" data-width="14" data-height="12" data-material="0.035" data-contents="0.050">Medium Box</button>
+                    <button class="preset-btn" data-length="24" data-width="18" data-height="18" data-material="0.035" data-contents="0.080">Large Box</button>
+                </div>
+                
+                <button class="btn-estimate" id="estimate">Estimate Weight</button>
+                <button class="btn-clear" id="clear">Clear All</button>
+                
+                <div class="info-section">
+                    <div class="info-title">Weight Estimation Guide</div>
+                    <div class="info-content">
+                        <p>Estimate package weight by entering dimensions and material properties. This tool helps determine shipping costs and handling requirements.</p>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Common Densities</h4>
+                                <p>Cardboard: 0.035 lbs/in³<br>
+                                Wood: 0.050 lbs/in³<br>
+                                Plastic: 0.010 lbs/in³<br>
+                                Foam: 0.008 lbs/in³</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Weight Classes</h4>
+                                <p>Under 1 lb: Light<br>
+                                1-5 lbs: Medium<br>
+                                5-20 lbs: Heavy<br>
+                                20+ lbs: Very Heavy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-box">
+                    <div class="result-title">Estimated Package Weight</div>
+                    <div class="result-value" id="total-weight">0.00 lbs</div>
+                    <div class="result-subtitle">Based on entered dimensions and materials</div>
+                    
+                    <div class="weight-breakdown">
+                        <h3>Weight Breakdown</h3>
+                        
+                        <div class="weight-item">
+                            <span class="weight-label">Box Weight:</span>
+                            <span class="weight-value" id="box-weight">0.00 lbs</span>
+                        </div>
+                        
+                        <div class="weight-item">
+                            <span class="weight-label">Contents Weight:</span>
+                            <span class="weight-value" id="contents-weight">0.00 lbs</span>
+                        </div>
+                        
+                        <div class="weight-item">
+                            <span class="weight-label">Padding Weight:</span>
+                            <span class="weight-value" id="padding-weight">0.00 lbs</span>
+                        </div>
+                        
+                        <div class="weight-item" style="border-top: 1px solid #dee2e6; margin-top: 10px; padding-top: 15px;">
+                            <span class="weight-label">Total Weight:</span>
+                            <span class="weight-value" id="final-weight">0.00 lbs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const estimateBtn = document.getElementById('estimate');
+            const clearBtn = document.getElementById('clear');
+            const lengthInput = document.getElementById('length');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            const unitSelect = document.getElementById('unit');
+            const materialSelect = document.getElementById('material');
+            const contentsSelect = document.getElementById('contents');
+            const paddingInput = document.getElementById('padding');
+            
+            const totalWeightEl = document.getElementById('total-weight');
+            const boxWeightEl = document.getElementById('box-weight');
+            const contentsWeightEl = document.getElementById('contents-weight');
+            const paddingWeightEl = document.getElementById('padding-weight');
+            const finalWeightEl = document.getElementById('final-weight');
+            
+            // Load saved data
+            loadSavedData();
+            
+            estimateBtn.addEventListener('click', estimateWeight);
+            clearBtn.addEventListener('click', clearData);
+            
+            // Add event listeners to preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const length = this.getAttribute('data-length');
+                    const width = this.getAttribute('data-width');
+                    const height = this.getAttribute('data-height');
+                    const material = this.getAttribute('data-material');
+                    const contents = this.getAttribute('data-contents');
+                    
+                    lengthInput.value = length;
+                    widthInput.value = width;
+                    heightInput.value = height;
+                    materialSelect.value = material;
+                    contentsSelect.value = contents;
+                    
+                    estimateWeight();
+                });
+            });
+            
+            // Initial estimation
+            estimateWeight();
+            
+            function estimateWeight() {
+                // Get input values
+                const length = parseFloat(lengthInput.value) || 0;
+                const width = parseFloat(widthInput.value) || 0;
+                const height = parseFloat(heightInput.value) || 0;
+                const materialDensity = parseFloat(materialSelect.value);
+                const contentsDensity = parseFloat(contentsSelect.value);
+                const paddingWeight = parseFloat(paddingInput.value) || 0;
+                
+                // Calculate volume
+                const volume = length * width * height;
+                
+                // Calculate weights
+                const boxWeight = volume * materialDensity;
+                const contentsWeight = volume * contentsDensity;
+                const totalWeight = boxWeight + contentsWeight + paddingWeight;
+                
+                // Update display
+                boxWeightEl.textContent = `${boxWeight.toFixed(2)} lbs`;
+                contentsWeightEl.textContent = `${contentsWeight.toFixed(2)} lbs`;
+                paddingWeightEl.textContent = `${paddingWeight.toFixed(2)} lbs`;
+                totalWeightEl.textContent = `${totalWeight.toFixed(2)} lbs`;
+                finalWeightEl.textContent = `${totalWeight.toFixed(2)} lbs`;
+                
+                // Save data to localStorage
+                saveData();
+            }
+            
+            function saveData() {
+                const data = {
+                    length: lengthInput.value,
+                    width: widthInput.value,
+                    height: heightInput.value,
+                    unit: unitSelect.value,
+                    material: materialSelect.value,
+                    contents: contentsSelect.value,
+                    padding: paddingInput.value
+                };
+                localStorage.setItem('packageWeightData', JSON.stringify(data));
+            }
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('packageWeightData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    lengthInput.value = data.length || '12';
+                    widthInput.value = data.width || '8';
+                    heightInput.value = data.height || '6';
+                    unitSelect.value = data.unit || 'in';
+                    materialSelect.value = data.material || '0.035';
+                    contentsSelect.value = data.contents || '0.025';
+                    paddingInput.value = data.padding || '0.5';
+                }
+            }
+            
+            function clearData() {
+                // Reset form inputs
+                lengthInput.value = '12';
+                widthInput.value = '8';
+                heightInput.value = '6';
+                unitSelect.value = 'in';
+                materialSelect.value = '0.035';
+                contentsSelect.value = '0.025';
+                paddingInput.value = '0.5';
+                
+                // Reset results
+                totalWeightEl.textContent = '0.00 lbs';
+                boxWeightEl.textContent = '0.00 lbs';
+                contentsWeightEl.textContent = '0.00 lbs';
+                paddingWeightEl.textContent = '0.00 lbs';
+                finalWeightEl.textContent = '0.00 lbs';
+                
+                // Remove saved data
+                localStorage.removeItem('packageWeightData');
+            }
+            
+            // Add event listeners to inputs to recalculate when values change
+            [lengthInput, widthInput, heightInput, materialSelect, contentsSelect, paddingInput].forEach(input => {
+                input.addEventListener('input', estimateWeight);
+            });
+        });
+    </script>
+</body>
+</html>
