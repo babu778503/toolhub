@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Balance Assistant</title>
+    <meta name="description" content="White Balance Assistant helps photographers and videographers select the correct white balance settings for different lighting conditions. Achieve accurate color reproduction.">
+    <meta name="keywords" content="white balance assistant, photography white balance, color temperature calculator, white balance tool, photography settings, color correction, white balance guide, photography lighting, camera settings, color temperature">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .assistant {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .wb-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .wb-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .wb-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .color-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .assistant {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wb-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>White Balance Assistant</h1>
+        </header>
+        
+        <div class="assistant">
+            <div class="input-group">
+                <label for="lighting">Lighting Condition</label>
+                <select id="lighting">
+                    <option value="daylight">Daylight (5500K)</option>
+                    <option value="cloudy">Cloudy (6500K)</option>
+                    <option value="shade">Shade (7500K)</option>
+                    <option value="tungsten">Tungsten Bulb (3200K)</option>
+                    <option value="fluorescent">Fluorescent (4000K)</option>
+                    <option value="sunset">Sunset (2000K)</option>
+                    <option value="candle">Candlelight (1800K)</option>
+                    <option value="flash">Flash (5500K)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="scene">Scene Type</label>
+                <select id="scene">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                    <option value="indoor">Indoor</option>
+                    <option value="outdoor">Outdoor</option>
+                    <option value="night">Night</option>
+                    <option value="studio">Studio</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="camera">Camera Type</label>
+                <select id="camera">
+                    <option value="dslr">DSLR</option>
+                    <option value="mirrorless">Mirrorless</option>
+                    <option value="phone">Smartphone</option>
+                    <option value="film">Film Camera</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="priority">Priority</label>
+                <select id="priority">
+                    <option value="accuracy">Color Accuracy</option>
+                    <option value="creative">Creative Effect</option>
+                    <option value="mixed">Mixed Lighting</option>
+                    <option value="auto">Auto White Balance</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="kelvin">Custom Kelvin (optional)</label>
+                <input type="number" id="kelvin" placeholder="Enter custom Kelvin value (2000-10000)" min="2000" max="10000" value="5500">
+            </div>
+            
+            <button class="btn" onclick="calculateWB()">Calculate White Balance</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="wb-icon">WB</div>
+                <h3>White Balance Results</h3>
+                
+                <div class="wb-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="lightingValue">Daylight</div>
+                        <div class="stat-label">Lighting</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="sceneValue">Portrait</div>
+                        <div class="stat-label">Scene</div>
+                    </div>
+                </div>
+                
+                <div class="color-preview" id="colorPreview" style="background: linear-gradient(45deg, #f0f0f0, #ffffff);">
+                    Preview Color Temperature
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Recommended Setting</div>
+                        <div class="result-value" id="recommendedSetting">Daylight</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Kelvin Value</div>
+                        <div class="result-value" id="kelvinValue">5500K</div>
+                    </div>
+                </div>
+                
+                <div class="wb-info">
+                    <div class="info-title">White Balance Information</div>
+                    <div class="info-content" id="infoContent">
+                        For daylight portrait photography, use the Daylight white balance setting (5500K). This setting compensates for the color temperature of natural sunlight to produce accurate colors. Adjust based on your creative vision.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedLighting = localStorage.getItem('lighting');
+            const savedScene = localStorage.getItem('scene');
+            const savedCamera = localStorage.getItem('camera');
+            const savedPriority = localStorage.getItem('priority');
+            const savedKelvin = localStorage.getItem('kelvin');
+            
+            if (savedLighting) document.getElementById('lighting').value = savedLighting;
+            if (savedScene) document.getElementById('scene').value = savedScene;
+            if (savedCamera) document.getElementById('camera').value = savedCamera;
+            if (savedPriority) document.getElementById('priority').value = savedPriority;
+            if (savedKelvin) document.getElementById('kelvin').value = savedKelvin;
+            
+            // Perform calculation with saved values
+            calculateWB();
+        }
+
+        function calculateWB() {
+            const lighting = document.getElementById('lighting').value;
+            const scene = document.getElementById('scene').value;
+            const camera = document.getElementById('camera').value;
+            const priority = document.getElementById('priority').value;
+            const customKelvin = parseInt(document.getElementById('kelvin').value) || 5500;
+            
+            if (customKelvin < 2000 || customKelvin > 10000) {
+                alert('Please enter a valid Kelvin value (2000-10000)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('lighting', lighting);
+            localStorage.setItem('scene', scene);
+            localStorage.setItem('camera', camera);
+            localStorage.setItem('priority', priority);
+            localStorage.setItem('kelvin', customKelvin);
+            
+            // Update displays
+            document.getElementById('lightingValue').textContent = getLightingText(lighting);
+            document.getElementById('sceneValue').textContent = getSceneText(scene);
+            
+            // Determine recommended white balance setting based on lighting
+            let recommendedSetting = getLightingText(lighting);
+            let kelvinValue = getKelvinForLighting(lighting);
+            
+            // Override with custom Kelvin if priority is mixed lighting
+            if (priority === 'mixed' || document.getElementById('kelvin').value !== '') {
+                kelvinValue = customKelvin;
+                recommendedSetting = 'Custom (' + kelvinValue + 'K)';
+            }
+            
+            document.getElementById('recommendedSetting').textContent = recommendedSetting;
+            document.getElementById('kelvinValue').textContent = kelvinValue + 'K';
+            
+            // Update color preview based on temperature
+            const colorPreview = document.getElementById('colorPreview');
+            const color = kelvinToRGB(kelvinValue);
+            colorPreview.style.background = `linear-gradient(45deg, ${color}, #ffffff)`;
+            colorPreview.textContent = `Color Temperature: ${kelvinValue}K`;
+            
+            // Update info content
+            const lightingText = getLightingText(lighting);
+            const sceneText = getSceneText(scene);
+            let info = `For ${lightingText.toLowerCase()} ${sceneText.toLowerCase()} photography, `;
+            
+            if (priority === 'accuracy') {
+                info += `use the ${recommendedSetting} white balance setting (${kelvinValue}K). `;
+                info += `This setting compensates for the color temperature to produce accurate colors. `;
+            } else if (priority === 'creative') {
+                info += `consider using the ${recommendedSetting} white balance setting (${kelvinValue}K) for creative effect. `;
+                info += `This setting may introduce color casts for artistic purposes. `;
+            } else if (priority === 'mixed') {
+                info += `use a custom white balance setting (${kelvinValue}K) to handle mixed lighting conditions. `;
+                info += `This setting helps balance different light sources. `;
+            } else {
+                info += `use the ${recommendedSetting} white balance setting (${kelvinValue}K). `;
+                info += `This setting provides the best color balance for the lighting conditions. `;
+            }
+            
+            info += `Adjust based on your creative vision.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function getLightingText(value) {
+            const lightingTexts = {
+                'daylight': 'Daylight',
+                'cloudy': 'Cloudy',
+                'shade': 'Shade',
+                'tungsten': 'Tungsten',
+                'fluorescent': 'Fluorescent',
+                'sunset': 'Sunset',
+                'candle': 'Candlelight',
+                'flash': 'Flash'
+            };
+            return lightingTexts[value] || value;
+        }
+        
+        function getSceneText(value) {
+            const sceneTexts = {
+                'portrait': 'Portrait',
+                'landscape': 'Landscape',
+                'indoor': 'Indoor',
+                'outdoor': 'Outdoor',
+                'night': 'Night',
+                'studio': 'Studio'
+            };
+            return sceneTexts[value] || value;
+        }
+        
+        function getKelvinForLighting(lighting) {
+            const kelvinValues = {
+                'daylight': 5500,
+                'cloudy': 6500,
+                'shade': 7500,
+                'tungsten': 3200,
+                'fluorescent': 4000,
+                'sunset': 2000,
+                'candle': 1800,
+                'flash': 5500
+            };
+            return kelvinValues[lighting] || 5500;
+        }
+        
+        function kelvinToRGB(kelvin) {
+            // Simplified approximation of color temperature to RGB
+            let temp = kelvin / 100;
+            let r, g, b;
+            
+            if (temp <= 66) {
+                r = 255;
+                g = temp;
+                g = 99.4708025861 * Math.log(g) - 161.1195681661;
+            } else {
+                r = temp - 60;
+                r = 329.698727446 * Math.pow(r, -0.1332047592);
+                g = temp - 60;
+                g = 288.1221695283 * Math.pow(g, -0.0755148492);
+            }
+            
+            if (temp >= 66) {
+                b = 255;
+            } else if (temp <= 19) {
+                b = 0;
+            } else {
+                b = temp - 10;
+                b = 138.5177312231 * Math.log(b) - 305.0447927307;
+            }
+            
+            r = Math.max(0, Math.min(255, r));
+            g = Math.max(0, Math.min(255, g));
+            b = Math.max(0, Math.min(255, b));
+            
+            return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+        }
+        
+        function exportResults() {
+            const lighting = getLightingText(document.getElementById('lighting').value);
+            const scene = getSceneText(document.getElementById('scene').value);
+            const camera = document.getElementById('camera').value;
+            const priority = document.getElementById('priority').value;
+            const kelvin = document.getElementById('kelvinValue').textContent;
+            const setting = document.getElementById('recommendedSetting').textContent;
+            
+            const exportText = `White Balance Assistant Results\n\n`;
+            exportText += `Lighting Condition: ${lighting}\n`;
+            exportText += `Scene Type: ${scene}\n`;
+            exportText += `Camera Type: ${getCameraText(camera)}\n`;
+            exportText += `Priority: ${getPriorityText(priority)}\n`;
+            exportText += `Recommended Setting: ${setting}\n`;
+            exportText += `Kelvin Value: ${kelvin}\n\n`;
+            exportText += `Photography Tips:\n`;
+            exportText += `- Daylight: 5500K for sunny conditions\n`;
+            exportText += `- Cloudy: 6500K for overcast skies\n`;
+            exportText += `- Tungsten: 3200K for incandescent bulbs\n`;
+            exportText += `- Fluorescent: 4000K for fluorescent lights\n`;
+            exportText += `- Shade: 7500K for blue-tinted light\n`;
+            exportText += `- Use custom white balance for mixed lighting\n`;
+            exportText += `- Shoot in RAW to adjust white balance in post\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('White balance results exported to clipboard!');
+        }
+        
+        function getCameraText(value) {
+            const cameraTexts = {
+                'dslr': 'DSLR',
+                'mirrorless': 'Mirrorless',
+                'phone': 'Smartphone',
+                'film': 'Film Camera'
+            };
+            return cameraTexts[value] || value;
+        }
+        
+        function getPriorityText(value) {
+            const priorityTexts = {
+                'accuracy': 'Color Accuracy',
+                'creative': 'Creative Effect',
+                'mixed': 'Mixed Lighting',
+                'auto': 'Auto White Balance'
+            };
+            return priorityTexts[value] || value;
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('lighting').value = 'daylight';
+                document.getElementById('scene').value = 'portrait';
+                document.getElementById('camera').value = 'dslr';
+                document.getElementById('priority').value = 'accuracy';
+                document.getElementById('kelvin').value = '5500';
+                
+                // Clear localStorage
+                localStorage.removeItem('lighting');
+                localStorage.removeItem('scene');
+                localStorage.removeItem('camera');
+                localStorage.removeItem('priority');
+                localStorage.removeItem('kelvin');
+                
+                // Reset displays
+                document.getElementById('lightingValue').textContent = 'Daylight';
+                document.getElementById('sceneValue').textContent = 'Portrait';
+                document.getElementById('recommendedSetting').textContent = 'Daylight';
+                document.getElementById('kelvinValue').textContent = '5500K';
+                document.getElementById('infoContent').textContent = 'For daylight portrait photography, use the Daylight white balance setting (5500K). This setting compensates for the color temperature of natural sunlight to produce accurate colors. Adjust based on your creative vision.';
+                
+                // Reset color preview
+                document.getElementById('colorPreview').style.background = 'linear-gradient(45deg, #f0f0f0, #ffffff)';
+                document.getElementById('colorPreview').textContent = 'Preview Color Temperature';
+            }
+        }
+    </script>
+</body>
+</html>

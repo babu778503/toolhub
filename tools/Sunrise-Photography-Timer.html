@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunrise Photography Timer</title>
+    <meta name="description" content="Sunrise Photography Timer helps photographers plan and time their sunrise photography sessions. Calculate golden hour, blue hour, and optimal shooting times.">
+    <meta name="keywords" content="sunrise photography timer, golden hour calculator, photography timing tool, sunrise photography guide, golden hour photography, blue hour photography, photography planning tool, outdoor photography timing, nature photography tool, landscape photography timer">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffecb3, #ffd54f);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #ff8f00, #ffca28);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .timer {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ff8f00;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #ffca28;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 202, 40, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #ff8f00, #ffca28);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 143, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .timer-display {
+            margin-top: 25px;
+            padding: 20px;
+            background: #ffecb3;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .timer-display h3 {
+            color: #ff8f00;
+            margin-bottom: 15px;
+        }
+        
+        .time {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #ffca28;
+            margin: 20px 0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .sun-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #ffecb3;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff8f00;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .timer-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #ffd54f;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #ff8f00;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .sun-icon {
+            font-size: 2rem;
+            color: #ffca28;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .progress-container {
+            height: 20px;
+            background: #ffd54f;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8f00, #ffca28);
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .timer {
+                padding: 20px 0;
+            }
+            
+            .time {
+                font-size: 3rem;
+            }
+            
+            .sun-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .timer-display {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sunrise Photography Timer</h1>
+        </header>
+        
+        <div class="timer">
+            <div class="input-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g., Yosemite, Grand Canyon, Local Park">
+            </div>
+            
+            <div class="input-group">
+                <label for="date">Date</label>
+                <input type="date" id="date">
+            </div>
+            
+            <div class="input-group">
+                <label for="sunriseTime">Sunrise Time</label>
+                <input type="time" id="sunriseTime" value="06:30">
+            </div>
+            
+            <div class="input-group">
+                <label for="timezone">Timezone</label>
+                <select id="timezone">
+                    <option value="utc-12">UTC-12:00</option>
+                    <option value="utc-11">UTC-11:00</option>
+                    <option value="utc-10">UTC-10:00</option>
+                    <option value="utc-9">UTC-09:00</option>
+                    <option value="utc-8">UTC-08:00</option>
+                    <option value="utc-7">UTC-07:00</option>
+                    <option value="utc-6">UTC-06:00</option>
+                    <option value="utc-5">UTC-05:00</option>
+                    <option value="utc-4">UTC-04:00</option>
+                    <option value="utc-3">UTC-03:00</option>
+                    <option value="utc-2">UTC-02:00</option>
+                    <option value="utc-1">UTC-01:00</option>
+                    <option value="utc0">UTC+00:00</option>
+                    <option value="utc1">UTC+01:00</option>
+                    <option value="utc2">UTC+02:00</option>
+                    <option value="utc3">UTC+03:00</option>
+                    <option value="utc4">UTC+04:00</option>
+                    <option value="utc5">UTC+05:00</option>
+                    <option value="utc6">UTC+06:00</option>
+                    <option value="utc7">UTC+07:00</option>
+                    <option value="utc8">UTC+08:00</option>
+                    <option value="utc9">UTC+09:00</option>
+                    <option value="utc10">UTC+10:00</option>
+                    <option value="utc11">UTC+11:00</option>
+                    <option value="utc12">UTC+12:00</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="duration">Session Duration (minutes)</label>
+                <input type="number" id="duration" placeholder="Enter duration" min="15" max="120" value="60">
+            </div>
+            
+            <button class="btn" onclick="startTimer()">Start Timer</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportTimer()">Export Timer</button>
+                <button class="btn-clear" onclick="clearTimer()">Clear Timer</button>
+            </div>
+            
+            <div class="timer-display">
+                <div class="sun-icon">🌅</div>
+                <h3>Sunrise Photography Timer</h3>
+                
+                <div class="sun-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="timeRemaining">00:00</div>
+                        <div class="stat-label">Time Remaining</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="goldenHour">06:30 AM</div>
+                        <div class="stat-label">Golden Hour</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="time" id="timer">00:00</div>
+                
+                <div class="timer-info">
+                    <div class="info-title">Photography Information</div>
+                    <div class="info-content" id="infoContent">
+                        Golden hour starts 1 hour before sunrise. Blue hour occurs during the last 20-30 minutes of twilight. Best photography times: 30 minutes before sunrise to 30 minutes after sunrise.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval = null;
+        let timeLeft = 0;
+        let originalTime = 0;
+        let isRunning = false;
+
+        // Load saved timer on page load
+        window.onload = function() {
+            const savedLocation = localStorage.getItem('location');
+            const savedDate = localStorage.getItem('date');
+            const savedSunriseTime = localStorage.getItem('sunriseTime');
+            const savedTimezone = localStorage.getItem('timezone');
+            const savedDuration = localStorage.getItem('duration');
+            const savedTimeLeft = localStorage.getItem('timeLeft');
+            const savedOriginalTime = localStorage.getItem('originalTime');
+            const savedIsRunning = localStorage.getItem('isRunning') === 'true';
+            
+            if (savedLocation) document.getElementById('location').value = savedLocation;
+            if (savedDate) document.getElementById('date').value = savedDate;
+            if (savedSunriseTime) document.getElementById('sunriseTime').value = savedSunriseTime;
+            if (savedTimezone) document.getElementById('timezone').value = savedTimezone;
+            if (savedDuration) document.getElementById('duration').value = savedDuration;
+            
+            if (savedTimeLeft) {
+                timeLeft = parseInt(savedTimeLeft);
+                originalTime = parseInt(savedOriginalTime);
+                isRunning = savedIsRunning;
+                
+                updateDisplay();
+                
+                if (isRunning) {
+                    startTimer();
+                }
+            }
+        }
+
+        function startTimer() {
+            const location = document.getElementById('location').value;
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            const sunriseTime = document.getElementById('sunriseTime').value || '06:30';
+            const timezone = document.getElementById('timezone').value;
+            const duration = parseInt(document.getElementById('duration').value) || 60;
+            
+            // Calculate time in seconds (duration in minutes)
+            const seconds = duration * 60;
+            
+            // Save settings to localStorage
+            localStorage.setItem('location', location);
+            localStorage.setItem('date', date);
+            localStorage.setItem('sunriseTime', sunriseTime);
+            localStorage.setItem('timezone', timezone);
+            localStorage.setItem('duration', duration);
+            localStorage.setItem('timeLeft', seconds);
+            localStorage.setItem('originalTime', seconds);
+            localStorage.setItem('isRunning', 'true');
+            
+            // Set timer values
+            timeLeft = seconds;
+            originalTime = seconds;
+            isRunning = true;
+            
+            // Update display
+            updateDisplay();
+            
+            // Clear any existing interval
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Start timer
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                document.getElementById('timer').textContent = '00:00';
+                document.getElementById('timeRemaining').textContent = '00:00';
+                document.getElementById('progressBar').style.width = '100%';
+                localStorage.setItem('isRunning', 'false');
+                isRunning = false;
+                alert('Sunrise photography session complete! Your golden hour has ended.');
+                return;
+            }
+            
+            timeLeft--;
+            updateDisplay();
+            
+            // Save time to localStorage
+            localStorage.setItem('timeLeft', timeLeft);
+        }
+        
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timer').textContent = timeString;
+            document.getElementById('timeRemaining').textContent = timeString;
+            
+            // Update progress bar
+            if (originalTime > 0) {
+                const progress = ((originalTime - timeLeft) / originalTime) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+            }
+            
+            // Update golden hour time
+            const sunriseTime = document.getElementById('sunriseTime').value || '06:30';
+            document.getElementById('goldenHour').textContent = sunriseTime + ' AM';
+            
+            // Update information
+            const location = document.getElementById('location').value || 'Your Location';
+            const duration = parseInt(document.getElementById('duration').value) || 60;
+            
+            let info = `Location: ${location}. Golden hour starts 1 hour before sunrise. Blue hour occurs during the last 20-30 minutes of twilight. `;
+            info += `Best photography times: 30 minutes before sunrise to 30 minutes after sunrise. `;
+            info += `Session duration: ${duration} minutes.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function exportTimer() {
+            const location = document.getElementById('location').value || 'Your Location';
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            const sunriseTime = document.getElementById('sunriseTime').value || '06:30';
+            const timezone = document.getElementById('timezone').value;
+            const duration = document.getElementById('duration').value || '60';
+            const timeRemaining = document.getElementById('timeRemaining').textContent;
+            
+            const exportText = `Sunrise Photography Timer\n\n`;
+            exportText += `Location: ${location}\n`;
+            exportText += `Date: ${date}\n`;
+            exportText += `Sunrise Time: ${sunriseTime}\n`;
+            exportText += `Timezone: ${timezone}\n`;
+            exportText += `Duration: ${duration} minutes\n`;
+            exportText += `Time Remaining: ${timeRemaining}\n\n`;
+            exportText += `Photography Tips:\n`;
+            exportText += `- Arrive 30 minutes before sunrise for golden hour\n`;
+            exportText += `- Use a tripod for sharp images\n`;
+            exportText += `- Bracket exposures for HDR\n`;
+            exportText += `- Use a polarizing filter to reduce glare\n`;
+            exportText += `- Shoot in RAW format for maximum flexibility\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Sunrise photography timer exported to clipboard!');
+        }
+        
+        function clearTimer() {
+            if (confirm('Are you sure you want to clear the timer?')) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timeLeft = 0;
+                originalTime = 0;
+                isRunning = false;
+                
+                // Clear localStorage
+                localStorage.removeItem('timeLeft');
+                localStorage.removeItem('originalTime');
+                localStorage.removeItem('isRunning');
+                
+                // Reset display
+                document.getElementById('timer').textContent = '00:00';
+                document.getElementById('timeRemaining').textContent = '00:00';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('infoContent').textContent = 'Golden hour starts 1 hour before sunrise. Blue hour occurs during the last 20-30 minutes of twilight. Best photography times: 30 minutes before sunrise to 30 minutes after sunrise.';
+            }
+        }
+    </script>
+</body>
+</html>

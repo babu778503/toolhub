@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noise Cancellation Tester</title>
+    <meta name="description" content="Noise Cancellation Tester helps evaluate and compare noise cancellation performance of headphones and earbuds. Test ANC effectiveness in various environments.">
+    <meta name="keywords" content="noise cancellation tester, ANC tester, noise cancelling headphones, active noise cancellation, headphone tester, earbud tester, noise reduction tester, audio testing tool, ANC performance, headphone comparison">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .tester {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #388e3c;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .tester-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c8e6c9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .tester-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .tester-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .noise-meter {
+            height: 200px;
+            background: #c8e6c9;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .meter-scale {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meter-segment {
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+        }
+        
+        .segment-label {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .meter-needle {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #d32f2f;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        
+        .needle-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #d32f2f;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .level-indicator {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .status-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .status-item {
+            text-align: center;
+        }
+        
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+        }
+        
+        .status-excellent {
+            background-color: #4caf50;
+        }
+        
+        .status-good {
+            background-color: #8bc34a;
+        }
+        
+        .status-fair {
+            background-color: #ffeb3b;
+        }
+        
+        .status-poor {
+            background-color: #f44336;
+        }
+        
+        .comparison-chart {
+            height: 150px;
+            background: white;
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-bars {
+            display: flex;
+            height: 100%;
+            align-items: flex-end;
+            padding: 10px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            margin: 0 2px;
+            background: linear-gradient(to top, #388e3c, #4caf50);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+        
+        .bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #555;
+            white-space: nowrap;
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .tester {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tester-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Noise Cancellation Tester</h1>
+        </header>
+        
+        <div class="tester">
+            <div class="input-group">
+                <label for="device">Headphone/Earbud Model</label>
+                <select id="device">
+                    <option value="airpods">Apple AirPods Pro</option>
+                    <option value="sony_wh1000xm4">Sony WH-1000XM4</option>
+                    <option value="bose_qc45">Bose QuietComfort 45</option>
+                    <option value="airpods_max">Apple AirPods Max</option>
+                    <option value="sony_wh1000xm5">Sony WH-1000XM5</option>
+                    <option value="bose_qc35">Bose QuietComfort 35</option>
+                    <option value="sennheiser_momentum">Sennheiser Momentum</option>
+                    <option value="jabra_elite">Jabra Elite 85h</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="environment">Test Environment</label>
+                <select id="environment">
+                    <option value="office">Office/Indoor</option>
+                    <option value="airplane">Airplane Cabin</option>
+                    <option value="train">Train/Subway</option>
+                    <option value="cafe">Cafe/Restaurant</option>
+                    <option value="outdoor">Outdoor/Park</option>
+                    <option value="traffic">Busy Street/Traffic</option>
+                    <option value="construction">Construction Site</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="noiseType">Noise Type</label>
+                <select id="noiseType">
+                    <option value="continuous">Continuous (HVAC, Fans)</option>
+                    <option value="engine">Engine/Propeller</option>
+                    <option value="traffic">Traffic/Road Noise</option>
+                    <option value="human">Human Voices</option>
+                    <option value="impulse">Impulse (Doors, Horns)</option>
+                    <option value="wideband">Wideband Noise</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="ancMode">ANC Mode</label>
+                <select id="ancMode">
+                    <option value="adaptive">Adaptive ANC</option>
+                    <option value="transparency">Transparency Mode</option>
+                    <option value="off">ANC Off</option>
+                    <option value="custom">Custom Settings</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="volume">Test Volume Level (%)</label>
+                <input type="number" id="volume" placeholder="Enter volume level" min="0" max="100" value="50">
+            </div>
+            
+            <div class="input-group">
+                <label for="duration">Test Duration (seconds)</label>
+                <input type="number" id="duration" placeholder="Enter test duration" min="10" max="300" value="60">
+            </div>
+            
+            <button class="btn" onclick="testNoiseCancellation()">Test Noise Cancellation</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="tester-icon">🔇</div>
+                <h3>Noise Cancellation Test Results</h3>
+                
+                <div class="tester-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="deviceValue">AirPods Pro</div>
+                        <div class="stat-label">Device</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="environmentValue">Office</div>
+                        <div class="stat-label">Environment</div>
+                    </div>
+                </div>
+                
+                <div class="noise-meter">
+                    <div class="meter-scale">
+                        <div class="meter-segment" style="background: #4caf50;">
+                            <div class="segment-label">-30 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #8bc34a;">
+                            <div class="segment-label">-20 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #cddc39;">
+                            <div class="segment-label">-10 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #ffeb3b;">
+                            <div class="segment-label">0 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #ffc107;">
+                            <div class="segment-label">+10 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #ff9800;">
+                            <div class="segment-label">+20 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #f44336;">
+                            <div class="segment-label">+30 dB</div>
+                        </div>
+                    </div>
+                    <div class="meter-needle" id="meterNeedle">
+                        <div class="needle-head"></div>
+                    </div>
+                    <div class="level-indicator" id="levelIndicator">-18 dB</div>
+                </div>
+                
+                <div class="status-indicator">
+                    <div class="status-item">
+                        <div class="status-dot status-excellent"></div>
+                        <div>Excellent</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot status-good"></div>
+                        <div>Good</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot status-fair"></div>
+                        <div>Fair</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot status-poor"></div>
+                        <div>Poor</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Noise Reduction</div>
+                        <div class="result-value" id="noiseReduction">18 dB</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Effectiveness</div>
+                        <div class="result-value" id="effectiveness">85%</div>
+                    </div>
+                </div>
+                
+                <div class="comparison-chart">
+                    <div class="chart-bars">
+                        <div class="chart-bar" style="height: 80%;">
+                            <div class="bar-value">18 dB</div>
+                            <div class="bar-label">Current</div>
+                        </div>
+                        <div class="chart-bar" style="height: 90%;">
+                            <div class="bar-value">22 dB</div>
+                            <div class="bar-label">Top ANC</div>
+                        </div>
+                        <div class="chart-bar" style="height: 60%;">
+                            <div class="bar-value">12 dB</div>
+                            <div class="bar-label">Avg ANC</div>
+                        </div>
+                        <div class="chart-bar" style="height: 30%;">
+                            <div class="bar-value">6 dB</div>
+                            <div class="bar-label">Passive</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tester-info">
+                    <div class="info-title">Test Information</div>
+                    <div class="info-content" id="infoContent">
+                        Apple AirPods Pro achieved 18 dB noise reduction in office environment with continuous noise. This represents 85% effectiveness compared to industry leaders. ANC performance is excellent for HVAC and fan noise cancellation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedDevice = localStorage.getItem('device');
+            const savedEnvironment = localStorage.getItem('environment');
+            const savedNoiseType = localStorage.getItem('noiseType');
+            const savedAncMode = localStorage.getItem('ancMode');
+            const savedVolume = localStorage.getItem('volume');
+            const savedDuration = localStorage.getItem('duration');
+            
+            if (savedDevice) document.getElementById('device').value = savedDevice;
+            if (savedEnvironment) document.getElementById('environment').value = savedEnvironment;
+            if (savedNoiseType) document.getElementById('noiseType').value = savedNoiseType;
+            if (savedAncMode) document.getElementById('ancMode').value = savedAncMode;
+            if (savedVolume) document.getElementById('volume').value = savedVolume;
+            if (savedDuration) document.getElementById('duration').value = savedDuration;
+            
+            // Perform test with saved values
+            testNoiseCancellation();
+        }
+
+        function testNoiseCancellation() {
+            const device = document.getElementById('device').value;
+            const environment = document.getElementById('environment').value;
+            const noiseType = document.getElementById('noiseType').value;
+            const ancMode = document.getElementById('ancMode').value;
+            const volume = parseInt(document.getElementById('volume').value) || 50;
+            const duration = parseInt(document.getElementById('duration').value) || 60;
+            
+            if (volume < 0 || volume > 100) {
+                alert('Please enter a valid volume level (0-100%)');
+                return;
+            }
+            
+            if (duration < 10 || duration > 300) {
+                alert('Please enter a valid test duration (10-300 seconds)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('device', device);
+            localStorage.setItem('environment', environment);
+            localStorage.setItem('noiseType', noiseType);
+            localStorage.setItem('ancMode', ancMode);
+            localStorage.setItem('volume', volume);
+            localStorage.setItem('duration', duration);
+            
+            // Update displays
+            document.getElementById('deviceValue').textContent = getDeviceText(device);
+            document.getElementById('environmentValue').textContent = getEnvironmentText(environment);
+            
+            // Simulate noise cancellation test
+            const noiseReduction = simulateNoiseTest(device, environment, noiseType, ancMode);
+            const effectiveness = Math.min(100, Math.round((noiseReduction / 25) * 100));
+            
+            // Update displays
+            document.getElementById('noiseReduction').textContent = noiseReduction + ' dB';
+            document.getElementById('effectiveness').textContent = effectiveness + '%';
+            document.getElementById('levelIndicator').textContent = '-' + noiseReduction + ' dB';
+            
+            // Update meter needle position (0 to 100% representing -30dB to +30dB)
+            const meterRange = 60; // -30dB to +30dB
+            const normalizedLevel = (noiseReduction + 30) / meterRange;
+            const needlePosition = Math.max(0, Math.min(100, normalizedLevel * 100));
+            document.getElementById('meterNeedle').style.height = needlePosition + '%';
+            
+            // Update info content
+            const deviceText = getDeviceText(device);
+            const environmentText = getEnvironmentText(environment);
+            const noiseTypeText = getNoiseTypeText(noiseType);
+            const ancModeText = getAncModeText(ancMode);
+            
+            let info = `${deviceText} achieved ${noiseReduction} dB noise reduction in ${environmentText.toLowerCase()} environment `;
+            info += `with ${noiseTypeText.toLowerCase()}. This represents ${effectiveness}% effectiveness compared to industry leaders. `;
+            
+            if (noiseReduction > 20) {
+                info += 'ANC performance is excellent for this environment and noise type.';
+            } else if (noiseReduction > 15) {
+                info += 'ANC performance is good for this environment and noise type.';
+            } else if (noiseReduction > 10) {
+                info += 'ANC performance is fair for this environment and noise type.';
+            } else {
+                info += 'ANC performance is limited for this environment and noise type.';
+            }
+            
+            info += ` ${ancModeText} mode was used during testing.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function simulateNoiseTest(device, environment, noiseType, ancMode) {
+            // Base noise reduction value
+            let baseReduction = 15; // dB
+            
+            // Adjust based on device
+            switch(device) {
+                case 'sony_wh1000xm4':
+                case 'sony_wh1000xm5':
+                    baseReduction = 22;
+                    break;
+                case 'bose_qc45':
+                case 'bose_qc35':
+                    baseReduction = 20;
+                    break;
+                case 'airpods':
+                case 'airpods_max':
+                    baseReduction = 18;
+                    break;
+                case 'sennheiser_momentum':
+                    baseReduction = 19;
+                    break;
+                case 'jabra_elite':
+                    baseReduction = 17;
+                    break;
+            }
+            
+            // Adjust based on environment
+            switch(environment) {
+                case 'office':
+                    baseReduction *= 1.0; // Neutral
+                    break;
+                case 'airplane':
+                    baseReduction *= 1.1; // Good for ANC
+                    break;
+                case 'train':
+                    baseReduction *= 1.05; // Good for ANC
+                    break;
+                case 'cafe':
+                    baseReduction *= 0.9; // Challenging
+                    break;
+                case 'outdoor':
+                    baseReduction *= 0.8; // Very challenging
+                    break;
+                case 'traffic':
+                    baseReduction *= 0.85; // Challenging
+                    break;
+                case 'construction':
+                    baseReduction *= 0.7; // Very challenging
+                    break;
+            }
+            
+            // Adjust based on noise type
+            switch(noiseType) {
+                case 'continuous':
+                    baseReduction *= 1.1; // Best case
+                    break;
+                case 'engine':
+                    baseReduction *= 1.05; // Good
+                    break;
+                case 'traffic':
+                    baseReduction *= 0.95; // Moderate
+                    break;
+                case 'human':
+                    baseReduction *= 0.8; // Challenging
+                    break;
+                case 'impulse':
+                    baseReduction *= 0.7; // Difficult
+                    break;
+                case 'wideband':
+                    baseReduction *= 0.85; // Moderate
+                    break;
+            }
+            
+            // Adjust based on ANC mode
+            switch(ancMode) {
+                case 'adaptive':
+                    baseReduction *= 1.0; // Standard
+                    break;
+                case 'transparency':
+                    baseReduction *= 0.3; // Limited
+                    break;
+                case 'off':
+                    baseReduction *= 0.0; // None
+                    break;
+                case 'custom':
+                    baseReduction *= 1.05; // Slightly better
+                    break;
+            }
+            
+            // Add some random variation to simulate real-world conditions
+            const variation = (Math.random() * 4) - 2; // -2 to +2 dB
+            return Math.max(0, Math.round(baseReduction + variation));
+        }
+        
+        function getDeviceText(value) {
+            const deviceTexts = {
+                'airpods': 'Apple AirPods Pro',
+                'sony_wh1000xm4': 'Sony WH-1000XM4',
+                'bose_qc45': 'Bose QuietComfort 45',
+                'airpods_max': 'Apple AirPods Max',
+                'sony_wh1000xm5': 'Sony WH-1000XM5',
+                'bose_qc35': 'Bose QuietComfort 35',
+                'sennheiser_momentum': 'Sennheiser Momentum',
+                'jabra_elite': 'Jabra Elite 85h'
+            };
+            return deviceTexts[value] || value;
+        }
+        
+        function getEnvironmentText(value) {
+            const environmentTexts = {
+                'office': 'Office/Indoor',
+                'airplane': 'Airplane Cabin',
+                'train': 'Train/Subway',
+                'cafe': 'Cafe/Restaurant',
+                'outdoor': 'Outdoor/Park',
+                'traffic': 'Busy Street/Traffic',
+                'construction': 'Construction Site'
+            };
+            return environmentTexts[value] || value;
+        }
+        
+        function getNoiseTypeText(value) {
+            const noiseTypeTexts = {
+                'continuous': 'Continuous Noise',
+                'engine': 'Engine/Propeller',
+                'traffic': 'Traffic/Road Noise',
+                'human': 'Human Voices',
+                'impulse': 'Impulse Noise',
+                'wideband': 'Wideband Noise'
+            };
+            return noiseTypeTexts[value] || value;
+        }
+        
+        function getAncModeText(value) {
+            const ancModeTexts = {
+                'adaptive': 'Adaptive ANC',
+                'transparency': 'Transparency Mode',
+                'off': 'ANC Off',
+                'custom': 'Custom Settings'
+            };
+            return ancModeTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const device = getDeviceText(document.getElementById('device').value);
+            const environment = getEnvironmentText(document.getElementById('environment').value);
+            const noiseType = getNoiseTypeText(document.getElementById('noiseType').value);
+            const ancMode = getAncModeText(document.getElementById('ancMode').value);
+            const volume = document.getElementById('volume').value;
+            const duration = document.getElementById('duration').value;
+            const noiseReduction = document.getElementById('noiseReduction').textContent;
+            const effectiveness = document.getElementById('effectiveness').textContent;
+            
+            const exportText = `Noise Cancellation Tester Results\n\n`;
+            exportText += `Device: ${device}\n`;
+            exportText += `Environment: ${environment}\n`;
+            exportText += `Noise Type: ${noiseType}\n`;
+            exportText += `ANC Mode: ${ancMode}\n`;
+            exportText += `Test Volume: ${volume}%\n`;
+            exportText += `Test Duration: ${duration} seconds\n`;
+            exportText += `Noise Reduction: ${noiseReduction}\n`;
+            exportText += `Effectiveness: ${effectiveness}\n\n`;
+            exportText += `ANC Performance Ratings:\n`;
+            exportText += `- Excellent: 20+ dB reduction\n`;
+            exportText += `- Good: 15-19 dB reduction\n`;
+            exportText += `- Fair: 10-14 dB reduction\n`;
+            exportText += `- Poor: Below 10 dB reduction\n\n`;
+            exportText += `Testing Tips:\n`;
+            exportText += `- Test in representative environments\n`;
+            exportText += `- Compare adaptive vs manual modes\n`;
+            exportText += `- Test different noise frequencies\n`;
+            exportText += `- Measure both static and dynamic noise\n`;
+            exportText += `- Consider transparency mode performance\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Noise cancellation test results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('device').value = 'airpods';
+                document.getElementById('environment').value = 'office';
+                document.getElementById('noiseType').value = 'continuous';
+                document.getElementById('ancMode').value = 'adaptive';
+                document.getElementById('volume').value = '50';
+                document.getElementById('duration').value = '60';
+                
+                // Clear localStorage
+                localStorage.removeItem('device');
+                localStorage.removeItem('environment');
+                localStorage.removeItem('noiseType');
+                localStorage.removeItem('ancMode');
+                localStorage.removeItem('volume');
+                localStorage.removeItem('duration');
+                
+                // Reset displays
+                document.getElementById('deviceValue').textContent = 'Apple AirPods Pro';
+                document.getElementById('environmentValue').textContent = 'Office';
+                document.getElementById('noiseReduction').textContent = '18 dB';
+                document.getElementById('effectiveness').textContent = '85%';
+                document.getElementById('levelIndicator').textContent = '-18 dB';
+                document.getElementById('meterNeedle').style.height = '60%';
+                document.getElementById('infoContent').textContent = 'Apple AirPods Pro achieved 18 dB noise reduction in office environment with continuous noise. This represents 85% effectiveness compared to industry leaders. ANC performance is excellent for HVAC and fan noise cancellation.';
+            }
+        }
+    </script>
+</body>
+</html>

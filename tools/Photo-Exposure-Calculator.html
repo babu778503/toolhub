@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Exposure Calculator</title>
+    <meta name="description" content="Photo Exposure Calculator helps photographers determine optimal camera settings for different lighting conditions. Calculate aperture, shutter speed, and ISO combinations.">
+    <meta name="keywords" content="photo exposure calculator, camera exposure calculator, photography exposure tool, aperture calculator, shutter speed calculator, iso calculator, photography settings, camera settings calculator, exposure triangle, photography guide">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .calculator {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .exposure-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .exposure-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .camera-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .calculator {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .exposure-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Photo Exposure Calculator</h1>
+        </header>
+        
+        <div class="calculator">
+            <div class="input-group">
+                <label for="lighting">Lighting Condition</label>
+                <select id="lighting">
+                    <option value="bright">Bright Sunlight</option>
+                    <option value="cloudy">Overcast/Cloudy</option>
+                    <option value="shade">Shade</option>
+                    <option value="sunset">Sunset/Golden Hour</option>
+                    <option value="indoor">Indoor/Artificial Light</option>
+                    <option value="night">Night/Very Low Light</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="subject">Subject Type</label>
+                <select id="subject">
+                    <option value="landscape">Landscape</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="action">Action/Sports</option>
+                    <option value="macro">Macro/Close-up</option>
+                    <option value="architecture">Architecture</option>
+                    <option value="wildlife">Wildlife</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="iso">ISO</label>
+                <select id="iso">
+                    <option value="100">ISO 100</option>
+                    <option value="200">ISO 200</option>
+                    <option value="400">ISO 400</option>
+                    <option value="800">ISO 800</option>
+                    <option value="1600">ISO 1600</option>
+                    <option value="3200">ISO 3200</option>
+                    <option value="6400">ISO 6400</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="aperture">Aperture (f-stop)</label>
+                <select id="aperture">
+                    <option value="1.4">f/1.4</option>
+                    <option value="2">f/2</option>
+                    <option value="2.8">f/2.8</option>
+                    <option value="4">f/4</option>
+                    <option value="5.6">f/5.6</option>
+                    <option value="8">f/8</option>
+                    <option value="11">f/11</option>
+                    <option value="16">f/16</option>
+                    <option value="22">f/22</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="shutter">Shutter Speed</label>
+                <select id="shutter">
+                    <option value="1">1s</option>
+                    <option value="0.5">1/2s</option>
+                    <option value="0.25">1/4s</option>
+                    <option value="0.125">1/8s</option>
+                    <option value="0.0625">1/16s</option>
+                    <option value="0.03125">1/32s</option>
+                    <option value="0.015625">1/64s</option>
+                    <option value="0.0078125">1/128s</option>
+                    <option value="0.00390625">1/256s</option>
+                    <option value="0.001953125">1/512s</option>
+                    <option value="0.0009765625">1/1024s</option>
+                    <option value="0.00048828125">1/2048s</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="calculateExposure()">Calculate Exposure</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="camera-icon">📷</div>
+                <h3>Exposure Results</h3>
+                
+                <div class="exposure-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="lightingValue">Bright Sunlight</div>
+                        <div class="stat-label">Lighting</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="subjectValue">Landscape</div>
+                        <div class="stat-label">Subject</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="exposureValue">0 EV</div>
+                        <div class="stat-label">Exposure</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Recommended Aperture</div>
+                        <div class="result-value" id="recommendedAperture">f/8</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Recommended Shutter</div>
+                        <div class="result-value" id="recommendedShutter">1/125s</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Recommended ISO</div>
+                        <div class="result-value" id="recommendedISO">100</div>
+                    </div>
+                </div>
+                
+                <div class="exposure-info">
+                    <div class="info-title">Exposure Information</div>
+                    <div class="info-content" id="infoContent">
+                        For bright sunlight landscape photography, use f/8 at 1/125s with ISO 100. This provides a good balance of depth of field and sharpness. Adjust settings based on your creative vision.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedLighting = localStorage.getItem('lighting');
+            const savedSubject = localStorage.getItem('subject');
+            const savedISO = localStorage.getItem('iso');
+            const savedAperture = localStorage.getItem('aperture');
+            const savedShutter = localStorage.getItem('shutter');
+            
+            if (savedLighting) document.getElementById('lighting').value = savedLighting;
+            if (savedSubject) document.getElementById('subject').value = savedSubject;
+            if (savedISO) document.getElementById('iso').value = savedISO;
+            if (savedAperture) document.getElementById('aperture').value = savedAperture;
+            if (savedShutter) document.getElementById('shutter').value = savedShutter;
+            
+            // Perform calculation with saved values
+            calculateExposure();
+        }
+
+        function calculateExposure() {
+            const lighting = document.getElementById('lighting').value;
+            const subject = document.getElementById('subject').value;
+            const iso = parseInt(document.getElementById('iso').value);
+            const aperture = parseFloat(document.getElementById('aperture').value);
+            const shutter = parseFloat(document.getElementById('shutter').value);
+            
+            // Save to localStorage
+            localStorage.setItem('lighting', lighting);
+            localStorage.setItem('subject', subject);
+            localStorage.setItem('iso', iso);
+            localStorage.setItem('aperture', aperture);
+            localStorage.setItem('shutter', shutter);
+            
+            // Update displays
+            document.getElementById('lightingValue').textContent = getLightingText(lighting);
+            document.getElementById('subjectValue').textContent = getSubjectText(subject);
+            
+            // Calculate exposure value (simplified)
+            const ev = Math.log2((aperture * aperture) / shutter) - Math.log2(iso / 100);
+            document.getElementById('exposureValue').textContent = ev.toFixed(1) + ' EV';
+            
+            // Calculate recommended settings based on lighting and subject
+            let recommendedAperture = aperture;
+            let recommendedShutter = shutter;
+            let recommendedISO = iso;
+            
+            // Adjust based on lighting condition
+            switch(lighting) {
+                case 'bright':
+                    recommendedISO = 100;
+                    recommendedAperture = 8;
+                    recommendedShutter = 1/125;
+                    break;
+                case 'cloudy':
+                    recommendedISO = 200;
+                    recommendedAperture = 5.6;
+                    recommendedShutter = 1/125;
+                    break;
+                case 'shade':
+                    recommendedISO = 400;
+                    recommendedAperture = 4;
+                    recommendedShutter = 1/125;
+                    break;
+                case 'sunset':
+                    recommendedISO = 200;
+                    recommendedAperture = 5.6;
+                    recommendedShutter = 1/60;
+                    break;
+                case 'indoor':
+                    recommendedISO = 800;
+                    recommendedAperture = 2.8;
+                    recommendedShutter = 1/60;
+                    break;
+                case 'night':
+                    recommendedISO = 1600;
+                    recommendedAperture = 2.8;
+                    recommendedShutter = 1/30;
+                    break;
+            }
+            
+            // Adjust based on subject
+            if (subject === 'action') {
+                recommendedShutter = 1/500; // Faster for action
+            } else if (subject === 'landscape') {
+                recommendedAperture = 8; // For depth of field
+            } else if (subject === 'portrait') {
+                recommendedAperture = 2.8; // For shallow depth of field
+            }
+            
+            document.getElementById('recommendedAperture').textContent = 'f/' + recommendedAperture;
+            document.getElementById('recommendedShutter').textContent = getShutterText(recommendedShutter);
+            document.getElementById('recommendedISO').textContent = recommendedISO;
+            
+            // Update info content
+            const lightingText = getLightingText(lighting);
+            const subjectText = getSubjectText(subject);
+            document.getElementById('infoContent').textContent = 
+                `For ${lightingText.toLowerCase()} ${subjectText.toLowerCase()} photography, use f/${recommendedAperture} at ${getShutterText(recommendedShutter)} with ISO ${recommendedISO}. ` +
+                `This provides a good balance of depth of field and sharpness. Adjust settings based on your creative vision.`;
+        }
+        
+        function getLightingText(value) {
+            const lightingTexts = {
+                'bright': 'Bright Sunlight',
+                'cloudy': 'Overcast/Cloudy',
+                'shade': 'Shade',
+                'sunset': 'Sunset/Golden Hour',
+                'indoor': 'Indoor/Artificial Light',
+                'night': 'Night/Very Low Light'
+            };
+            return lightingTexts[value] || value;
+        }
+        
+        function getSubjectText(value) {
+            const subjectTexts = {
+                'landscape': 'Landscape',
+                'portrait': 'Portrait',
+                'action': 'Action/Sports',
+                'macro': 'Macro/Close-up',
+                'architecture': 'Architecture',
+                'wildlife': 'Wildlife'
+            };
+            return subjectTexts[value] || value;
+        }
+        
+        function getShutterText(value) {
+            if (value >= 1) {
+                return value + 's';
+            } else {
+                const denominator = Math.round(1 / value);
+                return '1/' + denominator + 's';
+            }
+        }
+        
+        function exportResults() {
+            const lighting = getLightingText(document.getElementById('lighting').value);
+            const subject = getSubjectText(document.getElementById('subject').value);
+            const iso = document.getElementById('iso').value;
+            const aperture = document.getElementById('aperture').value;
+            const shutter = getShutterText(parseFloat(document.getElementById('shutter').value));
+            const recommendedAperture = document.getElementById('recommendedAperture').textContent;
+            const recommendedShutter = document.getElementById('recommendedShutter').textContent;
+            const recommendedISO = document.getElementById('recommendedISO').textContent;
+            
+            const exportText = `Photo Exposure Calculator Results\n\n`;
+            exportText += `Lighting Condition: ${lighting}\n`;
+            exportText += `Subject Type: ${subject}\n`;
+            exportText += `Current Settings: f/${aperture}, ${shutter}, ISO ${iso}\n`;
+            exportText += `Recommended Settings: ${recommendedAperture}, ${recommendedShutter}, ISO ${recommendedISO}\n\n`;
+            exportText += `Photography Tips:\n`;
+            exportText += `- Use the exposure triangle (aperture, shutter, ISO) to balance your image\n`;
+            exportText += `- Aperture controls depth of field\n`;
+            exportText += `- Shutter speed controls motion blur\n`;
+            exportText += `- ISO controls sensitivity to light\n`;
+            exportText += `- Adjust settings based on lighting conditions and creative vision\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Photo exposure results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('lighting').value = 'bright';
+                document.getElementById('subject').value = 'landscape';
+                document.getElementById('iso').value = '100';
+                document.getElementById('aperture').value = '8';
+                document.getElementById('shutter').value = '0.0078125';
+                
+                // Clear localStorage
+                localStorage.removeItem('lighting');
+                localStorage.removeItem('subject');
+                localStorage.removeItem('iso');
+                localStorage.removeItem('aperture');
+                localStorage.removeItem('shutter');
+                
+                // Reset displays
+                document.getElementById('lightingValue').textContent = 'Bright Sunlight';
+                document.getElementById('subjectValue').textContent = 'Landscape';
+                document.getElementById('exposureValue').textContent = '0 EV';
+                document.getElementById('recommendedAperture').textContent = 'f/8';
+                document.getElementById('recommendedShutter').textContent = '1/125s';
+                document.getElementById('recommendedISO').textContent = '100';
+                document.getElementById('infoContent').textContent = 'For bright sunlight landscape photography, use f/8 at 1/125s with ISO 100. This provides a good balance of depth of field and sharpness. Adjust settings based on your creative vision.';
+            }
+        }
+    </script>
+</body>
+</html>

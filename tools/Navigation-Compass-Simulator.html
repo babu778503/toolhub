@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Compass Simulator</title>
+    <meta name="description" content="Navigation Compass Simulator provides a digital compass for outdoor navigation. Practice navigation skills and learn to use a compass in various outdoor environments.">
+    <meta name="keywords" content="navigation compass simulator, digital compass, outdoor navigation, compass simulator, wilderness navigation, hiking navigation, orienteering compass, navigation skills, compass app alternative, compass bearing calculator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .simulator {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .compass-container {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .compass-container h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .compass {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .compass-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform: rotate(0deg);
+            transition: transform 1s ease;
+        }
+        
+        .compass-rose {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #f5f5f5 0%, #e0e0e0 100%);
+        }
+        
+        .compass-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 120px;
+            background: #d32f2f;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .compass-needle::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid #d32f2f;
+        }
+        
+        .compass-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #4caf50;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+        }
+        
+        .directions {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .direction {
+            position: absolute;
+            font-weight: bold;
+            font-size: 18px;
+            color: #00796b;
+        }
+        
+        .n { top: 5px; left: 50%; transform: translateX(-50%); }
+        .e { top: 50%; right: 5px; transform: translateY(-50%); }
+        .s { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .w { top: 50%; left: 5px; transform: translateY(-50%); }
+        
+        .bearing-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 20px 0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .compass-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .navigation-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .compass-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .simulator {
+                padding: 20px 0;
+            }
+            
+            .compass {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto 20px;
+            }
+            
+            .bearing-display {
+                font-size: 1.5rem;
+            }
+            
+            .compass-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .compass-container {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Navigation Compass Simulator</h1>
+        </header>
+        
+        <div class="simulator">
+            <div class="input-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g., Local Park, Mountain Trail, Forest">
+            </div>
+            
+            <div class="input-group">
+                <label for="activity">Activity</label>
+                <select id="activity">
+                    <option value="hiking">Hiking</option>
+                    <option value="camping">Camping</option>
+                    <option value="orienteering">Orienteering</option>
+                    <option value="backpacking">Backpacking</option>
+                    <option value="fishing">Fishing</option>
+                    <option value="hunting">Hunting</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="bearing">Bearing (degrees)</label>
+                <input type="number" id="bearing" placeholder="Enter bearing in degrees" min="0" max="359" value="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="destination">Destination</label>
+                <input type="text" id="destination" placeholder="e.g., Campsite, Water Source, Trailhead">
+            </div>
+            
+            <button class="btn" onclick="updateCompass()">Set Bearing</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportCompass()">Export Data</button>
+                <button class="btn-clear" onclick="clearCompass()">Clear Data</button>
+            </div>
+            
+            <div class="compass-container">
+                <div class="compass-icon">🧭</div>
+                <h3>Navigation Compass</h3>
+                
+                <div class="compass-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="currentBearing">0°</div>
+                        <div class="stat-label">Current Bearing</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="direction">N</div>
+                        <div class="stat-label">Direction</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="deviation">0°</div>
+                        <div class="stat-label">Deviation</div>
+                    </div>
+                </div>
+                
+                <div class="compass">
+                    <div class="compass-inner" id="compassInner">
+                        <div class="compass-rose">
+                            <div class="directions">
+                                <div class="direction n">N</div>
+                                <div class="direction e">E</div>
+                                <div class="direction s">S</div>
+                                <div class="direction w">W</div>
+                            </div>
+                        </div>
+                        <div class="compass-needle"></div>
+                        <div class="compass-center"></div>
+                    </div>
+                </div>
+                
+                <div class="bearing-display" id="bearingDisplay">0°</div>
+                
+                <div class="navigation-info">
+                    <div class="info-title">Navigation Information</div>
+                    <div class="info-content" id="infoContent">
+                        North is 0°, East is 90°, South is 180°, West is 270°. Keep the compass level and away from metal objects for accurate readings.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved compass data on page load
+        window.onload = function() {
+            const savedLocation = localStorage.getItem('location');
+            const savedActivity = localStorage.getItem('activity');
+            const savedBearing = localStorage.getItem('bearing');
+            const savedDestination = localStorage.getItem('destination');
+            
+            if (savedLocation) document.getElementById('location').value = savedLocation;
+            if (savedActivity) document.getElementById('activity').value = savedActivity;
+            if (savedBearing) {
+                document.getElementById('bearing').value = savedBearing;
+                updateCompass();
+            }
+            if (savedDestination) document.getElementById('destination').value = savedDestination;
+        }
+
+        function updateCompass() {
+            const bearing = parseInt(document.getElementById('bearing').value) || 0;
+            const location = document.getElementById('location').value;
+            const activity = document.getElementById('activity').value;
+            const destination = document.getElementById('destination').value;
+            
+            // Validate bearing
+            if (bearing < 0 || bearing > 359) {
+                alert('Bearing must be between 0 and 359 degrees');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('location', location);
+            localStorage.setItem('activity', activity);
+            localStorage.setItem('bearing', bearing);
+            localStorage.setItem('destination', destination);
+            
+            // Update compass rotation
+            const compassInner = document.getElementById('compassInner');
+            compassInner.style.transform = `rotate(${bearing}deg)`;
+            
+            // Update bearing display
+            document.getElementById('bearingDisplay').textContent = bearing + '°';
+            document.getElementById('currentBearing').textContent = bearing + '°';
+            
+            // Update direction based on bearing
+            let direction = '';
+            if (bearing >= 337.5 || bearing < 22.5) {
+                direction = 'N';
+            } else if (bearing >= 22.5 && bearing < 67.5) {
+                direction = 'NE';
+            } else if (bearing >= 67.5 && bearing < 112.5) {
+                direction = 'E';
+            } else if (bearing >= 112.5 && bearing < 157.5) {
+                direction = 'SE';
+            } else if (bearing >= 157.5 && bearing < 202.5) {
+                direction = 'S';
+            } else if (bearing >= 202.5 && bearing < 247.5) {
+                direction = 'SW';
+            } else if (bearing >= 247.5 && bearing < 292.5) {
+                direction = 'W';
+            } else {
+                direction = 'NW';
+            }
+            
+            document.getElementById('direction').textContent = direction;
+            
+            // Update navigation information
+            let info = '';
+            if (destination) {
+                info = `Heading to ${destination} on bearing ${bearing}°. `;
+            } else {
+                info = `Current bearing: ${bearing}°. `;
+            }
+            
+            info += 'North is 0°, East is 90°, South is 180°, West is 270°. ';
+            info += 'Keep the compass level and away from metal objects for accurate readings.';
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function exportCompass() {
+            const location = document.getElementById('location').value || 'Your Location';
+            const activity = document.getElementById('activity').value;
+            const bearing = document.getElementById('bearing').value || '0';
+            const destination = document.getElementById('destination').value || 'Unknown';
+            
+            const exportText = `Navigation Compass Data\nLocation: ${location}\nActivity: ${activity}\nBearing: ${bearing}°\nDestination: ${destination}\n\n`;
+            exportText += 'Navigation Information:\n';
+            exportText += 'North is 0°, East is 90°, South is 180°, West is 270°\n';
+            exportText += 'Keep the compass level and away from metal objects for accurate readings\n';
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Compass data exported to clipboard!');
+        }
+        
+        function clearCompass() {
+            if (confirm('Are you sure you want to clear all compass data?')) {
+                // Clear form inputs
+                document.getElementById('location').value = '';
+                document.getElementById('activity').value = 'hiking';
+                document.getElementById('bearing').value = '0';
+                document.getElementById('destination').value = '';
+                
+                // Clear localStorage
+                localStorage.removeItem('location');
+                localStorage.removeItem('activity');
+                localStorage.removeItem('bearing');
+                localStorage.removeItem('destination');
+                
+                // Reset compass to north
+                document.getElementById('compassInner').style.transform = 'rotate(0deg)';
+                document.getElementById('bearingDisplay').textContent = '0°';
+                document.getElementById('currentBearing').textContent = '0°';
+                document.getElementById('direction').textContent = 'N';
+                document.getElementById('infoContent').textContent = 'North is 0°, East is 90°, South is 180°, West is 270°. Keep the compass level and away from metal objects for accurate readings.';
+            }
+        }
+    </script>
+</body>
+</html>

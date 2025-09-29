@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Hour Tracker</title>
+    <meta name="description" content="Blue Hour Tracker helps photographers find and track blue hour times for stunning landscape and cityscape photography. Calculate optimal shooting windows.">
+    <meta name="keywords" content="blue hour tracker, blue hour calculator, photography timing tool, blue hour times, twilight photography, landscape photography tool, cityscape photography, golden hour alternative, outdoor photography timing, photography planning tool">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1976d2, #42a5f5);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .tracker {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #42a5f5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #1976d2, #42a5f5);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #42a5f5;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .tracking-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #bbdefb;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .time-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .blue-icon {
+            font-size: 2rem;
+            color: #42a5f5;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .progress-container {
+            height: 20px;
+            background: #bbdefb;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1976d2, #42a5f5);
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .tracker {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Blue Hour Tracker</h1>
+        </header>
+        
+        <div class="tracker">
+            <div class="input-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g., New York, Paris, Local Park">
+            </div>
+            
+            <div class="input-group">
+                <label for="date">Date</label>
+                <input type="date" id="date">
+            </div>
+            
+            <div class="input-group">
+                <label for="sunset">Sunset Time</label>
+                <input type="time" id="sunset" placeholder="Enter sunset time" value="19:30">
+            </div>
+            
+            <div class="input-group">
+                <label for="timezone">Timezone</label>
+                <select id="timezone">
+                    <option value="utc-12">UTC-12:00</option>
+                    <option value="utc-11">UTC-11:00</option>
+                    <option value="utc-10">UTC-10:00</option>
+                    <option value="utc-9">UTC-09:00</option>
+                    <option value="utc-8">UTC-08:00</option>
+                    <option value="utc-7">UTC-07:00</option>
+                    <option value="utc-6">UTC-06:00</option>
+                    <option value="utc-5">UTC-05:00</option>
+                    <option value="utc-4">UTC-04:00</option>
+                    <option value="utc-3">UTC-03:00</option>
+                    <option value="utc-2">UTC-02:00</option>
+                    <option value="utc-1">UTC-01:00</option>
+                    <option value="utc0">UTC+00:00</option>
+                    <option value="utc1">UTC+01:00</option>
+                    <option value="utc2">UTC+02:00</option>
+                    <option value="utc3">UTC+03:00</option>
+                    <option value="utc4">UTC+04:00</option>
+                    <option value="utc5">UTC+05:00</option>
+                    <option value="utc6">UTC+06:00</option>
+                    <option value="utc7">UTC+07:00</option>
+                    <option value="utc8">UTC+08:00</option>
+                    <option value="utc9">UTC+09:00</option>
+                    <option value="utc10">UTC+10:00</option>
+                    <option value="utc11">UTC+11:00</option>
+                    <option value="utc12">UTC+12:00</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="duration">Blue Hour Duration (minutes)</label>
+                <input type="number" id="duration" placeholder="Enter duration" min="20" max="60" value="40">
+            </div>
+            
+            <button class="btn" onclick="calculateBlueHour()">Calculate Blue Hour</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="blue-icon">🌌</div>
+                <h3>Blue Hour Results</h3>
+                
+                <div class="time-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="sunsetTime">07:30 PM</div>
+                        <div class="stat-label">Sunset</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="blueHourDuration">40 min</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Blue Hour Start</div>
+                        <div class="result-value" id="blueStart">07:30 PM</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Blue Hour End</div>
+                        <div class="result-value" id="blueEnd">08:10 PM</div>
+                    </div>
+                </div>
+                
+                <div class="tracking-info">
+                    <div class="info-title">Blue Hour Information</div>
+                    <div class="info-content" id="infoContent">
+                        Blue hour occurs during the last 20-40 minutes of twilight when the sun is between 4-8 degrees below the horizon. The sky takes on a deep blue color, creating stunning contrast with artificial lights.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedLocation = localStorage.getItem('location');
+            const savedDate = localStorage.getItem('date');
+            const savedSunset = localStorage.getItem('sunset');
+            const savedTimezone = localStorage.getItem('timezone');
+            const savedDuration = localStorage.getItem('duration');
+            
+            if (savedLocation) document.getElementById('location').value = savedLocation;
+            if (savedDate) document.getElementById('date').value = savedDate;
+            if (savedSunset) document.getElementById('sunset').value = savedSunset;
+            if (savedTimezone) document.getElementById('timezone').value = savedTimezone;
+            if (savedDuration) document.getElementById('duration').value = savedDuration;
+            
+            // Perform calculation with saved values
+            calculateBlueHour();
+        }
+
+        function calculateBlueHour() {
+            const location = document.getElementById('location').value;
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            const sunset = document.getElementById('sunset').value || '19:30';
+            const timezone = document.getElementById('timezone').value;
+            const duration = parseInt(document.getElementById('duration').value) || 40;
+            
+            if (!sunset) {
+                alert('Please enter sunset time');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('location', location);
+            localStorage.setItem('date', date);
+            localStorage.setItem('sunset', sunset);
+            localStorage.setItem('timezone', timezone);
+            localStorage.setItem('duration', duration);
+            
+            // Update displays
+            document.getElementById('sunsetTime').textContent = formatTime(sunset);
+            document.getElementById('blueHourDuration').textContent = duration + ' min';
+            
+            // Calculate blue hour start and end
+            const blueStart = sunset;
+            const blueEnd = calculateTimeOffset(sunset, duration);
+            
+            document.getElementById('blueStart').textContent = formatTime(blueStart);
+            document.getElementById('blueEnd').textContent = formatTime(blueEnd);
+            
+            // Update progress bar
+            document.getElementById('progressBar').style.width = '100%';
+            
+            // Update info content
+            const locationText = location || 'Your Location';
+            document.getElementById('infoContent').textContent = 
+                `Location: ${locationText}. Blue hour occurs during the last ${duration} minutes of twilight when the sun is between 4-8 degrees below the horizon. ` +
+                `The sky takes on a deep blue color, creating stunning contrast with artificial lights. ` +
+                `This is an ideal time for landscape and cityscape photography.`;
+        }
+        
+        function formatTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':');
+            let hour = parseInt(hours);
+            const min = minutes;
+            
+            let ampm = 'AM';
+            if (hour >= 12) {
+                ampm = 'PM';
+                if (hour > 12) hour -= 12;
+            }
+            if (hour === 0) hour = 12;
+            
+            return `${hour}:${min} ${ampm}`;
+        }
+        
+        function calculateTimeOffset(baseTime, offsetMinutes) {
+            const [hours, minutes] = baseTime.split(':');
+            let totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
+            totalMinutes += offsetMinutes;
+            
+            // Handle day wraparound
+            if (totalMinutes < 0) totalMinutes += 24 * 60;
+            if (totalMinutes >= 24 * 60) totalMinutes -= 24 * 60;
+            
+            const newHours = Math.floor(totalMinutes / 60);
+            const newMinutes = totalMinutes % 60;
+            
+            return `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+        }
+        
+        function exportResults() {
+            const location = document.getElementById('location').value || 'Your Location';
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            const sunset = document.getElementById('sunset').value;
+            const timezone = document.getElementById('timezone').value;
+            const duration = document.getElementById('duration').value;
+            const blueStart = document.getElementById('blueStart').textContent;
+            const blueEnd = document.getElementById('blueEnd').textContent;
+            
+            const exportText = `Blue Hour Tracker Results\n\n`;
+            exportText += `Location: ${location}\n`;
+            exportText += `Date: ${date}\n`;
+            exportText += `Sunset: ${formatTime(sunset)}\n`;
+            exportText += `Timezone: ${timezone}\n`;
+            exportText += `Duration: ${duration} minutes\n`;
+            exportText += `Blue Hour: ${blueStart} - ${blueEnd}\n\n`;
+            exportText += `Photography Tips:\n`;
+            exportText += `- Blue hour occurs when the sun is between 4-8 degrees below the horizon\n`;
+            exportText += `- Use a tripod for sharp images during low light conditions\n`;
+            exportText += `- Shoot in RAW format for maximum flexibility\n`;
+            exportText += `- Use a polarizing filter to reduce reflections\n`;
+            exportText += `- Arrive early to scout the location and set up\n`;
+            exportText += `- Blue hour provides excellent contrast between sky and artificial lights\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Blue hour results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Clear form inputs
+                document.getElementById('location').value = '';
+                document.getElementById('date').value = '';
+                document.getElementById('sunset').value = '19:30';
+                document.getElementById('timezone').value = 'utc0';
+                document.getElementById('duration').value = '40';
+                
+                // Clear localStorage
+                localStorage.removeItem('location');
+                localStorage.removeItem('date');
+                localStorage.removeItem('sunset');
+                localStorage.removeItem('timezone');
+                localStorage.removeItem('duration');
+                
+                // Reset displays
+                document.getElementById('sunsetTime').textContent = '07:30 PM';
+                document.getElementById('blueHourDuration').textContent = '40 min';
+                document.getElementById('blueStart').textContent = '07:30 PM';
+                document.getElementById('blueEnd').textContent = '08:10 PM';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('infoContent').textContent = 'Blue hour occurs during the last 20-40 minutes of twilight when the sun is between 4-8 degrees below the horizon. The sky takes on a deep blue color, creating stunning contrast with artificial lights.';
+            }
+        }
+    </script>
+</body>
+</html>

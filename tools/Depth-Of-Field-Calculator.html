@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depth of Field Calculator</title>
+    <meta name="description" content="Depth of Field Calculator helps photographers determine the depth of field for different camera settings. Calculate hyperfocal distance, near and far focus limits.">
+    <meta name="keywords" content="depth of field calculator, dof calculator, photography dof tool, hyperfocal distance calculator, photography settings, camera settings tool, depth of field guide, photography exposure, camera aperture, photography focus">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .calculator {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #388e3c;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .dof-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c8e6c9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .dof-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .dof-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .calculator {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dof-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Depth of Field Calculator</h1>
+        </header>
+        
+        <div class="calculator">
+            <div class="input-group">
+                <label for="focal">Focal Length (mm)</label>
+                <input type="number" id="focal" placeholder="Enter focal length" min="10" max="800" value="50">
+            </div>
+            
+            <div class="input-group">
+                <label for="aperture">Aperture (f-stop)</label>
+                <input type="number" id="aperture" placeholder="Enter f-stop" min="1.4" max="22" step="0.1" value="8">
+            </div>
+            
+            <div class="input-group">
+                <label for="distance">Subject Distance (meters)</label>
+                <input type="number" id="distance" placeholder="Enter distance" min="0.1" max="1000" step="0.1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="sensor">Camera Sensor</label>
+                <select id="sensor">
+                    <option value="full">Full Frame (35mm)</option>
+                    <option value="aps-c">APS-C (1.5x Crop)</option>
+                    <option value="micro">Micro Four Thirds (2x Crop)</option>
+                    <option value="medium">Medium Format</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="subject">Subject Type</label>
+                <select id="subject">
+                    <option value="landscape">Landscape</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="macro">Macro/Close-up</option>
+                    <option value="street">Street Photography</option>
+                    <option value="architecture">Architecture</option>
+                    <option value="wildlife">Wildlife</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="calculateDOF()">Calculate Depth of Field</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="dof-icon">🔍</div>
+                <h3>Depth of Field Results</h3>
+                
+                <div class="dof-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="focalValue">50mm</div>
+                        <div class="stat-label">Focal Length</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="apertureValue">f/8</div>
+                        <div class="stat-label">Aperture</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="distanceValue">10m</div>
+                        <div class="stat-label">Distance</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Near Limit</div>
+                        <div class="result-value" id="nearLimit">9.5m</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Far Limit</div>
+                        <div class="result-value" id="farLimit">10.5m</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Total DOF</div>
+                        <div class="result-value" id="totalDOF">1.0m</div>
+                    </div>
+                </div>
+                
+                <div class="dof-info">
+                    <div class="info-title">Depth of Field Information</div>
+                    <div class="info-content" id="infoContent">
+                        With 50mm focal length at f/8 and 10m distance, your depth of field extends from 9.5m to 10.5m. This provides a total depth of field of 1.0m. Adjust settings to control the sharp area in your image.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedFocal = localStorage.getItem('focal');
+            const savedAperture = localStorage.getItem('aperture');
+            const savedDistance = localStorage.getItem('distance');
+            const savedSensor = localStorage.getItem('sensor');
+            const savedSubject = localStorage.getItem('subject');
+            
+            if (savedFocal) document.getElementById('focal').value = savedFocal;
+            if (savedAperture) document.getElementById('aperture').value = savedAperture;
+            if (savedDistance) document.getElementById('distance').value = savedDistance;
+            if (savedSensor) document.getElementById('sensor').value = savedSensor;
+            if (savedSubject) document.getElementById('subject').value = savedSubject;
+            
+            // Perform calculation with saved values
+            calculateDOF();
+        }
+
+        function calculateDOF() {
+            const focal = parseFloat(document.getElementById('focal').value) || 50;
+            const aperture = parseFloat(document.getElementById('aperture').value) || 8;
+            const distance = parseFloat(document.getElementById('distance').value) || 10;
+            const sensor = document.getElementById('sensor').value;
+            const subject = document.getElementById('subject').value;
+            
+            if (focal < 10 || focal > 800) {
+                alert('Please enter a valid focal length (10-800mm)');
+                return;
+            }
+            
+            if (aperture < 1.4 || aperture > 22) {
+                alert('Please enter a valid aperture (1.4-22)');
+                return;
+            }
+            
+            if (distance < 0.1 || distance > 1000) {
+                alert('Please enter a valid distance (0.1-1000m)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('focal', focal);
+            localStorage.setItem('aperture', aperture);
+            localStorage.setItem('distance', distance);
+            localStorage.setItem('sensor', sensor);
+            localStorage.setItem('subject', subject);
+            
+            // Update displays
+            document.getElementById('focalValue').textContent = focal + 'mm';
+            document.getElementById('apertureValue').textContent = 'f/' + aperture.toFixed(1);
+            document.getElementById('distanceValue').textContent = distance + 'm';
+            
+            // Calculate circle of confusion based on sensor
+            let coc = 0.03; // Full frame
+            if (sensor === 'aps-c') coc = 0.02; // APS-C
+            else if (sensor === 'micro') coc = 0.015; // Micro Four Thirds
+            else if (sensor === 'medium') coc = 0.04; // Medium format
+            
+            // Calculate hyperfocal distance
+            const hyperfocal = (focal * focal) / (aperture * coc * 1000) + focal / 1000; // in meters
+            
+            // Calculate near and far limits
+            const nearLimit = (hyperfocal * distance) / (hyperfocal + (distance - focal / 1000));
+            const farLimit = (hyperfocal * distance) / (hyperfocal - (distance - focal / 1000));
+            
+            // Calculate total depth of field
+            let totalDOF = 0;
+            if (farLimit > 0) {
+                totalDOF = farLimit - nearLimit;
+            } else {
+                totalDOF = Infinity; // When far limit is infinity
+            }
+            
+            // Format results for display
+            document.getElementById('nearLimit').textContent = nearLimit.toFixed(1) + 'm';
+            document.getElementById('farLimit').textContent = farLimit > 0 ? farLimit.toFixed(1) + 'm' : '∞';
+            document.getElementById('totalDOF').textContent = totalDOF < Infinity ? totalDOF.toFixed(1) + 'm' : '∞';
+            
+            // Update info content
+            const subjectText = getSubjectText(subject);
+            let info = `With ${focal}mm focal length at f/${aperture.toFixed(1)} and ${distance}m distance, `;
+            info += `your depth of field extends from ${nearLimit.toFixed(1)}m to `;
+            info += farLimit > 0 ? `${farLimit.toFixed(1)}m. ` : 'infinity. ';
+            info += `This provides a total depth of field of ${totalDOF < Infinity ? totalDOF.toFixed(1) + 'm' : 'infinite'}. `;
+            info += `For ${subjectText.toLowerCase()} photography, adjust settings to control the sharp area in your image.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function getSubjectText(value) {
+            const subjectTexts = {
+                'landscape': 'Landscape',
+                'portrait': 'Portrait',
+                'macro': 'Macro/Close-up',
+                'street': 'Street Photography',
+                'architecture': 'Architecture',
+                'wildlife': 'Wildlife'
+            };
+            return subjectTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const focal = document.getElementById('focal').value;
+            const aperture = document.getElementById('aperture').value;
+            const distance = document.getElementById('distance').value;
+            const sensor = document.getElementById('sensor').value;
+            const subject = getSubjectText(document.getElementById('subject').value);
+            const nearLimit = document.getElementById('nearLimit').textContent;
+            const farLimit = document.getElementById('farLimit').textContent;
+            const totalDOF = document.getElementById('totalDOF').textContent;
+            
+            const exportText = `Depth of Field Calculator Results\n\n`;
+            exportText += `Focal Length: ${focal}mm\n`;
+            exportText += `Aperture: f/${aperture}\n`;
+            exportText += `Subject Distance: ${distance}m\n`;
+            exportText += `Camera Sensor: ${getSensorText(sensor)}\n`;
+            exportText += `Subject Type: ${subject}\n`;
+            exportText += `Near Focus Limit: ${nearLimit}\n`;
+            exportText += `Far Focus Limit: ${farLimit}\n`;
+            exportText += `Total Depth of Field: ${totalDOF}\n\n`;
+            exportText += `Photography Tips:\n`;
+            exportText += `- Smaller apertures (higher f-numbers) increase depth of field\n`;
+            exportText += `- Shorter focal lengths increase depth of field\n`;
+            exportText += `- Greater distances increase depth of field\n`;
+            exportText += `- Use hyperfocal distance for maximum sharpness\n`;
+            exportText += `- Consider the circle of confusion for your sensor\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Depth of field results exported to clipboard!');
+        }
+        
+        function getSensorText(value) {
+            const sensorTexts = {
+                'full': 'Full Frame (35mm)',
+                'aps-c': 'APS-C (1.5x Crop)',
+                'micro': 'Micro Four Thirds (2x Crop)',
+                'medium': 'Medium Format'
+            };
+            return sensorTexts[value] || value;
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('focal').value = '50';
+                document.getElementById('aperture').value = '8';
+                document.getElementById('distance').value = '10';
+                document.getElementById('sensor').value = 'full';
+                document.getElementById('subject').value = 'landscape';
+                
+                // Clear localStorage
+                localStorage.removeItem('focal');
+                localStorage.removeItem('aperture');
+                localStorage.removeItem('distance');
+                localStorage.removeItem('sensor');
+                localStorage.removeItem('subject');
+                
+                // Reset displays
+                document.getElementById('focalValue').textContent = '50mm';
+                document.getElementById('apertureValue').textContent = 'f/8';
+                document.getElementById('distanceValue').textContent = '10m';
+                document.getElementById('nearLimit').textContent = '9.5m';
+                document.getElementById('farLimit').textContent = '10.5m';
+                document.getElementById('totalDOF').textContent = '1.0m';
+                document.getElementById('infoContent').textContent = 'With 50mm focal length at f/8 and 10m distance, your depth of field extends from 9.5m to 10.5m. This provides a total depth of field of 1.0m. Adjust settings to control the sharp area in your image.';
+            }
+        }
+    </script>
+</body>
+</html>

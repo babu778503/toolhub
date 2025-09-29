@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Buffer Monitor</title>
+    <meta name="description" content="Streaming Buffer Monitor helps content creators monitor and optimize streaming performance. Track buffer status, latency, and connection quality in real-time.">
+    <meta name="keywords" content="streaming buffer monitor, streaming performance tool, buffer monitor, streaming quality monitor, streaming latency checker, streaming tools, content creation tools, streaming workflow, streaming optimization, live streaming tools">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .monitor {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .monitor-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .monitor-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .monitor-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .buffer-visual {
+            height: 20px;
+            background: #b2ebf2;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .buffer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            width: 70%;
+            transition: width 1s ease;
+        }
+        
+        .status-indicator {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .status-good {
+            background-color: #4caf50;
+        }
+        
+        .status-moderate {
+            background-color: #ffeb3b;
+        }
+        
+        .status-poor {
+            background-color: #f44336;
+        }
+        
+        .connection-history {
+            margin-top: 15px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .monitor {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .monitor-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Streaming Buffer Monitor</h1>
+        </header>
+        
+        <div class="monitor">
+            <div class="input-group">
+                <label for="resolution">Stream Resolution</label>
+                <select id="resolution">
+                    <option value="480p">480p (SD)</option>
+                    <option value="720p">720p (HD)</option>
+                    <option value="1080p">1080p (Full HD)</option>
+                    <option value="1440p">1440p (2K)</option>
+                    <option value="2160p">2160p (4K)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="framerate">Frame Rate (fps)</label>
+                <select id="framerate">
+                    <option value="24">24 fps</option>
+                    <option value="30">30 fps</option>
+                    <option value="60">60 fps</option>
+                    <option value="120">120 fps</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="bitrate">Bitrate (Mbps)</label>
+                <input type="number" id="bitrate" placeholder="Enter bitrate" min="1" value="6" step="0.1">
+            </div>
+            
+            <div class="input-group">
+                <label for="platform">Streaming Platform</label>
+                <select id="platform">
+                    <option value="twitch">Twitch</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="facebook">Facebook Live</option>
+                    <option value="instagram">Instagram Live</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="bandwidth">Upload Speed (Mbps)</label>
+                <input type="number" id="bandwidth" placeholder="Enter upload speed" min="1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="buffer">Buffer Duration (seconds)</label>
+                <input type="number" id="buffer" placeholder="Enter buffer duration" min="1" value="10">
+            </div>
+            
+            <button class="btn" onclick="monitorBuffer()">Monitor Buffer</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Monitor</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Monitor</button>
+            </div>
+            
+            <div class="results">
+                <div class="monitor-icon">📡</div>
+                <h3>Streaming Buffer Monitor</h3>
+                
+                <div class="monitor-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="resolutionValue">1080p</div>
+                        <div class="stat-label">Resolution</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="framerateValue">30fps</div>
+                        <div class="stat-label">Frame Rate</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Buffer Status</div>
+                        <div class="result-value" id="bufferStatus">Good</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Latency</div>
+                        <div class="result-value" id="latency">2.5s</div>
+                    </div>
+                </div>
+                
+                <div class="buffer-visual">
+                    <div class="buffer-bar" id="bufferBar"></div>
+                </div>
+                
+                <div class="status-indicator">
+                    <span><span class="status-dot status-good"></span> Good</span>
+                    <span><span class="status-dot status-moderate"></span> Moderate</span>
+                    <span><span class="status-dot status-poor"></span> Poor</span>
+                </div>
+                
+                <div class="monitor-info">
+                    <div class="info-title">Buffer Information</div>
+                    <div class="info-content" id="infoContent">
+                        Current buffer status is Good with 2.5s latency. Your 1080p stream at 30fps with 6 Mbps bitrate is stable on your 10 Mbps upload connection. Buffer is at 70% capacity.
+                    </div>
+                </div>
+                
+                <div class="connection-history" id="history">
+                    <div class="history-item">Connection: Stable (10:30:15)</div>
+                    <div class="history-item">Buffer: Good (10:30:10)</div>
+                    <div class="history-item">Latency: 2.5s (10:30:05)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedResolution = localStorage.getItem('resolution');
+            const savedFramerate = localStorage.getItem('framerate');
+            const savedBitrate = localStorage.getItem('bitrate');
+            const savedPlatform = localStorage.getItem('platform');
+            const savedBandwidth = localStorage.getItem('bandwidth');
+            const savedBuffer = localStorage.getItem('buffer');
+            
+            if (savedResolution) document.getElementById('resolution').value = savedResolution;
+            if (savedFramerate) document.getElementById('framerate').value = savedFramerate;
+            if (savedBitrate) document.getElementById('bitrate').value = savedBitrate;
+            if (savedPlatform) document.getElementById('platform').value = savedPlatform;
+            if (savedBandwidth) document.getElementById('bandwidth').value = savedBandwidth;
+            if (savedBuffer) document.getElementById('buffer').value = savedBuffer;
+            
+            // Perform monitoring with saved values
+            monitorBuffer();
+        }
+
+        function monitorBuffer() {
+            const resolution = document.getElementById('resolution').value;
+            const framerate = parseInt(document.getElementById('framerate').value) || 30;
+            const bitrate = parseFloat(document.getElementById('bitrate').value) || 6;
+            const platform = document.getElementById('platform').value;
+            const bandwidth = parseFloat(document.getElementById('bandwidth').value) || 10;
+            const buffer = parseInt(document.getElementById('buffer').value) || 10;
+            
+            if (bitrate < 1) {
+                alert('Please enter a valid bitrate (1 Mbps or more)');
+                return;
+            }
+            
+            if (bandwidth < 1) {
+                alert('Please enter a valid upload speed (1 Mbps or more)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('resolution', resolution);
+            localStorage.setItem('framerate', framerate);
+            localStorage.setItem('bitrate', bitrate);
+            localStorage.setItem('platform', platform);
+            localStorage.setItem('bandwidth', bandwidth);
+            localStorage.setItem('buffer', buffer);
+            
+            // Update displays
+            document.getElementById('resolutionValue').textContent = resolution;
+            document.getElementById('framerateValue').textContent = framerate + 'fps';
+            
+            // Calculate buffer status and latency
+            let bufferStatus = 'Good';
+            let latency = 2.5; // seconds
+            let bufferPercentage = 70; // %
+            
+            // Calculate based on bandwidth vs bitrate ratio
+            const bandwidthRatio = bandwidth / bitrate;
+            
+            if (bandwidthRatio < 1.2) {
+                bufferStatus = 'Poor';
+                latency = 5.0;
+                bufferPercentage = 30;
+            } else if (bandwidthRatio < 1.5) {
+                bufferStatus = 'Moderate';
+                latency = 3.5;
+                bufferPercentage = 50;
+            } else {
+                bufferStatus = 'Good';
+                latency = 2.5;
+                bufferPercentage = 70;
+            }
+            
+            // Adjust for resolution and framerate
+            if (resolution === '2160p' || resolution === '1440p') {
+                bufferPercentage -= 10;
+                latency += 0.5;
+            }
+            
+            if (framerate > 60) {
+                bufferPercentage -= 5;
+                latency += 0.2;
+            }
+            
+            document.getElementById('bufferStatus').textContent = bufferStatus;
+            document.getElementById('latency').textContent = latency.toFixed(1) + 's';
+            
+            // Update buffer bar
+            document.getElementById('bufferBar').style.width = bufferPercentage + '%';
+            
+            // Update info content
+            const resolutionText = getResolutionText(resolution);
+            const platformText = getPlatformText(platform);
+            
+            let info = `Current buffer status is ${bufferStatus} with ${latency.toFixed(1)}s latency. `;
+            info += `Your ${resolutionText} stream at ${framerate}fps with ${bitrate} Mbps bitrate is `;
+            info += `stable on your ${bandwidth} Mbps upload connection. Buffer is at ${bufferPercentage}% capacity.`;
+            
+            document.getElementById('infoContent').textContent = info;
+            
+            // Add to history
+            addToHistory(bufferStatus, latency, bitrate, resolution);
+        }
+        
+        function addToHistory(status, latency, bitrate, resolution) {
+            const history = document.getElementById('history');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.textContent = `Status: ${status}, Latency: ${latency.toFixed(1)}s (${timestamp})`;
+            
+            // Add to beginning of history
+            history.insertBefore(historyItem, history.firstChild);
+            
+            // Keep only last 5 items
+            const items = history.querySelectorAll('.history-item');
+            if (items.length > 5) {
+                history.removeChild(items[items.length - 1]);
+            }
+        }
+        
+        function getResolutionText(value) {
+            const resolutionTexts = {
+                '480p': '480p',
+                '720p': '720p',
+                '1080p': '1080p',
+                '1440p': '1440p',
+                '2160p': '2160p'
+            };
+            return resolutionTexts[value] || value;
+        }
+        
+        function getPlatformText(value) {
+            const platformTexts = {
+                'twitch': 'Twitch',
+                'youtube': 'YouTube',
+                'facebook': 'Facebook Live',
+                'instagram': 'Instagram Live',
+                'custom': 'Custom'
+            };
+            return platformTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const resolution = getResolutionText(document.getElementById('resolution').value);
+            const framerate = document.getElementById('framerate').value;
+            const bitrate = document.getElementById('bitrate').value;
+            const platform = getPlatformText(document.getElementById('platform').value);
+            const bandwidth = document.getElementById('bandwidth').value;
+            const bufferStatus = document.getElementById('bufferStatus').textContent;
+            const latency = document.getElementById('latency').textContent;
+            
+            const exportText = `Streaming Buffer Monitor Results\n\n`;
+            exportText += `Stream Resolution: ${resolution}\n`;
+            exportText += `Frame Rate: ${framerate} fps\n`;
+            exportText += `Bitrate: ${bitrate} Mbps\n`;
+            exportText += `Streaming Platform: ${platform}\n`;
+            exportText += `Upload Speed: ${bandwidth} Mbps\n`;
+            exportText += `Buffer Status: ${bufferStatus}\n`;
+            exportText += `Latency: ${latency}\n\n`;
+            exportText += `Optimization Tips:\n`;
+            exportText += `- Bitrate should be 70-80% of upload speed\n`;
+            exportText += `- Higher resolutions require more bandwidth\n`;
+            exportText += `- Lower frame rates reduce bandwidth usage\n`;
+            exportText += `- Monitor latency for smooth streaming\n`;
+            exportText += `- Keep buffer at least 2-3 seconds\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Streaming buffer monitor results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('resolution').value = '1080p';
+                document.getElementById('framerate').value = '30';
+                document.getElementById('bitrate').value = '6';
+                document.getElementById('platform').value = 'twitch';
+                document.getElementById('bandwidth').value = '10';
+                document.getElementById('buffer').value = '10';
+                
+                // Clear localStorage
+                localStorage.removeItem('resolution');
+                localStorage.removeItem('framerate');
+                localStorage.removeItem('bitrate');
+                localStorage.removeItem('platform');
+                localStorage.removeItem('bandwidth');
+                localStorage.removeItem('buffer');
+                
+                // Reset displays
+                document.getElementById('resolutionValue').textContent = '1080p';
+                document.getElementById('framerateValue').textContent = '30fps';
+                document.getElementById('bufferStatus').textContent = 'Good';
+                document.getElementById('latency').textContent = '2.5s';
+                document.getElementById('bufferBar').style.width = '70%';
+                document.getElementById('infoContent').textContent = 'Current buffer status is Good with 2.5s latency. Your 1080p stream at 30fps with 6 Mbps bitrate is stable on your 10 Mbps upload connection. Buffer is at 70% capacity.';
+                
+                // Clear history
+                document.getElementById('history').innerHTML = '<div class="history-item">No connection history yet</div>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Scale Converter</title>
+    <meta name="description" content="Map Scale Converter helps you convert between different map scales and distances. Essential tool for navigation, hiking, and outdoor activities.">
+    <meta name="keywords" content="map scale converter, map distance calculator, navigation tool, hiking map scale, outdoor navigation, map reading tool, topographic map scale, compass navigation, map scale conversion, outdoor safety tool">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .converter {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .conversion-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .map-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .map-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .converter {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Map Scale Converter</h1>
+        </header>
+        
+        <div class="converter">
+            <div class="input-group">
+                <label for="mapScale">Map Scale (e.g., 1:24000)</label>
+                <input type="text" id="mapScale" placeholder="Enter scale (e.g., 24000 for 1:24000)" value="24000">
+            </div>
+            
+            <div class="input-group">
+                <label for="measurement">Measurement on Map</label>
+                <input type="number" id="measurement" placeholder="Enter measurement" min="0" step="0.01" value="1">
+            </div>
+            
+            <div class="input-group">
+                <label for="unit">Unit of Measurement</label>
+                <select id="unit">
+                    <option value="inches">Inches</option>
+                    <option value="centimeters">Centimeters</option>
+                    <option value="millimeters">Millimeters</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="targetUnit">Target Unit</label>
+                <select id="targetUnit">
+                    <option value="miles">Miles</option>
+                    <option value="kilometers">Kilometers</option>
+                    <option value="feet">Feet</option>
+                    <option value="meters">Meters</option>
+                    <option value="yards">Yards</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="convertScale()">Convert Scale</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="map-icon">🗺️</div>
+                <h3>Map Scale Conversion Results</h3>
+                
+                <div class="map-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="scaleValue">1:24000</div>
+                        <div class="stat-label">Map Scale</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="conversionFactor">1 inch = 0.38 miles</div>
+                        <div class="stat-label">Conversion Factor</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Distance on Map</div>
+                        <div class="result-value" id="mapDistance">1.00 in</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Actual Distance</div>
+                        <div class="result-value" id="actualDistance">0.38 mi</div>
+                    </div>
+                </div>
+                
+                <div class="conversion-info">
+                    <div class="info-title">Map Scale Information</div>
+                    <div class="info-content" id="infoContent">
+                        A scale of 1:24000 means 1 unit on the map equals 24000 units in reality. For example, 1 inch on the map equals 24000 inches (0.38 miles) in real life.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedScale = localStorage.getItem('mapScale');
+            const savedMeasurement = localStorage.getItem('measurement');
+            const savedUnit = localStorage.getItem('unit');
+            const savedTargetUnit = localStorage.getItem('targetUnit');
+            
+            if (savedScale) document.getElementById('mapScale').value = savedScale;
+            if (savedMeasurement) document.getElementById('measurement').value = savedMeasurement;
+            if (savedUnit) document.getElementById('unit').value = savedUnit;
+            if (savedTargetUnit) document.getElementById('targetUnit').value = savedTargetUnit;
+            
+            // Perform conversion with saved values
+            convertScale();
+        }
+
+        function convertScale() {
+            const scale = parseFloat(document.getElementById('mapScale').value);
+            const measurement = parseFloat(document.getElementById('measurement').value);
+            const unit = document.getElementById('unit').value;
+            const targetUnit = document.getElementById('targetUnit').value;
+            
+            if (!scale || !measurement) {
+                alert('Please enter both scale and measurement values');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('mapScale', scale);
+            localStorage.setItem('measurement', measurement);
+            localStorage.setItem('unit', unit);
+            localStorage.setItem('targetUnit', targetUnit);
+            
+            // Update scale display
+            document.getElementById('scaleValue').textContent = `1:${scale}`;
+            
+            // Convert map measurement to real distance
+            let realDistance = 0;
+            let realUnit = targetUnit;
+            
+            // Convert measurement to inches first
+            let measurementInches = 0;
+            switch(unit) {
+                case 'inches':
+                    measurementInches = measurement;
+                    break;
+                case 'centimeters':
+                    measurementInches = measurement / 2.54;
+                    break;
+                case 'millimeters':
+                    measurementInches = measurement / 25.4;
+                    break;
+            }
+            
+            // Calculate real distance in inches
+            const realDistanceInches = measurementInches * scale;
+            
+            // Convert to target unit
+            switch(targetUnit) {
+                case 'miles':
+                    realDistance = realDistanceInches / 63360; // 63360 inches in a mile
+                    realUnit = 'mi';
+                    break;
+                case 'kilometers':
+                    realDistance = (realDistanceInches * 2.54) / 100000; // Convert inches to km
+                    realUnit = 'km';
+                    break;
+                case 'feet':
+                    realDistance = realDistanceInches / 12; // 12 inches in a foot
+                    realUnit = 'ft';
+                    break;
+                case 'meters':
+                    realDistance = (realDistanceInches * 2.54) / 100; // Convert inches to meters
+                    realUnit = 'm';
+                    break;
+                case 'yards':
+                    realDistance = realDistanceInches / 36; // 36 inches in a yard
+                    realUnit = 'yd';
+                    break;
+            }
+            
+            // Update display
+            document.getElementById('mapDistance').textContent = measurement.toFixed(2) + ' ' + getUnitAbbreviation(unit);
+            document.getElementById('actualDistance').textContent = realDistance.toFixed(2) + ' ' + realUnit;
+            
+            // Update conversion factor
+            let conversionFactor = '';
+            switch(unit) {
+                case 'inches':
+                    let factor = 0;
+                    switch(targetUnit) {
+                        case 'miles':
+                            factor = (1 * scale) / 63360;
+                            break;
+                        case 'kilometers':
+                            factor = (1 * scale * 2.54) / 100000;
+                            break;
+                        case 'feet':
+                            factor = (1 * scale) / 12;
+                            break;
+                        case 'meters':
+                            factor = (1 * scale * 2.54) / 100;
+                            break;
+                        case 'yards':
+                            factor = (1 * scale) / 36;
+                            break;
+                    }
+                    conversionFactor = `1 inch = ${factor.toFixed(2)} ${targetUnit}`;
+                    break;
+                case 'centimeters':
+                    let cmFactor = 0;
+                    switch(targetUnit) {
+                        case 'miles':
+                            cmFactor = ((1/2.54) * scale) / 63360;
+                            break;
+                        case 'kilometers':
+                            cmFactor = ((1/2.54) * scale * 2.54) / 100000;
+                            break;
+                        case 'feet':
+                            cmFactor = ((1/2.54) * scale) / 12;
+                            break;
+                        case 'meters':
+                            cmFactor = ((1/2.54) * scale * 2.54) / 100;
+                            break;
+                        case 'yards':
+                            cmFactor = ((1/2.54) * scale) / 36;
+                            break;
+                    }
+                    conversionFactor = `1 cm = ${cmFactor.toFixed(2)} ${targetUnit}`;
+                    break;
+            }
+            
+            document.getElementById('conversionFactor').textContent = conversionFactor;
+            
+            // Update info content
+            document.getElementById('infoContent').textContent = 
+                `A scale of 1:${scale} means 1 unit on the map equals ${scale} units in reality. ` +
+                `For example, 1 inch on the map equals ${scale} inches (${(scale/63360).toFixed(2)} miles) in real life.`;
+        }
+        
+        function getUnitAbbreviation(unit) {
+            switch(unit) {
+                case 'inches': return 'in';
+                case 'centimeters': return 'cm';
+                case 'millimeters': return 'mm';
+                default: return unit;
+            }
+        }
+        
+        function exportResults() {
+            const scale = document.getElementById('mapScale').value;
+            const measurement = document.getElementById('measurement').value;
+            const unit = document.getElementById('unit').value;
+            const targetUnit = document.getElementById('targetUnit').value;
+            const actualDistance = document.getElementById('actualDistance').textContent;
+            const mapDistance = document.getElementById('mapDistance').textContent;
+            
+            const exportText = `Map Scale Converter Results\n\n`;
+            exportText += `Map Scale: 1:${scale}\n`;
+            exportText += `Measurement on Map: ${mapDistance}\n`;
+            exportText += `Actual Distance: ${actualDistance}\n`;
+            exportText += `Target Unit: ${targetUnit}\n\n`;
+            exportText += `Conversion Information:\n`;
+            exportText += `A scale of 1:${scale} means 1 unit on the map equals ${scale} units in reality.\n`;
+            exportText += `This conversion helps with navigation and distance estimation.\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Map scale conversion results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Clear form inputs
+                document.getElementById('mapScale').value = '24000';
+                document.getElementById('measurement').value = '1';
+                document.getElementById('unit').value = 'inches';
+                document.getElementById('targetUnit').value = 'miles';
+                
+                // Clear localStorage
+                localStorage.removeItem('mapScale');
+                localStorage.removeItem('measurement');
+                localStorage.removeItem('unit');
+                localStorage.removeItem('targetUnit');
+                
+                // Reset displays
+                document.getElementById('scaleValue').textContent = '1:24000';
+                document.getElementById('conversionFactor').textContent = '1 inch = 0.38 miles';
+                document.getElementById('mapDistance').textContent = '1.00 in';
+                document.getElementById('actualDistance').textContent = '0.38 mi';
+                document.getElementById('infoContent').textContent = 'A scale of 1:24000 means 1 unit on the map equals 24000 units in reality. For example, 1 inch on the map equals 24000 inches (0.38 miles) in real life.';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<!-- Category: Travel Tools -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window vs Aisle Chooser - Travel Planning Tool</title>
+    <meta name="description" content="Choose between window and aisle seats with our easy-to-use window vs aisle chooser. Find the best seat option for your travel preferences.">
+    <meta name="keywords" content="window vs aisle chooser, flight seat selector, travel seat preferences, airline seating, window or aisle seat, flight seating tool">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #ffcc00, #ff9500);
+            border-radius: 2px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #ffcc00;
+            font-size: 1.1rem;
+        }
+        
+        input, select, textarea {
+            padding: 14px 15px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+        }
+        
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .option-group label:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to right, #ffcc00, #ff9500);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 204, 0, 0.5);
+        }
+        
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result h3 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .seat-recommendation {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #4cff00;
+            text-shadow: 0 0 10px rgba(76, 255, 0, 0.5);
+        }
+        
+        .recommendation-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .recommendation-details h4 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-details ul {
+            padding-left: 20px;
+        }
+        
+        .recommendation-details li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .comparison-section {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .seat-option {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .seat-option h4 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .seat-option.window {
+            border: 2px solid rgba(76, 255, 0, 0.5);
+        }
+        
+        .seat-option.aisle {
+            border: 2px solid rgba(0, 206, 201, 0.5);
+        }
+        
+        .info-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        .info-section h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .data-management {
+            background: rgba(150, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .data-management h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .data-actions button {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .data-actions .clear-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff4757);
+        }
+        
+        .data-actions .save-btn {
+            background: linear-gradient(to right, #2ed573, #1dd1a1);
+        }
+        
+        .data-status {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Header Height */
+        @media (max-width: 768px) {
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem; /* Reduced font size for one line */
+                margin: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .container {
+                padding: 15px 0;
+                margin: 0;
+                width: 100%;
+                border-radius: 0;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            .result {
+                padding: 20px 15px;
+            }
+            
+            .seat-recommendation {
+                font-size: 2rem;
+            }
+            
+            .comparison-section {
+                flex-direction: column;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                margin: 0;
+                width: 100%;
+                padding: 15px 0;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Window vs Aisle Chooser</h1>
+        </header>
+        
+        <div class="input-group">
+            <label for="flight-duration">Flight Duration (hours):</label>
+            <input type="number" id="flight-duration" min="0" step="0.5" placeholder="e.g., 5.5">
+        </div>
+        
+        <div class="input-group">
+            <label for="travel-purpose">Travel Purpose:</label>
+            <select id="travel-purpose">
+                <option value="">Select Purpose</option>
+                <option value="business">Business</option>
+                <option value="leisure">Leisure</option>
+                <option value="family">Family</option>
+                <option value="first-time">First Time Flying</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="seat-class">Seat Class:</label>
+            <select id="seat-class">
+                <option value="economy">Economy</option>
+                <option value="premium">Premium Economy</option>
+                <option value="business">Business</option>
+                <option value="first">First Class</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label>Personal Preferences:</label>
+            <div class="options">
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="prefer-sleeping"> Prefer Sleeping
+                    </label>
+                    <label>
+                        <input type="checkbox" id="like-views"> Like Scenic Views
+                    </label>
+                    <label>
+                        <input type="checkbox" id="need-movement"> Need to Move Around
+                    </label>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="motion-sensitive"> Motion Sensitive
+                    </label>
+                    <label>
+                        <input type="checkbox" id="work-during-flight"> Work During Flight
+                    </label>
+                    <label>
+                        <input type="checkbox" id="want-privacy"> Want Privacy
+                    </label>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="frequent-bathroom"> Frequent Bathroom Use
+                    </label>
+                    <label>
+                        <input type="checkbox" id="eat-during-flight"> Eat During Flight
+                    </label>
+                    <label>
+                        <input type="checkbox" id="dislike-disturbance"> Dislike Disturbance
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="notes">Additional Notes:</label>
+            <textarea id="notes" placeholder="Any specific requirements or preferences..."></textarea>
+        </div>
+        
+        <button id="choose-seat">Recommend Seat Type</button>
+        
+        <div class="result" id="result">
+            <h3>Seat Recommendation</h3>
+            <div class="seat-recommendation" id="seat-recommendation">Recommendation will appear here</div>
+            
+            <div class="recommendation-details">
+                <h4>Recommendation Details:</h4>
+                <ul id="recommendation-details">
+                    <li>Details will appear here</li>
+                </ul>
+            </div>
+            
+            <div class="comparison-section">
+                <div class="seat-option window">
+                    <h4>Window Seat Advantages</h4>
+                    <ul id="window-advantages">
+                        <li>Scenic views during flight</li>
+                        <li>Support for sleeping</li>
+                        <li>Less disturbance from other passengers</li>
+                    </ul>
+                </div>
+                
+                <div class="seat-option aisle">
+                    <h4>Aisle Seat Advantages</h4>
+                    <ul id="aisle-advantages">
+                        <li>Easy access to bathroom</li>
+                        <li>Ability to stretch legs</li>
+                        <li>More freedom to move</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>Seat Selection Tips:</h3>
+            <ul>
+                <li>Window seats are ideal for sleeping and scenic views</li>
+                <li>Aisle seats are better for passengers who need to move around</li>
+                <li>For long flights, consider your comfort preferences</li>
+                <li>Check the aircraft layout before selecting seats</li>
+                <li>Research airline seat maps online before booking</li>
+                <li>Consider exit rows for extra legroom (may have restrictions)</li>
+                <li>Bulkhead seats offer more legroom but no under-seat storage</li>
+            </ul>
+        </div>
+        
+        <div class="data-management">
+            <h3>Data Management</h3>
+            <div class="data-actions">
+                <button class="save-btn" id="save-data">Save Current Data</button>
+                <button class="clear-btn" id="clear-data">Clear Saved Data</button>
+            </div>
+            <div class="data-status" id="data-status">
+                No saved data found
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('choose-seat').addEventListener('click', function() {
+            const flightDuration = parseFloat(document.getElementById('flight-duration').value) || 0;
+            const travelPurpose = document.getElementById('travel-purpose').value;
+            const seatClass = document.getElementById('seat-class').value;
+            const preferSleeping = document.getElementById('prefer-sleeping').checked;
+            const likeViews = document.getElementById('like-views').checked;
+            const needMovement = document.getElementById('need-movement').checked;
+            const motionSensitive = document.getElementById('motion-sensitive').checked;
+            const workDuringFlight = document.getElementById('work-during-flight').checked;
+            const wantPrivacy = document.getElementById('want-privacy').checked;
+            const frequentBathroom = document.getElementById('frequent-bathroom').checked;
+            const eatDuringFlight = document.getElementById('eat-during-flight').checked;
+            const dislikeDisturbance = document.getElementById('dislike-disturbance').checked;
+            const notes = document.getElementById('notes').value;
+            
+            if (flightDuration <= 0) {
+                alert('Please enter a valid flight duration');
+                return;
+            }
+            
+            // Calculate scores for window and aisle
+            let windowScore = 0;
+            let aisleScore = 0;
+            
+            // Based on preferences, assign points to each seat type
+            if (preferSleeping) {
+                windowScore += 15;
+                aisleScore += 5;
+            }
+            
+            if (likeViews) {
+                windowScore += 20;
+                aisleScore += 2;
+            }
+            
+            if (needMovement) {
+                aisleScore += 20;
+                windowScore += 3;
+            }
+            
+            if (motionSensitive) {
+                windowScore += 10;
+                aisleScore += 5;
+            }
+            
+            if (workDuringFlight) {
+                windowScore += 8;
+                aisleScore += 12;
+            }
+            
+            if (wantPrivacy) {
+                windowScore += 15;
+                aisleScore += 5;
+            }
+            
+            if (frequentBathroom) {
+                aisleScore += 25;
+                windowScore += 2;
+            }
+            
+            if (eatDuringFlight) {
+                windowScore += 5;
+                aisleScore += 8;
+            }
+            
+            if (dislikeDisturbance) {
+                windowScore += 18;
+                aisleScore += 3;
+            }
+            
+            // Adjust based on flight duration
+            if (flightDuration > 6) {
+                windowScore += 10;
+                aisleScore += 15;
+            } else if (flightDuration > 3) {
+                windowScore += 5;
+                aisleScore += 8;
+            }
+            
+            // Adjust based on travel purpose
+            if (travelPurpose === 'business') {
+                aisleScore += 10;
+                windowScore += 5;
+            } else if (travelPurpose === 'leisure') {
+                windowScore += 10;
+                aisleScore += 5;
+            } else if (travelPurpose === 'family') {
+                aisleScore += 15;
+                windowScore += 5;
+            }
+            
+            // Adjust based on seat class
+            if (seatClass === 'business' || seatClass === 'first') {
+                bothScoreAdjustment = 5; // Both get a slight boost
+                windowScore += bothScoreAdjustment;
+                aisleScore += bothScoreAdjustment;
+            }
+            
+            // Determine recommendation
+            let recommendation = '';
+            let recommendationDetails = [];
+            
+            if (windowScore > aisleScore) {
+                recommendation = 'WINDOW SEAT';
+                document.getElementById('seat-recommendation').textContent = recommendation;
+                document.getElementById('seat-recommendation').style.color = '#4cff00';
+                
+                recommendationDetails.push('Perfect for your preference of sleeping and scenic views');
+                if (likeViews) recommendationDetails.push('You enjoy scenic views');
+                if (preferSleeping) recommendationDetails.push('Ideal for sleeping during the flight');
+                if (wantPrivacy) recommendationDetails.push('Provides more privacy');
+                if (dislikeDisturbance) recommendationDetails.push('Less disturbance from other passengers');
+                
+            } else if (aisleScore > windowScore) {
+                recommendation = 'AISLE SEAT';
+                document.getElementById('seat-recommendation').textContent = recommendation;
+                document.getElementById('seat-recommendation').style.color = '#00cec9';
+                
+                recommendationDetails.push('Perfect for your need to move around and access bathroom');
+                if (frequentBathroom) recommendationDetails.push('Easy access to bathroom');
+                if (needMovement) recommendationDetails.push('Freedom to stretch and move');
+                if (workDuringFlight) recommendationDetails.push('Better for working during flight');
+            } else {
+                recommendation = 'BOTH ARE SUITABLE';
+                document.getElementById('seat-recommendation').textContent = recommendation;
+                document.getElementById('seat-recommendation').style.color = '#ffcc00';
+                
+                recommendationDetails.push('Both seat types are equally suitable for your preferences');
+                recommendationDetails.push('Consider your mood on the day of travel');
+            }
+            
+            // Update recommendation details
+            const detailsList = document.getElementById('recommendation-details');
+            detailsList.innerHTML = '';
+            
+            recommendationDetails.forEach(detail => {
+                const li = document.createElement('li');
+                li.textContent = detail;
+                detailsList.appendChild(li);
+            });
+            
+            // Update advantages based on recommendation
+            const windowAdvantages = document.getElementById('window-advantages');
+            const aisleAdvantages = document.getElementById('aisle-advantages');
+            
+            windowAdvantages.innerHTML = '';
+            aisleAdvantages.innerHTML = '';
+            
+            // Default advantages
+            const defaultWindowAdvantages = [
+                'Scenic views during flight',
+                'Support for sleeping',
+                'Less disturbance from other passengers',
+                'More privacy'
+            ];
+            
+            const defaultAisleAdvantages = [
+                'Easy access to bathroom',
+                'Ability to stretch legs',
+                'More freedom to move',
+                'Better for working'
+            ];
+            
+            // Add custom advantages based on preferences
+            if (preferSleeping) {
+                defaultWindowAdvantages.push('Ideal for sleeping');
+            }
+            if (likeViews) {
+                defaultWindowAdvantages.push('Perfect for scenic views');
+            }
+            if (frequentBathroom) {
+                defaultAisleAdvantages.push('Essential for frequent bathroom trips');
+            }
+            if (needMovement) {
+                defaultAisleAdvantages.push('Necessary for frequent movement');
+            }
+            
+            defaultWindowAdvantages.forEach(adv => {
+                const li = document.createElement('li');
+                li.textContent = adv;
+                windowAdvantages.appendChild(li);
+            });
+            
+            defaultAisleAdvantages.forEach(adv => {
+                const li = document.createElement('li');
+                li.textContent = adv;
+                aisleAdvantages.appendChild(li);
+            });
+            
+            document.getElementById('result').style.display = 'block';
+        });
+        
+        // Data management
+        document.getElementById('save-data').addEventListener('click', function() {
+            const data = {
+                flightDuration: document.getElementById('flight-duration').value,
+                travelPurpose: document.getElementById('travel-purpose').value,
+                seatClass: document.getElementById('seat-class').value,
+                preferSleeping: document.getElementById('prefer-sleeping').checked,
+                likeViews: document.getElementById('like-views').checked,
+                needMovement: document.getElementById('need-movement').checked,
+                motionSensitive: document.getElementById('motion-sensitive').checked,
+                workDuringFlight: document.getElementById('work-during-flight').checked,
+                wantPrivacy: document.getElementById('want-privacy').checked,
+                frequentBathroom: document.getElementById('frequent-bathroom').checked,
+                eatDuringFlight: document.getElementById('eat-during-flight').checked,
+                dislikeDisturbance: document.getElementById('dislike-disturbance').checked,
+                notes: document.getElementById('notes').value
+            };
+            
+            localStorage.setItem('windowAisleData', JSON.stringify(data));
+            document.getElementById('data-status').textContent = 'Data saved successfully!';
+            
+            setTimeout(() => {
+                document.getElementById('data-status').textContent = 'Data saved on: ' + new Date().toLocaleString();
+            }, 2000);
+        });
+        
+        document.getElementById('clear-data').addEventListener('click', function() {
+            localStorage.removeItem('windowAisleData');
+            document.getElementById('data-status').textContent = 'Saved data cleared!';
+            
+            // Reset form
+            document.getElementById('flight-duration').value = '';
+            document.getElementById('travel-purpose').value = '';
+            document.getElementById('seat-class').value = 'economy';
+            document.getElementById('prefer-sleeping').checked = false;
+            document.getElementById('like-views').checked = false;
+            document.getElementById('need-movement').checked = false;
+            document.getElementById('motion-sensitive').checked = false;
+            document.getElementById('work-during-flight').checked = false;
+            document.getElementById('want-privacy').checked = false;
+            document.getElementById('frequent-bathroom').checked = false;
+            document.getElementById('eat-during-flight').checked = false;
+            document.getElementById('dislike-disturbance').checked = false;
+            document.getElementById('notes').value = '';
+            
+            setTimeout(() => {
+                document.getElementById('data-status').textContent = 'No saved data found';
+            }, 2000);
+        });
+        
+        function loadData() {
+            const savedData = localStorage.getItem('windowAisleData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                document.getElementById('flight-duration').value = data.flightDuration || '';
+                document.getElementById('travel-purpose').value = data.travelPurpose || '';
+                document.getElementById('seat-class').value = data.seatClass || 'economy';
+                
+                document.getElementById('prefer-sleeping').checked = data.preferSleeping || false;
+                document.getElementById('like-views').checked = data.likeViews || false;
+                document.getElementById('need-movement').checked = data.needMovement || false;
+                document.getElementById('motion-sensitive').checked = data.motionSensitive || false;
+                document.getElementById('work-during-flight').checked = data.workDuringFlight || false;
+                document.getElementById('want-privacy').checked = data.wantPrivacy || false;
+                document.getElementById('frequent-bathroom').checked = data.frequentBathroom || false;
+                document.getElementById('eat-during-flight').checked = data.eatDuringFlight || false;
+                document.getElementById('dislike-disturbance').checked = data.dislikeDisturbance || false;
+                document.getElementById('notes').value = data.notes || '';
+                
+                document.getElementById('data-status').textContent = 'Data loaded from: ' + new Date().toLocaleString();
+            }
+        }
+        
+        // Load saved data on page load
+        window.addEventListener('load', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>

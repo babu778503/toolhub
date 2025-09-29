@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<!-- Category: Health -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altitude Sickness Predictor</title>
+    <meta name="description" content="Altitude Sickness Predictor helps you assess your risk for altitude sickness based on elevation, ascent rate, and personal factors. Essential for mountain climbers and hikers.">
+    <meta name="keywords" content="altitude sickness predictor, altitude sickness calculator, mountain sickness risk, hiking altitude safety, climbing altitude guide, altitude illness prevention, high altitude sickness, outdoor safety tool, mountain climbing safety, altitude sickness symptoms">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #3f51b5, #5c6bc0);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .predictor {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #3f51b5;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #5c6bc0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #3f51b5, #5c6bc0);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(63, 81, 181, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .prediction {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8eaf6;
+            border-radius: 8px;
+        }
+        
+        .prediction h3 {
+            color: #3f51b5;
+            margin-bottom: 15px;
+        }
+        
+        .risk-level {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 15px 0;
+        }
+        
+        .low-risk {
+            background: #c8e6c9;
+            color: #388e3c;
+        }
+        
+        .moderate-risk {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+        
+        .high-risk {
+            background: #ffcdd2;
+            color: #d32f2f;
+        }
+        
+        .prediction-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c5cae9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #3f51b5;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .risk-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8eaf6;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3f51b5;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .altitude-icon {
+            font-size: 2rem;
+            color: #5c6bc0;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .symptoms-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        
+        .symptoms-list li {
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .predictor {
+                padding: 20px 0;
+            }
+            
+            .risk-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .prediction {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Altitude Sickness Predictor</h1>
+        </header>
+        
+        <div class="predictor">
+            <div class="input-group">
+                <label for="currentAltitude">Current Altitude (ft)</label>
+                <input type="number" id="currentAltitude" placeholder="Enter current altitude" min="0" value="5000">
+            </div>
+            
+            <div class="input-group">
+                <label for="targetAltitude">Target Altitude (ft)</label>
+                <input type="number" id="targetAltitude" placeholder="Enter target altitude" min="0" value="10000">
+            </div>
+            
+            <div class="input-group">
+                <label for="ascentRate">Ascent Rate (ft/day)</label>
+                <input type="number" id="ascentRate" placeholder="Enter ascent rate" min="0" value="1000">
+            </div>
+            
+            <div class="input-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" placeholder="Enter your age" min="10" max="100" value="30">
+            </div>
+            
+            <div class="input-group">
+                <label for="healthCondition">Health Condition</label>
+                <select id="healthCondition">
+                    <option value="excellent">Excellent</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="previousExperience">Previous High Altitude Experience</label>
+                <select id="previousExperience">
+                    <option value="none">None</option>
+                    <option value="some">Some</option>
+                    <option value="extensive">Extensive</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="predictRisk()">Calculate Risk</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportPrediction()">Export Prediction</button>
+                <button class="btn-clear" onclick="clearPrediction()">Clear Data</button>
+            </div>
+            
+            <div class="prediction">
+                <div class="altitude-icon">⛰️</div>
+                <h3>Altitude Sickness Risk Assessment</h3>
+                
+                <div class="risk-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="currentAlt">5000 ft</div>
+                        <div class="stat-label">Current Altitude</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="targetAlt">10000 ft</div>
+                        <div class="stat-label">Target Altitude</div>
+                    </div>
+                </div>
+                
+                <div class="risk-level high-risk" id="riskLevel">
+                    High Risk (Calculate to see assessment)
+                </div>
+                
+                <div class="prediction-info">
+                    <div class="info-title">Risk Assessment</div>
+                    <div class="info-content" id="infoContent">
+                        Altitude sickness risk is high. Ascend slowly, stay hydrated, and monitor for symptoms. Consider acclimatization days before reaching target altitude.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedCurrentAlt = localStorage.getItem('currentAltitude');
+            const savedTargetAlt = localStorage.getItem('targetAltitude');
+            const savedAscentRate = localStorage.getItem('ascentRate');
+            const savedAge = localStorage.getItem('age');
+            const savedHealth = localStorage.getItem('healthCondition');
+            const savedExperience = localStorage.getItem('previousExperience');
+            
+            if (savedCurrentAlt) document.getElementById('currentAltitude').value = savedCurrentAlt;
+            if (savedTargetAlt) document.getElementById('targetAltitude').value = savedTargetAlt;
+            if (savedAscentRate) document.getElementById('ascentRate').value = savedAscentRate;
+            if (savedAge) document.getElementById('age').value = savedAge;
+            if (savedHealth) document.getElementById('healthCondition').value = savedHealth;
+            if (savedExperience) document.getElementById('previousExperience').value = savedExperience;
+            
+            // Perform prediction with saved values
+            predictRisk();
+        }
+
+        function predictRisk() {
+            const currentAlt = parseInt(document.getElementById('currentAltitude').value) || 0;
+            const targetAlt = parseInt(document.getElementById('targetAltitude').value) || 0;
+            const ascentRate = parseInt(document.getElementById('ascentRate').value) || 0;
+            const age = parseInt(document.getElementById('age').value) || 30;
+            const healthCondition = document.getElementById('healthCondition').value;
+            const previousExperience = document.getElementById('previousExperience').value;
+            
+            if (currentAlt < 0 || targetAlt < 0 || ascentRate < 0 || age < 10) {
+                alert('Please enter valid values for all fields');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('currentAltitude', currentAlt);
+            localStorage.setItem('targetAltitude', targetAlt);
+            localStorage.setItem('ascentRate', ascentRate);
+            localStorage.setItem('age', age);
+            localStorage.setItem('healthCondition', healthCondition);
+            localStorage.setItem('previousExperience', previousExperience);
+            
+            // Update altitude displays
+            document.getElementById('currentAlt').textContent = currentAlt + ' ft';
+            document.getElementById('targetAlt').textContent = targetAlt + ' ft';
+            
+            // Calculate risk score
+            let riskScore = 0;
+            
+            // Altitude difference factor
+            const altitudeDiff = targetAlt - currentAlt;
+            if (altitudeDiff > 4000) riskScore += 3;
+            else if (altitudeDiff > 2000) riskScore += 2;
+            else if (altitudeDiff > 1000) riskScore += 1;
+            
+            // Ascent rate factor (faster ascent = higher risk)
+            if (ascentRate > 2000) riskScore += 3;
+            else if (ascentRate > 1000) riskScore += 2;
+            else if (ascentRate > 500) riskScore += 1;
+            
+            // Age factor (younger and older have higher risk)
+            if (age < 18 || age > 65) riskScore += 1;
+            
+            // Health condition factor
+            if (healthCondition === 'poor') riskScore += 2;
+            else if (healthCondition === 'fair') riskScore += 1;
+            
+            // Previous experience factor
+            if (previousExperience === 'none') riskScore += 2;
+            else if (previousExperience === 'some') riskScore += 1;
+            
+            // Determine risk level
+            let riskLevel = '';
+            let riskClass = '';
+            let riskMessage = '';
+            
+            if (riskScore >= 6) {
+                riskLevel = 'High Risk';
+                riskClass = 'high-risk';
+                riskMessage = 'Altitude sickness risk is high. Ascend slowly, stay hydrated, and monitor for symptoms. Consider acclimatization days before reaching target altitude.';
+            } else if (riskScore >= 3) {
+                riskLevel = 'Moderate Risk';
+                riskClass = 'moderate-risk';
+                riskMessage = 'Altitude sickness risk is moderate. Ascend gradually, stay hydrated, and be aware of symptoms. Consider taking acclimatization breaks.';
+            } else {
+                riskLevel = 'Low Risk';
+                riskClass = 'low-risk';
+                riskMessage = 'Altitude sickness risk is low. Continue with gradual ascent, stay hydrated, and monitor for any symptoms.';
+            }
+            
+            // Update risk display
+            const riskElement = document.getElementById('riskLevel');
+            riskElement.textContent = riskLevel;
+            riskElement.className = `risk-level ${riskClass}`;
+            
+            // Update info content
+            document.getElementById('infoContent').textContent = riskMessage;
+            
+            // Add prevention tips
+            let preventionTips = '<div class="info-title">Prevention Tips</div><ul class="symptoms-list">';
+            preventionTips += '<li>Ascend gradually - no more than 1000 ft per day above 8000 ft</li>';
+            preventionTips += '<li>Stay hydrated - drink 3-4 liters of water per day</li>';
+            preventionTips += '<li>Take acclimatization days every 3000 ft of elevation gain</li>';
+            preventionTips += '<li>Consider medication like acetazolamide (consult a doctor)</li>';
+            preventionTips += '<li>Recognize early symptoms and descend if severe symptoms occur</li>';
+            preventionTips += '</ul>';
+            
+            document.getElementById('infoContent').innerHTML = riskMessage + preventionTips;
+        }
+        
+        function exportPrediction() {
+            const currentAlt = document.getElementById('currentAltitude').value || '0';
+            const targetAlt = document.getElementById('targetAltitude').value || '0';
+            const ascentRate = document.getElementById('ascentRate').value || '0';
+            const age = document.getElementById('age').value || '0';
+            const healthCondition = document.getElementById('healthCondition').value;
+            const previousExperience = document.getElementById('previousExperience').value;
+            const riskLevel = document.getElementById('riskLevel').textContent;
+            
+            const exportText = `Altitude Sickness Predictor Results\n\n`;
+            exportText += `Current Altitude: ${currentAlt} ft\n`;
+            exportText += `Target Altitude: ${targetAlt} ft\n`;
+            exportText += `Ascent Rate: ${ascentRate} ft/day\n`;
+            exportText += `Age: ${age}\n`;
+            exportText += `Health Condition: ${healthCondition}\n`;
+            exportText += `Previous Experience: ${previousExperience}\n`;
+            exportText += `Risk Level: ${riskLevel}\n\n`;
+            exportText += `Prevention Tips:\n`;
+            exportText += `- Ascend gradually - no more than 1000 ft per day above 8000 ft\n`;
+            exportText += `- Stay hydrated - drink 3-4 liters of water per day\n`;
+            exportText += `- Take acclimatization days every 3000 ft of elevation gain\n`;
+            exportText += `- Consider medication like acetazolamide (consult a doctor)\n`;
+            exportText += `- Recognize early symptoms and descend if severe symptoms occur\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Altitude sickness prediction exported to clipboard!');
+        }
+        
+        function clearPrediction() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Clear form inputs
+                document.getElementById('currentAltitude').value = '5000';
+                document.getElementById('targetAltitude').value = '10000';
+                document.getElementById('ascentRate').value = '1000';
+                document.getElementById('age').value = '30';
+                document.getElementById('healthCondition').value = 'good';
+                document.getElementById('previousExperience').value = 'some';
+                
+                // Clear localStorage
+                localStorage.removeItem('currentAltitude');
+                localStorage.removeItem('targetAltitude');
+                localStorage.removeItem('ascentRate');
+                localStorage.removeItem('age');
+                localStorage.removeItem('healthCondition');
+                localStorage.removeItem('previousExperience');
+                
+                // Reset displays
+                document.getElementById('currentAlt').textContent = '5000 ft';
+                document.getElementById('targetAlt').textContent = '10000 ft';
+                document.getElementById('riskLevel').textContent = 'High Risk (Calculate to see assessment)';
+                document.getElementById('riskLevel').className = 'risk-level high-risk';
+                document.getElementById('infoContent').textContent = 'Altitude sickness risk is high. Ascend slowly, stay hydrated, and monitor for symptoms. Consider acclimatization days before reaching target altitude.';
+            }
+        }
+    </script>
+</body>
+</html>

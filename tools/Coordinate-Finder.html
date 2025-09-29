@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Finder</title>
+    <meta name="description" content="Coordinate Finder helps you find and convert geographic coordinates. Essential tool for navigation, hiking, and outdoor activities.">
+    <meta name="keywords" content="coordinate finder, geographic coordinates, GPS coordinates, latitude longitude, navigation tool, hiking coordinates, outdoor navigation, coordinate converter, map coordinates, geolocation tool">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .finder {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .coordinates {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .coordinates h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .coord-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .coord-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .coord-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .coord-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .coord-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .coord-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .coord-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .format-examples {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .finder {
+                padding: 20px 0;
+            }
+            
+            .coord-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .coord-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .coordinates {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Coordinate Finder</h1>
+        </header>
+        
+        <div class="finder">
+            <div class="input-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g., Mountain Trail, Lake, Campsite">
+            </div>
+            
+            <div class="input-group">
+                <label for="lat">Latitude</label>
+                <input type="text" id="lat" placeholder="Enter latitude (e.g., 39.9042 or 39° 54' 15.12\" N)" value="39.9042">
+                <div class="format-examples">Examples: 39.9042, 39° 54' 15.12" N, 39d 54m 15.12s N</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="lng">Longitude</label>
+                <input type="text" id="lng" placeholder="Enter longitude (e.g., -105.0530 or 105° 3' 10.8\" W)" value="-105.0530">
+                <div class="format-examples">Examples: -105.0530, 105° 3' 10.8" W, 105d 3m 10.8s W</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="coordFormat">Coordinate Format</label>
+                <select id="coordFormat">
+                    <option value="decimal">Decimal Degrees (DD)</option>
+                    <option value="dms">Degrees Minutes Seconds (DMS)</option>
+                    <option value="utm">UTM</option>
+                    <option value="mgrs">MGRS</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="findCoordinates()">Find Coordinates</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportCoordinates()">Export Coordinates</button>
+                <button class="btn-clear" onclick="clearCoordinates()">Clear Coordinates</button>
+            </div>
+            
+            <div class="coordinates">
+                <div class="coord-icon">📍</div>
+                <h3>Coordinate Information</h3>
+                
+                <div class="coord-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="latValue">39.9042°</div>
+                        <div class="stat-label">Latitude</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="lngValue">-105.0530°</div>
+                        <div class="stat-label">Longitude</div>
+                    </div>
+                </div>
+                
+                <div class="coord-grid">
+                    <div class="coord-box">
+                        <div class="coord-label">Decimal Degrees</div>
+                        <div class="coord-value" id="decimalCoord">39.9042, -105.0530</div>
+                    </div>
+                    <div class="coord-box">
+                        <div class="coord-label">DMS Format</div>
+                        <div class="coord-value" id="dmsCoord">39°54'15.12"N, 105°3'10.8"W</div>
+                    </div>
+                </div>
+                
+                <div class="coord-info">
+                    <div class="info-title">Coordinate Information</div>
+                    <div class="info-content" id="infoContent">
+                        Latitude: 39.9042° N, Longitude: 105.0530° W. This coordinate system helps locate points on Earth's surface. Latitude ranges from -90° to 90°, longitude from -180° to 180°.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedLocation = localStorage.getItem('location');
+            const savedLat = localStorage.getItem('lat');
+            const savedLng = localStorage.getItem('lng');
+            const savedFormat = localStorage.getItem('coordFormat');
+            
+            if (savedLocation) document.getElementById('location').value = savedLocation;
+            if (savedLat) document.getElementById('lat').value = savedLat;
+            if (savedLng) document.getElementById('lng').value = savedLng;
+            if (savedFormat) document.getElementById('coordFormat').value = savedFormat;
+            
+            // Perform conversion with saved values
+            findCoordinates();
+        }
+
+        function parseCoordinate(coordStr) {
+            // Remove any non-numeric characters except for degrees, minutes, seconds symbols and direction
+            coordStr = coordStr.trim();
+            
+            // Check if it's already in decimal format
+            if (!isNaN(parseFloat(coordStr))) {
+                return parseFloat(coordStr);
+            }
+            
+            // Handle DMS format (e.g., 39° 54' 15.12" N)
+            const dmsRegex = /(\d+)[°d]\s*(\d+)[\'m]\s*(\d+(?:\.\d+)?)["s]\s*([NSEW])/i;
+            const match = coordStr.match(dmsRegex);
+            
+            if (match) {
+                const degrees = parseFloat(match[1]);
+                const minutes = parseFloat(match[2]);
+                const seconds = parseFloat(match[3]);
+                const direction = match[4].toUpperCase();
+                
+                let decimal = degrees + (minutes / 60) + (seconds / 3600);
+                
+                // Apply negative sign for South or West
+                if (direction === 'S' || direction === 'W') {
+                    decimal = -decimal;
+                }
+                
+                return decimal;
+            }
+            
+            // If we can't parse, return NaN
+            return NaN;
+        }
+
+        function findCoordinates() {
+            const location = document.getElementById('location').value;
+            const latStr = document.getElementById('lat').value;
+            const lngStr = document.getElementById('lng').value;
+            const format = document.getElementById('coordFormat').value;
+            
+            if (!latStr || !lngStr) {
+                alert('Please enter both latitude and longitude');
+                return;
+            }
+            
+            // Parse coordinates
+            let parsedLat = parseCoordinate(latStr);
+            let parsedLng = parseCoordinate(lngStr);
+            
+            // Validate coordinates
+            if (isNaN(parsedLat) || isNaN(parsedLng) || parsedLat < -90 || parsedLat > 90 || parsedLng < -180 || parsedLng > 180) {
+                alert('Please enter valid coordinates (Latitude: -90 to 90, Longitude: -180 to 180)\n\nExamples:\nDecimal: 39.9042, -105.0530\nDMS: 39° 54\' 15.12" N, 105° 3\' 10.8" W');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('location', location);
+            localStorage.setItem('lat', latStr);
+            localStorage.setItem('lng', lngStr);
+            localStorage.setItem('coordFormat', format);
+            
+            // Update displays
+            document.getElementById('latValue').textContent = parsedLat.toFixed(4) + '°';
+            document.getElementById('lngValue').textContent = parsedLng.toFixed(4) + '°';
+            
+            // Format decimal coordinates
+            const decimalCoord = `${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)}`;
+            document.getElementById('decimalCoord').textContent = decimalCoord;
+            
+            // Convert to DMS
+            const dms = convertToDMS(parsedLat, parsedLng);
+            document.getElementById('dmsCoord').textContent = dms;
+            
+            // Update info content
+            const latDir = parsedLat >= 0 ? 'N' : 'S';
+            const lngDir = parsedLng >= 0 ? 'E' : 'W';
+            document.getElementById('infoContent').textContent = 
+                `Latitude: ${Math.abs(parsedLat).toFixed(4)}° ${latDir}, Longitude: ${Math.abs(parsedLng).toFixed(4)}° ${lngDir}. ` +
+                `This coordinate system helps locate points on Earth's surface. ` +
+                `Latitude ranges from -90° to 90°, longitude from -180° to 180°.`;
+        }
+        
+        function convertToDMS(lat, lng) {
+            // Convert latitude
+            const latAbs = Math.abs(lat);
+            const latDeg = Math.floor(latAbs);
+            const latMin = Math.floor((latAbs - latDeg) * 60);
+            const latSec = ((latAbs - latDeg - latMin/60) * 3600).toFixed(2);
+            const latDir = lat >= 0 ? 'N' : 'S';
+            
+            // Convert longitude
+            const lngAbs = Math.abs(lng);
+            const lngDeg = Math.floor(lngAbs);
+            const lngMin = Math.floor((lngAbs - lngDeg) * 60);
+            const lngSec = ((lngAbs - lngDeg - lngMin/60) * 3600).toFixed(2);
+            const lngDir = lng >= 0 ? 'E' : 'W';
+            
+            return `${latDeg}°${latMin}'${latSec}"${latDir}, ${lngDeg}°${lngMin}'${lngSec}"${lngDir}`;
+        }
+        
+        function exportCoordinates() {
+            const location = document.getElementById('location').value || 'Unknown Location';
+            const lat = document.getElementById('lat').value;
+            const lng = document.getElementById('lng').value;
+            const format = document.getElementById('coordFormat').value;
+            const decimalCoord = document.getElementById('decimalCoord').textContent;
+            const dmsCoord = document.getElementById('dmsCoord').textContent;
+            
+            const exportText = `Coordinate Finder Results\n\n`;
+            exportText += `Location: ${location}\n`;
+            exportText += `Decimal Coordinates: ${decimalCoord}\n`;
+            exportText += `DMS Coordinates: ${dmsCoord}\n`;
+            exportText += `Format: ${format}\n\n`;
+            exportText += `Coordinate Information:\n`;
+            exportText += `Latitude: ${lat}\n`;
+            exportText += `Longitude: ${lng}\n`;
+            exportText += `This coordinate system helps locate points on Earth's surface.\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Coordinates exported to clipboard!');
+        }
+        
+        function clearCoordinates() {
+            if (confirm('Are you sure you want to clear all coordinate data?')) {
+                // Clear form inputs
+                document.getElementById('location').value = '';
+                document.getElementById('lat').value = '';
+                document.getElementById('lng').value = '';
+                document.getElementById('coordFormat').value = 'decimal';
+                
+                // Clear localStorage
+                localStorage.removeItem('location');
+                localStorage.removeItem('lat');
+                localStorage.removeItem('lng');
+                localStorage.removeItem('coordFormat');
+                
+                // Reset displays
+                document.getElementById('latValue').textContent = '0.0000°';
+                document.getElementById('lngValue').textContent = '0.0000°';
+                document.getElementById('decimalCoord').textContent = '0.0000, 0.0000';
+                document.getElementById('dmsCoord').textContent = '0°0\'0.00"N, 0°0\'0.00"E';
+                document.getElementById('infoContent').textContent = 'Latitude: 0.0000° N, Longitude: 0.0000° W. This coordinate system helps locate points on Earth\'s surface. Latitude ranges from -90° to 90°, longitude from -180° to 180°.';
+            }
+        }
+    </script>
+</body>
+</html>

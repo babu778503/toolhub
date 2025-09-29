@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concert Setlist Planner</title>
+    <meta name="description" content="Concert Setlist Planner helps musicians and bands organize their concert performances. Create, manage, and optimize live music setlists for unforgettable shows.">
+    <meta name="keywords" content="concert setlist planner, setlist creator, live music planner, band setlist tool, concert performance planner, music setlist organizer, gig planner, live show planner, musician tools, band management, concert workflow">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .planner {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .plan-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .plan-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .plan-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .setlist-visual {
+            height: 20px;
+            background: #b2ebf2;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .setlist-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            width: 60%;
+            transition: width 1s ease;
+        }
+        
+        .setlist-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .setlist-tracks {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .track-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .track-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+        }
+        
+        .track-item:last-child {
+            border-bottom: none;
+        }
+        
+        .track-info {
+            flex: 1;
+        }
+        
+        .track-title {
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        .track-details {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .track-duration {
+            font-weight: bold;
+            color: #0097a7;
+            margin: 0 15px;
+        }
+        
+        .track-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            background: #0097a7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .add-track {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .add-track input {
+            flex: 1;
+        }
+        
+        .add-btn {
+            background: #0097a7;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .setlist-summary {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #00796b;
+            padding-top: 10px;
+            border-top: 2px solid #b2ebf2;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .planner {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .plan-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+            
+            .track-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .track-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Concert Setlist Planner</h1>
+        </header>
+        
+        <div class="planner">
+            <div class="input-group">
+                <label for="bandName">Band/Artist Name</label>
+                <input type="text" id="bandName" placeholder="Enter band or artist name">
+            </div>
+            
+            <div class="input-group">
+                <label for="venue">Venue</label>
+                <input type="text" id="venue" placeholder="Enter venue name">
+            </div>
+            
+            <div class="input-group">
+                <label for="eventDate">Event Date</label>
+                <input type="date" id="eventDate">
+            </div>
+            
+            <div class="input-group">
+                <label for="eventType">Event Type</label>
+                <select id="eventType">
+                    <option value="concert">Concert</option>
+                    <option value="festival">Festival</option>
+                    <option value="club">Club Show</option>
+                    <option value="private">Private Event</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="corporate">Corporate Event</option>
+                    <option value="street">Street Performance</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="audience">Expected Audience</label>
+                <select id="audience">
+                    <option value="intimate">Intimate (20-50 people)</option>
+                    <option value="small">Small Venue (50-200 people)</option>
+                    <option value="medium">Medium Venue (200-1000 people)</option>
+                    <option value="large">Large Venue (1000+ people)</option>
+                    <option value="festival">Festival Crowd</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="performanceTime">Performance Time (minutes)</label>
+                <input type="number" id="performanceTime" placeholder="Enter performance time" min="10" value="60">
+            </div>
+            
+            <div class="input-group">
+                <label for="energyLevel">Energy Level</label>
+                <select id="energyLevel">
+                    <option value="low">Low Energy (Acoustic/Chill)</option>
+                    <option value="medium">Medium Energy (Balanced)</option>
+                    <option value="high">High Energy (Rock/Energetic)</option>
+                    <option value="variable">Variable Energy (Dynamic)</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="planSetlist()">Plan Setlist</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Setlist</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Setlist</button>
+            </div>
+            
+            <div class="results">
+                <div class="plan-icon">🎸</div>
+                <h3>Setlist Planning</h3>
+                
+                <div class="plan-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="bandValue">My Band</div>
+                        <div class="stat-label">Artist</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="venueValue">Unknown</div>
+                        <div class="stat-label">Venue</div>
+                    </div>
+                </div>
+                
+                <div class="setlist-visual">
+                    <div class="setlist-bar" id="setlistBar"></div>
+                </div>
+                
+                <div class="setlist-scale">
+                    <span>0 min</span>
+                    <span>15 min</span>
+                    <span>30 min</span>
+                    <span>45 min</span>
+                    <span>60+ min</span>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Total Duration</div>
+                        <div class="result-value" id="totalDuration">60m</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Number of Songs</div>
+                        <div class="result-value" id="songCount">12</div>
+                    </div>
+                </div>
+                
+                <div class="setlist-tracks">
+                    <h4>Setlist Tracks</h4>
+                    <div class="track-list" id="trackList">
+                        <div class="track-item">
+                            <div class="track-info">
+                                <div class="track-title">Opening Song</div>
+                                <div class="track-details">Album Track • Key: C Major</div>
+                            </div>
+                            <div class="track-duration">4:30</div>
+                            <div class="track-actions">
+                                <button class="action-btn">▲</button>
+                                <button class="action-btn">▼</button>
+                                <button class="action-btn">✕</button>
+                            </div>
+                        </div>
+                        <div class="track-item">
+                            <div class="track-info">
+                                <div class="track-title">Popular Hit</div>
+                                <div class="track-details">Single • Key: G Major</div>
+                            </div>
+                            <div class="track-duration">3:45</div>
+                            <div class="track-actions">
+                                <button class="action-btn">▲</button>
+                                <button class="action-btn">▼</button>
+                                <button class="action-btn">✕</button>
+                            </div>
+                        </div>
+                        <div class="track-item">
+                            <div class="track-info">
+                                <div class="track-title">Fan Favorite</div>
+                                <div class="track-details">Album Track • Key: D Minor</div>
+                            </div>
+                            <div class="track-duration">5:15</div>
+                            <div class="track-actions">
+                                <button class="action-btn">▲</button>
+                                <button class="action-btn">▼</button>
+                                <button class="action-btn">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="add-track">
+                        <input type="text" id="newTrack" placeholder="Add new track to setlist">
+                        <button class="add-btn" onclick="addTrack()">+</button>
+                    </div>
+                    
+                    <div class="setlist-summary">
+                        <div>Total Songs: <span id="summarySongs">12</span></div>
+                        <div>Total Time: <span id="summaryTime">60:00</span></div>
+                    </div>
+                </div>
+                
+                <div class="plan-info">
+                    <div class="info-title">Setlist Information</div>
+                    <div class="info-content" id="infoContent">
+                        Planned 60-minute performance for My Band at Unknown venue. Setlist includes 12 songs with balanced energy flow. Average song duration is 5 minutes. Suitable for intimate to small venue settings.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedBandName = localStorage.getItem('bandName');
+            const savedVenue = localStorage.getItem('venue');
+            const savedEventDate = localStorage.getItem('eventDate');
+            const savedEventType = localStorage.getItem('eventType');
+            const savedAudience = localStorage.getItem('audience');
+            const savedPerformanceTime = localStorage.getItem('performanceTime');
+            const savedEnergyLevel = localStorage.getItem('energyLevel');
+            
+            if (savedBandName) document.getElementById('bandName').value = savedBandName;
+            if (savedVenue) document.getElementById('venue').value = savedVenue;
+            if (savedEventDate) document.getElementById('eventDate').value = savedEventDate;
+            if (savedEventType) document.getElementById('eventType').value = savedEventType;
+            if (savedAudience) document.getElementById('audience').value = savedAudience;
+            if (savedPerformanceTime) document.getElementById('performanceTime').value = savedPerformanceTime;
+            if (savedEnergyLevel) document.getElementById('energyLevel').value = savedEnergyLevel;
+            
+            // Set today's date as default if not set
+            if (!savedEventDate) {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('eventDate').value = today;
+            }
+            
+            // Perform planning with saved values
+            planSetlist();
+        }
+
+        function planSetlist() {
+            const bandName = document.getElementById('bandName').value || 'My Band';
+            const venue = document.getElementById('venue').value || 'Unknown Venue';
+            const eventDate = document.getElementById('eventDate').value;
+            const eventType = document.getElementById('eventType').value;
+            const audience = document.getElementById('audience').value;
+            const performanceTime = parseInt(document.getElementById('performanceTime').value) || 60;
+            const energyLevel = document.getElementById('energyLevel').value;
+            
+            if (performanceTime < 10) {
+                alert('Please enter a valid performance time (10 minutes or more)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('bandName', bandName);
+            localStorage.setItem('venue', venue);
+            localStorage.setItem('eventDate', eventDate);
+            localStorage.setItem('eventType', eventType);
+            localStorage.setItem('audience', audience);
+            localStorage.setItem('performanceTime', performanceTime);
+            localStorage.setItem('energyLevel', energyLevel);
+            
+            // Update displays
+            document.getElementById('bandValue').textContent = bandName;
+            document.getElementById('venueValue').textContent = venue;
+            
+            // Calculate number of songs (average 5 minutes per song)
+            const numberOfSongs = Math.max(3, Math.floor(performanceTime / 5));
+            
+            // Update displays
+            document.getElementById('totalDuration').textContent = performanceTime + 'm';
+            document.getElementById('songCount').textContent = numberOfSongs;
+            document.getElementById('summarySongs').textContent = numberOfSongs;
+            document.getElementById('summaryTime').textContent = performanceTime + ':00';
+            
+            // Update setlist bar (max 120 minutes for visualization)
+            const setlistBar = document.getElementById('setlistBar');
+            const percentage = Math.min(100, (performanceTime / 120) * 100);
+            setlistBar.style.width = percentage + '%';
+            
+            // Generate sample setlist
+            generateSetlist(numberOfSongs, performanceTime);
+            
+            // Update info content
+            const typeText = getEventTypeText(eventType);
+            const audienceText = getAudienceText(audience);
+            const energyText = getEnergyLevelText(energyLevel);
+            
+            let info = `Planned ${performanceTime}-minute performance for ${bandName} at ${venue}. `;
+            info += `Setlist includes ${numberOfSongs} songs with ${energyText.toLowerCase()} energy flow. `;
+            info += `Average song duration is ${Math.floor(performanceTime / numberOfSongs)} minutes. `;
+            info += `Suitable for ${audienceText.toLowerCase()} settings.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function generateSetlist(songCount, totalTime) {
+            const trackList = document.getElementById('trackList');
+            trackList.innerHTML = '';
+            
+            // Sample songs database
+            const sampleSongs = [
+                { title: "Opening Song", album: "Album Track", key: "C Major", duration: "4:30" },
+                { title: "Popular Hit", album: "Single", key: "G Major", duration: "3:45" },
+                { title: "Fan Favorite", album: "Album Track", key: "D Minor", duration: "5:15" },
+                { title: "New Release", album: "Latest Album", key: "A Minor", duration: "4:10" },
+                { title: "Cover Song", album: "Tribute", key: "E Major", duration: "3:55" },
+                { title: "Acoustic Version", album: "Unplugged", key: "B Minor", duration: "4:20" },
+                { title: "High Energy Track", album: "Live Favorite", key: "F Major", duration: "3:30" },
+                { title: "Slow Ballad", album: "Emotional", key: "G Minor", duration: "6:00" },
+                { title: "Crowd Pleaser", album: "Hit Single", key: "D Major", duration: "4:05" },
+                { title: "Closing Song", album: "Signature Track", key: "A Major", duration: "5:45" }
+            ];
+            
+            // Generate setlist based on song count
+            for (let i = 0; i < Math.min(songCount, sampleSongs.length); i++) {
+                const song = sampleSongs[i];
+                const trackItem = document.createElement('div');
+                trackItem.className = 'track-item';
+                trackItem.innerHTML = `
+                    <div class="track-info">
+                        <div class="track-title">${song.title}</div>
+                        <div class="track-details">${song.album} • Key: ${song.key}</div>
+                    </div>
+                    <div class="track-duration">${song.duration}</div>
+                    <div class="track-actions">
+                        <button class="action-btn" onclick="moveTrackUp(this)">▲</button>
+                        <button class="action-btn" onclick="moveTrackDown(this)">▼</button>
+                        <button class="action-btn" onclick="removeTrack(this)">✕</button>
+                    </div>
+                `;
+                trackList.appendChild(trackItem);
+            }
+            
+            // Add placeholder tracks if needed
+            if (songCount > sampleSongs.length) {
+                for (let i = sampleSongs.length; i < songCount; i++) {
+                    const trackItem = document.createElement('div');
+                    trackItem.className = 'track-item';
+                    trackItem.innerHTML = `
+                        <div class="track-info">
+                            <div class="track-title">Track ${i + 1}</div>
+                            <div class="track-details">TBD • Key: TBD</div>
+                        </div>
+                        <div class="track-duration">4:00</div>
+                        <div class="track-actions">
+                            <button class="action-btn" onclick="moveTrackUp(this)">▲</button>
+                            <button class="action-btn" onclick="moveTrackDown(this)">▼</button>
+                            <button class="action-btn" onclick="removeTrack(this)">✕</button>
+                        </div>
+                    `;
+                    trackList.appendChild(trackItem);
+                }
+            }
+        }
+        
+        function addTrack() {
+            const newTrackInput = document.getElementById('newTrack');
+            const trackTitle = newTrackInput.value.trim();
+            
+            if (!trackTitle) {
+                alert('Please enter a track title');
+                return;
+            }
+            
+            const trackList = document.getElementById('trackList');
+            const trackCount = trackList.children.length + 1;
+            
+            const trackItem = document.createElement('div');
+            trackItem.className = 'track-item';
+            trackItem.innerHTML = `
+                <div class="track-info">
+                    <div class="track-title">${trackTitle}</div>
+                    <div class="track-details">New Track • Key: TBD</div>
+                </div>
+                <div class="track-duration">4:00</div>
+                <div class="track-actions">
+                    <button class="action-btn" onclick="moveTrackUp(this)">▲</button>
+                    <button class="action-btn" onclick="moveTrackDown(this)">▼</button>
+                    <button class="action-btn" onclick="removeTrack(this)">✕</button>
+                </div>
+            `;
+            
+            trackList.appendChild(trackItem);
+            
+            // Update counters
+            const songCount = parseInt(document.getElementById('songCount').textContent) + 1;
+            document.getElementById('songCount').textContent = songCount;
+            document.getElementById('summarySongs').textContent = songCount;
+            
+            // Clear input
+            newTrackInput.value = '';
+        }
+        
+        function removeTrack(button) {
+            const trackItem = button.closest('.track-item');
+            trackItem.remove();
+            
+            // Update counters
+            const songCount = parseInt(document.getElementById('songCount').textContent) - 1;
+            document.getElementById('songCount').textContent = songCount;
+            document.getElementById('summarySongs').textContent = songCount;
+        }
+        
+        function moveTrackUp(button) {
+            const trackItem = button.closest('.track-item');
+            const prevItem = trackItem.previousElementSibling;
+            if (prevItem) {
+                trackItem.parentNode.insertBefore(trackItem, prevItem);
+            }
+        }
+        
+        function moveTrackDown(button) {
+            const trackItem = button.closest('.track-item');
+            const nextItem = trackItem.nextElementSibling;
+            if (nextItem) {
+                trackItem.parentNode.insertBefore(nextItem, trackItem);
+            }
+        }
+        
+        function getEventTypeText(value) {
+            const typeTexts = {
+                'concert': 'Concert',
+                'festival': 'Festival',
+                'club': 'Club Show',
+                'private': 'Private Event',
+                'wedding': 'Wedding',
+                'corporate': 'Corporate Event',
+                'street': 'Street Performance'
+            };
+            return typeTexts[value] || value;
+        }
+        
+        function getAudienceText(value) {
+            const audienceTexts = {
+                'intimate': 'Intimate (20-50 people)',
+                'small': 'Small Venue (50-200 people)',
+                'medium': 'Medium Venue (200-1000 people)',
+                'large': 'Large Venue (1000+ people)',
+                'festival': 'Festival Crowd'
+            };
+            return audienceTexts[value] || value;
+        }
+        
+        function getEnergyLevelText(value) {
+            const energyTexts = {
+                'low': 'Low Energy (Acoustic/Chill)',
+                'medium': 'Medium Energy (Balanced)',
+                'high': 'High Energy (Rock/Energetic)',
+                'variable': 'Variable Energy (Dynamic)'
+            };
+            return energyTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const bandName = document.getElementById('bandName').value || 'My Band';
+            const venue = document.getElementById('venue').value || 'Unknown Venue';
+            const eventDate = document.getElementById('eventDate').value;
+            const eventType = getEventTypeText(document.getElementById('eventType').value);
+            const audience = getAudienceText(document.getElementById('audience').value);
+            const performanceTime = document.getElementById('performanceTime').value;
+            const energyLevel = getEnergyLevelText(document.getElementById('energyLevel').value);
+            const totalDuration = document.getElementById('totalDuration').textContent;
+            const songCount = document.getElementById('songCount').textContent;
+            
+            const exportText = `Concert Setlist Planner Results\n\n`;
+            exportText += `Band/Artist: ${bandName}\n`;
+            exportText += `Venue: ${venue}\n`;
+            exportText += `Event Date: ${eventDate}\n`;
+            exportText += `Event Type: ${eventType}\n`;
+            exportText += `Audience: ${audience}\n`;
+            exportText += `Performance Time: ${performanceTime} minutes\n`;
+            exportText += `Energy Level: ${energyLevel}\n`;
+            exportText += `Total Duration: ${totalDuration}\n`;
+            exportText += `Number of Songs: ${songCount}\n\n`;
+            
+            exportText += `Setlist Tracks:\n`;
+            const trackItems = document.querySelectorAll('.track-item');
+            trackItems.forEach((item, index) => {
+                const title = item.querySelector('.track-title').textContent;
+                const duration = item.querySelector('.track-duration').textContent;
+                exportText += `${index + 1}. ${title} (${duration})\n`;
+            });
+            
+            exportText += `\nSetlist Planning Tips:\n`;
+            exportText += `- Start with an energetic opener to grab attention\n`;
+            exportText += `- Place popular songs in the middle of the set\n`;
+            exportText += `- Save biggest hits for the encore\n`;
+            exportText += `- Vary tempo and mood throughout the set\n`;
+            exportText += `- Consider key changes for smooth transitions\n`;
+            exportText += `- Plan for crowd interaction and banter\n`;
+            exportText += `- Include acoustic/ballad moments for dynamics\n`;
+            exportText += `- End with a strong closer or leave them wanting more\n\n`;
+            
+            exportText += `Event Type Guidelines:\n`;
+            exportText += `- Concert: Standard set structure, 45-90 minutes\n`;
+            exportText += `- Festival: Shorter set, high-energy, 30-60 minutes\n`;
+            exportText += `- Club: Danceable tracks, 60-120 minutes\n`;
+            exportText += `- Private Event: Tailored to audience, 30-90 minutes\n`;
+            exportText += `- Wedding: Mix of genres, 90-120 minutes\n`;
+            exportText += `- Corporate: Professional, 45-60 minutes\n`;
+            exportText += `- Street Performance: High-energy, 30-60 minutes\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Setlist plan exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('bandName').value = '';
+                document.getElementById('venue').value = '';
+                document.getElementById('eventType').value = 'concert';
+                document.getElementById('audience').value = 'intimate';
+                document.getElementById('performanceTime').value = '60';
+                document.getElementById('energyLevel').value = 'medium';
+                
+                // Set today's date
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('eventDate').value = today;
+                
+                // Clear localStorage
+                localStorage.removeItem('bandName');
+                localStorage.removeItem('venue');
+                localStorage.removeItem('eventDate');
+                localStorage.removeItem('eventType');
+                localStorage.removeItem('audience');
+                localStorage.removeItem('performanceTime');
+                localStorage.removeItem('energyLevel');
+                
+                // Reset displays
+                document.getElementById('bandValue').textContent = 'My Band';
+                document.getElementById('venueValue').textContent = 'Unknown Venue';
+                document.getElementById('totalDuration').textContent = '60m';
+                document.getElementById('songCount').textContent = '12';
+                document.getElementById('summarySongs').textContent = '12';
+                document.getElementById('summaryTime').textContent = '60:00';
+                document.getElementById('setlistBar').style.width = '50%';
+                document.getElementById('infoContent').textContent = 'Planned 60-minute performance for My Band at Unknown venue. Setlist includes 12 songs with balanced energy flow. Average song duration is 5 minutes. Suitable for intimate to small venue settings.';
+                
+                // Regenerate sample setlist
+                generateSetlist(12, 60);
+            }
+        }
+    </script>
+</body>
+</html>

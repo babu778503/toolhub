@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<!-- Category: Travel Tools -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astronomy Event Reminder - Travel Planning Tool</title>
+    <meta name="description" content="Track astronomy events with our easy-to-use astronomy event reminder. Plan your stargazing activities based on celestial events.">
+    <meta name="keywords" content="astronomy event reminder, celestial events, stargazing planner, astronomy calendar, celestial calendar, space events, astronomical events">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50, #4a235a, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(142, 68, 173, 0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #9b59b6;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            border-radius: 2px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #9b59b6;
+            font-size: 1.1rem;
+        }
+        
+        input, select, textarea {
+            padding: 14px 15px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+        }
+        
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .option-group label:hover {
+            background: rgba(155, 89, 182, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(155, 89, 182, 0.5);
+        }
+        
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result h3 {
+            color: #9b59b6;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .event-status {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #2ecc71;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+        
+        .event-status.problem {
+            color: #e74c3c;
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+        
+        .event-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .event-details h4 {
+            color: #9b59b6;
+            margin-bottom: 10px;
+        }
+        
+        .event-details ul {
+            padding-left: 20px;
+        }
+        
+        .event-details li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .info-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 8px;
+        }
+        
+        .info-section h3 {
+            color: #9b59b6;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .data-management {
+            background: rgba(150, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .data-management h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .data-actions button {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .data-actions .clear-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff4757);
+        }
+        
+        .data-actions .save-btn {
+            background: linear-gradient(to right, #2ed573, #1dd1a1);
+        }
+        
+        .data-status {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .visualizer {
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .visualizer h4 {
+            color: #9b59b6;
+            margin-bottom: 10px;
+        }
+        
+        .event-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .event-item {
+            background: rgba(155, 89, 182, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 80px;
+            margin: 5px;
+            text-align: center;
+        }
+        
+        .event-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+        
+        .event-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .comparison {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .event-info {
+            background: rgba(46, 204, 113, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            margin: 5px;
+        }
+        
+        .event-date {
+            background: rgba(155, 89, 182, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            margin: 5px;
+        }
+        
+        /* Mobile Header Height */
+        @media (max-width: 768px) {
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem; /* Reduced font size for one line */
+                margin: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .container {
+                padding: 15px 0;
+                margin: 0;
+                width: 100%;
+                border-radius: 0;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            .result {
+                padding: 20px 15px;
+            }
+            
+            .event-status {
+                font-size: 2rem;
+            }
+            
+            .event-display {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .event-item {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .comparison {
+                flex-direction: column;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                margin: 0;
+                width: 100%;
+                padding: 15px 0;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Astronomy Event Reminder</h1>
+        </header>
+        
+        <div class="input-group">
+            <label for="event-type">Event Type:</label>
+            <select id="event-type">
+                <option value="solar-eclipse">Solar Eclipse</option>
+                <option value="lunar-eclipse">Lunar Eclipse</option>
+                <option value="meteor-shower">Meteor Shower</option>
+                <option value="meteor-storm">Meteor Storm</option>
+                <option value="planetary">Planetary Alignment</option>
+                <option value="conjunction">Planetary Conjunction</option>
+                <option value="transit">Transit</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="event-date">Event Date:</label>
+            <input type="date" id="event-date">
+        </div>
+        
+        <div class="input-group">
+            <label for="event-time">Event Time:</label>
+            <input type="time" id="event-time">
+        </div>
+        
+        <div class="input-group">
+            <label for="location">Location:</label>
+            <input type="text" id="location" placeholder="Enter city or coordinates">
+        </div>
+        
+        <div class="input-group">
+            <label for="visibility">Visibility:</label>
+            <select id="visibility">
+                <option value="visible">Visible</option>
+                <option value="partial">Partially Visible</option>
+                <option value="not-visible">Not Visible</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label>Reminder Options:</label>
+            <div class="options">
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="email-reminder"> Email Reminder
+                    </label>
+                    <label>
+                        <input type="checkbox" id="push-reminder"> Push Notification
+                    </label>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="weather-check"> Weather Check
+                    </label>
+                    <label>
+                        <input type="checkbox" id="equipment"> Equipment Needed
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="notes">Additional Notes:</label>
+            <textarea id="notes" placeholder="Any specific requirements or observations..."></textarea>
+        </div>
+        
+        <button id="set-reminder">Set Event Reminder</button>
+        
+        <div class="result" id="result">
+            <h3>Astronomy Event Information</h3>
+            <div class="event-status" id="event-status">Event status will appear here</div>
+            
+            <div class="visualizer">
+                <h4>Event Details</h4>
+                <div class="event-display">
+                    <div class="event-item">
+                        <div class="event-value" id="event-type-display">N/A</div>
+                        <div class="event-label">Event Type</div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-value" id="event-date-display">00/00/00</div>
+                        <div class="event-label">Date</div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-value" id="event-time-display">00:00</div>
+                        <div class="event-label">Time</div>
+                    </div>
+                </div>
+                
+                <div class="comparison">
+                    <div class="event-info">
+                        <h4>Event Info</h4>
+                        <div class="event-value" id="event-name">Event Name</div>
+                        <div class="event-label">Astronomy Event</div>
+                    </div>
+                    <div class="event-date">
+                        <h4>Event Date</h4>
+                        <div class="event-value" id="full-date">00/00/0000</div>
+                        <div class="event-label">Date & Time</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="event-details">
+                <h4>Event Details:</h4>
+                <ul id="event-details">
+                    <li>Event details will appear here</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>Astronomy Event Guidelines:</h3>
+            <ul>
+                <li>Solar eclipses require proper eye protection to view safely</li>
+                <li>Meteor showers are best viewed from dark locations</li>
+                <li>Lunar eclipses are safe to view with naked eye</li>
+                <li>Planetary alignments are visible with binoculars</li>
+                <li>Check weather conditions before viewing</li>
+                <li>Allow extra time for setup and observation</li>
+                <li>Consider travel time to optimal viewing locations</li>
+            </ul>
+        </div>
+        
+        <div class="data-management">
+            <h3>Data Management</h3>
+            <div class="data-actions">
+                <button class="save-btn" id="save-data">Save Current Data</button>
+                <button class="clear-btn" id="clear-data">Clear Saved Data</button>
+            </div>
+            <div class="data-status" id="data-status">
+                No saved data found
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('set-reminder').addEventListener('click', function() {
+            const eventType = document.getElementById('event-type').value;
+            const eventDate = document.getElementById('event-date').value;
+            const eventTime = document.getElementById('event-time').value;
+            const location = document.getElementById('location').value;
+            const visibility = document.getElementById('visibility').value;
+            const emailReminder = document.getElementById('email-reminder').checked;
+            const pushReminder = document.getElementById('push-reminder').checked;
+            const weatherCheck = document.getElementById('weather-check').checked;
+            const equipmentNeeded = document.getElementById('equipment').checked;
+            const notes = document.getElementById('notes').value;
+            
+            if (!eventDate || !eventTime) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Determine event status
+            let status = '';
+            let statusClass = '';
+            let details = [];
+            let eventName = '';
+            
+            // Set event name based on type
+            const eventNames = {
+                'solar-eclipse': 'Solar Eclipse',
+                'lunar-eclipse': 'Lunar Eclipse',
+                'meteor-shower': 'Meteor Shower',
+                'meteor-storm': 'Meteor Storm',
+                'planetary': 'Planetary Alignment',
+                'conjunction': 'Planetary Conjunction',
+                'transit': 'Transit',
+                'other': 'Astronomy Event'
+            };
+            
+            eventName = eventNames[eventType] || 'Astronomy Event';
+            
+            // Determine status based on visibility
+            if (visibility === 'visible') {
+                status = 'EVENT VISIBLE';
+                statusClass = 'event-status';
+                details.push('Event is visible from your location');
+                details.push('Optimal viewing conditions expected');
+            } else if (visibility === 'partial') {
+                status = 'PARTIAL VISIBILITY';
+                statusClass = 'event-status';
+                details.push('Event is partially visible from your location');
+                details.push('Some parts of the event will be observable');
+            } else {
+                status = 'NOT VISIBLE';
+                statusClass = 'event-status problem';
+                details.push('Event is not visible from your location');
+                details.push('Consider traveling to a better viewing location');
+            }
+            
+            // Add event-specific details
+            if (eventType === 'solar-eclipse') {
+                details.push('⚠️ Solar eclipses require proper eye protection');
+                details.push('Use ISO-certified eclipse glasses');
+            } else if (eventType === 'meteor-shower') {
+                details.push('Best viewed from dark locations away from city lights');
+                details.push('Peak viewing time is during the event');
+            } else if (eventType === 'lunar-eclipse') {
+                details.push('Safe to view with naked eye');
+                details.push('Best viewed during totality');
+            }
+            
+            // Add reminder options
+            if (emailReminder) {
+                details.push('Email reminder set');
+            }
+            
+            if (pushReminder) {
+                details.push('Push notification reminder set');
+            }
+            
+            if (weatherCheck) {
+                details.push('Weather check will be performed before event');
+            }
+            
+            if (equipmentNeeded) {
+                if (eventType === 'solar-eclipse') {
+                    details.push('Equipment: Solar viewing glasses required');
+                } else if (eventType === 'meteor-shower') {
+                    details.push('Equipment: Blanket, reclining chair, warm clothing');
+                } else {
+                    details.push('Equipment: Binoculars or telescope recommended');
+                }
+            }
+            
+            // Add location info
+            if (location) {
+                details.push(`Viewing location: ${location}`);
+            }
+            
+            // Add notes if provided
+            if (notes) {
+                details.push(`Additional notes: ${notes}`);
+            }
+            
+            // Update the result display
+            document.getElementById('event-status').textContent = status;
+            document.getElementById('event-status').className = statusClass;
+            
+            // Update visualizer
+            document.getElementById('event-type-display').textContent = eventName;
+            document.getElementById('event-date-display').textContent = new Date(eventDate).toLocaleDateString();
+            document.getElementById('event-time-display').textContent = eventTime;
+            
+            document.getElementById('event-name').textContent = eventName;
+            document.getElementById('full-date').textContent = new Date(eventDate + 'T' + eventTime).toLocaleString();
+            
+            // Update details
+            const detailsList = document.getElementById('event-details');
+            detailsList.innerHTML = '';
+            
+            details.forEach(detail => {
+                const li = document.createElement('li');
+                li.textContent = detail;
+                detailsList.appendChild(li);
+            });
+            
+            document.getElementById('result').style.display = 'block';
+        });
+        
+        // Data management
+        document.getElementById('save-data').addEventListener('click', function() {
+            const data = {
+                eventType: document.getElementById('event-type').value,
+                eventDate: document.getElementById('event-date').value,
+                eventTime: document.getElementById('event-time').value,
+                location: document.getElementById('location').value,
+                visibility: document.getElementById('visibility').value,
+                emailReminder: document.getElementById('email-reminder').checked,
+                pushReminder: document.getElementById('push-reminder').checked,
+                weatherCheck: document.getElementById('weather-check').checked,
+                equipmentNeeded: document.getElementById('equipment').checked,
+                notes: document.getElementById('notes').value
+            };
+            
+            localStorage.setItem('astronomyEventData', JSON.stringify(data));
+            document.getElementById('data-status').textContent = 'Data saved successfully!';
+            
+            setTimeout(() => {
+                document.getElementById('data-status').textContent = 'Data saved on: ' + new Date().toLocaleString();
+            }, 2000);
+        });
+        
+        document.getElementById('clear-data').addEventListener('click', function() {
+            localStorage.removeItem('astronomyEventData');
+            document.getElementById('data-status').textContent = 'Saved data cleared!';
+            
+            // Reset form
+            document.getElementById('event-type').value = 'solar-eclipse';
+            document.getElementById('event-date').value = '';
+            document.getElementById('event-time').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('visibility').value = 'visible';
+            document.getElementById('email-reminder').checked = false;
+            document.getElementById('push-reminder').checked = false;
+            document.getElementById('weather-check').checked = false;
+            document.getElementById('equipment').checked = false;
+            document.getElementById('notes').value = '';
+            
+            setTimeout(() => {
+                document.getElementById('data-status').textContent = 'No saved data found';
+            }, 2000);
+        });
+        
+        function loadData() {
+            const savedData = localStorage.getItem('astronomyEventData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                document.getElementById('event-type').value = data.eventType || 'solar-eclipse';
+                document.getElementById('event-date').value = data.eventDate || '';
+                document.getElementById('event-time').value = data.eventTime || '';
+                document.getElementById('location').value = data.location || '';
+                document.getElementById('visibility').value = data.visibility || 'visible';
+                
+                document.getElementById('email-reminder').checked = data.emailReminder || false;
+                document.getElementById('push-reminder').checked = data.pushReminder || false;
+                document.getElementById('weather-check').checked = data.weatherCheck || false;
+                document.getElementById('equipment').checked = data.equipmentNeeded || false;
+                document.getElementById('notes').value = data.notes || '';
+                
+                document.getElementById('data-status').textContent = 'Data loaded from: ' + new Date().toLocaleString();
+            }
+        }
+        
+        // Load saved data on page load
+        window.addEventListener('load', function() {
+            loadData();
+        });
+        
+        // Set default date to today
+        document.getElementById('event-date').valueAsDate = new Date();
+    </script>
+</body>
+</html>

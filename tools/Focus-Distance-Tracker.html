@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Distance Tracker</title>
+    <meta name="description" content="Focus Distance Tracker helps photographers track and calculate focus distances for different subjects and camera settings. Optimize sharpness and depth of field.">
+    <meta name="keywords" content="focus distance tracker, photography focus calculator, focus distance calculator, depth of field, hyperfocal distance, photography settings, camera settings tool, focus tracking, photography focus, camera focus">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .tracker {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #388e3c;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .focus-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c8e6c9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .focus-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .focus-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .history-list {
+            margin-top: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.8rem;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .tracker {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .focus-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Focus Distance Tracker</h1>
+        </header>
+        
+        <div class="tracker">
+            <div class="input-group">
+                <label for="subject">Subject Type</label>
+                <select id="subject">
+                    <option value="landscape">Landscape</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="macro">Macro/Close-up</option>
+                    <option value="street">Street Photography</option>
+                    <option value="architecture">Architecture</option>
+                    <option value="wildlife">Wildlife</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="distance">Focus Distance (meters)</label>
+                <input type="number" id="distance" placeholder="Enter focus distance" min="0.1" max="1000" step="0.1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="focal">Focal Length (mm)</label>
+                <input type="number" id="focal" placeholder="Enter focal length" min="10" max="800" value="50">
+            </div>
+            
+            <div class="input-group">
+                <label for="aperture">Aperture (f-stop)</label>
+                <input type="number" id="aperture" placeholder="Enter f-stop" min="1.4" max="22" step="0.1" value="8">
+            </div>
+            
+            <div class="input-group">
+                <label for="sensor">Camera Sensor</label>
+                <select id="sensor">
+                    <option value="full">Full Frame (35mm)</option>
+                    <option value="aps-c">APS-C (1.5x Crop)</option>
+                    <option value="micro">Micro Four Thirds (2x Crop)</option>
+                    <option value="medium">Medium Format</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="calculateFocus()">Calculate Focus</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="focus-icon">🔍</div>
+                <h3>Focus Distance Results</h3>
+                
+                <div class="focus-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="subjectValue">Landscape</div>
+                        <div class="stat-label">Subject</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="distanceValue">10m</div>
+                        <div class="stat-label">Focus Distance</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Hyperfocal Distance</div>
+                        <div class="result-value" id="hyperfocal">20.8m</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Sharp Range</div>
+                        <div class="result-value" id="sharpRange">9.5m - 10.5m</div>
+                    </div>
+                </div>
+                
+                <div class="focus-info">
+                    <div class="info-title">Focus Information</div>
+                    <div class="info-content" id="infoContent">
+                        For landscape photography at 10m focus distance with 50mm lens at f/8, your hyperfocal distance is 20.8m. The sharp range extends from 9.5m to 10.5m. Adjust settings to control the sharp area in your image.
+                    </div>
+                </div>
+                
+                <div class="history-list" id="historyList">
+                    <div class="history-item">Focus calculated: Landscape at 10m (50mm, f/8)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedSubject = localStorage.getItem('subject');
+            const savedDistance = localStorage.getItem('distance');
+            const savedFocal = localStorage.getItem('focal');
+            const savedAperture = localStorage.getItem('aperture');
+            const savedSensor = localStorage.getItem('sensor');
+            const savedHistory = localStorage.getItem('focusHistory');
+            
+            if (savedSubject) document.getElementById('subject').value = savedSubject;
+            if (savedDistance) document.getElementById('distance').value = savedDistance;
+            if (savedFocal) document.getElementById('focal').value = savedFocal;
+            if (savedAperture) document.getElementById('aperture').value = savedAperture;
+            if (savedSensor) document.getElementById('sensor').value = savedSensor;
+            
+            // Perform calculation with saved values
+            calculateFocus();
+            
+            // Load history
+            if (savedHistory) {
+                const history = JSON.parse(savedHistory);
+                renderHistory(history);
+            }
+        }
+
+        function calculateFocus() {
+            const subject = document.getElementById('subject').value;
+            const distance = parseFloat(document.getElementById('distance').value) || 10;
+            const focal = parseFloat(document.getElementById('focal').value) || 50;
+            const aperture = parseFloat(document.getElementById('aperture').value) || 8;
+            const sensor = document.getElementById('sensor').value;
+            
+            if (distance < 0.1 || distance > 1000) {
+                alert('Please enter a valid distance (0.1-1000m)');
+                return;
+            }
+            
+            if (focal < 10 || focal > 800) {
+                alert('Please enter a valid focal length (10-800mm)');
+                return;
+            }
+            
+            if (aperture < 1.4 || aperture > 22) {
+                alert('Please enter a valid aperture (1.4-22)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('subject', subject);
+            localStorage.setItem('distance', distance);
+            localStorage.setItem('focal', focal);
+            localStorage.setItem('aperture', aperture);
+            localStorage.setItem('sensor', sensor);
+            
+            // Update displays
+            document.getElementById('subjectValue').textContent = getSubjectText(subject);
+            document.getElementById('distanceValue').textContent = distance + 'm';
+            
+            // Calculate circle of confusion based on sensor
+            let coc = 0.03; // Full frame
+            if (sensor === 'aps-c') coc = 0.02; // APS-C
+            else if (sensor === 'micro') coc = 0.015; // Micro Four Thirds
+            else if (sensor === 'medium') coc = 0.04; // Medium format
+            
+            // Calculate hyperfocal distance
+            const hyperfocal = (focal * focal) / (aperture * coc * 1000) + focal / 1000; // in meters
+            
+            // Calculate near and far limits
+            const nearLimit = (hyperfocal * distance) / (hyperfocal + (distance - focal / 1000));
+            const farLimit = (hyperfocal * distance) / (hyperfocal - (distance - focal / 1000));
+            
+            // Format results for display
+            document.getElementById('hyperfocal').textContent = hyperfocal.toFixed(1) + 'm';
+            document.getElementById('sharpRange').textContent = nearLimit.toFixed(1) + 'm - ' + 
+                (farLimit > 0 ? farLimit.toFixed(1) + 'm' : '∞');
+            
+            // Update info content
+            const subjectText = getSubjectText(subject);
+            let info = `For ${subjectText.toLowerCase()} photography at ${distance}m focus distance `;
+            info += `with ${focal}mm lens at f/${aperture.toFixed(1)}, your hyperfocal distance is ${hyperfocal.toFixed(1)}m. `;
+            info += `The sharp range extends from ${nearLimit.toFixed(1)}m to `;
+            info += farLimit > 0 ? `${farLimit.toFixed(1)}m. ` : 'infinity. ';
+            info += `Adjust settings to control the sharp area in your image.`;
+            
+            document.getElementById('infoContent').textContent = info;
+            
+            // Add to history
+            addToHistory(subject, distance, focal, aperture, sensor);
+        }
+        
+        function addToHistory(subject, distance, focal, aperture, sensor) {
+            const historyItem = {
+                subject: getSubjectText(subject),
+                distance: distance,
+                focal: focal,
+                aperture: aperture,
+                sensor: getSensorText(sensor),
+                timestamp: new Date().toLocaleString()
+            };
+            
+            let history = JSON.parse(localStorage.getItem('focusHistory')) || [];
+            history.unshift(historyItem); // Add to beginning
+            
+            // Keep only last 5 items
+            if (history.length > 5) {
+                history = history.slice(0, 5);
+            }
+            
+            localStorage.setItem('focusHistory', JSON.stringify(history));
+            renderHistory(history);
+        }
+        
+        function renderHistory(history) {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-item">No focus history yet</div>';
+                return;
+            }
+            
+            history.forEach(item => {
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.textContent = 
+                    `Focus: ${item.subject} at ${item.distance}m (${item.focal}mm, f/${item.aperture.toFixed(1)}) - ${item.timestamp}`;
+                historyList.appendChild(historyElement);
+            });
+        }
+        
+        function getSubjectText(value) {
+            const subjectTexts = {
+                'landscape': 'Landscape',
+                'portrait': 'Portrait',
+                'macro': 'Macro/Close-up',
+                'street': 'Street Photography',
+                'architecture': 'Architecture',
+                'wildlife': 'Wildlife'
+            };
+            return subjectTexts[value] || value;
+        }
+        
+        function getSensorText(value) {
+            const sensorTexts = {
+                'full': 'Full Frame',
+                'aps-c': 'APS-C',
+                'micro': 'Micro Four Thirds',
+                'medium': 'Medium Format'
+            };
+            return sensorTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const subject = getSubjectText(document.getElementById('subject').value);
+            const distance = document.getElementById('distance').value;
+            const focal = document.getElementById('focal').value;
+            const aperture = document.getElementById('aperture').value;
+            const sensor = getSensorText(document.getElementById('sensor').value);
+            const hyperfocal = document.getElementById('hyperfocal').textContent;
+            const sharpRange = document.getElementById('sharpRange').textContent;
+            
+            const exportText = `Focus Distance Tracker Results\n\n`;
+            exportText += `Subject Type: ${subject}\n`;
+            exportText += `Focus Distance: ${distance}m\n`;
+            exportText += `Focal Length: ${focal}mm\n`;
+            exportText += `Aperture: f/${aperture}\n`;
+            exportText += `Camera Sensor: ${sensor}\n`;
+            exportText += `Hyperfocal Distance: ${hyperfocal}\n`;
+            exportText += `Sharp Range: ${sharpRange}\n\n`;
+            exportText += `Photography Tips:\n`;
+            exportText += `- Focus on the hyperfocal distance to maximize sharpness\n`;
+            exportText += `- Use smaller apertures for greater depth of field\n`;
+            exportText += `- Consider the circle of confusion for your sensor\n`;
+            exportText += `- Focus one-third into the scene for landscape photography\n`;
+            exportText += `- Use autofocus for critical focus in portraits\n`;
+            
+            // Add history if available
+            const history = JSON.parse(localStorage.getItem('focusHistory')) || [];
+            if (history.length > 0) {
+                exportText += `\nRecent Focus History:\n`;
+                history.forEach(item => {
+                    exportText += `- ${item.timestamp}: ${item.subject} at ${item.distance}m (${item.focal}mm, f/${item.aperture.toFixed(1)})\n`;
+                });
+            }
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Focus distance results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('subject').value = 'landscape';
+                document.getElementById('distance').value = '10';
+                document.getElementById('focal').value = '50';
+                document.getElementById('aperture').value = '8';
+                document.getElementById('sensor').value = 'full';
+                
+                // Clear localStorage
+                localStorage.removeItem('subject');
+                localStorage.removeItem('distance');
+                localStorage.removeItem('focal');
+                localStorage.removeItem('aperture');
+                localStorage.removeItem('sensor');
+                localStorage.removeItem('focusHistory');
+                
+                // Reset displays
+                document.getElementById('subjectValue').textContent = 'Landscape';
+                document.getElementById('distanceValue').textContent = '10m';
+                document.getElementById('hyperfocal').textContent = '20.8m';
+                document.getElementById('sharpRange').textContent = '9.5m - 10.5m';
+                document.getElementById('infoContent').textContent = 'For landscape photography at 10m focus distance with 50mm lens at f/8, your hyperfocal distance is 20.8m. The sharp range extends from 9.5m to 10.5m. Adjust settings to control the sharp area in your image.';
+                
+                // Clear history
+                document.getElementById('historyList').innerHTML = '<div class="history-item">No focus history yet</div>';
+            }
+        }
+    </script>
+</body>
+</html>

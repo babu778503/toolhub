@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitrate Estimator</title>
+    <meta name="description" content="Bitrate Estimator helps videographers calculate the optimal bitrate for video encoding. Determine quality and file size based on resolution and frame rate.">
+    <meta name="keywords" content="bitrate estimator, video bitrate calculator, video encoding tool, bitrate calculator, video quality calculator, video compression tool, video production tools, videography tools, video workflow, content creation tools">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .estimator {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .estimate-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .estimate-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .estimate-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .quality-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .quality-indicator {
+            height: 20px;
+            background: linear-gradient(to right, #4caf50, #ffeb3b, #f44336);
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .quality-marker {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 30px;
+            background: #d32f2f;
+            transform: translateX(-50%);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .estimator {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .estimate-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bitrate Estimator</h1>
+        </header>
+        
+        <div class="estimator">
+            <div class="input-group">
+                <label for="resolution">Video Resolution</label>
+                <select id="resolution">
+                    <option value="480p">480p (SD)</option>
+                    <option value="720p">720p (HD)</option>
+                    <option value="1080p">1080p (Full HD)</option>
+                    <option value="1440p">1440p (2K)</option>
+                    <option value="2160p">2160p (4K)</option>
+                    <option value="4320p">4320p (8K)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="framerate">Frame Rate (fps)</label>
+                <select id="framerate">
+                    <option value="24">24 fps (Cinematic)</option>
+                    <option value="30">30 fps (Standard)</option>
+                    <option value="60">60 fps (Smooth)</option>
+                    <option value="120">120 fps (Slow Motion)</option>
+                    <option value="240">240 fps (High Speed)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="quality">Quality Level</label>
+                <select id="quality">
+                    <option value="low">Low Quality (Streaming)</option>
+                    <option value="medium">Medium Quality (Standard)</option>
+                    <option value="high">High Quality (Professional)</option>
+                    <option value="ultra">Ultra Quality (Archival)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="codec">Video Codec</label>
+                <select id="codec">
+                    <option value="h264">H.264 (AVC)</option>
+                    <option value="h265">H.265 (HEVC)</option>
+                    <option value="vp9">VP9</option>
+                    <option value="av1">AV1</option>
+                    <option value="prores">ProRes</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="duration">Video Duration (minutes)</label>
+                <input type="number" id="duration" placeholder="Enter duration in minutes" min="1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="targetSize">Target File Size (GB)</label>
+                <input type="number" id="targetSize" placeholder="Enter target file size" min="0.1" value="1" step="0.1">
+            </div>
+            
+            <button class="btn" onclick="estimateBitrate()">Estimate Bitrate</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Estimate</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Estimate</button>
+            </div>
+            
+            <div class="results">
+                <div class="estimate-icon">📊</div>
+                <h3>Bitrate Estimation</h3>
+                
+                <div class="estimate-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="resolutionValue">1080p</div>
+                        <div class="stat-label">Resolution</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="framerateValue">30fps</div>
+                        <div class="stat-label">Frame Rate</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Recommended Bitrate</div>
+                        <div class="result-value" id="recommendedBitrate">15 Mbps</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">File Size</div>
+                        <div class="result-value" id="fileSize">1.1GB</div>
+                    </div>
+                </div>
+                
+                <div class="quality-indicator">
+                    <div class="quality-marker" id="qualityMarker" style="left: 60%;"></div>
+                </div>
+                
+                <div class="quality-scale">
+                    <span>Low</span>
+                    <span>Medium</span>
+                    <span>High</span>
+                    <span>Ultra</span>
+                </div>
+                
+                <div class="estimate-info">
+                    <div class="info-title">Bitrate Information</div>
+                    <div class="info-content" id="infoContent">
+                        For 1080p video at 30fps with high quality, recommended bitrate is 15 Mbps. This will result in a file size of approximately 1.1GB for a 10-minute video. Adjust based on your storage and quality requirements.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedResolution = localStorage.getItem('resolution');
+            const savedFramerate = localStorage.getItem('framerate');
+            const savedQuality = localStorage.getItem('quality');
+            const savedCodec = localStorage.getItem('codec');
+            const savedDuration = localStorage.getItem('duration');
+            const savedTargetSize = localStorage.getItem('targetSize');
+            
+            if (savedResolution) document.getElementById('resolution').value = savedResolution;
+            if (savedFramerate) document.getElementById('framerate').value = savedFramerate;
+            if (savedQuality) document.getElementById('quality').value = savedQuality;
+            if (savedCodec) document.getElementById('codec').value = savedCodec;
+            if (savedDuration) document.getElementById('duration').value = savedDuration;
+            if (savedTargetSize) document.getElementById('targetSize').value = savedTargetSize;
+            
+            // Perform estimation with saved values
+            estimateBitrate();
+        }
+
+        function estimateBitrate() {
+            const resolution = document.getElementById('resolution').value;
+            const framerate = parseInt(document.getElementById('framerate').value) || 30;
+            const quality = document.getElementById('quality').value;
+            const codec = document.getElementById('codec').value;
+            const duration = parseFloat(document.getElementById('duration').value) || 10;
+            const targetSize = parseFloat(document.getElementById('targetSize').value) || 1;
+            
+            // Save to localStorage
+            localStorage.setItem('resolution', resolution);
+            localStorage.setItem('framerate', framerate);
+            localStorage.setItem('quality', quality);
+            localStorage.setItem('codec', codec);
+            localStorage.setItem('duration', duration);
+            localStorage.setItem('targetSize', targetSize);
+            
+            // Update displays
+            document.getElementById('resolutionValue').textContent = resolution;
+            document.getElementById('framerateValue').textContent = framerate + 'fps';
+            
+            // Calculate recommended bitrate based on resolution, framerate, and quality
+            let baseBitrate = 5; // Mbps
+            
+            // Adjust for resolution
+            switch(resolution) {
+                case '480p':
+                    baseBitrate = 2.5;
+                    break;
+                case '720p':
+                    baseBitrate = 5;
+                    break;
+                case '1080p':
+                    baseBitrate = 10;
+                    break;
+                case '1440p':
+                    baseBitrate = 20;
+                    break;
+                case '2160p':
+                    baseBitrate = 40;
+                    break;
+                case '4320p':
+                    baseBitrate = 80;
+                    break;
+            }
+            
+            // Adjust for framerate
+            if (framerate > 60) {
+                baseBitrate *= 1.5; // Higher framerates need more bitrate
+            } else if (framerate > 30) {
+                baseBitrate *= 1.2;
+            }
+            
+            // Adjust for quality
+            switch(quality) {
+                case 'low':
+                    baseBitrate *= 0.5;
+                    break;
+                case 'medium':
+                    baseBitrate *= 0.8;
+                    break;
+                case 'high':
+                    baseBitrate *= 1.0;
+                    break;
+                case 'ultra':
+                    baseBitrate *= 1.5;
+                    break;
+            }
+            
+            // Adjust for codec efficiency
+            switch(codec) {
+                case 'h265':
+                    baseBitrate *= 0.6; // HEVC is more efficient
+                    break;
+                case 'vp9':
+                    baseBitrate *= 0.65;
+                    break;
+                case 'av1':
+                    baseBitrate *= 0.55;
+                    break;
+                case 'prores':
+                    baseBitrate *= 2; // ProRes is less efficient but higher quality
+                    break;
+            }
+            
+            // Calculate file size
+            const fileSizeGB = (baseBitrate * duration * 60) / 8192; // Convert Mbps to GB
+            const fileSizeString = fileSizeGB.toFixed(1) + 'GB';
+            
+            // Format bitrate for display
+            const bitrateString = Math.round(baseBitrate) + ' Mbps';
+            
+            document.getElementById('recommendedBitrate').textContent = bitrateString;
+            document.getElementById('fileSize').textContent = fileSizeString;
+            
+            // Update quality marker position
+            let markerPosition = 0;
+            switch(quality) {
+                case 'low':
+                    markerPosition = 25;
+                    break;
+                case 'medium':
+                    markerPosition = 50;
+                    break;
+                case 'high':
+                    markerPosition = 75;
+                    break;
+                case 'ultra':
+                    markerPosition = 90;
+                    break;
+            }
+            
+            document.getElementById('qualityMarker').style.left = markerPosition + '%';
+            
+            // Update info content
+            const resolutionText = getResolutionText(resolution);
+            const qualityText = getQualityText(quality);
+            const codecText = getCodecText(codec);
+            
+            let info = `For ${resolutionText} video at ${framerate}fps with ${qualityText.toLowerCase()} quality, `;
+            info += `recommended bitrate is ${bitrateString}. `;
+            info += `This will result in a file size of approximately ${fileSizeString} for a ${duration}-minute video. `;
+            info += `Using ${codecText} codec. Adjust based on your storage and quality requirements.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function getResolutionText(value) {
+            const resolutionTexts = {
+                '480p': '480p',
+                '720p': '720p',
+                '1080p': '1080p',
+                '1440p': '1440p',
+                '2160p': '2160p',
+                '4320p': '4320p'
+            };
+            return resolutionTexts[value] || value;
+        }
+        
+        function getQualityText(value) {
+            const qualityTexts = {
+                'low': 'Low',
+                'medium': 'Medium',
+                'high': 'High',
+                'ultra': 'Ultra'
+            };
+            return qualityTexts[value] || value;
+        }
+        
+        function getCodecText(value) {
+            const codecTexts = {
+                'h264': 'H.264',
+                'h265': 'H.265',
+                'vp9': 'VP9',
+                'av1': 'AV1',
+                'prores': 'ProRes'
+            };
+            return codecTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const resolution = getResolutionText(document.getElementById('resolution').value);
+            const framerate = document.getElementById('framerate').value;
+            const quality = getQualityText(document.getElementById('quality').value);
+            const codec = getCodecText(document.getElementById('codec').value);
+            const duration = document.getElementById('duration').value;
+            const targetSize = document.getElementById('targetSize').value;
+            const recommendedBitrate = document.getElementById('recommendedBitrate').textContent;
+            const fileSize = document.getElementById('fileSize').textContent;
+            
+            const exportText = `Bitrate Estimator Results\n\n`;
+            exportText += `Video Resolution: ${resolution}\n`;
+            exportText += `Frame Rate: ${framerate} fps\n`;
+            exportText += `Quality Level: ${quality}\n`;
+            exportText += `Video Codec: ${codec}\n`;
+            exportText += `Video Duration: ${duration} minutes\n`;
+            exportText += `Target File Size: ${targetSize} GB\n`;
+            exportText += `Recommended Bitrate: ${recommendedBitrate}\n`;
+            exportText += `Estimated File Size: ${fileSize}\n\n`;
+            exportText += `Bitrate Guidelines:\n`;
+            exportText += `- 480p: 2-4 Mbps (Low quality)\n`;
+            exportText += `- 720p: 5-8 Mbps (Standard quality)\n`;
+            exportText += `- 1080p: 10-15 Mbps (High quality)\n`;
+            exportText += `- 1440p: 20-30 Mbps (Professional)\n`;
+            exportText += `- 2160p: 40-60 Mbps (Ultra HD)\n`;
+            exportText += `- Higher frame rates require higher bitrates\n`;
+            exportText += `- HEVC/H.265 uses less bitrate than H.264\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Bitrate estimation exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('resolution').value = '1080p';
+                document.getElementById('framerate').value = '30';
+                document.getElementById('quality').value = 'high';
+                document.getElementById('codec').value = 'h264';
+                document.getElementById('duration').value = '10';
+                document.getElementById('targetSize').value = '1';
+                
+                // Clear localStorage
+                localStorage.removeItem('resolution');
+                localStorage.removeItem('framerate');
+                localStorage.removeItem('quality');
+                localStorage.removeItem('codec');
+                localStorage.removeItem('duration');
+                localStorage.removeItem('targetSize');
+                
+                // Reset displays
+                document.getElementById('resolutionValue').textContent = '1080p';
+                document.getElementById('framerateValue').textContent = '30fps';
+                document.getElementById('recommendedBitrate').textContent = '15 Mbps';
+                document.getElementById('fileSize').textContent = '1.1GB';
+                document.getElementById('qualityMarker').style.left = '75%';
+                document.getElementById('infoContent').textContent = 'For 1080p video at 30fps with high quality, recommended bitrate is 15 Mbps. This will result in a file size of approximately 1.1GB for a 10-minute video. Adjust based on your storage and quality requirements.';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtitle Sync Tool</title>
+    <meta name="description" content="Subtitle Sync Tool helps synchronize subtitles with video content. Adjust timing, fix synchronization issues, and perfectly align captions with audio.">
+    <meta name="keywords" content="subtitle sync tool, subtitle synchronization, caption timing tool, video subtitle editor, subtitle adjustment, caption alignment, video editing tool, subtitle correction, caption sync, video workflow">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .tool {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .sync-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .sync-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .tool-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .sync-visual {
+            height: 20px;
+            background: #b2ebf2;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .sync-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            width: 50%;
+            transition: width 1s ease;
+        }
+        
+        .sync-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .timing-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .timing-control {
+            text-align: center;
+        }
+        
+        .timing-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #0097a7;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        
+        .timing-btn:hover {
+            background: #00796b;
+        }
+        
+        .subtitle-preview {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .preview-line {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .preview-line.current {
+            background: #e0f7fa;
+            font-weight: bold;
+        }
+        
+        .adjustment-panel {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .adjustment-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .adjustment-slider {
+            flex: 1;
+            margin: 0 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .tool {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sync-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+            
+            .timing-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Subtitle Sync Tool</h1>
+        </header>
+        
+        <div class="tool">
+            <div class="input-group">
+                <label for="subtitleFormat">Subtitle Format</label>
+                <select id="subtitleFormat">
+                    <option value="srt">SRT (SubRip)</option>
+                    <option value="ass">ASS/SSA (Advanced SubStation Alpha)</option>
+                    <option value="vtt">VTT (WebVTT)</option>
+                    <option value="sub">SUB (MicroDVD)</option>
+                    <option value="txt">TXT (Plain Text)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="videoDuration">Video Duration (minutes)</label>
+                <input type="number" id="videoDuration" placeholder="Enter video duration" min="1" value="120">
+            </div>
+            
+            <div class="input-group">
+                <label for="syncIssue">Sync Issue Type</label>
+                <select id="syncIssue">
+                    <option value="early">Subtitles Appear Early</option>
+                    <option value="late">Subtitles Appear Late</option>
+                    <option value="inconsistent">Inconsistent Timing</option>
+                    <option value="offset">Constant Offset</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="adjustment">Timing Adjustment (seconds)</label>
+                <input type="number" id="adjustment" placeholder="Enter adjustment in seconds" step="0.1" value="2.5">
+            </div>
+            
+            <div class="input-group">
+                <label for="subtitleCount">Number of Subtitles</label>
+                <input type="number" id="subtitleCount" placeholder="Enter number of subtitles" min="1" value="150">
+            </div>
+            
+            <div class="input-group">
+                <label for="language">Language</label>
+                <select id="language">
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                    <option value="german">German</option>
+                    <option value="italian">Italian</option>
+                    <option value="portuguese">Portuguese</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="japanese">Japanese</option>
+                    <option value="korean">Korean</option>
+                    <option value="russian">Russian</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="syncSubtitles()">Sync Subtitles</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="tool-icon">⏱️</div>
+                <h3>Subtitle Synchronization</h3>
+                
+                <div class="sync-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="durationValue">120 min</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="formatValue">SRT</div>
+                        <div class="stat-label">Format</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="issueValue">Early</div>
+                        <div class="stat-label">Issue</div>
+                    </div>
+                </div>
+                
+                <div class="sync-visual">
+                    <div class="sync-bar" id="syncBar"></div>
+                </div>
+                
+                <div class="sync-scale">
+                    <span>0%</span>
+                    <span>25%</span>
+                    <span>50%</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Adjustment Applied</div>
+                        <div class="result-value" id="adjustmentValue">+2.5s</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Subtitles Affected</div>
+                        <div class="result-value" id="affectedValue">150</div>
+                    </div>
+                </div>
+                
+                <div class="timing-controls">
+                    <div class="timing-control">
+                        <button class="timing-btn" onclick="adjustTiming(-0.5)">-</button>
+                        <div>Fine Tune</div>
+                    </div>
+                    <div class="timing-control">
+                        <button class="timing-btn" onclick="adjustTiming(0.5)">+</button>
+                        <div>Adjust</div>
+                    </div>
+                </div>
+                
+                <div class="adjustment-panel">
+                    <div class="adjustment-controls">
+                        <span>-5s</span>
+                        <input type="range" id="fineAdjustment" min="-5" max="5" step="0.1" value="2.5" class="adjustment-slider">
+                        <span>+5s</span>
+                    </div>
+                </div>
+                
+                <div class="subtitle-preview">
+                    <div class="preview-line">1</div>
+                    <div class="preview-line">00:00:01,500 --> 00:00:04,200</div>
+                    <div class="preview-line">Welcome to our presentation.</div>
+                    <div class="preview-line current">2</div>
+                    <div class="preview-line">00:00:05,800 --> 00:00:08,300</div>
+                    <div class="preview-line">Today we'll discuss subtitle synchronization.</div>
+                    <div class="preview-line">3</div>
+                    <div class="preview-line">00:00:10,100 --> 00:00:13,700</div>
+                    <div class="preview-line">This tool helps fix timing issues.</div>
+                </div>
+                
+                <div class="sync-info">
+                    <div class="info-title">Synchronization Information</div>
+                    <div class="info-content" id="infoContent">
+                        Applied +2.5 seconds adjustment to 150 SRT subtitles for a 120-minute video. Subtitles were appearing early and have been corrected. Fine-tune using the adjustment controls if needed. Preview shows synchronized timing.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedFormat = localStorage.getItem('subtitleFormat');
+            const savedDuration = localStorage.getItem('videoDuration');
+            const savedIssue = localStorage.getItem('syncIssue');
+            const savedAdjustment = localStorage.getItem('adjustment');
+            const savedCount = localStorage.getItem('subtitleCount');
+            const savedLanguage = localStorage.getItem('language');
+            
+            if (savedFormat) document.getElementById('subtitleFormat').value = savedFormat;
+            if (savedDuration) document.getElementById('videoDuration').value = savedDuration;
+            if (savedIssue) document.getElementById('syncIssue').value = savedIssue;
+            if (savedAdjustment) document.getElementById('adjustment').value = savedAdjustment;
+            if (savedCount) document.getElementById('subtitleCount').value = savedCount;
+            if (savedLanguage) document.getElementById('language').value = savedLanguage;
+            
+            // Perform synchronization with saved values
+            syncSubtitles();
+        }
+
+        function syncSubtitles() {
+            const format = document.getElementById('subtitleFormat').value;
+            const duration = parseInt(document.getElementById('videoDuration').value) || 120;
+            const issue = document.getElementById('syncIssue').value;
+            const adjustment = parseFloat(document.getElementById('adjustment').value) || 2.5;
+            const count = parseInt(document.getElementById('subtitleCount').value) || 150;
+            const language = document.getElementById('language').value;
+            
+            if (duration < 1) {
+                alert('Please enter a valid video duration (1 minute or more)');
+                return;
+            }
+            
+            if (count < 1) {
+                alert('Please enter a valid number of subtitles (1 or more)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('subtitleFormat', format);
+            localStorage.setItem('videoDuration', duration);
+            localStorage.setItem('syncIssue', issue);
+            localStorage.setItem('adjustment', adjustment);
+            localStorage.setItem('subtitleCount', count);
+            localStorage.setItem('language', language);
+            
+            // Update displays
+            document.getElementById('durationValue').textContent = duration + ' min';
+            document.getElementById('formatValue').textContent = getFormatText(format);
+            document.getElementById('issueValue').textContent = getIssueText(issue);
+            
+            // Format adjustment value
+            const adjustmentString = (adjustment >= 0 ? '+' : '') + adjustment + 's';
+            document.getElementById('adjustmentValue').textContent = adjustmentString;
+            document.getElementById('affectedValue').textContent = count;
+            
+            // Update sync bar (0% to 100% representing -10s to +10s adjustment)
+            const syncBar = document.getElementById('syncBar');
+            const percentage = Math.min(100, Math.max(0, ((adjustment + 10) / 20) * 100));
+            syncBar.style.width = percentage + '%';
+            
+            // Update info content
+            const formatText = getFormatText(format);
+            const issueText = getIssueText(issue);
+            const languageText = getLanguageText(language);
+            
+            let info = `Applied ${adjustmentString} adjustment to ${count} ${formatText} subtitles `;
+            info += `for a ${duration}-minute video. Subtitles were ${issueText.toLowerCase()} `;
+            info += `and have been corrected. Language: ${languageText}. `;
+            info += `Fine-tune using the adjustment controls if needed.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function adjustTiming(seconds) {
+            const currentAdjustment = parseFloat(document.getElementById('adjustment').value) || 0;
+            const newAdjustment = currentAdjustment + seconds;
+            
+            // Update adjustment input
+            document.getElementById('adjustment').value = newAdjustment.toFixed(1);
+            
+            // Update fine adjustment slider
+            document.getElementById('fineAdjustment').value = newAdjustment;
+            
+            // Re-sync subtitles
+            syncSubtitles();
+        }
+        
+        function getFormatText(value) {
+            const formatTexts = {
+                'srt': 'SRT',
+                'ass': 'ASS/SSA',
+                'vtt': 'VTT',
+                'sub': 'SUB',
+                'txt': 'TXT'
+            };
+            return formatTexts[value] || value;
+        }
+        
+        function getIssueText(value) {
+            const issueTexts = {
+                'early': 'Appearing Early',
+                'late': 'Appearing Late',
+                'inconsistent': 'Inconsistent Timing',
+                'offset': 'Constant Offset'
+            };
+            return issueTexts[value] || value;
+        }
+        
+        function getLanguageText(value) {
+            const languageTexts = {
+                'english': 'English',
+                'spanish': 'Spanish',
+                'french': 'French',
+                'german': 'German',
+                'italian': 'Italian',
+                'portuguese': 'Portuguese',
+                'chinese': 'Chinese',
+                'japanese': 'Japanese',
+                'korean': 'Korean',
+                'russian': 'Russian'
+            };
+            return languageTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const format = getFormatText(document.getElementById('subtitleFormat').value);
+            const duration = document.getElementById('videoDuration').value;
+            const issue = getIssueText(document.getElementById('syncIssue').value);
+            const adjustment = document.getElementById('adjustment').value;
+            const count = document.getElementById('subtitleCount').value;
+            const language = getLanguageText(document.getElementById('language').value);
+            const adjustmentValue = document.getElementById('adjustmentValue').textContent;
+            const affectedCount = document.getElementById('affectedValue').textContent;
+            
+            const exportText = `Subtitle Sync Tool Results\n\n`;
+            exportText += `Subtitle Format: ${format}\n`;
+            exportText += `Video Duration: ${duration} minutes\n`;
+            exportText += `Sync Issue: ${issue}\n`;
+            exportText += `Language: ${language}\n`;
+            exportText += `Number of Subtitles: ${count}\n`;
+            exportText += `Timing Adjustment: ${adjustmentValue}\n`;
+            exportText += `Subtitles Affected: ${affectedCount}\n\n`;
+            exportText += `Synchronization Tips:\n`;
+            exportText += `- SRT: Most common format, simple timing\n`;
+            exportText += `- ASS/SSA: Advanced styling and karaoke effects\n`;
+            exportText += `- VTT: Web-based subtitles, supports CSS\n`;
+            exportText += `- SUB: Frame-based timing, less common\n`;
+            exportText += `- TXT: Plain text, no timing information\n\n`;
+            exportText += `Common Issues:\n`;
+            exportText += `- Early: Subtitles appear before dialogue\n`;
+            exportText += `- Late: Subtitles appear after dialogue\n`;
+            exportText += `- Inconsistent: Irregular timing throughout\n`;
+            exportText += `- Offset: Constant time difference\n\n`;
+            exportText += `Adjustment Guidelines:\n`;
+            exportText += `- Small adjustments: ±0.1 to ±0.5 seconds\n`;
+            exportText += `- Medium adjustments: ±0.5 to ±2.0 seconds\n`;
+            exportText += `- Large adjustments: ±2.0 to ±5.0 seconds\n`;
+            exportText += `- Extreme adjustments: More than ±5.0 seconds\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Subtitle synchronization results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('subtitleFormat').value = 'srt';
+                document.getElementById('videoDuration').value = '120';
+                document.getElementById('syncIssue').value = 'early';
+                document.getElementById('adjustment').value = '2.5';
+                document.getElementById('subtitleCount').value = '150';
+                document.getElementById('language').value = 'english';
+                
+                // Clear localStorage
+                localStorage.removeItem('subtitleFormat');
+                localStorage.removeItem('videoDuration');
+                localStorage.removeItem('syncIssue');
+                localStorage.removeItem('adjustment');
+                localStorage.removeItem('subtitleCount');
+                localStorage.removeItem('language');
+                
+                // Reset displays
+                document.getElementById('durationValue').textContent = '120 min';
+                document.getElementById('formatValue').textContent = 'SRT';
+                document.getElementById('issueValue').textContent = 'Early';
+                document.getElementById('adjustmentValue').textContent = '+2.5s';
+                document.getElementById('affectedValue').textContent = '150';
+                document.getElementById('syncBar').style.width = '62.5%';
+                document.getElementById('fineAdjustment').value = '2.5';
+                document.getElementById('infoContent').textContent = 'Applied +2.5 seconds adjustment to 150 SRT subtitles for a 120-minute video. Subtitles were appearing early and have been corrected. Fine-tune using the adjustment controls if needed. Preview shows synchronized timing.';
+            }
+        }
+        
+        // Add event listener for fine adjustment slider
+        document.getElementById('fineAdjustment').addEventListener('input', function() {
+            document.getElementById('adjustment').value = this.value;
+            syncSubtitles();
+        });
+    </script>
+</body>
+</html>

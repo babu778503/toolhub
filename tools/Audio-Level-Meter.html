@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Level Meter</title>
+    <meta name="description" content="Audio Level Meter helps content creators monitor and optimize audio levels for streaming and recording. Measure decibels, peak levels, and ensure optimal sound quality.">
+    <meta name="keywords" content="audio level meter, audio monitoring tool, decibel meter, sound level checker, audio recording tool, streaming audio tool, podcast audio tool, content creation tools, audio workflow, audio optimization">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .meter {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #0097a7;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 151, 167, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00796b, #0097a7);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 121, 107, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e0f7fa;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #00796b;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0097a7;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .meter-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #b2ebf2;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #00796b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .meter-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e0f7fa;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .meter-icon {
+            font-size: 2rem;
+            color: #0097a7;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .audio-meter {
+            height: 200px;
+            background: #b2ebf2;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .meter-scale {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meter-segment {
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+        }
+        
+        .segment-label {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .meter-needle {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #d32f2f;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        
+        .needle-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #d32f2f;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .level-indicator {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        
+        .status-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .status-item {
+            text-align: center;
+        }
+        
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+        }
+        
+        .status-good {
+            background-color: #4caf50;
+        }
+        
+        .status-warning {
+            background-color: #ffeb3b;
+        }
+        
+        .status-danger {
+            background-color: #f44336;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .meter {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .meter-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Audio Level Meter</h1>
+        </header>
+        
+        <div class="meter">
+            <div class="input-group">
+                <label for="device">Audio Device</label>
+                <select id="device">
+                    <option value="microphone">Microphone</option>
+                    <option value="line_in">Line In</option>
+                    <option value="usb_audio">USB Audio Interface</option>
+                    <option value="headset">Headset</option>
+                    <option value="mixer">Mixer Output</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="source">Audio Source</label>
+                <select id="source">
+                    <option value="voice">Voice/Dialogue</option>
+                    <option value="music">Music</option>
+                    <option value="ambient">Ambient Sound</option>
+                    <option value="effects">Sound Effects</option>
+                    <option value="mixed">Mixed Audio</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="gain">Input Gain (dB)</label>
+                <input type="number" id="gain" placeholder="Enter gain in dB" min="-20" max="60" value="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="threshold">Threshold Level (dB)</label>
+                <input type="number" id="threshold" placeholder="Enter threshold in dB" min="-60" max="0" value="-30">
+            </div>
+            
+            <div class="input-group">
+                <label for="compression">Compression Ratio</label>
+                <select id="compression">
+                    <option value="1:1">1:1 (No Compression)</option>
+                    <option value="2:1">2:1 (Light)</option>
+                    <option value="4:1">4:1 (Moderate)</option>
+                    <option value="8:1">8:1 (Heavy)</option>
+                    <option value="20:1">20:1 (Limiting)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="peakHold">Peak Hold Time (seconds)</label>
+                <input type="number" id="peakHold" placeholder="Enter peak hold time" min="0" max="10" step="0.1" value="2.0">
+            </div>
+            
+            <button class="btn" onclick="measureAudio()">Measure Audio Levels</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="meter-icon">🔊</div>
+                <h3>Audio Level Measurement</h3>
+                
+                <div class="meter-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="deviceValue">Microphone</div>
+                        <div class="stat-label">Device</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="sourceValue">Voice</div>
+                        <div class="stat-label">Source</div>
+                    </div>
+                </div>
+                
+                <div class="audio-meter">
+                    <div class="meter-scale">
+                        <div class="meter-segment" style="background: #4caf50;">
+                            <div class="segment-label">-20 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #8bc34a;">
+                            <div class="segment-label">-15 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #cddc39;">
+                            <div class="segment-label">-10 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #ffeb3b;">
+                            <div class="segment-label">-5 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #ffc107;">
+                            <div class="segment-label">0 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #ff9800;">
+                            <div class="segment-label">+5 dB</div>
+                        </div>
+                        <div class="meter-segment" style="background: #f44336;">
+                            <div class="segment-label">+10 dB</div>
+                        </div>
+                    </div>
+                    <div class="meter-needle" id="meterNeedle">
+                        <div class="needle-head"></div>
+                    </div>
+                    <div class="level-indicator" id="levelIndicator">-12 dB</div>
+                </div>
+                
+                <div class="status-indicator">
+                    <div class="status-item">
+                        <div class="status-dot status-good"></div>
+                        <div>Good</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot status-warning"></div>
+                        <div>Warning</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot status-danger"></div>
+                        <div>Danger</div>
+                    </div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Peak Level</div>
+                        <div class="result-value" id="peakLevel">-8 dB</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">RMS Level</div>
+                        <div class="result-value" id="rmsLevel">-18 dB</div>
+                    </div>
+                </div>
+                
+                <div class="meter-info">
+                    <div class="info-title">Audio Level Information</div>
+                    <div class="info-content" id="infoContent">
+                        Current audio level is -12 dB with microphone input. Peak level is -8 dB and RMS level is -18 dB. Audio levels are within optimal range for voice recording. Maintain levels between -20 dB and -3 dB for best quality.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedDevice = localStorage.getItem('device');
+            const savedSource = localStorage.getItem('source');
+            const savedGain = localStorage.getItem('gain');
+            const savedThreshold = localStorage.getItem('threshold');
+            const savedCompression = localStorage.getItem('compression');
+            const savedPeakHold = localStorage.getItem('peakHold');
+            
+            if (savedDevice) document.getElementById('device').value = savedDevice;
+            if (savedSource) document.getElementById('source').value = savedSource;
+            if (savedGain) document.getElementById('gain').value = savedGain;
+            if (savedThreshold) document.getElementById('threshold').value = savedThreshold;
+            if (savedCompression) document.getElementById('compression').value = savedCompression;
+            if (savedPeakHold) document.getElementById('peakHold').value = savedPeakHold;
+            
+            // Perform measurement with saved values
+            measureAudio();
+        }
+
+        function measureAudio() {
+            const device = document.getElementById('device').value;
+            const source = document.getElementById('source').value;
+            const gain = parseFloat(document.getElementById('gain').value) || 0;
+            const threshold = parseFloat(document.getElementById('threshold').value) || -30;
+            const compression = document.getElementById('compression').value;
+            const peakHold = parseFloat(document.getElementById('peakHold').value) || 2.0;
+            
+            if (gain < -20 || gain > 60) {
+                alert('Please enter a valid gain (-20 to 60 dB)');
+                return;
+            }
+            
+            if (threshold < -60 || threshold > 0) {
+                alert('Please enter a valid threshold (-60 to 0 dB)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('device', device);
+            localStorage.setItem('source', source);
+            localStorage.setItem('gain', gain);
+            localStorage.setItem('threshold', threshold);
+            localStorage.setItem('compression', compression);
+            localStorage.setItem('peakHold', peakHold);
+            
+            // Update displays
+            document.getElementById('deviceValue').textContent = getDeviceText(device);
+            document.getElementById('sourceValue').textContent = getSourceText(source);
+            
+            // Simulate audio level measurement
+            // In a real implementation, this would interface with Web Audio API
+            const currentLevel = simulateAudioLevel(source, gain);
+            const peakLevel = currentLevel + 5; // Peak is typically higher
+            const rmsLevel = currentLevel - 6; // RMS is typically lower
+            
+            // Update level indicator
+            document.getElementById('levelIndicator').textContent = currentLevel + ' dB';
+            
+            // Update meter needle position (0 to 100% representing -30dB to +10dB)
+            const meterRange = 40; // -30dB to +10dB
+            const normalizedLevel = (currentLevel + 30) / meterRange;
+            const needlePosition = Math.max(0, Math.min(100, normalizedLevel * 100));
+            document.getElementById('meterNeedle').style.height = needlePosition + '%';
+            
+            // Update peak and RMS levels
+            document.getElementById('peakLevel').textContent = peakLevel + ' dB';
+            document.getElementById('rmsLevel').textContent = rmsLevel + ' dB';
+            
+            // Update info content
+            const deviceText = getDeviceText(device);
+            const sourceText = getSourceText(source);
+            const compressionText = getCompressionText(compression);
+            
+            let info = `Current audio level is ${currentLevel} dB with ${deviceText.toLowerCase()} input. `;
+            info += `Peak level is ${peakLevel} dB and RMS level is ${rmsLevel} dB. `;
+            
+            if (currentLevel > -3) {
+                info += 'Audio levels are too high. Reduce input gain to prevent clipping.';
+            } else if (currentLevel < -25) {
+                info += 'Audio levels are too low. Increase input gain for better signal-to-noise ratio.';
+            } else {
+                info += 'Audio levels are within optimal range for recording.';
+            }
+            
+            info += ` Maintain levels between -20 dB and -3 dB for best quality with ${compressionText.toLowerCase()} compression.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function simulateAudioLevel(source, gain) {
+            // Simulate different audio sources with varying levels
+            let baseLevel = -20; // dB
+            
+            switch(source) {
+                case 'voice':
+                    baseLevel = -18;
+                    break;
+                case 'music':
+                    baseLevel = -15;
+                    break;
+                case 'ambient':
+                    baseLevel = -25;
+                    break;
+                case 'effects':
+                    baseLevel = -12;
+                    break;
+                case 'mixed':
+                    baseLevel = -16;
+                    break;
+            }
+            
+            // Apply gain adjustment
+            baseLevel += gain;
+            
+            // Add some random variation to simulate real audio
+            const variation = (Math.random() * 4) - 2; // -2 to +2 dB
+            return Math.round(baseLevel + variation);
+        }
+        
+        function getDeviceText(value) {
+            const deviceTexts = {
+                'microphone': 'Microphone',
+                'line_in': 'Line In',
+                'usb_audio': 'USB Audio Interface',
+                'headset': 'Headset',
+                'mixer': 'Mixer Output'
+            };
+            return deviceTexts[value] || value;
+        }
+        
+        function getSourceText(value) {
+            const sourceTexts = {
+                'voice': 'Voice/Dialogue',
+                'music': 'Music',
+                'ambient': 'Ambient Sound',
+                'effects': 'Sound Effects',
+                'mixed': 'Mixed Audio'
+            };
+            return sourceTexts[value] || value;
+        }
+        
+        function getCompressionText(value) {
+            const compressionTexts = {
+                '1:1': 'No Compression',
+                '2:1': 'Light Compression',
+                '4:1': 'Moderate Compression',
+                '8:1': 'Heavy Compression',
+                '20:1': 'Limiting'
+            };
+            return compressionTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const device = getDeviceText(document.getElementById('device').value);
+            const source = getSourceText(document.getElementById('source').value);
+            const gain = document.getElementById('gain').value;
+            const threshold = document.getElementById('threshold').value;
+            const compression = getCompressionText(document.getElementById('compression').value);
+            const peakHold = document.getElementById('peakHold').value;
+            const peakLevel = document.getElementById('peakLevel').textContent;
+            const rmsLevel = document.getElementById('rmsLevel').textContent;
+            const currentLevel = document.getElementById('levelIndicator').textContent;
+            
+            const exportText = `Audio Level Meter Results\n\n`;
+            exportText += `Audio Device: ${device}\n`;
+            exportText += `Audio Source: ${source}\n`;
+            exportText += `Input Gain: ${gain} dB\n`;
+            exportText += `Threshold Level: ${threshold} dB\n`;
+            exportText += `Compression Ratio: ${compression}\n`;
+            exportText += `Peak Hold Time: ${peakHold} seconds\n`;
+            exportText += `Current Level: ${currentLevel}\n`;
+            exportText += `Peak Level: ${peakLevel}\n`;
+            exportText += `RMS Level: ${rmsLevel}\n\n`;
+            exportText += `Audio Level Guidelines:\n`;
+            exportText += `- Voice: -18 to -12 dB (optimal)\n`;
+            exportText += `- Music: -15 to -9 dB (optimal)\n`;
+            exportText += `- Ambient: -25 to -20 dB (optimal)\n`;
+            exportText += `- Never exceed 0 dB (clipping)\n`;
+            exportText += `- Use compression to control dynamics\n`;
+            exportText += `- Monitor peak levels to prevent distortion\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Audio level results exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('device').value = 'microphone';
+                document.getElementById('source').value = 'voice';
+                document.getElementById('gain').value = '0';
+                document.getElementById('threshold').value = '-30';
+                document.getElementById('compression').value = '1:1';
+                document.getElementById('peakHold').value = '2.0';
+                
+                // Clear localStorage
+                localStorage.removeItem('device');
+                localStorage.removeItem('source');
+                localStorage.removeItem('gain');
+                localStorage.removeItem('threshold');
+                localStorage.removeItem('compression');
+                localStorage.removeItem('peakHold');
+                
+                // Reset displays
+                document.getElementById('deviceValue').textContent = 'Microphone';
+                document.getElementById('sourceValue').textContent = 'Voice';
+                document.getElementById('levelIndicator').textContent = '-12 dB';
+                document.getElementById('meterNeedle').style.height = '30%';
+                document.getElementById('peakLevel').textContent = '-8 dB';
+                document.getElementById('rmsLevel').textContent = '-18 dB';
+                document.getElementById('infoContent').textContent = 'Current audio level is -12 dB with microphone input. Peak level is -8 dB and RMS level is -18 dB. Audio levels are within optimal range for voice recording. Maintain levels between -20 dB and -3 dB for best quality.';
+            }
+        }
+    </script>
+</body>
+</html>

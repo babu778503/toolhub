@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Identification Assistant</title>
+    <meta name="description" content="Plant Identification Assistant helps you identify plants, flowers, and trees in nature. Upload a photo or describe characteristics to get accurate plant identification and information.">
+    <meta name="keywords" content="plant identification assistant, plant identifier, flower identification, tree identification, plant recognition, nature guide, botanical identification, plant species finder, wildflower identification, plant app alternative">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .assistant {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .identification-info {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .identification-info h3 {
+            color: #388e3c;
+            margin-bottom: 15px;
+        }
+        
+        .plant-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .plant {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            align-items: center;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .plant-name {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .plant-details {
+            color: #777;
+        }
+        
+        .plant-details .plant-category {
+            background: #c8e6c9;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            color: #388e3c;
+            margin-left: 5px;
+        }
+        
+        .plant-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c8e6c9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .plant-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .plant-category {
+            background: #c8e6c9;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #388e3c;
+            margin-left: 10px;
+        }
+        
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: #a5d6a7;
+            color: #388e3c;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .filter-btn.active {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .plant-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .characteristics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .char-item {
+            background: #f1f8e9;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .assistant {
+                padding: 20px 0;
+            }
+            
+            .plant-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .category-filter {
+                justify-content: center;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .identification-info {
+                padding: 20px 0;
+            }
+            
+            .characteristics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Plant Identification Assistant</h1>
+        </header>
+        
+        <div class="assistant">
+            <div class="input-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g., Local Park, Forest Trail, Backyard">
+            </div>
+            
+            <div class="input-group">
+                <label for="plantType">Plant Type</label>
+                <select id="plantType">
+                    <option value="flower">Flower</option>
+                    <option value="tree">Tree</option>
+                    <option value="shrub">Shrub</option>
+                    <option value="grass">Grass</option>
+                    <option value="herb">Herb</option>
+                    <option value="fern">Fern</option>
+                    <option value="cactus">Cactus</option>
+                    <option value="moss">Moss</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="plantSelect">Select Plant</label>
+                <select id="plantSelect">
+                    <option value="">Select a plant</option>
+                    <option value="rose">Rose - Flower</option>
+                    <option value="oak">Oak Tree - Tree</option>
+                    <option value="lavender">Lavender - Herb</option>
+                    <option value="maple">Maple Tree - Tree</option>
+                    <option value="daisy">Daisy - Flower</option>
+                    <option value="pine">Pine Tree - Tree</option>
+                    <option value="sunflower">Sunflower - Flower</option>
+                    <option value="fern">Fern - Fern</option>
+                    <option value="cactus">Cactus - Cactus</option>
+                    <option value="moss">Moss - Moss</option>
+                    <option value="grass">Grass - Grass</option>
+                    <option value="ivy">Ivy - Shrub</option>
+                    <option value="tulip">Tulip - Flower</option>
+                    <option value="birch">Birch Tree - Tree</option>
+                    <option value="moss">Moss - Moss</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="characteristics">Plant Characteristics</label>
+                <textarea id="characteristics" placeholder="Describe leaf shape, flower color, size, etc." rows="3"></textarea>
+            </div>
+            
+            <button class="btn" onclick="addPlant()">Add to Guide</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportGuide()">Export Guide</button>
+                <button class="btn-clear" onclick="clearGuide()">Clear Guide</button>
+            </div>
+            
+            <div class="identification-info">
+                <div class="plant-icon">🌿</div>
+                <h3>Plant Identification Guide</h3>
+                
+                <div class="plant-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="plantCount">0</div>
+                        <div class="stat-label">Plants</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="plantTypes">0</div>
+                        <div class="stat-label">Types</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="edibleCount">0</div>
+                        <div class="stat-label">Edible</div>
+                    </div>
+                </div>
+                
+                <div class="category-filter">
+                    <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+                    <button class="filter-btn" onclick="filterCategory('flower')">Flowers</button>
+                    <button class="filter-btn" onclick="filterCategory('tree')">Trees</button>
+                    <button class="filter-btn" onclick="filterCategory('herb')">Herbs</button>
+                    <button class="filter-btn" onclick="filterCategory('edible')">Edible</button>
+                    <button class="filter-btn" onclick="filterCategory('poisonous')">Poisonous</button>
+                </div>
+                
+                <div class="plant-list" id="plantList">
+                    <!-- Plants will be added here dynamically -->
+                </div>
+                
+                <div class="plant-info">
+                    <div class="info-title">Plant Information</div>
+                    <div class="info-content" id="infoContent">
+                        Use this guide to help identify plants in nature. Note leaf shape, flower color, bark texture, and growth patterns. Always verify with a field guide before consuming any plant.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved guide on page load
+        window.onload = function() {
+            const savedGuide = localStorage.getItem('plantGuide');
+            const savedLocation = localStorage.getItem('location');
+            const savedPlantType = localStorage.getItem('plantType');
+            
+            if (savedGuide) {
+                const guide = JSON.parse(savedGuide);
+                document.getElementById('location').value = savedLocation || '';
+                document.getElementById('plantType').value = savedPlantType || 'flower';
+                renderGuide(guide);
+            } else {
+                // Add default plants for new users
+                const defaultGuide = [
+                    { id: 'rose', name: 'Rose - Flower', type: 'flower', edible: false, characteristics: 'Thorns, fragrant, various colors' },
+                    { id: 'oak', name: 'Oak Tree - Tree', type: 'tree', edible: false, characteristics: 'Lobed leaves, acorns, strong wood' }
+                ];
+                localStorage.setItem('plantGuide', JSON.stringify(defaultGuide));
+                renderGuide(defaultGuide);
+            }
+        }
+
+        function addPlant() {
+            const plantSelect = document.getElementById('plantSelect');
+            const location = document.getElementById('location').value;
+            const plantType = document.getElementById('plantType').value;
+            const characteristics = document.getElementById('characteristics').value;
+            
+            if (!plantSelect.value) {
+                alert('Please select a plant');
+                return;
+            }
+            
+            // Get plant name from selected option
+            const plantName = plantSelect.options[plantSelect.selectedIndex].text;
+            const plantId = plantSelect.value;
+            
+            // Determine plant type and characteristics based on selection
+            let plantTypeFromList = 'flower';
+            let isEdible = false;
+            let plantCharacteristics = characteristics || 'Common characteristics';
+            
+            switch(plantId) {
+                case 'rose':
+                    plantTypeFromList = 'flower';
+                    isEdible = false;
+                    plantCharacteristics = 'Thorns, fragrant, various colors';
+                    break;
+                case 'oak':
+                    plantTypeFromList = 'tree';
+                    isEdible = false;
+                    plantCharacteristics = 'Lobed leaves, acorns, strong wood';
+                    break;
+                case 'lavender':
+                    plantTypeFromList = 'herb';
+                    isEdible = true;
+                    plantCharacteristics = 'Purple flowers, fragrant, used in cooking';
+                    break;
+                case 'maple':
+                    plantTypeFromList = 'tree';
+                    isEdible = false;
+                    plantCharacteristics = 'Maple-shaped leaves, distinctive bark';
+                    break;
+                case 'daisy':
+                    plantTypeFromList = 'flower';
+                    isEdible = true;
+                    plantCharacteristics = 'White petals, yellow center, common lawn flower';
+                    break;
+                case 'pine':
+                    plantTypeFromList = 'tree';
+                    isEdible = false;
+                    plantCharacteristics = 'Needle-like leaves, cone-shaped';
+                    break;
+                case 'sunflower':
+                    plantTypeFromList = 'flower';
+                    isEdible = true;
+                    plantCharacteristics = 'Large yellow flowers, edible seeds';
+                    break;
+                case 'fern':
+                    plantTypeFromList = 'fern';
+                    isEdible = false;
+                    plantCharacteristics = 'Feathery fronds, grows in shade';
+                    break;
+                case 'cactus':
+                    plantTypeFromList = 'cactus';
+                    isEdible = false;
+                    plantCharacteristics = 'Spiky, water-storing plant';
+                    break;
+                case 'moss':
+                    plantTypeFromList = 'moss';
+                    isEdible = false;
+                    plantCharacteristics = 'Soft, green, grows in damp areas';
+                    break;
+                case 'grass':
+                    plantTypeFromList = 'grass';
+                    isEdible = false;
+                    plantCharacteristics = 'Green blades, grows in lawns';
+                    break;
+                case 'ivy':
+                    plantTypeFromList = 'shrub';
+                    isEdible = false;
+                    plantCharacteristics = 'Climbing vine, glossy leaves';
+                    break;
+                case 'tulip':
+                    plantTypeFromList = 'flower';
+                    isEdible = false;
+                    plantCharacteristics = 'Cup-shaped flowers, spring bloom';
+                    break;
+                case 'birch':
+                    plantTypeFromList = 'tree';
+                    isEdible = false;
+                    plantCharacteristics = 'White bark, triangular leaves';
+                    break;
+            }
+            
+            // Load existing guide or create new one
+            let guide = JSON.parse(localStorage.getItem('plantGuide')) || [];
+            
+            // Check if plant already exists
+            const existingPlantIndex = guide.findIndex(plant => plant.id === plantId);
+            if (existingPlantIndex === -1) {
+                // Add new plant to guide
+                guide.push({
+                    id: plantId,
+                    name: plantName,
+                    type: plantTypeFromList,
+                    edible: isEdible,
+                    characteristics: plantCharacteristics
+                });
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('plantGuide', JSON.stringify(guide));
+            localStorage.setItem('location', location);
+            localStorage.setItem('plantType', plantType);
+            
+            // Render updated guide
+            renderGuide(guide);
+            
+            // Reset form
+            plantSelect.value = '';
+            document.getElementById('characteristics').value = '';
+        }
+        
+        function removePlant(index) {
+            let guide = JSON.parse(localStorage.getItem('plantGuide')) || [];
+            guide.splice(index, 1);
+            
+            // Save updated guide
+            localStorage.setItem('plantGuide', JSON.stringify(guide));
+            
+            // Render updated guide
+            renderGuide(guide);
+        }
+        
+        function renderGuide(guide) {
+            const plantList = document.getElementById('plantList');
+            const infoContent = document.getElementById('infoContent');
+            const plantCount = document.getElementById('plantCount');
+            const plantTypes = document.getElementById('plantTypes');
+            const edibleCount = document.getElementById('edibleCount');
+            
+            // Update stats
+            plantCount.textContent = guide.length;
+            
+            // Calculate unique plant types
+            const uniqueTypes = new Set();
+            guide.forEach(plant => {
+                uniqueTypes.add(plant.type);
+            });
+            plantTypes.textContent = uniqueTypes.size;
+            
+            // Calculate edible plants
+            const ediblePlants = guide.filter(plant => plant.edible).length;
+            edibleCount.textContent = ediblePlants;
+            
+            if (guide.length === 0) {
+                plantList.innerHTML = '<div class="plant">No plants in your guide yet</div>';
+                infoContent.innerHTML = '<p>Use this guide to help identify plants in nature. Note leaf shape, flower color, bark texture, and growth patterns. Always verify with a field guide before consuming any plant.</p>';
+                return;
+            }
+            
+            // Render plants
+            plantList.innerHTML = '';
+            guide.forEach((plant, index) => {
+                const plantElement = document.createElement('div');
+                plantElement.className = 'plant';
+                plantElement.innerHTML = `
+                    <div>
+                        <div class="plant-name">${plant.name.split(' - ')[0]}</div>
+                        <div class="plant-details">
+                            Type: ${plant.type} <span class="plant-category">${plant.edible ? 'Edible' : 'Non-edible'}</span>
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removePlant(${index})">Remove</button>
+                `;
+                plantList.appendChild(plantElement);
+            });
+            
+            // Update info content
+            let info = '<p>Use this guide to help identify plants in nature. Note leaf shape, flower color, bark texture, and growth patterns. Always verify with a field guide before consuming any plant.</p>';
+            
+            if (guide.length > 0) {
+                info += '<div class="characteristics">';
+                guide.forEach(plant => {
+                    info += `<div class="char-item">${plant.characteristics}</div>`;
+                });
+                info += '</div>';
+            }
+            
+            infoContent.innerHTML = info;
+        }
+        
+        function filterCategory(category) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // In a real implementation, this would filter the displayed plants
+            // For this example, we'll just show all plants
+            const guide = JSON.parse(localStorage.getItem('plantGuide')) || [];
+            renderGuide(guide);
+        }
+        
+        function exportGuide() {
+            const guide = JSON.parse(localStorage.getItem('plantGuide')) || [];
+            const location = document.getElementById('location').value || 'Your Location';
+            const plantType = document.getElementById('plantType').value;
+            
+            if (guide.length === 0) {
+                alert('Your guide is empty! Add plants before exporting.');
+                return;
+            }
+            
+            let exportText = `Plant Identification Guide\nLocation: ${location}\nPlant Type: ${plantType}\n\n`;
+            exportText += 'Plants:\n';
+            guide.forEach(plant => {
+                const plantName = plant.name.split(' - ')[0];
+                exportText += `- ${plantName}: Type - ${plant.type}, Edible - ${plant.edible ? 'Yes' : 'No'}, Characteristics - ${plant.characteristics}\n`;
+            });
+            
+            exportText += `\nTotal Plants: ${guide.length}\n\n`;
+            exportText += 'Identification Tips:\n';
+            exportText += 'Note leaf shape, flower color, bark texture, and growth patterns\n';
+            exportText += 'Always verify with a field guide before consuming any plant\n';
+            exportText += 'Take photos from multiple angles for better identification\n';
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Plant identification guide exported to clipboard!');
+        }
+        
+        function clearGuide() {
+            if (confirm('Are you sure you want to clear your entire guide?')) {
+                localStorage.removeItem('plantGuide');
+                localStorage.removeItem('location');
+                localStorage.removeItem('plantType');
+                document.getElementById('location').value = '';
+                renderGuide([]);
+            }
+        }
+    </script>
+</body>
+</html>

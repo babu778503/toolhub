@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription Time Estimator</title>
+    <meta name="description" content="Transcription Time Estimator helps calculate the time needed to transcribe audio and video files. Estimate transcription duration based on file length and complexity.">
+    <meta name="keywords" content="transcription time estimator, transcription calculator, audio transcription time, video transcription time, transcription duration calculator, transcription planning, transcription workflow, audio video transcription, transcription tools">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .estimator {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #388e3c;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .est-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c8e6c9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .est-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .est-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .time-visual {
+            height: 20px;
+            background: #c8e6c9;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .time-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            width: 40%;
+            transition: width 1s ease;
+        }
+        
+        .time-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .complexity-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .complexity-item {
+            text-align: center;
+        }
+        
+        .complexity-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+        }
+        
+        .complexity-low {
+            background-color: #4caf50;
+        }
+        
+        .complexity-medium {
+            background-color: #ffeb3b;
+        }
+        
+        .complexity-high {
+            background-color: #f44336;
+        }
+        
+        .transcription-timeline {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        .timeline-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .step-number {
+            width: 25px;
+            height: 25px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-info {
+            flex: 1;
+        }
+        
+        .step-time {
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .estimator {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .est-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Transcription Time Estimator</h1>
+        </header>
+        
+        <div class="estimator">
+            <div class="input-group">
+                <label for="duration">Audio/Video Duration (minutes)</label>
+                <input type="number" id="duration" placeholder="Enter duration in minutes" min="1" value="30">
+            </div>
+            
+            <div class="input-group">
+                <label for="transcriptionType">Transcription Type</label>
+                <select id="transcriptionType">
+                    <option value="verbatim">Verbatim Transcription</option>
+                    <option value="intelligent">Intelligent Transcription</option>
+                    <option value="timestamped">Timestamped Transcription</option>
+                    <option value="edited">Edited Transcription</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="audioQuality">Audio Quality</label>
+                <select id="audioQuality">
+                    <option value="excellent">Excellent (Studio Quality)</option>
+                    <option value="good">Good (Clear Speech)</option>
+                    <option value="fair">Fair (Some Background Noise)</option>
+                    <option value="poor">Poor (Significant Noise)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="speakers">Number of Speakers</label>
+                <select id="speakers">
+                    <option value="1">Single Speaker</option>
+                    <option value="2">Two Speakers</option>
+                    <option value="3">Three Speakers</option>
+                    <option value="4">Four or More Speakers</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="accent">Accent/Clarity</label>
+                <select id="accent">
+                    <option value="native">Native Speaker/Standard Accent</option>
+                    <option value="regional">Regional Accent</option>
+                    <option value="foreign">Foreign Accent</option>
+                    <option value="strong">Strong Accent/Difficult to Understand</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="turnaround">Turnaround Time</label>
+                <select id="turnaround">
+                    <option value="standard">Standard (24-48 hours)</option>
+                    <option value="expedited">Expedited (8-12 hours)</option>
+                    <option value="rush">Rush (2-4 hours)</option>
+                    <option value="same_day">Same Day (Within 24 hours)</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="estimateTime()">Estimate Transcription Time</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="est-icon">⏱️</div>
+                <h3>Transcription Time Estimation</h3>
+                
+                <div class="est-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="durationValue">30 min</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="typeValue">Verbatim</div>
+                        <div class="stat-label">Type</div>
+                    </div>
+                </div>
+                
+                <div class="time-visual">
+                    <div class="time-bar" id="timeBar"></div>
+                </div>
+                
+                <div class="time-scale">
+                    <span>0h</span>
+                    <span>2h</span>
+                    <span>4h</span>
+                    <span>6h</span>
+                    <span>8h+</span>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Estimated Time</div>
+                        <div class="result-value" id="estimatedTime">4h 30m</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Complexity</div>
+                        <div class="result-value" id="complexity">Medium</div>
+                    </div>
+                </div>
+                
+                <div class="complexity-indicator">
+                    <div class="complexity-item">
+                        <div class="complexity-dot complexity-low"></div>
+                        <div>Low</div>
+                    </div>
+                    <div class="complexity-item">
+                        <div class="complexity-dot complexity-medium"></div>
+                        <div>Medium</div>
+                    </div>
+                    <div class="complexity-item">
+                        <div class="complexity-dot complexity-high"></div>
+                        <div>High</div>
+                    </div>
+                </div>
+                
+                <div class="transcription-timeline">
+                    <div class="timeline-header">
+                        <div>Transcription Process Timeline</div>
+                        <div>Time</div>
+                    </div>
+                    <div class="timeline-steps">
+                        <div class="timeline-step">
+                            <div class="step-number">1</div>
+                            <div class="step-info">Audio Preparation & Setup</div>
+                            <div class="step-time">30m</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">2</div>
+                            <div class="step-info">Initial Transcription</div>
+                            <div class="step-time">3h</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">3</div>
+                            <div class="step-info">Review & Editing</div>
+                            <div class="step-time">1h</div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">4</div>
+                            <div class="step-info">Final Formatting</div>
+                            <div class="step-time">30m</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="est-info">
+                    <div class="info-title">Estimation Information</div>
+                    <div class="info-content" id="infoContent">
+                        For 30 minutes of verbatim transcription with good audio quality and two speakers, estimated time is 4 hours and 30 minutes. This includes preparation, transcription, review, and formatting. Complexity is medium due to multiple speakers. Adjust based on your specific requirements.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedDuration = localStorage.getItem('duration');
+            const savedType = localStorage.getItem('transcriptionType');
+            const savedQuality = localStorage.getItem('audioQuality');
+            const savedSpeakers = localStorage.getItem('speakers');
+            const savedAccent = localStorage.getItem('accent');
+            const savedTurnaround = localStorage.getItem('turnaround');
+            
+            if (savedDuration) document.getElementById('duration').value = savedDuration;
+            if (savedType) document.getElementById('transcriptionType').value = savedType;
+            if (savedQuality) document.getElementById('audioQuality').value = savedQuality;
+            if (savedSpeakers) document.getElementById('speakers').value = savedSpeakers;
+            if (savedAccent) document.getElementById('accent').value = savedAccent;
+            if (savedTurnaround) document.getElementById('turnaround').value = savedTurnaround;
+            
+            // Perform estimation with saved values
+            estimateTime();
+        }
+
+        function estimateTime() {
+            const duration = parseInt(document.getElementById('duration').value) || 30;
+            const transcriptionType = document.getElementById('transcriptionType').value;
+            const audioQuality = document.getElementById('audioQuality').value;
+            const speakers = parseInt(document.getElementById('speakers').value) || 1;
+            const accent = document.getElementById('accent').value;
+            const turnaround = document.getElementById('turnaround').value;
+            
+            if (duration < 1) {
+                alert('Please enter a valid duration (1 minute or more)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('duration', duration);
+            localStorage.setItem('transcriptionType', transcriptionType);
+            localStorage.setItem('audioQuality', audioQuality);
+            localStorage.setItem('speakers', speakers);
+            localStorage.setItem('accent', accent);
+            localStorage.setItem('turnaround', turnaround);
+            
+            // Update displays
+            document.getElementById('durationValue').textContent = duration + ' min';
+            document.getElementById('typeValue').textContent = getTranscriptionTypeText(transcriptionType);
+            
+            // Calculate base transcription time (minutes)
+            // Standard ratio: 1 minute of audio = 4-6 minutes of transcription time
+            let baseTime = duration * 6; // Base case: 6:1 ratio
+            
+            // Adjust based on transcription type
+            switch(transcriptionType) {
+                case 'verbatim':
+                    baseTime *= 1.2; // Takes longer for exact transcription
+                    break;
+                case 'intelligent':
+                    baseTime *= 0.8; // Faster with intelligent editing
+                    break;
+                case 'timestamped':
+                    baseTime *= 1.1; // Additional time for timestamps
+                    break;
+                case 'edited':
+                    baseTime *= 0.9; // Some editing required
+                    break;
+            }
+            
+            // Adjust based on audio quality
+            switch(audioQuality) {
+                case 'excellent':
+                    baseTime *= 0.8; // Faster with clear audio
+                    break;
+                case 'good':
+                    baseTime *= 1.0; // Standard time
+                    break;
+                case 'fair':
+                    baseTime *= 1.3; // Slower with background noise
+                    break;
+                case 'poor':
+                    baseTime *= 1.8; // Much slower with poor quality
+                    break;
+            }
+            
+            // Adjust based on number of speakers
+            if (speakers > 1) {
+                baseTime *= (1 + (speakers - 1) * 0.3); // Additional time per speaker
+            }
+            
+            // Adjust based on accent/clarity
+            switch(accent) {
+                case 'native':
+                    baseTime *= 0.9; // Faster with native speakers
+                    break;
+                case 'regional':
+                    baseTime *= 1.0; // Standard time
+                    break;
+                case 'foreign':
+                    baseTime *= 1.2; // Slower with foreign accents
+                    break;
+                case 'strong':
+                    baseTime *= 1.5; // Much slower with strong accents
+                    break;
+            }
+            
+            // Adjust based on turnaround time
+            switch(turnaround) {
+                case 'expedited':
+                    baseTime *= 1.2; // Rush jobs cost more time
+                    break;
+                case 'rush':
+                    baseTime *= 1.5; // Very rush jobs cost even more
+                    break;
+                case 'same_day':
+                    baseTime *= 1.1; // Same day requires efficiency
+                    break;
+                case 'standard':
+                    baseTime *= 1.0; // Standard pricing
+                    break;
+            }
+            
+            // Calculate complexity level
+            let complexity = 'Low';
+            if (baseTime > duration * 8) {
+                complexity = 'High';
+            } else if (baseTime > duration * 5) {
+                complexity = 'Medium';
+            }
+            
+            // Convert to hours and minutes
+            const hours = Math.floor(baseTime / 60);
+            const minutes = Math.round(baseTime % 60);
+            
+            // Format time string
+            let timeString = '';
+            if (hours > 0) {
+                timeString = hours + 'h ' + minutes + 'm';
+            } else {
+                timeString = minutes + 'm';
+            }
+            
+            // Update displays
+            document.getElementById('estimatedTime').textContent = timeString;
+            document.getElementById('complexity').textContent = complexity;
+            
+            // Update time bar (max 8 hours for visualization)
+            const timeBar = document.getElementById('timeBar');
+            const percentage = Math.min(100, (baseTime / 480) * 100);
+            timeBar.style.width = percentage + '%';
+            
+            // Update info content
+            const typeText = getTranscriptionTypeText(transcriptionType);
+            const qualityText = getAudioQualityText(audioQuality);
+            const speakersText = getSpeakersText(speakers);
+            const accentText = getAccentText(accent);
+            
+            let info = `For ${duration} minutes of ${typeText.toLowerCase()} with ${qualityText.toLowerCase()} `;
+            info += `and ${speakersText.toLowerCase()}, estimated time is ${timeString}. `;
+            info += `Complexity is ${complexity.toLowerCase()} due to ${accentText.toLowerCase()}. `;
+            info += `Adjust based on your specific requirements.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function getTranscriptionTypeText(value) {
+            const typeTexts = {
+                'verbatim': 'Verbatim',
+                'intelligent': 'Intelligent',
+                'timestamped': 'Timestamped',
+                'edited': 'Edited'
+            };
+            return typeTexts[value] || value;
+        }
+        
+        function getAudioQualityText(value) {
+            const qualityTexts = {
+                'excellent': 'Excellent Quality',
+                'good': 'Good Quality',
+                'fair': 'Fair Quality',
+                'poor': 'Poor Quality'
+            };
+            return qualityTexts[value] || value;
+        }
+        
+        function getSpeakersText(value) {
+            const speakersTexts = {
+                '1': 'Single Speaker',
+                '2': 'Two Speakers',
+                '3': 'Three Speakers',
+                '4': 'Multiple Speakers'
+            };
+            return speakersTexts[value] || value + ' Speakers';
+        }
+        
+        function getAccentText(value) {
+            const accentTexts = {
+                'native': 'Native Speaker',
+                'regional': 'Regional Accent',
+                'foreign': 'Foreign Accent',
+                'strong': 'Strong Accent'
+            };
+            return accentTexts[value] || value;
+        }
+        
+        function getTurnaroundText(value) {
+            const turnaroundTexts = {
+                'standard': 'Standard Turnaround',
+                'expedited': 'Expedited Service',
+                'rush': 'Rush Service',
+                'same_day': 'Same Day Service'
+            };
+            return turnaroundTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const duration = document.getElementById('duration').value;
+            const transcriptionType = getTranscriptionTypeText(document.getElementById('transcriptionType').value);
+            const audioQuality = getAudioQualityText(document.getElementById('audioQuality').value);
+            const speakers = getSpeakersText(document.getElementById('speakers').value);
+            const accent = getAccentText(document.getElementById('accent').value);
+            const turnaround = getTurnaroundText(document.getElementById('turnaround').value);
+            const estimatedTime = document.getElementById('estimatedTime').textContent;
+            const complexity = document.getElementById('complexity').textContent;
+            
+            const exportText = `Transcription Time Estimator Results\n\n`;
+            exportText += `Audio/Video Duration: ${duration} minutes\n`;
+            exportText += `Transcription Type: ${transcriptionType}\n`;
+            exportText += `Audio Quality: ${audioQuality}\n`;
+            exportText += `Number of Speakers: ${speakers}\n`;
+            exportText += `Accent/Clarity: ${accent}\n`;
+            exportText += `Turnaround Time: ${turnaround}\n`;
+            exportText += `Estimated Transcription Time: ${estimatedTime}\n`;
+            exportText += `Complexity Level: ${complexity}\n\n`;
+            exportText += `Transcription Guidelines:\n`;
+            exportText += `- Verbatim: Exact word-for-word transcription\n`;
+            exportText += `- Intelligent: Edited for readability while preserving meaning\n`;
+            exportText += `- Timestamped: Time codes inserted at regular intervals\n`;
+            exportText += `- Edited: Basic editing and formatting applied\n\n`;
+            exportText += `Time Factors:\n`;
+            exportText += `- Excellent audio quality reduces transcription time\n`;
+            exportText += `- Multiple speakers increase complexity and time\n`;
+            exportText += `- Foreign accents require more careful listening\n`;
+            exportText += `- Rush services may incur additional costs\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Transcription time estimation exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('duration').value = '30';
+                document.getElementById('transcriptionType').value = 'verbatim';
+                document.getElementById('audioQuality').value = 'good';
+                document.getElementById('speakers').value = '2';
+                document.getElementById('accent').value = 'native';
+                document.getElementById('turnaround').value = 'standard';
+                
+                // Clear localStorage
+                localStorage.removeItem('duration');
+                localStorage.removeItem('transcriptionType');
+                localStorage.removeItem('audioQuality');
+                localStorage.removeItem('speakers');
+                localStorage.removeItem('accent');
+                localStorage.removeItem('turnaround');
+                
+                // Reset displays
+                document.getElementById('durationValue').textContent = '30 min';
+                document.getElementById('typeValue').textContent = 'Verbatim';
+                document.getElementById('estimatedTime').textContent = '4h 30m';
+                document.getElementById('complexity').textContent = 'Medium';
+                document.getElementById('timeBar').style.width = '40%';
+                document.getElementById('infoContent').textContent = 'For 30 minutes of verbatim transcription with good audio quality and two speakers, estimated time is 4 hours and 30 minutes. This includes preparation, transcription, review, and formatting. Complexity is medium due to multiple speakers. Adjust based on your specific requirements.';
+            }
+        }
+    </script>
+</body>
+</html>

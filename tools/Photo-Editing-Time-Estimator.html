@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Editing Time Estimator</title>
+    <meta name="description" content="Photo Editing Time Estimator helps photographers estimate the time needed for photo editing tasks. Calculate editing time based on complexity and desired output.">
+    <meta name="keywords" content="photo editing time estimator, photo editing calculator, editing time calculator, photography workflow, photo editing time, post processing time, photo editing tool, editing workflow, photography post processing, photo editing duration">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .estimator {
+            padding: 25px 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .results h3 {
+            color: #388e3c;
+            margin-bottom: 15px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .editing-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #c8e6c9;
+            border-radius: 8px;
+        }
+        
+        .info-title {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .info-content {
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(90deg, #5d4037, #795548);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .editing-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #388e3c;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .editing-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .progress-container {
+            height: 20px;
+            background: #c8e6c9;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #388e3c, #4caf50);
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                padding: 0 10px;
+            }
+            
+            .estimator {
+                padding: 20px 0;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .editing-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .input-group {
+                padding: 0 15px;
+            }
+            
+            .btn {
+                margin: 0 15px;
+            }
+            
+            .controls {
+                padding: 0 15px;
+            }
+            
+            .results {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Photo Editing Time Estimator</h1>
+        </header>
+        
+        <div class="estimator">
+            <div class="input-group">
+                <label for="photoCount">Number of Photos</label>
+                <input type="number" id="photoCount" placeholder="Enter number of photos" min="1" value="10">
+            </div>
+            
+            <div class="input-group">
+                <label for="complexity">Editing Complexity</label>
+                <select id="complexity">
+                    <option value="basic">Basic (Lightroom adjustments)</option>
+                    <option value="standard">Standard (Basic + minor retouching)</option>
+                    <option value="advanced">Advanced (Major retouching)</option>
+                    <option value="complex">Complex (Compositing, HDR, etc.)</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="output">Output Requirements</label>
+                <select id="output">
+                    <option value="web">Web/Online (Low resolution)</option>
+                    <option value="print">Print Ready (High resolution)</option>
+                    <option value="social">Social Media (Various sizes)</option>
+                    <option value="commercial">Commercial/Professional</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="skill">Skill Level</label>
+                <select id="skill">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="format">File Format</label>
+                <select id="format">
+                    <option value="jpeg">JPEG</option>
+                    <option value="raw">RAW</option>
+                    <option value="tiff">TIFF</option>
+                    <option value="psd">PSD/PSB</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="estimateTime()">Estimate Editing Time</button>
+            
+            <div class="controls">
+                <button class="btn-export" onclick="exportResults()">Export Results</button>
+                <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div class="results">
+                <div class="editing-icon">⏱️</div>
+                <h3>Editing Time Estimation</h3>
+                
+                <div class="editing-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="photoCountValue">10</div>
+                        <div class="stat-label">Photos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="complexityValue">Basic</div>
+                        <div class="stat-label">Complexity</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-box">
+                        <div class="result-label">Estimated Time</div>
+                        <div class="result-value" id="estimatedTime">2h 30m</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Per Photo</div>
+                        <div class="result-value" id="timePerPhoto">15m</div>
+                    </div>
+                </div>
+                
+                <div class="editing-info">
+                    <div class="info-title">Editing Time Information</div>
+                    <div class="info-content" id="infoContent">
+                        For 10 photos with basic editing complexity, estimated time is 2 hours and 30 minutes (15 minutes per photo). This includes import, culling, basic adjustments, and export. Adjust based on your specific workflow.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.onload = function() {
+            const savedPhotoCount = localStorage.getItem('photoCount');
+            const savedComplexity = localStorage.getItem('complexity');
+            const savedOutput = localStorage.getItem('output');
+            const savedSkill = localStorage.getItem('skill');
+            const savedFormat = localStorage.getItem('format');
+            
+            if (savedPhotoCount) document.getElementById('photoCount').value = savedPhotoCount;
+            if (savedComplexity) document.getElementById('complexity').value = savedComplexity;
+            if (savedOutput) document.getElementById('output').value = savedOutput;
+            if (savedSkill) document.getElementById('skill').value = savedSkill;
+            if (savedFormat) document.getElementById('format').value = savedFormat;
+            
+            // Perform estimation with saved values
+            estimateTime();
+        }
+
+        function estimateTime() {
+            const photoCount = parseInt(document.getElementById('photoCount').value) || 10;
+            const complexity = document.getElementById('complexity').value;
+            const output = document.getElementById('output').value;
+            const skill = document.getElementById('skill').value;
+            const format = document.getElementById('format').value;
+            
+            if (photoCount < 1) {
+                alert('Please enter a valid number of photos (1 or more)');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('photoCount', photoCount);
+            localStorage.setItem('complexity', complexity);
+            localStorage.setItem('output', output);
+            localStorage.setItem('skill', skill);
+            localStorage.setItem('format', format);
+            
+            // Update displays
+            document.getElementById('photoCountValue').textContent = photoCount;
+            document.getElementById('complexityValue').textContent = getComplexityText(complexity);
+            
+            // Calculate base time per photo in minutes based on complexity
+            let baseTimePerPhoto = 10; // minutes
+            
+            switch(complexity) {
+                case 'basic':
+                    baseTimePerPhoto = 10;
+                    break;
+                case 'standard':
+                    baseTimePerPhoto = 20;
+                    break;
+                case 'advanced':
+                    baseTimePerPhoto = 45;
+                    break;
+                case 'complex':
+                    baseTimePerPhoto = 90;
+                    break;
+            }
+            
+            // Adjust based on output requirements
+            switch(output) {
+                case 'web':
+                    baseTimePerPhoto *= 0.8; // Faster for web
+                    break;
+                case 'print':
+                    baseTimePerPhoto *= 1.2; // Slower for print
+                    break;
+                case 'social':
+                    baseTimePerPhoto *= 1.0; // Standard
+                    break;
+                case 'commercial':
+                    baseTimePerPhoto *= 1.5; // More detailed work
+                    break;
+            }
+            
+            // Adjust based on skill level (beginner takes longer)
+            switch(skill) {
+                case 'beginner':
+                    baseTimePerPhoto *= 2.0; // Much slower
+                    break;
+                case 'intermediate':
+                    baseTimePerPhoto *= 1.5; // Slower
+                    break;
+                case 'advanced':
+                    baseTimePerPhoto *= 0.8; // Faster
+                    break;
+                case 'expert':
+                    baseTimePerPhoto *= 0.6; // Much faster
+                    break;
+            }
+            
+            // Adjust based on file format
+            switch(format) {
+                case 'raw':
+                    baseTimePerPhoto *= 1.5; // RAW takes longer to process
+                    break;
+                case 'tiff':
+                    baseTimePerPhoto *= 1.2; // TIFF is larger
+                    break;
+                case 'psd':
+                    baseTimePerPhoto *= 2.0; // PSD can be complex
+                    break;
+                case 'jpeg':
+                    baseTimePerPhoto *= 1.0; // Standard
+                    break;
+            }
+            
+            // Calculate total time
+            const totalTimeMinutes = photoCount * baseTimePerPhoto;
+            const totalHours = Math.floor(totalTimeMinutes / 60);
+            const totalMinutes = Math.round(totalTimeMinutes % 60);
+            
+            // Format time for display
+            const timeString = totalHours > 0 ? `${totalHours}h ${totalMinutes}m` : `${totalMinutes}m`;
+            const perPhotoTime = Math.round(baseTimePerPhoto);
+            const perPhotoString = perPhotoTime > 60 ? `${Math.floor(perPhotoTime/60)}h ${perPhotoTime%60}m` : `${perPhotoTime}m`;
+            
+            document.getElementById('estimatedTime').textContent = timeString;
+            document.getElementById('timePerPhoto').textContent = perPhotoString;
+            
+            // Update progress bar
+            const progressBar = document.getElementById('progressBar');
+            const progress = Math.min(100, (totalTimeMinutes / 240) * 100); // 240 = 4 hours max
+            progressBar.style.width = progress + '%';
+            
+            // Update info content
+            const complexityText = getComplexityText(complexity);
+            const outputText = getOutputText(output);
+            const skillText = getSkillText(skill);
+            const formatText = getFormatText(format);
+            
+            let info = `For ${photoCount} photos with ${complexityText.toLowerCase()} editing, `;
+            info += `estimated time is ${timeString} (${perPhotoString} per photo). `;
+            info += `This includes import, culling, adjustments, and export. `;
+            info += `Adjust based on your specific workflow and ${skillText.toLowerCase()} skill level.`;
+            
+            document.getElementById('infoContent').textContent = info;
+        }
+        
+        function getComplexityText(value) {
+            const complexityTexts = {
+                'basic': 'Basic',
+                'standard': 'Standard',
+                'advanced': 'Advanced',
+                'complex': 'Complex'
+            };
+            return complexityTexts[value] || value;
+        }
+        
+        function getOutputText(value) {
+            const outputTexts = {
+                'web': 'Web',
+                'print': 'Print',
+                'social': 'Social Media',
+                'commercial': 'Commercial'
+            };
+            return outputTexts[value] || value;
+        }
+        
+        function getSkillText(value) {
+            const skillTexts = {
+                'beginner': 'Beginner',
+                'intermediate': 'Intermediate',
+                'advanced': 'Advanced',
+                'expert': 'Expert'
+            };
+            return skillTexts[value] || value;
+        }
+        
+        function getFormatText(value) {
+            const formatTexts = {
+                'jpeg': 'JPEG',
+                'raw': 'RAW',
+                'tiff': 'TIFF',
+                'psd': 'PSD'
+            };
+            return formatTexts[value] || value;
+        }
+        
+        function exportResults() {
+            const photoCount = document.getElementById('photoCount').value;
+            const complexity = getComplexityText(document.getElementById('complexity').value);
+            const output = getOutputText(document.getElementById('output').value);
+            const skill = getSkillText(document.getElementById('skill').value);
+            const format = getFormatText(document.getElementById('format').value);
+            const estimatedTime = document.getElementById('estimatedTime').textContent;
+            const timePerPhoto = document.getElementById('timePerPhoto').textContent;
+            
+            const exportText = `Photo Editing Time Estimator Results\n\n`;
+            exportText += `Number of Photos: ${photoCount}\n`;
+            exportText += `Editing Complexity: ${complexity}\n`;
+            exportText += `Output Requirements: ${output}\n`;
+            exportText += `Skill Level: ${skill}\n`;
+            exportText += `File Format: ${format}\n`;
+            exportText += `Estimated Total Time: ${estimatedTime}\n`;
+            exportText += `Time Per Photo: ${timePerPhoto}\n\n`;
+            exportText += `Workflow Tips:\n`;
+            exportText += `- Basic editing: Lightroom adjustments, basic corrections\n`;
+            exportText += `- Standard editing: Basic + minor retouching\n`;
+            exportText += `- Advanced editing: Major retouching, skin work\n`;
+            exportText += `- Complex editing: Compositing, HDR, multiple layers\n`;
+            exportText += `- Consider batch processing for similar photos\n`;
+            exportText += `- Use presets to speed up your workflow\n`;
+            
+            // Create a temporary textarea to copy text
+            const textArea = document.createElement('textarea');
+            textArea.value = exportText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            alert('Editing time estimation exported to clipboard!');
+        }
+        
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                // Reset to default values
+                document.getElementById('photoCount').value = '10';
+                document.getElementById('complexity').value = 'basic';
+                document.getElementById('output').value = 'web';
+                document.getElementById('skill').value = 'intermediate';
+                document.getElementById('format').value = 'jpeg';
+                
+                // Clear localStorage
+                localStorage.removeItem('photoCount');
+                localStorage.removeItem('complexity');
+                localStorage.removeItem('output');
+                localStorage.removeItem('skill');
+                localStorage.removeItem('format');
+                
+                // Reset displays
+                document.getElementById('photoCountValue').textContent = '10';
+                document.getElementById('complexityValue').textContent = 'Basic';
+                document.getElementById('estimatedTime').textContent = '2h 30m';
+                document.getElementById('timePerPhoto').textContent = '15m';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('infoContent').textContent = 'For 10 photos with basic editing complexity, estimated time is 2 hours and 30 minutes (15 minutes per photo). This includes import, culling, basic adjustments, and export. Adjust based on your specific workflow.';
+            }
+        }
+    </script>
+</body>
+</html>
