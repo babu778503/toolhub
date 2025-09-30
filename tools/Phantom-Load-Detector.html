@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Load Detector</title>
+    <meta name="description" content="Detect phantom loads in your home to reduce energy waste and lower electricity bills. Identify devices that consume power when turned off.">
+    <meta name="keywords" content="phantom load detector, energy detector, standby power, phantom load, energy waste, power consumption, electricity usage, energy efficiency">
+    <meta name="author" content="Energy Solutions">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Phantom Load Detector">
+    <meta property="og:description" content="Detect phantom loads in your home to reduce energy waste and lower electricity bills">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://example.com/phantom-load-detector">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            height: 50px;
+            background-color: #0d1b2a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Desktop Header */
+        .desktop-header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .desktop-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            width: 100%;
+            padding: 0;
+        }
+
+        .detector-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #ff6b6b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 107, 107, 0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: rgba(220, 20, 60, 0.2);
+        }
+
+        .btn-reset:hover {
+            background: rgba(220, 20, 60, 0.3);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .device-list {
+            margin-top: 20px;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-weight: 500;
+        }
+
+        .device-power {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .data-controls {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-controls h3 {
+            margin-bottom: 15px;
+            color: #ff6b6b;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .data-btn {
+            padding: 8px 15px;
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .data-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .savings-tips {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .savings-tips h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .savings-tips ul {
+            padding-left: 20px;
+        }
+
+        .savings-tips li {
+            margin-bottom: 8px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .progress-container {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            border-radius: 4px;
+        }
+
+        .severity-high {
+            color: #ff6b6b;
+        }
+
+        .severity-medium {
+            color: #ffd166;
+        }
+
+        .severity-low {
+            color: #4ade80;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            background: rgba(255, 107, 107, 0.3);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            width: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .time-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .time-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn.active {
+            background: rgba(255, 107, 107, 0.5);
+        }
+
+        .time-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .detection-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 107, 107, 0.5);
+        }
+
+        .detection-progress {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .detection-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+            
+            .desktop-header {
+                display: none;
+            }
+            
+            .detector-container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .device-actions {
+                align-self: flex-end;
+            }
+            
+            .time-selector {
+                flex-wrap: wrap;
+            }
+            
+            .detection-mode {
+                flex-direction: column;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .desktop-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header (50px height) -->
+    <div class="mobile-header">Phantom Load Detector</div>
+    
+    <!-- Desktop Header -->
+    <div class="desktop-header">
+        <h1>Phantom Load Detector</h1>
+    </div>
+    
+    <div class="container">
+        <div class="detector-container">
+            <div class="time-selector">
+                <button class="time-btn active">Today</button>
+                <button class="time-btn">Week</button>
+                <button class="time-btn">Month</button>
+                <button class="time-btn">Year</button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Detect Phantom Loads</h2>
+                
+                <div class="detection-mode">
+                    <button class="mode-btn active">Auto Detect</button>
+                    <button class="mode-btn">Manual Input</button>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="deviceName">Device Name</label>
+                        <input type="text" id="deviceName" placeholder="e.g. TV, Router, Charger">
+                    </div>
+                    <div class="form-group">
+                        <label for="powerRating">Power Rating (W)</label>
+                        <input type="number" id="powerRating" placeholder="e.g. 5">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hoursPerDay">Hours in Standby Per Day</label>
+                        <input type="number" id="hoursPerDay" placeholder="e.g. 20" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="electricityCost">Electricity Cost ($/kWh)</label>
+                        <input type="number" id="electricityCost" placeholder="e.g. 0.15" step="0.01" value="0.15">
+                    </div>
+                </div>
+                
+                <button class="btn" id="detectBtn">Detect Phantom Load</button>
+                
+                <div class="detection-progress">
+                    <div class="detection-progress-bar" id="detectionProgress"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Results</h2>
+                <div class="results">
+                    <div class="result-card">
+                        <div class="result-label">Total Phantom Load</div>
+                        <div class="result-value" id="totalPower">0 W</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Daily Consumption</div>
+                        <div class="result-value" id="dailyConsumption">0 kWh</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Monthly Cost</div>
+                        <div class="result-value" id="monthlyCost">$0.00</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Cost</div>
+                        <div class="result-value" id="annualCost">$0.00</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Devices</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Efficiency</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2.4 kWh</div>
+                        <div class="stat-label">Avg/Day</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">15%</div>
+                        <div class="stat-label">Savings</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 70%; left: 10%;"></div>
+                    <div class="chart-bar" style="height: 50%; left: 25%;"></div>
+                    <div class="chart-bar" style="height: 90%; left: 40%;"></div>
+                    <div class="chart-bar" style="height: 60%; left: 55%;"></div>
+                    <div class="chart-bar" style="height: 40%; left: 70%;"></div>
+                    <div class="chart-bar" style="height: 30%; left: 85%;"></div>
+                    <div class="chart-label" style="left: 10%;">TV</div>
+                    <div class="chart-label" style="left: 25%;">Router</div>
+                    <div class="chart-label" style="left: 40%;">Charger</div>
+                    <div class="chart-label" style="left: 55%;">Microwave</div>
+                    <div class="chart-label" style="left: 70%;">Coffee Maker</div>
+                    <div class="chart-label" style="left: 85%;">Cable Box</div>
+                </div>
+                
+                <div class="device-list">
+                    <h3>Detected Phantom Loads</h3>
+                    <div id="deviceList">
+                        <!-- Devices will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Energy Savings Tips</h2>
+                <div class="savings-tips">
+                    <h3>Reduce Phantom Loads</h3>
+                    <ul>
+                        <li>Use smart power strips to cut power to devices when not in use</li>
+                        <li>Unplug chargers when not needed</li>
+                        <li>Turn off devices completely instead of leaving in standby mode</li>
+                        <li>Look for ENERGY STAR certified devices when purchasing new electronics</li>
+                        <li>Enable power management settings on computers and monitors</li>
+                    </ul>
+                </div>
+                
+                <div class="data-controls">
+                    <h3>Data Management</h3>
+                    <div class="data-actions">
+                        <button class="data-btn" id="saveData">Save Data</button>
+                        <button class="data-btn" id="loadData">Load Data</button>
+                        <button class="data-btn" id="clearData">Clear Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Phantom load detected successfully!</div>
+
+    <script>
+        // Device list to store added devices
+        let devices = [];
+        
+        // DOM elements
+        const deviceNameInput = document.getElementById('deviceName');
+        const powerRatingInput = document.getElementById('powerRating');
+        const hoursPerDayInput = document.getElementById('hoursPerDay');
+        const electricityCostInput = document.getElementById('electricityCost');
+        const detectBtn = document.getElementById('detectBtn');
+        const deviceList = document.getElementById('deviceList');
+        const totalPowerEl = document.getElementById('totalPower');
+        const dailyConsumptionEl = document.getElementById('dailyConsumption');
+        const monthlyCostEl = document.getElementById('monthlyCost');
+        const annualCostEl = document.getElementById('annualCost');
+        const saveDataBtn = document.getElementById('saveData');
+        const loadDataBtn = document.getElementById('loadData');
+        const clearDataBtn = document.getElementById('clearData');
+        const notification = document.getElementById('notification');
+        const detectionProgress = document.getElementById('detectionProgress');
+        
+        // Time selector functionality
+        document.querySelectorAll('.time-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.time-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Mode selector functionality
+        document.querySelectorAll('.mode-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Detect phantom load function
+        detectBtn.addEventListener('click', function() {
+            const name = deviceNameInput.value.trim();
+            const power = parseFloat(powerRatingInput.value);
+            const hours = parseFloat(hoursPerDayInput.value);
+            const cost = parseFloat(electricityCostInput.value);
+            
+            if (!name || isNaN(power) || isNaN(hours) || isNaN(cost)) {
+                showNotification('Please fill in all fields with valid values');
+                return;
+            }
+            
+            // Calculate daily consumption for this device
+            const dailyKWh = (power * hours) / 1000;
+            const monthlyCost = dailyKWh * 30 * cost;
+            const annualCost = monthlyCost * 12;
+            
+            // Create device object
+            const device = {
+                name,
+                power,
+                hours,
+                cost,
+                dailyKWh,
+                monthlyCost,
+                annualCost
+            };
+            
+            // Add to devices array
+            devices.push(device);
+            
+            // Update UI
+            updateDeviceList();
+            updateResults();
+            
+            // Clear form
+            deviceNameInput.value = '';
+            powerRatingInput.value = '';
+            hoursPerDayInput.value = '20';
+            electricityCostInput.value = '0.15';
+            
+            // Animate detection progress
+            detectionProgress.style.width = '0%';
+            setTimeout(() => {
+                detectionProgress.style.width = '100%';
+            }, 100);
+            
+            showNotification(`Phantom load for "${name}" detected!`);
+        });
+        
+        // Update device list display
+        function updateDeviceList() {
+            deviceList.innerHTML = '';
+            
+            devices.forEach((device, index) => {
+                // Determine severity level
+                let severityClass = '';
+                let severityText = '';
+                
+                if (device.power > 10) {
+                    severityClass = 'severity-high';
+                    severityText = 'High';
+                } else if (device.power > 5) {
+                    severityClass = 'severity-medium';
+                    severityText = 'Medium';
+                } else {
+                    severityClass = 'severity-low';
+                    severityText = 'Low';
+                }
+                
+                const deviceEl = document.createElement('div');
+                deviceEl.className = 'device-item';
+                deviceEl.innerHTML = `
+                    <div class="device-info">
+                        <div class="device-name">${device.name}</div>
+                        <div class="device-power">${device.power}W × ${device.hours}h = ${device.dailyKWh.toFixed(3)} kWh/day</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${Math.min(100, device.power)}%"></div>
+                        </div>
+                        <div class="${severityClass}">Severity: ${severityText}</div>
+                    </div>
+                    <div class="device-actions">
+                        <button class="action-btn" onclick="removeDevice(${index})">Remove</button>
+                    </div>
+                `;
+                deviceList.appendChild(deviceEl);
+            });
+        }
+        
+        // Remove device function
+        window.removeDevice = function(index) {
+            const removedDevice = devices.splice(index, 1)[0];
+            updateDeviceList();
+            updateResults();
+            showNotification(`Phantom load for "${removedDevice.name}" removed`);
+        };
+        
+        // Update results display
+        function updateResults() {
+            // Calculate totals
+            let totalPower = 0;
+            let totalDailyKWh = 0;
+            let totalMonthlyCost = 0;
+            let totalAnnualCost = 0;
+            
+            devices.forEach(device => {
+                totalPower += device.power;
+                totalDailyKWh += device.dailyKWh;
+                totalMonthlyCost += device.monthlyCost;
+                totalAnnualCost += device.annualCost;
+            });
+            
+            // Update UI
+            totalPowerEl.textContent = `${totalPower.toFixed(2)} W`;
+            dailyConsumptionEl.textContent = `${totalDailyKWh.toFixed(3)} kWh`;
+            monthlyCostEl.textContent = `$${totalMonthlyCost.toFixed(2)}`;
+            annualCostEl.textContent = `$${totalAnnualCost.toFixed(2)}`;
+        }
+        
+        // Data management functions
+        saveDataBtn.addEventListener('click', function() {
+            const dataToSave = {
+                devices: devices,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('phantomLoadData', JSON.stringify(dataToSave));
+            showNotification('Data saved successfully!');
+        });
+        
+        loadDataBtn.addEventListener('click', function() {
+            const savedData = localStorage.getItem('phantomLoadData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                devices = data.devices || [];
+                
+                updateDeviceList();
+                updateResults();
+                
+                showNotification('Data loaded successfully!');
+            } else {
+                showNotification('No saved data found!');
+            }
+        });
+        
+        clearDataBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('phantomLoadData');
+                devices = [];
+                updateDeviceList();
+                updateResults();
+                showNotification('All data cleared!');
+            }
+        });
+        
+        // Show notification function
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize with saved data if available
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('phantomLoadData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                devices = data.devices || [];
+                
+                updateDeviceList();
+                updateResults();
+                
+                console.log('Loaded data from localStorage:', data);
+            }
+        });
+        
+        // Simulate chart animation
+        document.querySelectorAll('.chart-bar').forEach(bar => {
+            const currentHeight = parseInt(bar.style.height);
+            const newHeight = Math.max(10, Math.min(100, currentHeight + (Math.random() * 20 - 10)));
+            bar.style.height = newHeight + '%';
+        });
+    </script>
+</body>
+</html>

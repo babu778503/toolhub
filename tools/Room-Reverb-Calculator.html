@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<!-- Category: Audio Engineering -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Reverb Calculator</title>
+    <meta name="description" content="Calculate room reverb time with our interactive calculator. Perfect for acousticians, audio engineers, and room designers. Includes Sabine and Eyring formulas, material database, and frequency analysis.">
+    <meta name="keywords" content="room reverb calculator, reverb time, acoustic design, room acoustics, Sabine formula, Eyring formula, acoustic modeling, audio engineering, reverberation time, RT60, acoustic analysis, room modes, frequency response">
+    <meta name="author" content="Audio Engineering Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Room Reverb Calculator">
+    <meta property="og:description" content="Calculate room reverb time with our interactive calculator. Perfect for acousticians, audio engineers, and room designers.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/room-reverb-calculator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --reverb-color: #00c9a7;
+            --result-color: #4a90e2;
+            --material-color: #ff7a9d;
+            --mode-color: #ffcc00;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Room visualization */
+        .room-visualization {
+            position: relative;
+            height: 200px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room {
+            position: absolute;
+            width: 80%;
+            height: 60%;
+            background: rgba(50, 50, 65, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room-dimensions {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .reverb-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .wave {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--reverb-color);
+            opacity: 0.3;
+            transform: scale(0);
+        }
+
+        /* Form */
+        .form-container {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Materials */
+        .materials {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .materials-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .material-item {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .material-item:hover {
+            background: rgba(60, 60, 80, 0.7);
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: var(--material-color);
+            margin-bottom: 8px;
+        }
+
+        .material-absorption {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .material-item.active {
+            border: 2px solid var(--accent);
+        }
+
+        /* Frequency response */
+        .frequency-response {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .frequency-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .frequency-chart {
+            height: 150px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .frequency-bar {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            background: var(--mode-color);
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* Room modes */
+        .room-modes {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .modes-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .mode-item {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .mode-frequency {
+            font-weight: bold;
+            color: var(--mode-color);
+        }
+
+        .mode-type {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .reverb-time {
+            color: var(--reverb-color);
+        }
+
+        .early-decay {
+            color: var(--result-color);
+        }
+
+        .clarity {
+            color: var(--accent);
+        }
+
+        .definition {
+            color: var(--material-color);
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .room-visualization {
+                height: 150px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .material-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Room Reverb Calculator</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="room-visualization">
+                <div class="room">
+                    <div class="room-dimensions" id="room-dimensions">L: 8m × W: 6m × H: 3m</div>
+                </div>
+                <div class="reverb-waves" id="reverb-waves">
+                    <!-- Reverb waves will be generated here -->
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <div class="form-title">Room Dimensions</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Length (m)</label>
+                        <input type="number" class="form-input" id="length" min="1" max="50" value="8" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Width (m)</label>
+                        <input type="number" class="form-input" id="width" min="1" max="50" value="6" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Height (m)</label>
+                        <input type="number" class="form-input" id="height" min="1" max="20" value="3" step="0.1">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="materials">
+                <div class="materials-title">Surface Materials</div>
+                <div class="material-grid">
+                    <div class="material-item active" data-absorption="0.01">
+                        <div class="material-name">Concrete Floor</div>
+                        <div class="material-absorption">Absorption: 0.01</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.05">
+                        <div class="material-name">Drywall Ceiling</div>
+                        <div class="material-absorption">Absorption: 0.05</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.15">
+                        <div class="material-name">Carpeted Floor</div>
+                        <div class="material-absorption">Absorption: 0.15</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.80">
+                        <div class="material-name">Acoustic Panels</div>
+                        <div class="material-absorption">Absorption: 0.80</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.10">
+                        <div class="material-name">Glass Windows</div>
+                        <div class="material-absorption">Absorption: 0.10</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.30">
+                        <div class="material-name">Fabric Upholstery</div>
+                        <div class="material-absorption">Absorption: 0.30</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.10">
+                        <div class="material-name">Wood Panels</div>
+                        <div class="material-absorption">Absorption: 0.10</div>
+                    </div>
+                    <div class="material-item" data-absorption="0.40">
+                        <div class="material-name">Curtains</div>
+                        <div class="material-absorption">Absorption: 0.40</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="frequency-response">
+                <div class="frequency-title">Frequency Response</div>
+                <div class="frequency-chart" id="frequency-chart">
+                    <!-- Frequency bars will be generated here -->
+                </div>
+            </div>
+            
+            <div class="room-modes">
+                <div class="modes-title">Room Modes</div>
+                <div class="mode-grid" id="mode-grid">
+                    <!-- Mode items will be generated here -->
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Acoustic Results</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Reverb Time (T60) - Sabine</div>
+                        <div class="result-value reverb-time" id="reverb-time">0.00s</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Reverb Time (T60) - Eyring</div>
+                        <div class="result-value reverb-time" id="reverb-eyring">0.00s</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Early Decay Time</div>
+                        <div class="result-value early-decay" id="early-decay">0.00s</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Clarity (C80)</div>
+                        <div class="result-value clarity" id="clarity">0.00dB</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Definition (D50)</div>
+                        <div class="result-value definition" id="definition">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Absorption Coefficient</div>
+                        <div class="result-value" id="absorption-coefficient">0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn" class="calculate-btn">Calculate Reverb</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                length: 8,
+                width: 6,
+                height: 3,
+                materials: {
+                    floor: 0.01, // Concrete
+                    ceiling: 0.05, // Drywall
+                    walls: 0.10, // Average
+                    furniture: 0.20 // Average
+                },
+                selectedMaterial: 'floor',
+                materialAbsorption: 0.01
+            };
+            
+            // DOM elements
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const lengthInput = document.getElementById('length');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            const reverbTime = document.getElementById('reverb-time');
+            const reverbEyring = document.getElementById('reverb-eyring');
+            const earlyDecay = document.getElementById('early-decay');
+            const clarity = document.getElementById('clarity');
+            const definition = document.getElementById('definition');
+            const absorptionCoefficient = document.getElementById('absorption-coefficient');
+            const roomDimensions = document.getElementById('room-dimensions');
+            const reverbWaves = document.getElementById('reverb-waves');
+            const frequencyChart = document.getElementById('frequency-chart');
+            const modeGrid = document.getElementById('mode-grid');
+            const materialItems = document.querySelectorAll('.material-item');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('roomReverbState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.length = parsed.length || 8;
+                    state.width = parsed.width || 6;
+                    state.height = parsed.height || 3;
+                    state.materials = parsed.materials || state.materials;
+                    
+                    // Update UI
+                    lengthInput.value = state.length;
+                    widthInput.value = state.width;
+                    heightInput.value = state.height;
+                    
+                    calculateReverb();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('roomReverbState', JSON.stringify({
+                    length: state.length,
+                    width: state.width,
+                    height: state.height,
+                    materials: state.materials
+                }));
+            }
+            
+            // Calculate room volume
+            function calculateVolume() {
+                return state.length * state.width * state.height;
+            }
+            
+            // Calculate room surface area
+            function calculateSurfaceArea() {
+                const floorCeiling = 2 * state.length * state.width;
+                const walls = 2 * state.length * state.height + 2 * state.width * state.height;
+                return floorCeiling + walls;
+            }
+            
+            // Calculate average absorption coefficient
+            function calculateAverageAbsorption() {
+                const floor = state.materials.floor;
+                const ceiling = state.materials.ceiling;
+                const walls = state.materials.walls;
+                const furniture = state.materials.furniture;
+                
+                // Weighted average based on surface area
+                const floorCeilingArea = 2 * state.length * state.width;
+                const wallsArea = 2 * state.length * state.height + 2 * state.width * state.height;
+                
+                const avgAbsorption = (floor * floorCeilingArea + ceiling * floorCeilingArea + walls * wallsArea) / 
+                                     (2 * floorCeilingArea + wallsArea);
+                
+                return Math.max(0.01, Math.min(0.99, avgAbsorption));
+            }
+            
+            // Calculate reverb time using Sabine formula
+            function calculateSabineReverb() {
+                const volume = calculateVolume();
+                const surfaceArea = calculateSurfaceArea();
+                const avgAbsorption = calculateAverageAbsorption();
+                
+                // Sabine formula: T60 = 0.161 * V / (S * α)
+                const reverbTime = (0.161 * volume) / (surfaceArea * avgAbsorption);
+                
+                return Math.max(0.1, Math.min(10, reverbTime)); // Clamp between 0.1 and 10 seconds
+            }
+            
+            // Calculate reverb time using Eyring formula
+            function calculateEyringReverb() {
+                const volume = calculateVolume();
+                const surfaceArea = calculateSurfaceArea();
+                const avgAbsorption = calculateAverageAbsorption();
+                
+                // Eyring formula: T60 = 0.161 * V / (-S * ln(1 - α))
+                const reverbTime = (0.161 * volume) / (-surfaceArea * Math.log(1 - avgAbsorption));
+                
+                return Math.max(0.1, Math.min(10, reverbTime)); // Clamp between 0.1 and 10 seconds
+            }
+            
+            // Calculate acoustic parameters
+            function calculateAcoustics() {
+                const sabineRt = calculateSabineReverb();
+                const eyringRt = calculateEyringReverb();
+                
+                // Early Decay Time (EDT) - typically 0.6 * RT
+                const edt = 0.6 * sabineRt;
+                
+                // Clarity (C80) - simplified calculation
+                const clarity = -10 * Math.log10(Math.exp(-0.05 * sabineRt)) - 2;
+                
+                // Definition (D50) - simplified calculation
+                const d50 = 100 / (1 + Math.exp(-2 * (sabineRt - 1.5)));
+                
+                return {
+                    sabineRt: sabineRt,
+                    eyringRt: eyringRt,
+                    earlyDecay: edt,
+                    clarity: clarity,
+                    definition: d50,
+                    absorption: calculateAverageAbsorption()
+                };
+            }
+            
+            // Calculate room modes
+            function calculateRoomModes() {
+                const modes = [];
+                const speedOfSound = 343; // m/s
+                
+                // Calculate axial modes (between parallel surfaces)
+                for (let n = 1; n <= 3; n++) {
+                    // Length modes
+                    modes.push({
+                        freq: (n * speedOfSound) / (2 * state.length),
+                        type: 'Axial (Length)'
+                    });
+                    
+                    // Width modes
+                    modes.push({
+                        freq: (n * speedOfSound) / (2 * state.width),
+                        type: 'Axial (Width)'
+                    });
+                    
+                    // Height modes
+                    modes.push({
+                        freq: (n * speedOfSound) / (2 * state.height),
+                        type: 'Axial (Height)'
+                    });
+                }
+                
+                // Sort by frequency
+                modes.sort((a, b) => a.freq - b.freq);
+                
+                return modes.slice(0, 6); // Return first 6 modes
+            }
+            
+            // Render room modes
+            function renderRoomModes() {
+                modeGrid.innerHTML = '';
+                
+                const modes = calculateRoomModes();
+                
+                modes.forEach(mode => {
+                    const modeItem = document.createElement('div');
+                    modeItem.className = 'mode-item';
+                    modeItem.innerHTML = `
+                        <div class="mode-frequency">${mode.freq.toFixed(1)} Hz</div>
+                        <div class="mode-type">${mode.type}</div>
+                    `;
+                    modeGrid.appendChild(modeItem);
+                });
+            }
+            
+            // Render frequency response
+            function renderFrequencyResponse() {
+                frequencyChart.innerHTML = '';
+                
+                // Create frequency bars
+                for (let i = 0; i < 20; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'frequency-bar';
+                    
+                    // Random height for visualization
+                    const height = 20 + Math.random() * 80;
+                    bar.style.height = `${height}%`;
+                    bar.style.left = `${i * 5}%`;
+                    
+                    frequencyChart.appendChild(bar);
+                }
+            }
+            
+            // Update visualization
+            function updateVisualization() {
+                // Clear existing waves
+                reverbWaves.innerHTML = '';
+                
+                // Create new waves based on reverb time
+                const reverbValue = parseFloat(reverbTime.textContent);
+                const waveCount = Math.floor(reverbValue * 5); // More waves for longer reverb
+                
+                for (let i = 0; i < waveCount; i++) {
+                    const wave = document.createElement('div');
+                    wave.className = 'wave';
+                    
+                    // Random position
+                    const left = Math.random() * 100;
+                    const top = Math.random() * 100;
+                    
+                    wave.style.left = `${left}%`;
+                    wave.style.top = `${top}%`;
+                    
+                    // Random size
+                    const size = 20 + Math.random() * 80;
+                    wave.style.width = `${size}px`;
+                    wave.style.height = `${size}px`;
+                    
+                    // Animation
+                    wave.animate([
+                        { transform: 'scale(0)', opacity: 0.7 },
+                        { transform: 'scale(1)', opacity: 0.3 },
+                        { transform: 'scale(1.5)', opacity: 0 }
+                    ], {
+                        duration: 2000,
+                        delay: i * 200,
+                        iterations: 1
+                    });
+                    
+                    reverbWaves.appendChild(wave);
+                }
+            }
+            
+            // Calculate reverb
+            function calculateReverb() {
+                // Update room dimensions display
+                roomDimensions.textContent = `L: ${state.length}m × W: ${state.width}m × H: ${state.height}m`;
+                
+                // Calculate acoustic parameters
+                const results = calculateAcoustics();
+                
+                // Update display
+                reverbTime.textContent = results.sabineRt.toFixed(2) + 's';
+                reverbEyring.textContent = results.eyringRt.toFixed(2) + 's';
+                earlyDecay.textContent = results.earlyDecay.toFixed(2) + 's';
+                clarity.textContent = results.clarity.toFixed(1) + 'dB';
+                definition.textContent = results.definition.toFixed(1) + '%';
+                absorptionCoefficient.textContent = results.absorption.toFixed(3);
+                
+                // Update visualization
+                updateVisualization();
+                
+                // Render room modes
+                renderRoomModes();
+                
+                // Render frequency response
+                renderFrequencyResponse();
+                
+                // Save state
+                saveState();
+            }
+            
+            // Event listeners
+            calculateBtn.addEventListener('click', () => {
+                state.length = parseFloat(lengthInput.value) || 8;
+                state.width = parseFloat(widthInput.value) || 6;
+                state.height = parseFloat(heightInput.value) || 3;
+                
+                calculateReverb();
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('roomReverbState');
+                    
+                    // Reset form values
+                    lengthInput.value = '8';
+                    widthInput.value = '6';
+                    heightInput.value = '3';
+                    
+                    // Reset state
+                    state.length = 8;
+                    state.width = 6;
+                    state.height = 3;
+                    
+                    // Reset results
+                    reverbTime.textContent = '0.00s';
+                    reverbEyring.textContent = '0.00s';
+                    earlyDecay.textContent = '0.00s';
+                    clarity.textContent = '0.00dB';
+                    definition.textContent = '0%';
+                    absorptionCoefficient.textContent = '0.00';
+                    
+                    // Clear visualization
+                    reverbWaves.innerHTML = '';
+                    
+                    // Update room dimensions display
+                    roomDimensions.textContent = `L: ${state.length}m × W: ${state.width}m × H: ${state.height}m`;
+                    
+                    // Render empty charts
+                    frequencyChart.innerHTML = '';
+                    modeGrid.innerHTML = '';
+                }
+            });
+            
+            // Material selection
+            materialItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    materialItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    state.selectedMaterial = item.dataset.material || 'floor';
+                    state.materialAbsorption = parseFloat(item.dataset.absorption);
+                    
+                    // Update material in state
+                    state.materials[state.selectedMaterial] = state.materialAbsorption;
+                    
+                    // Recalculate
+                    calculateReverb();
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

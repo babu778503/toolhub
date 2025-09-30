@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standby Power Calculator | Calculate Energy Waste</title>
+    <meta name="description" content="Calculate standby power consumption of your devices to reduce energy waste and lower electricity bills.">
+    <meta name="keywords" content="standby power calculator, energy calculator, power consumption, electricity usage, energy efficiency, standby mode, phantom load, energy waste, power monitor">
+    <meta name="author" content="Energy Solutions">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Standby Power Calculator">
+    <meta property="og:description" content="Calculate standby power consumption of your devices to reduce energy waste">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://example.com/standby-power-calculator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            height: 50px;
+            background-color: #0d1b2a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Desktop Header */
+        .desktop-header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .desktop-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            width: 100%;
+            padding: 0;
+        }
+
+        .calculator-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #4ade80;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(74, 222, 128, 0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: rgba(74, 222, 128, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: rgba(220, 20, 60, 0.2);
+        }
+
+        .btn-reset:hover {
+            background: rgba(220, 20, 60, 0.3);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4ade80;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .device-list {
+            margin-top: 20px;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-weight: 500;
+        }
+
+        .device-power {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .data-controls {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-controls h3 {
+            margin-bottom: 15px;
+            color: #4ade80;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .data-btn {
+            padding: 8px 15px;
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .data-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .savings-tips {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .savings-tips h3 {
+            color: #4ade80;
+            margin-bottom: 10px;
+        }
+
+        .savings-tips ul {
+            padding-left: 20px;
+        }
+
+        .savings-tips li {
+            margin-bottom: 8px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+            
+            .desktop-header {
+                display: none;
+            }
+            
+            .calculator-container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .device-actions {
+                align-self: flex-end;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .desktop-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header (50px height) -->
+    <div class="mobile-header">Standby Power Calculator</div>
+    
+    <!-- Desktop Header -->
+    <div class="desktop-header">
+        <h1>Standby Power Calculator</h1>
+    </div>
+    
+    <div class="container">
+        <div class="calculator-container">
+            <div class="card">
+                <h2 class="card-title">Calculate Standby Power</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="deviceName">Device Name</label>
+                        <input type="text" id="deviceName" placeholder="e.g. TV, Router, Charger">
+                    </div>
+                    <div class="form-group">
+                        <label for="powerRating">Power Rating (W)</label>
+                        <input type="number" id="powerRating" placeholder="e.g. 5">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hoursPerDay">Hours in Standby Per Day</label>
+                        <input type="number" id="hoursPerDay" placeholder="e.g. 20" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="electricityCost">Electricity Cost ($/kWh)</label>
+                        <input type="number" id="electricityCost" placeholder="e.g. 0.15" step="0.01" value="0.15">
+                    </div>
+                </div>
+                
+                <button class="btn" id="calculateBtn">Add Device</button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Results</h2>
+                <div class="results">
+                    <div class="result-card">
+                        <div class="result-label">Total Standby Power</div>
+                        <div class="result-value" id="totalPower">0 W</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Daily Consumption</div>
+                        <div class="result-value" id="dailyConsumption">0 kWh</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Monthly Cost</div>
+                        <div class="result-value" id="monthlyCost">$0.00</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Cost</div>
+                        <div class="result-value" id="annualCost">$0.00</div>
+                    </div>
+                </div>
+                
+                <div class="device-list">
+                    <h3>Added Devices</h3>
+                    <div id="deviceList">
+                        <!-- Devices will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Energy Savings Tips</h2>
+                <div class="savings-tips">
+                    <h3>Reduce Standby Power Consumption</h3>
+                    <ul>
+                        <li>Use smart power strips to cut power to devices when not in use</li>
+                        <li>Unplug chargers when not needed</li>
+                        <li>Turn off devices completely instead of leaving in standby mode</li>
+                        <li>Look for ENERGY STAR certified devices when purchasing new electronics</li>
+                        <li>Enable power management settings on computers and monitors</li>
+                    </ul>
+                </div>
+                
+                <div class="data-controls">
+                    <h3>Data Management</h3>
+                    <div class="data-actions">
+                        <button class="data-btn" id="saveData">Save Data</button>
+                        <button class="data-btn" id="loadData">Load Data</button>
+                        <button class="data-btn" id="clearData">Clear Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Operation completed successfully!</div>
+
+    <script>
+        // Device list to store added devices
+        let devices = [];
+        
+        // DOM elements
+        const deviceNameInput = document.getElementById('deviceName');
+        const powerRatingInput = document.getElementById('powerRating');
+        const hoursPerDayInput = document.getElementById('hoursPerDay');
+        const electricityCostInput = document.getElementById('electricityCost');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const deviceList = document.getElementById('deviceList');
+        const totalPowerEl = document.getElementById('totalPower');
+        const dailyConsumptionEl = document.getElementById('dailyConsumption');
+        const monthlyCostEl = document.getElementById('monthlyCost');
+        const annualCostEl = document.getElementById('annualCost');
+        const saveDataBtn = document.getElementById('saveData');
+        const loadDataBtn = document.getElementById('loadData');
+        const clearDataBtn = document.getElementById('clearData');
+        const notification = document.getElementById('notification');
+        
+        // Add device function
+        calculateBtn.addEventListener('click', function() {
+            const name = deviceNameInput.value.trim();
+            const power = parseFloat(powerRatingInput.value);
+            const hours = parseFloat(hoursPerDayInput.value);
+            const cost = parseFloat(electricityCostInput.value);
+            
+            if (!name || isNaN(power) || isNaN(hours) || isNaN(cost)) {
+                showNotification('Please fill in all fields with valid values');
+                return;
+            }
+            
+            // Calculate daily consumption for this device
+            const dailyKWh = (power * hours) / 1000;
+            const monthlyCost = dailyKWh * 30 * cost;
+            const annualCost = monthlyCost * 12;
+            
+            // Create device object
+            const device = {
+                name,
+                power,
+                hours,
+                cost,
+                dailyKWh,
+                monthlyCost,
+                annualCost
+            };
+            
+            // Add to devices array
+            devices.push(device);
+            
+            // Update UI
+            updateDeviceList();
+            updateResults();
+            
+            // Clear form
+            deviceNameInput.value = '';
+            powerRatingInput.value = '';
+            hoursPerDayInput.value = '20';
+            electricityCostInput.value = '0.15';
+            
+            showNotification(`Device "${name}" added successfully!`);
+        });
+        
+        // Update device list display
+        function updateDeviceList() {
+            deviceList.innerHTML = '';
+            
+            devices.forEach((device, index) => {
+                const deviceEl = document.createElement('div');
+                deviceEl.className = 'device-item';
+                deviceEl.innerHTML = `
+                    <div class="device-info">
+                        <div class="device-name">${device.name}</div>
+                        <div class="device-power">${device.power}W × ${device.hours}h = ${device.dailyKWh.toFixed(3)} kWh/day</div>
+                    </div>
+                    <div class="device-actions">
+                        <button class="action-btn" onclick="removeDevice(${index})">Remove</button>
+                    </div>
+                `;
+                deviceList.appendChild(deviceEl);
+            });
+        }
+        
+        // Remove device function
+        window.removeDevice = function(index) {
+            const removedDevice = devices.splice(index, 1)[0];
+            updateDeviceList();
+            updateResults();
+            showNotification(`Device "${removedDevice.name}" removed`);
+        };
+        
+        // Update results display
+        function updateResults() {
+            // Calculate totals
+            let totalPower = 0;
+            let totalDailyKWh = 0;
+            let totalMonthlyCost = 0;
+            let totalAnnualCost = 0;
+            
+            devices.forEach(device => {
+                totalPower += device.power;
+                totalDailyKWh += device.dailyKWh;
+                totalMonthlyCost += device.monthlyCost;
+                totalAnnualCost += device.annualCost;
+            });
+            
+            // Update UI
+            totalPowerEl.textContent = `${totalPower.toFixed(2)} W`;
+            dailyConsumptionEl.textContent = `${totalDailyKWh.toFixed(3)} kWh`;
+            monthlyCostEl.textContent = `$${totalMonthlyCost.toFixed(2)}`;
+            annualCostEl.textContent = `$${totalAnnualCost.toFixed(2)}`;
+        }
+        
+        // Data management functions
+        saveDataBtn.addEventListener('click', function() {
+            const dataToSave = {
+                devices: devices,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('standbyPowerData', JSON.stringify(dataToSave));
+            showNotification('Data saved successfully!');
+        });
+        
+        loadDataBtn.addEventListener('click', function() {
+            const savedData = localStorage.getItem('standbyPowerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                devices = data.devices || [];
+                
+                updateDeviceList();
+                updateResults();
+                
+                showNotification('Data loaded successfully!');
+            } else {
+                showNotification('No saved data found!');
+            }
+        });
+        
+        clearDataBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('standbyPowerData');
+                devices = [];
+                updateDeviceList();
+                updateResults();
+                showNotification('All data cleared!');
+            }
+        });
+        
+        // Show notification function
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize with saved data if available
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('standbyPowerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                devices = data.devices || [];
+                
+                updateDeviceList();
+                updateResults();
+                
+                console.log('Loaded data from localStorage:', data);
+            }
+        });
+    </script>
+</body>
+</html>

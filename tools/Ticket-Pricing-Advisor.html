@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!-- Category: Entertainment & Events -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Pricing Advisor</title>
+    <meta name="description" content="Optimize your event ticket pricing with our interactive advisor. Perfect for concerts, festivals, and events.">
+    <meta name="keywords" content="ticket pricing advisor, event planning, concert pricing, ticket sales, event management, revenue optimization">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --price-color: #00c9a7;
+            --demand-color: #ff7a9d;
+            --revenue-color: #4a90e2;
+            --cost-color: #ffcc00;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Form */
+        .form-container {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Analysis */
+        .analysis {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .analysis-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .analysis-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .analysis-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .analysis-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .price {
+            color: var(--price-color);
+        }
+
+        .demand {
+            color: var(--demand-color);
+        }
+
+        .revenue {
+            color: var(--revenue-color);
+        }
+
+        .cost {
+            color: var(--cost-color);
+        }
+
+        /* Recommendations */
+        .recommendations {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .recommendations-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .recommendation-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .recommendation-item:before {
+            content: "•";
+            color: var(--price-color);
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        /* Pricing tiers */
+        .pricing-tiers {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .tiers-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .tier-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .tier-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .tier-name {
+            font-weight: 600;
+            color: var(--price-color);
+            margin-bottom: 10px;
+        }
+
+        .tier-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--price-color);
+            margin: 10px 0;
+        }
+
+        .tier-demand {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tier-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Ticket Pricing Advisor</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="form-container">
+                <div class="form-title">Event Details</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Event Type</label>
+                        <select class="form-input" id="event-type">
+                            <option value="concert">Concert</option>
+                            <option value="festival">Festival</option>
+                            <option value="theater">Theater</option>
+                            <option value="sports">Sports</option>
+                            <option value="comedy">Comedy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Venue Capacity</label>
+                        <input type="number" class="form-input" id="capacity" min="100" max="100000" value="5000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Artist/Performer</label>
+                        <input type="text" class="form-input" id="performer" placeholder="Enter artist name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-input" id="location" placeholder="Enter city">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ticket Supply</label>
+                        <input type="number" class="form-input" id="supply" min="100" max="100000" value="5000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Revenue ($)</label>
+                        <input type="number" class="form-input" id="target-revenue" min="10000" max="10000000" value="250000">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis">
+                <div class="analysis-title">Pricing Analysis</div>
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <div class="analysis-label">Optimal Price</div>
+                        <div class="analysis-value price" id="optimal-price">$0.00</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-label">Demand Level</div>
+                        <div class="analysis-value demand" id="demand-level">Medium</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-label">Expected Revenue</div>
+                        <div class="analysis-value revenue" id="expected-revenue">$0.00</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="analysis-label">Cost Per Ticket</div>
+                        <div class="analysis-value cost" id="cost-per-ticket">$0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendations">
+                <div class="recommendations-title">Pricing Recommendations</div>
+                <div id="recommendations-list">
+                    <div class="recommendation-item">Set base price at $50 for general admission</div>
+                    <div class="recommendation-item">Offer early bird discount of 15%</div>
+                    <div class="recommendation-item">Create VIP tier at 2.5x base price</div>
+                    <div class="recommendation-item">Implement dynamic pricing for remaining tickets</div>
+                </div>
+            </div>
+            
+            <div class="pricing-tiers">
+                <div class="tiers-title">Suggested Pricing Tiers</div>
+                <div class="tier-list" id="tier-list">
+                    <div class="tier-card">
+                        <div class="tier-name">General Admission</div>
+                        <div class="tier-price">$50</div>
+                        <div class="tier-demand">High Demand</div>
+                    </div>
+                    <div class="tier-card">
+                        <div class="tier-name">VIP</div>
+                        <div class="tier-price">$125</div>
+                        <div class="tier-demand">Medium Demand</div>
+                    </div>
+                    <div class="tier-card">
+                        <div class="tier-name">Premium</div>
+                        <div class="tier-price">$75</div>
+                        <div class="tier-demand">Medium Demand</div>
+                    </div>
+                    <div class="tier-card">
+                        <div class="tier-name">Backstage</div>
+                        <div class="tier-price">$200</div>
+                        <div class="tier-demand">Low Demand</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn" class="calculate-btn">Calculate Pricing</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                eventType: 'concert',
+                capacity: 5000,
+                performer: '',
+                location: '',
+                supply: 5000,
+                targetRevenue: 250000
+            };
+            
+            // DOM elements
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const eventType = document.getElementById('event-type');
+            const capacity = document.getElementById('capacity');
+            const performer = document.getElementById('performer');
+            const location = document.getElementById('location');
+            const supply = document.getElementById('supply');
+            const targetRevenue = document.getElementById('target-revenue');
+            const optimalPrice = document.getElementById('optimal-price');
+            const demandLevel = document.getElementById('demand-level');
+            const expectedRevenue = document.getElementById('expected-revenue');
+            const costPerTicket = document.getElementById('cost-per-ticket');
+            const recommendationsList = document.getElementById('recommendations-list');
+            const tierList = document.getElementById('tier-list');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('ticketPricingState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.eventType = parsed.eventType || 'concert';
+                    state.capacity = parsed.capacity || 5000;
+                    state.performer = parsed.performer || '';
+                    state.location = parsed.location || '';
+                    state.supply = parsed.supply || 5000;
+                    state.targetRevenue = parsed.targetRevenue || 250000;
+                    
+                    // Update UI
+                    eventType.value = state.eventType;
+                    capacity.value = state.capacity;
+                    performer.value = state.performer;
+                    location.value = state.location;
+                    supply.value = state.supply;
+                    targetRevenue.value = state.targetRevenue;
+                    
+                    // Calculate initial values
+                    calculatePricing();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('ticketPricingState', JSON.stringify({
+                    eventType: state.eventType,
+                    capacity: state.capacity,
+                    performer: state.performer,
+                    location: state.location,
+                    supply: state.supply,
+                    targetRevenue: state.targetRevenue
+                }));
+            }
+            
+            // Calculate pricing
+            function calculatePricing() {
+                // Get form values
+                state.eventType = eventType.value;
+                state.capacity = parseInt(capacity.value);
+                state.performer = performer.value.trim();
+                state.location = location.value.trim();
+                state.supply = parseInt(supply.value);
+                state.targetRevenue = parseInt(targetRevenue.value);
+                
+                // Calculate optimal price
+                const optimal = state.targetRevenue / state.supply;
+                optimalPrice.textContent = `$${optimal.toFixed(2)}`;
+                
+                // Calculate demand level
+                let demand = "Medium";
+                if (state.performer.toLowerCase().includes("legend") || state.performer.toLowerCase().includes("icon")) {
+                    demand = "Very High";
+                } else if (state.performer.toLowerCase().includes("rising") || state.performer.toLowerCase().includes("emerging")) {
+                    demand = "Low";
+                } else if (state.performer.toLowerCase().includes("popular") || state.location.toLowerCase().includes("major")) {
+                    demand = "High";
+                }
+                demandLevel.textContent = demand;
+                
+                // Calculate expected revenue
+                expectedRevenue.textContent = `$${state.targetRevenue.toLocaleString()}`;
+                
+                // Calculate cost per ticket (estimated)
+                const cost = optimal * 0.3; // 30% of ticket price
+                costPerTicket.textContent = `$${cost.toFixed(2)}`;
+                
+                // Generate recommendations
+                updateRecommendations();
+                
+                // Update pricing tiers
+                updatePricingTiers(optimal);
+                
+                // Save state
+                saveState();
+            }
+            
+            // Update recommendations
+            function updateRecommendations() {
+                const recommendations = [];
+                
+                // Add recommendations based on event type
+                switch(state.eventType) {
+                    case 'concert':
+                        recommendations.push("Set base price at $50 for general admission");
+                        recommendations.push("Offer early bird discount of 15%");
+                        recommendations.push("Create VIP tier at 2.5x base price");
+                        recommendations.push("Implement dynamic pricing for remaining tickets");
+                        break;
+                    case 'festival':
+                        recommendations.push("Offer 3-day passes at 15% discount");
+                        recommendations.push("Create VIP packages with exclusive access");
+                        recommendations.push("Price weekend tickets higher than single days");
+                        recommendations.push("Offer student discounts to increase demand");
+                        break;
+                    case 'theater':
+                        recommendations.push("Price premium seats at 2x general admission");
+                        recommendations.push("Offer group discounts for 4+ tickets");
+                        recommendations.push("Create season pass for multiple shows");
+                        recommendations.push("Price matinee shows 20% lower than evening shows");
+                        break;
+                    case 'sports':
+                        recommendations.push("Price season tickets at 25% discount");
+                        recommendations.push("Offer family packages for 4+ tickets");
+                        recommendations.push("Create premium seating with food included");
+                        recommendations.push("Implement dynamic pricing based on team performance");
+                        break;
+                    case 'comedy':
+                        recommendations.push("Price premium seating at 1.5x general admission");
+                        recommendations.push("Offer dinner and show packages");
+                        recommendations.push("Create meet and greet tickets at premium price");
+                        recommendations.push("Price weekend shows 10% higher than weekdays");
+                        break;
+                }
+                
+                // Add location-based recommendations
+                if (state.location.toLowerCase().includes("new york") || 
+                    state.location.toLowerCase().includes("london") || 
+                    state.location.toLowerCase().includes("tokyo")) {
+                    recommendations.push("Consider premium pricing for major city venues");
+                }
+                
+                // Add performer-based recommendations
+                if (state.performer.toLowerCase().includes("legend") || 
+                    state.performer.toLowerCase().includes("icon")) {
+                    recommendations.push("Set higher prices due to high demand");
+                    recommendations.push("Create exclusive merchandise bundles");
+                }
+                
+                // Update the recommendations list
+                recommendationsList.innerHTML = '';
+                recommendations.forEach(rec => {
+                    const item = document.createElement('div');
+                    item.className = 'recommendation-item';
+                    item.textContent = rec;
+                    recommendationsList.appendChild(item);
+                });
+            }
+            
+            // Update pricing tiers
+            function updatePricingTiers(basePrice) {
+                // Calculate tier prices based on base price
+                const tiers = [
+                    { name: "General Admission", price: basePrice, demand: "High" },
+                    { name: "Premium", price: basePrice * 1.5, demand: "Medium" },
+                    { name: "VIP", price: basePrice * 2.5, demand: "Medium" },
+                    { name: "Backstage", price: basePrice * 4, demand: "Low" }
+                ];
+                
+                // Update the tier list
+                tierList.innerHTML = '';
+                tiers.forEach(tier => {
+                    const card = document.createElement('div');
+                    card.className = 'tier-card';
+                    card.innerHTML = `
+                        <div class="tier-name">${tier.name}</div>
+                        <div class="tier-price">$${tier.price.toFixed(2)}</div>
+                        <div class="tier-demand">${tier.demand} Demand</div>
+                    `;
+                    tierList.appendChild(card);
+                });
+            }
+            
+            // Event listeners
+            calculateBtn.addEventListener('click', calculatePricing);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('ticketPricingState');
+                    
+                    // Reset form values
+                    eventType.value = 'concert';
+                    capacity.value = '5000';
+                    performer.value = '';
+                    location.value = '';
+                    supply.value = '5000';
+                    targetRevenue.value = '250000';
+                    
+                    // Reset displayed values
+                    optimalPrice.textContent = '$0.00';
+                    demandLevel.textContent = 'Medium';
+                    expectedRevenue.textContent = '$0.00';
+                    costPerTicket.textContent = '$0.00';
+                    
+                    // Reset recommendations and tiers
+                    recommendationsList.innerHTML = '<div class="recommendation-item">Set base price at $50 for general admission</div>';
+                    updatePricingTiers(50);
+                    
+                    // Reset state
+                    state.eventType = 'concert';
+                    state.capacity = 5000;
+                    state.performer = '';
+                    state.location = '';
+                    state.supply = 5000;
+                    state.targetRevenue = 250000;
+                }
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

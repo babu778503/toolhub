@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<!-- Category: Home Energy -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window Insulation Checker</title>
+    <meta name="description" content="Check your window insulation with our interactive checker. Perfect for improving home energy efficiency and reducing heating costs.">
+    <meta name="keywords" content="window insulation checker, energy efficiency, home insulation, thermal imaging, energy savings, window efficiency, home energy audit, insulation assessment">
+    <meta name="author" content="Home Energy Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Window Insulation Checker">
+    <meta property="og:description" content="Check your window insulation with our interactive checker. Perfect for improving home energy efficiency and reducing heating costs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/window-insulation-checker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --insulation-color: #00c9a7;
+            --thermal-color: #4a90e2;
+            --savings-color: #ffcc00;
+            --energy-color: #ff416c;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Window visualization */
+        .window-visualization {
+            position: relative;
+            height: 300px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .window-frame {
+            position: absolute;
+            width: 80%;
+            height: 70%;
+            background: rgba(50, 50, 65, 0.7);
+            border: 8px solid var(--gray);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .window-pane {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background: rgba(173, 216, 230, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thermal-imaging {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .thermal-spot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        .window-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .window-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--insulation-color);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Inspection areas */
+        .inspection-areas {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .areas-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .area-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .area-item {
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .area-item:hover {
+            background: rgba(60, 60, 80, 0.7);
+        }
+
+        .area-item.active {
+            background: rgba(0, 201, 167, 0.3);
+            border: 1px solid var(--insulation-color);
+        }
+
+        .area-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--insulation-color);
+        }
+
+        .area-name {
+            font-weight: 600;
+            color: var(--insulation-color);
+        }
+
+        .area-status {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .status-good {
+            color: var(--insulation-color);
+        }
+
+        .status-fair {
+            color: var(--savings-color);
+        }
+
+        .status-poor {
+            color: var(--energy-color);
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .insulation-rating {
+            color: var(--insulation-color);
+        }
+
+        .thermal-loss {
+            color: var(--thermal-color);
+        }
+
+        .energy-savings {
+            color: var(--savings-color);
+        }
+
+        .upgrade-cost {
+            color: var(--energy-color);
+        }
+
+        /* Recommendations */
+        .recommendations {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .recommendations-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .recommendation-item {
+            padding: 12px 15px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .recommendation-item:before {
+            content: "•";
+            color: var(--insulation-color);
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .check-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        .export-btn {
+            background: linear-gradient(to right, #ff9a00, #ff6a00);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .window-visualization {
+                height: 250px;
+            }
+            
+            .area-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendation-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Window Insulation Checker</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="window-visualization" id="window-visualization">
+                <div class="window-frame">
+                    <div class="window-pane"></div>
+                </div>
+                <div class="thermal-imaging" id="thermal-imaging"></div>
+                <div class="window-display" id="window-display">0%</div>
+                <div class="window-label" id="window-label">Insulation Rating</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Inspection Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Window Age (years)</div>
+                    <div class="slider-container">
+                        <input type="range" id="window-age" min="1" max="50" value="15">
+                        <span class="control-value" id="window-age-value">15 years</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Frame Material</div>
+                    <div class="slider-container">
+                        <select class="form-input" id="frame-material">
+                            <option value="vinyl">Vinyl</option>
+                            <option value="wood">Wood</option>
+                            <option value="aluminum">Aluminum</option>
+                            <option value="fiberglass">Fiberglass</option>
+                            <option value="composite">Composite</option>
+                        </select>
+                        <span class="control-value" id="frame-material-value">Vinyl</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Glazing Type</div>
+                    <div class="slider-container">
+                        <select class="form-input" id="glazing-type">
+                            <option value="single">Single Pane</option>
+                            <option value="double">Double Pane</option>
+                            <option value="triple">Triple Pane</option>
+                            <option value="lowe">Low-E Double Pane</option>
+                            <option value="argon">Argon Gas Fill</option>
+                        </select>
+                        <span class="control-value" id="glazing-type-value">Single Pane</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="inspection-areas">
+                <div class="areas-title">Inspection Areas</div>
+                <div class="area-grid" id="area-grid">
+                    <!-- Inspection areas will be generated here -->
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Insulation Results</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Insulation Rating</div>
+                        <div class="result-value insulation-rating" id="insulation-rating">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Thermal Loss</div>
+                        <div class="result-value thermal-loss" id="thermal-loss">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Savings</div>
+                        <div class="result-value energy-savings" id="annual-savings">$0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Upgrade Cost</div>
+                        <div class="result-value upgrade-cost" id="upgrade-cost">$0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendations">
+                <div class="recommendations-title">Improvement Recommendations</div>
+                <div class="recommendation-list" id="recommendation-list">
+                    <!-- Recommendations will be generated here -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="check-btn" class="check-btn">Check Insulation</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+                <button id="export-btn" class="export-btn">Export Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                windowAge: 15,
+                frameMaterial: 'vinyl',
+                glazingType: 'single',
+                inspectionAreas: [
+                    { id: 'frame', name: 'Window Frame', icon: '🪟', status: 'fair', active: true },
+                    { id: 'glass', name: 'Glass Panes', icon: '🔍', status: 'poor', active: false },
+                    { id: 'seals', name: 'Seals & Caulking', icon: '🧱', status: 'good', active: false },
+                    { id: 'hardware', name: 'Hardware', icon: '⚙️', status: 'fair', active: false },
+                    { id: 'blinds', name: 'Window Coverings', icon: '🪟', status: 'good', active: false },
+                    { id: 'trim', name: 'Trim & Siding', icon: '🪵', status: 'fair', active: false }
+                ],
+                insulationRating: 0,
+                thermalLoss: 0,
+                annualSavings: 0,
+                upgradeCost: 0,
+                recommendations: []
+            };
+            
+            // DOM elements
+            const windowVisualization = document.getElementById('window-visualization');
+            const thermalImaging = document.getElementById('thermal-imaging');
+            const windowDisplay = document.getElementById('window-display');
+            const windowLabel = document.getElementById('window-label');
+            const windowAgeSlider = document.getElementById('window-age');
+            const frameMaterialSelect = document.getElementById('frame-material');
+            const glazingTypeSelect = document.getElementById('glazing-type');
+            const windowAgeValue = document.getElementById('window-age-value');
+            const frameMaterialValue = document.getElementById('frame-material-value');
+            const glazingTypeValue = document.getElementById('glazing-type-value');
+            const areaGrid = document.getElementById('area-grid');
+            const insulationRating = document.getElementById('insulation-rating');
+            const thermalLoss = document.getElementById('thermal-loss');
+            const annualSavings = document.getElementById('annual-savings');
+            const upgradeCost = document.getElementById('upgrade-cost');
+            const recommendationList = document.getElementById('recommendation-list');
+            const checkBtn = document.getElementById('check-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const exportBtn = document.getElementById('export-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('windowInsulationCheckerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.windowAge = parsed.windowAge || 15;
+                    state.frameMaterial = parsed.frameMaterial || 'vinyl';
+                    state.glazingType = parsed.glazingType || 'single';
+                    state.inspectionAreas = parsed.inspectionAreas || state.inspectionAreas;
+                    state.insulationRating = parsed.insulationRating || 0;
+                    state.thermalLoss = parsed.thermalLoss || 0;
+                    state.annualSavings = parsed.annualSavings || 0;
+                    state.upgradeCost = parsed.upgradeCost || 0;
+                    state.recommendations = parsed.recommendations || [];
+                    
+                    // Update UI
+                    windowAgeSlider.value = state.windowAge;
+                    frameMaterialSelect.value = state.frameMaterial;
+                    glazingTypeSelect.value = state.glazingType;
+                    windowAgeValue.textContent = `${state.windowAge} years`;
+                    frameMaterialValue.textContent = state.frameMaterial.charAt(0).toUpperCase() + state.frameMaterial.slice(1);
+                    glazingTypeValue.textContent = state.glazingType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    insulationRating.textContent = `${state.insulationRating}%`;
+                    thermalLoss.textContent = `${state.thermalLoss}%`;
+                    annualSavings.textContent = `$${state.annualSavings}`;
+                    upgradeCost.textContent = `$${state.upgradeCost}`;
+                    
+                    renderInspectionAreas();
+                    renderRecommendations();
+                    updateThermalImaging();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('windowInsulationCheckerState', JSON.stringify({
+                    windowAge: state.windowAge,
+                    frameMaterial: state.frameMaterial,
+                    glazingType: state.glazingType,
+                    inspectionAreas: state.inspectionAreas,
+                    insulationRating: state.insulationRating,
+                    thermalLoss: state.thermalLoss,
+                    annualSavings: state.annualSavings,
+                    upgradeCost: state.upgradeCost,
+                    recommendations: state.recommendations
+                }));
+            }
+            
+            // Create thermal imaging visualization
+            function createThermalImaging() {
+                thermalImaging.innerHTML = '';
+                state.thermalSpots = [];
+                
+                // Create thermal spots based on insulation rating
+                const spotCount = Math.floor((100 - state.insulationRating) * 0.8);
+                
+                for (let i = 0; i < spotCount; i++) {
+                    const spot = document.createElement('div');
+                    spot.className = 'thermal-spot';
+                    
+                    // Random position
+                    const left = 10 + Math.random() * 80;
+                    const top = 10 + Math.random() * 80;
+                    
+                    spot.style.left = `${left}%`;
+                    spot.style.top = `${top}%`;
+                    
+                    // Random size
+                    const size = 15 + Math.random() * 30;
+                    spot.style.width = `${size}px`;
+                    spot.style.height = `${size}px`;
+                    
+                    // Color based on severity
+                    if (state.insulationRating < 30) {
+                        spot.style.background = 'var(--energy-color)'; // Red for poor insulation
+                    } else if (state.insulationRating < 60) {
+                        spot.style.background = 'var(--savings-color)'; // Yellow for fair insulation
+                    } else {
+                        spot.style.background = 'var(--insulation-color)'; // Green for good insulation
+                    }
+                    
+                    // Random animation
+                    const duration = 2 + Math.random() * 4;
+                    spot.style.animation = `pulse ${duration}s infinite ease-in-out`;
+                    
+                    thermalImaging.appendChild(spot);
+                    state.thermalSpots.push(spot);
+                }
+                
+                // Add CSS for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); opacity: 0.7; }
+                        50% { transform: scale(1.2); opacity: 0.9; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Update thermal imaging
+            function updateThermalImaging() {
+                windowDisplay.textContent = `${state.insulationRating}%`;
+                
+                // Update label based on rating
+                if (state.insulationRating >= 80) {
+                    windowLabel.textContent = 'Excellent Insulation';
+                    windowLabel.style.color = 'var(--insulation-color)';
+                } else if (state.insulationRating >= 60) {
+                    windowLabel.textContent = 'Good Insulation';
+                    windowLabel.style.color = 'var(--savings-color)';
+                } else {
+                    windowLabel.textContent = 'Poor Insulation';
+                    windowLabel.style.color = 'var(--energy-color)';
+                }
+                
+                createThermalImaging();
+            }
+            
+            // Render inspection areas
+            function renderInspectionAreas() {
+                areaGrid.innerHTML = '';
+                
+                state.inspectionAreas.forEach(area => {
+                    const item = document.createElement('div');
+                    item.className = `area-item ${area.active ? 'active' : ''}`;
+                    item.dataset.id = area.id;
+                    
+                    // Status color
+                    let statusClass = '';
+                    switch(area.status) {
+                        case 'good': statusClass = 'status-good'; break;
+                        case 'fair': statusClass = 'status-fair'; break;
+                        case 'poor': statusClass = 'status-poor'; break;
+                    }
+                    
+                    item.innerHTML = `
+                        <div class="area-icon">${area.icon}</div>
+                        <div class="area-name">${area.name}</div>
+                        <div class="area-status ${statusClass}">${area.status.charAt(0).toUpperCase() + area.status.slice(1)}</div>
+                    `;
+                    
+                    areaGrid.appendChild(item);
+                    
+                    // Add click event
+                    item.addEventListener('click', () => {
+                        state.inspectionAreas.forEach(a => a.active = false);
+                        area.active = true;
+                        renderInspectionAreas();
+                        saveState();
+                    });
+                });
+            }
+            
+            // Render recommendations
+            function renderRecommendations() {
+                recommendationList.innerHTML = '';
+                
+                if (state.recommendations.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'recommendation-item';
+                    emptyItem.textContent = 'No recommendations yet. Perform an inspection to get suggestions.';
+                    recommendationList.appendChild(emptyItem);
+                    return;
+                }
+                
+                state.recommendations.forEach(rec => {
+                    const item = document.createElement('div');
+                    item.className = 'recommendation-item';
+                    item.textContent = rec;
+                    recommendationList.appendChild(item);
+                });
+            }
+            
+            // Calculate insulation rating
+            function calculateInsulationRating() {
+                // Base rating based on window age
+                let rating = 100 - (state.windowAge * 2);
+                
+                // Adjust for frame material
+                switch(state.frameMaterial) {
+                    case 'vinyl': rating += 5; break;
+                    case 'wood': rating += 10; break;
+                    case 'fiberglass': rating += 15; break;
+                    case 'composite': rating += 20; break;
+                    case 'aluminum': rating -= 10; break;
+                }
+                
+                // Adjust for glazing type
+                switch(state.glazingType) {
+                    case 'single': rating -= 20; break;
+                    case 'double': rating += 10; break;
+                    case 'triple': rating += 20; break;
+                    case 'lowe': rating += 25; break;
+                    case 'argon': rating += 30; break;
+                }
+                
+                // Adjust for inspection areas
+                state.inspectionAreas.forEach(area => {
+                    if (area.active) {
+                        switch(area.status) {
+                            case 'good': rating += 5; break;
+                            case 'fair': rating -= 5; break;
+                            case 'poor': rating -= 15; break;
+                        }
+                    }
+                });
+                
+                // Clamp rating between 0 and 100
+                state.insulationRating = Math.max(0, Math.min(100, rating));
+                
+                // Calculate thermal loss (inverse of insulation rating)
+                state.thermalLoss = 100 - state.insulationRating;
+                
+                // Calculate annual savings based on rating
+                state.annualSavings = Math.floor(state.insulationRating * 2.5);
+                
+                // Calculate upgrade cost based on current rating
+                if (state.insulationRating < 40) {
+                    state.upgradeCost = 1500;
+                } else if (state.insulationRating < 60) {
+                    state.upgradeCost = 2500;
+                } else if (state.insulationRating < 80) {
+                    state.upgradeCost = 3500;
+                } else {
+                    state.upgradeCost = 0; // No upgrade needed
+                }
+                
+                // Generate recommendations
+                generateRecommendations();
+                
+                // Update UI
+                insulationRating.textContent = `${state.insulationRating}%`;
+                thermalLoss.textContent = `${state.thermalLoss}%`;
+                annualSavings.textContent = `$${state.annualSavings}`;
+                upgradeCost.textContent = `$${state.upgradeCost}`;
+                
+                updateThermalImaging();
+                renderRecommendations();
+                saveState();
+            }
+            
+            // Generate recommendations
+            function generateRecommendations() {
+                state.recommendations = [];
+                
+                // Add recommendations based on rating
+                if (state.insulationRating < 30) {
+                    state.recommendations.push('Replace windows with energy-efficient double-pane models');
+                    state.recommendations.push('Install low-E glass coating to reduce heat transfer');
+                    state.recommendations.push('Add storm windows for additional insulation');
+                } else if (state.insulationRating < 50) {
+                    state.recommendations.push('Upgrade to triple-pane windows for better insulation');
+                    state.recommendations.push('Seal gaps around window frames with caulk or weatherstripping');
+                    state.recommendations.push('Consider cellular shades or heavy drapes for added insulation');
+                } else if (state.insulationRating < 70) {
+                    state.recommendations.push('Apply window film to reduce heat transfer');
+                    state.recommendations.push('Check and replace worn weatherstripping');
+                    state.recommendations.push('Install insulated curtains to improve thermal performance');
+                } else {
+                    state.recommendations.push('Your windows have good insulation. Regular maintenance recommended.');
+                    state.recommendations.push('Clean windows regularly to maintain efficiency');
+                    state.recommendations.push('Inspect seals annually and replace as needed');
+                }
+                
+                // Add recommendations based on specific issues
+                state.inspectionAreas.forEach(area => {
+                    if (area.active && area.status === 'poor') {
+                        switch(area.id) {
+                            case 'frame':
+                                state.recommendations.push('Replace old aluminum frames with vinyl or fiberglass for better insulation');
+                                break;
+                            case 'glass':
+                                state.recommendations.push('Upgrade to double or triple-pane glass for improved thermal performance');
+                                break;
+                            case 'seals':
+                                state.recommendations.push('Replace worn seals and caulk gaps to prevent air leaks');
+                                break;
+                            case 'hardware':
+                                state.recommendations.push('Replace old hardware to ensure proper window sealing');
+                                break;
+                            case 'blinds':
+                                state.recommendations.push('Install insulated cellular shades to reduce heat transfer');
+                                break;
+                            case 'trim':
+                                state.recommendations.push('Seal gaps between trim and wall with caulk for better insulation');
+                                break;
+                        }
+                    }
+                });
+            }
+            
+            // Export report
+            function exportReport() {
+                alert('Report exported successfully!');
+                // In a real application, this would generate a PDF or CSV report
+            }
+            
+            // Event listeners
+            windowAgeSlider.addEventListener('input', () => {
+                state.windowAge = parseInt(windowAgeSlider.value);
+                windowAgeValue.textContent = `${state.windowAge} years`;
+                saveState();
+            });
+            
+            frameMaterialSelect.addEventListener('change', () => {
+                state.frameMaterial = frameMaterialSelect.value;
+                frameMaterialValue.textContent = state.frameMaterial.charAt(0).toUpperCase() + state.frameMaterial.slice(1);
+                saveState();
+            });
+            
+            glazingTypeSelect.addEventListener('change', () => {
+                state.glazingType = glazingTypeSelect.value;
+                glazingTypeValue.textContent = state.glazingType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                saveState();
+            });
+            
+            checkBtn.addEventListener('click', () => {
+                calculateInsulationRating();
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('windowInsulationCheckerState');
+                    
+                    // Reset to defaults
+                    state.windowAge = 15;
+                    state.frameMaterial = 'vinyl';
+                    state.glazingType = 'single';
+                    state.inspectionAreas = [
+                        { id: 'frame', name: 'Window Frame', icon: '🪟', status: 'fair', active: true },
+                        { id: 'glass', name: 'Glass Panes', icon: '🔍', status: 'poor', active: false },
+                        { id: 'seals', name: 'Seals & Caulking', icon: '🧱', status: 'good', active: false },
+                        { id: 'hardware', name: 'Hardware', icon: '⚙️', status: 'fair', active: false },
+                        { id: 'blinds', name: 'Window Coverings', icon: '🪟', status: 'good', active: false },
+                        { id: 'trim', name: 'Trim & Siding', icon: '🪵', status: 'fair', active: false }
+                    ];
+                    state.insulationRating = 0;
+                    state.thermalLoss = 0;
+                    state.annualSavings = 0;
+                    state.upgradeCost = 0;
+                    state.recommendations = [];
+                    
+                    // Update UI
+                    windowAgeSlider.value = state.windowAge;
+                    frameMaterialSelect.value = state.frameMaterial;
+                    glazingTypeSelect.value = state.glazingType;
+                    windowAgeValue.textContent = `${state.windowAge} years`;
+                    frameMaterialValue.textContent = state.frameMaterial.charAt(0).toUpperCase() + state.frameMaterial.slice(1);
+                    glazingTypeValue.textContent = state.glazingType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    insulationRating.textContent = `${state.insulationRating}%`;
+                    thermalLoss.textContent = `${state.thermalLoss}%`;
+                    annualSavings.textContent = `$${state.annualSavings}`;
+                    upgradeCost.textContent = `$${state.upgradeCost}`;
+                    
+                    renderInspectionAreas();
+                    renderRecommendations();
+                    updateThermalImaging();
+                    saveState();
+                }
+            });
+            
+            exportBtn.addEventListener('click', exportReport);
+            
+            // Initialize the app
+            loadState();
+            renderInspectionAreas();
+            renderRecommendations();
+            updateThermalImaging();
+        });
+    </script>
+</body>
+</html>

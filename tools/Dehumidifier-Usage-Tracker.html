@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<!-- Category: Humidity Control -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dehumidifier Usage Tracker</title>
+    <meta name="description" content="Track your dehumidifier usage with our interactive tracker. Perfect for controlling humidity and improving indoor air quality.">
+    <meta name="keywords" content="dehumidifier usage tracker, humidity control, moisture tracking, indoor air quality, dehumidifier monitor, humidity monitor, moisture control, air quality">
+    <meta name="author" content="Humidity Control Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Dehumidifier Usage Tracker">
+    <meta property="og:description" content="Track your dehumidifier usage with our interactive tracker. Perfect for controlling humidity and improving indoor air quality.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/dehumidifier-usage-tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --humidity-color: #00c9a7;
+            --water-color: #4a90e2;
+            --control-color: #ffcc00;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Humidity visualization */
+        .humidity-visualization {
+            position: relative;
+            height: 300px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room {
+            position: absolute;
+            width: 80%;
+            height: 70%;
+            background: rgba(50, 50, 65, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .dehumidifier {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 120px;
+            background: var(--gray);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dehumidifier-icon {
+            font-size: 2.5rem;
+            color: var(--humidity-color);
+        }
+
+        .humidity-drops {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .humidity-drop {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--water-color);
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        .humidity-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .humidity-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--humidity-color);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Usage stats */
+        .usage-stats {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .current-humidity {
+            color: var(--humidity-color);
+        }
+
+        .target-humidity {
+            color: var(--water-color);
+        }
+
+        .usage-time {
+            color: var(--control-color);
+        }
+
+        .water-removed {
+            color: var(--accent);
+        }
+
+        /* Scheduling */
+        .scheduling {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .scheduling-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .schedule-group {
+            margin-bottom: 15px;
+        }
+
+        .schedule-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .schedule-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-input {
+            width: 80px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Presets */
+        .presets {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .presets-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .preset-btn.active {
+            background: var(--humidity-color);
+            color: white;
+        }
+
+        /* Timer display */
+        .timer-display {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .timer-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .time-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--humidity-color);
+            margin: 10px 0;
+        }
+
+        .status-display {
+            font-size: 1.2rem;
+            color: var(--control-color);
+            font-weight: 600;
+        }
+
+        /* Power control */
+        .power-control {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .power-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .power-toggle {
+            width: 100px;
+            height: 50px;
+            background: var(--gray);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+
+        .power-toggle.on {
+            background: var(--humidity-color);
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .power-toggle.on .toggle-handle {
+            left: 55px;
+        }
+
+        .power-label {
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .start-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .stop-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .humidity-visualization {
+                height: 250px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                justify-content: center;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Dehumidifier Usage Tracker</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="humidity-visualization" id="humidity-visualization">
+                <div class="room"></div>
+                <div class="dehumidifier">
+                    <div class="dehumidifier-icon">💧</div>
+                </div>
+                <div class="humidity-drops" id="humidity-drops"></div>
+                <div class="humidity-display" id="humidity-display">50%</div>
+                <div class="humidity-label" id="humidity-label">Comfortable Humidity</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Humidity Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Current Humidity</div>
+                    <div class="slider-container">
+                        <input type="range" id="current-humidity" min="0" max="100" value="50">
+                        <span class="control-value" id="current-humidity-value">50%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Target Humidity</div>
+                    <div class="slider-container">
+                        <input type="range" id="target-humidity" min="30" max="60" value="45">
+                        <span class="control-value" id="target-humidity-value">45%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Tank Capacity (L)</div>
+                    <div class="slider-container">
+                        <input type="range" id="tank-capacity" min="1" max="10" value="4" step="0.5">
+                        <span class="control-value" id="tank-capacity-value">4L</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="usage-stats">
+                <div class="stats-title">Usage Statistics</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Current Humidity</div>
+                        <div class="stat-value current-humidity" id="stat-current-humidity">50%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Target Humidity</div>
+                        <div class="stat-value target-humidity" id="stat-target-humidity">45%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Usage Time</div>
+                        <div class="stat-value usage-time" id="stat-usage-time">0h 0m</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Water Removed</div>
+                        <div class="stat-value water-removed" id="stat-water-removed">0.0L</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="scheduling">
+                <div class="scheduling-title">Scheduling</div>
+                <div class="schedule-group">
+                    <div class="schedule-label">Start Time</div>
+                    <div class="schedule-container">
+                        <input type="time" class="time-input" id="start-time" value="08:00">
+                        <span class="control-value" id="start-time-value">08:00</span>
+                    </div>
+                </div>
+                
+                <div class="schedule-group">
+                    <div class="schedule-label">End Time</div>
+                    <div class="schedule-container">
+                        <input type="time" class="time-input" id="end-time" value="22:00">
+                        <span class="control-value" id="end-time-value">22:00</span>
+                    </div>
+                </div>
+                
+                <div class="schedule-group">
+                    <div class="schedule-label">Days Active</div>
+                    <div class="schedule-container">
+                        <select class="time-input" id="days-active">
+                            <option value="weekdays">Weekdays</option>
+                            <option value="weekends">Weekends</option>
+                            <option value="daily" selected>Daily</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <span class="control-value" id="days-value">Daily</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="presets">
+                <div class="presets-title">Humidity Presets</div>
+                <div class="preset-buttons">
+                    <div class="preset-btn active" data-preset="basement">Basement</div>
+                    <div class="preset-btn" data-preset="living">Living Room</div>
+                    <div class="preset-btn" data-preset="bedroom">Bedroom</div>
+                    <div class="preset-btn" data-preset="kitchen">Kitchen</div>
+                    <div class="preset-btn" data-preset="bathroom">Bathroom</div>
+                </div>
+            </div>
+            
+            <div class="timer-display">
+                <div class="timer-title">Dehumidifier Status</div>
+                <div class="time-display" id="time-display">00:00:00</div>
+                <div class="status-display" id="status-display">Dehumidifier Off</div>
+            </div>
+            
+            <div class="power-control">
+                <div class="power-title">Power Control</div>
+                <div class="power-toggle" id="power-toggle">
+                    <div class="toggle-handle"></div>
+                </div>
+                <div class="power-label" id="power-label">Dehumidifier Off</div>
+            </div>
+            
+            <div class="buttons">
+                <button id="start-btn" class="start-btn">▶ Start Dehumidifier</button>
+                <button id="stop-btn" class="stop-btn">⏹ Stop Dehumidifier</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                currentHumidity: 50,
+                targetHumidity: 45,
+                tankCapacity: 4,
+                startTime: '08:00',
+                endTime: '22:00',
+                daysActive: 'daily',
+                powerOn: false,
+                usageTime: 0,
+                waterRemoved: 0,
+                timerActive: false,
+                timerInterval: null,
+                humidityDrops: []
+            };
+            
+            // DOM elements
+            const currentHumiditySlider = document.getElementById('current-humidity');
+            const targetHumiditySlider = document.getElementById('target-humidity');
+            const tankCapacitySlider = document.getElementById('tank-capacity');
+            const currentHumidityValue = document.getElementById('current-humidity-value');
+            const targetHumidityValue = document.getElementById('target-humidity-value');
+            const tankCapacityValue = document.getElementById('tank-capacity-value');
+            const humidityDisplay = document.getElementById('humidity-display');
+            const humidityLabel = document.getElementById('humidity-label');
+            const statCurrentHumidity = document.getElementById('stat-current-humidity');
+            const statTargetHumidity = document.getElementById('stat-target-humidity');
+            const statUsageTime = document.getElementById('stat-usage-time');
+            const statWaterRemoved = document.getElementById('stat-water-removed');
+            const startTimeInput = document.getElementById('start-time');
+            const endTimeInput = document.getElementById('end-time');
+            const daysActiveSelect = document.getElementById('days-active');
+            const startTimeValue = document.getElementById('start-time-value');
+            const endTimeValue = document.getElementById('end-time-value');
+            const daysValue = document.getElementById('days-value');
+            const timeDisplay = document.getElementById('time-display');
+            const statusDisplay = document.getElementById('status-display');
+            const powerToggle = document.getElementById('power-toggle');
+            const powerLabel = document.getElementById('power-label');
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const humidityDrops = document.getElementById('humidity-drops');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('dehumidifierUsageTrackerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.currentHumidity = parsed.currentHumidity || 50;
+                    state.targetHumidity = parsed.targetHumidity || 45;
+                    state.tankCapacity = parsed.tankCapacity || 4;
+                    state.startTime = parsed.startTime || '08:00';
+                    state.endTime = parsed.endTime || '22:00';
+                    state.daysActive = parsed.daysActive || 'daily';
+                    state.powerOn = parsed.powerOn || false;
+                    state.usageTime = parsed.usageTime || 0;
+                    state.waterRemoved = parsed.waterRemoved || 0;
+                    
+                    // Update UI
+                    currentHumiditySlider.value = state.currentHumidity;
+                    targetHumiditySlider.value = state.targetHumidity;
+                    tankCapacitySlider.value = state.tankCapacity;
+                    startTimeInput.value = state.startTime;
+                    endTimeInput.value = state.endTime;
+                    daysActiveSelect.value = state.daysActive;
+                    
+                    currentHumidityValue.textContent = `${state.currentHumidity}%`;
+                    targetHumidityValue.textContent = `${state.targetHumidity}%`;
+                    tankCapacityValue.textContent = `${state.tankCapacity}L`;
+                    startTimeValue.textContent = state.startTime;
+                    endTimeValue.textContent = state.endTime;
+                    daysValue.textContent = daysActiveSelect.options[daysActiveSelect.selectedIndex].text;
+                    statCurrentHumidity.textContent = `${state.currentHumidity}%`;
+                    statTargetHumidity.textContent = `${state.targetHumidity}%`;
+                    
+                    const hours = Math.floor(state.usageTime / 60);
+                    const minutes = state.usageTime % 60;
+                    statUsageTime.textContent = `${hours}h ${minutes}m`;
+                    statWaterRemoved.textContent = `${state.waterRemoved.toFixed(1)}L`;
+                    
+                    if (state.powerOn) {
+                        powerToggle.classList.add('on');
+                        powerLabel.textContent = 'Dehumidifier On';
+                        statusDisplay.textContent = 'Removing Moisture...';
+                    }
+                    
+                    updateHumidityVisualization();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('dehumidifierUsageTrackerState', JSON.stringify({
+                    currentHumidity: state.currentHumidity,
+                    targetHumidity: state.targetHumidity,
+                    tankCapacity: state.tankCapacity,
+                    startTime: state.startTime,
+                    endTime: state.endTime,
+                    daysActive: state.daysActive,
+                    powerOn: state.powerOn,
+                    usageTime: state.usageTime,
+                    waterRemoved: state.waterRemoved
+                }));
+            }
+            
+            // Create humidity visualization
+            function createHumidityVisualization() {
+                humidityDrops.innerHTML = '';
+                state.humidityDrops = [];
+                
+                // Create humidity drops based on current humidity
+                const dropCount = Math.floor(state.currentHumidity * 0.6);
+                
+                for (let i = 0; i < dropCount; i++) {
+                    const drop = document.createElement('div');
+                    drop.className = 'humidity-drop';
+                    
+                    // Random position
+                    const left = Math.random() * 100;
+                    const top = Math.random() * 100;
+                    
+                    drop.style.left = `${left}%`;
+                    drop.style.top = `${top}%`;
+                    
+                    // Random size
+                    const size = 8 + Math.random() * 12;
+                    drop.style.width = `${size}px`;
+                    drop.style.height = `${size}px`;
+                    
+                    // Random animation
+                    const duration = 2 + Math.random() * 4;
+                    drop.style.animation = `fall ${duration}s linear infinite`;
+                    
+                    humidityDrops.appendChild(drop);
+                    state.humidityDrops.push(drop);
+                }
+                
+                // Add CSS for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fall {
+                        0% { transform: translateY(-100%); opacity: 0.7; }
+                        100% { transform: translateY(100vh); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Update humidity visualization
+            function updateHumidityVisualization() {
+                humidityDisplay.textContent = `${state.currentHumidity}%`;
+                
+                // Update label based on humidity level
+                if (state.currentHumidity > 60) {
+                    humidityLabel.textContent = 'High Humidity';
+                    humidityLabel.style.color = '#ff416c';
+                } else if (state.currentHumidity > 50) {
+                    humidityLabel.textContent = 'Moderate Humidity';
+                    humidityLabel.style.color = '#ffcc00';
+                } else {
+                    humidityLabel.textContent = 'Comfortable Humidity';
+                    humidityLabel.style.color = '#00c9a7';
+                }
+                
+                // Update drops
+                createHumidityVisualization();
+            }
+            
+            // Start timer
+            function startTimer() {
+                if (state.timerInterval) {
+                    clearInterval(state.timerInterval);
+                }
+                
+                // Update time display immediately
+                const now = new Date();
+                timeDisplay.textContent = now.toLocaleTimeString();
+                
+                state.timerInterval = setInterval(() => {
+                    // Update time display
+                    const now = new Date();
+                    timeDisplay.textContent = now.toLocaleTimeString();
+                    
+                    // Update usage time
+                    state.usageTime++;
+                    
+                    // Calculate water removed (0.1L per minute at 50% humidity difference)
+                    const humidityDiff = Math.max(0, state.currentHumidity - state.targetHumidity);
+                    const waterPerMinute = (humidityDiff / 100) * 0.1;
+                    state.waterRemoved += waterPerMinute;
+                    
+                    // Update displays
+                    const hours = Math.floor(state.usageTime / 60);
+                    const minutes = state.usageTime % 60;
+                    statUsageTime.textContent = `${hours}h ${minutes}m`;
+                    statWaterRemoved.textContent = `${state.waterRemoved.toFixed(1)}L`;
+                    
+                    // Gradually reduce humidity when dehumidifier is on
+                    if (state.powerOn && state.currentHumidity > state.targetHumidity) {
+                        state.currentHumidity -= 0.1;
+                        currentHumiditySlider.value = Math.round(state.currentHumidity);
+                        currentHumidityValue.textContent = `${Math.round(state.currentHumidity)}%`;
+                        statCurrentHumidity.textContent = `${Math.round(state.currentHumidity)}%`;
+                        updateHumidityVisualization();
+                    }
+                    
+                    saveState();
+                }, 60000); // Update every minute
+            }
+            
+            // Apply preset
+            function applyPreset(preset) {
+                switch(preset) {
+                    case 'basement':
+                        state.currentHumidity = 65;
+                        state.targetHumidity = 50;
+                        break;
+                    case 'living':
+                        state.currentHumidity = 55;
+                        state.targetHumidity = 45;
+                        break;
+                    case 'bedroom':
+                        state.currentHumidity = 50;
+                        state.targetHumidity = 40;
+                        break;
+                    case 'kitchen':
+                        state.currentHumidity = 60;
+                        state.targetHumidity = 50;
+                        break;
+                    case 'bathroom':
+                        state.currentHumidity = 70;
+                        state.targetHumidity = 55;
+                        break;
+                }
+                
+                // Update UI
+                currentHumiditySlider.value = state.currentHumidity;
+                targetHumiditySlider.value = state.targetHumidity;
+                currentHumidityValue.textContent = `${state.currentHumidity}%`;
+                targetHumidityValue.textContent = `${state.targetHumidity}%`;
+                statCurrentHumidity.textContent = `${state.currentHumidity}%`;
+                statTargetHumidity.textContent = `${state.targetHumidity}%`;
+                
+                updateHumidityVisualization();
+                saveState();
+            }
+            
+            // Event listeners
+            currentHumiditySlider.addEventListener('input', () => {
+                state.currentHumidity = parseInt(currentHumiditySlider.value);
+                currentHumidityValue.textContent = `${state.currentHumidity}%`;
+                statCurrentHumidity.textContent = `${state.currentHumidity}%`;
+                updateHumidityVisualization();
+                saveState();
+            });
+            
+            targetHumiditySlider.addEventListener('input', () => {
+                state.targetHumidity = parseInt(targetHumiditySlider.value);
+                targetHumidityValue.textContent = `${state.targetHumidity}%`;
+                statTargetHumidity.textContent = `${state.targetHumidity}%`;
+                saveState();
+            });
+            
+            tankCapacitySlider.addEventListener('input', () => {
+                state.tankCapacity = parseFloat(tankCapacitySlider.value);
+                tankCapacityValue.textContent = `${state.tankCapacity}L`;
+                saveState();
+            });
+            
+            startTimeInput.addEventListener('change', () => {
+                state.startTime = startTimeInput.value;
+                startTimeValue.textContent = state.startTime;
+                saveState();
+            });
+            
+            endTimeInput.addEventListener('change', () => {
+                state.endTime = endTimeInput.value;
+                endTimeValue.textContent = state.endTime;
+                saveState();
+            });
+            
+            daysActiveSelect.addEventListener('change', () => {
+                state.daysActive = daysActiveSelect.value;
+                daysValue.textContent = daysActiveSelect.options[daysActiveSelect.selectedIndex].text;
+                saveState();
+            });
+            
+            powerToggle.addEventListener('click', () => {
+                state.powerOn = !state.powerOn;
+                
+                if (state.powerOn) {
+                    powerToggle.classList.add('on');
+                    powerLabel.textContent = 'Dehumidifier On';
+                    statusDisplay.textContent = 'Removing Moisture...';
+                    startTimer();
+                } else {
+                    powerToggle.classList.remove('on');
+                    powerLabel.textContent = 'Dehumidifier Off';
+                    statusDisplay.textContent = 'Dehumidifier Off';
+                    
+                    if (state.timerInterval) {
+                        clearInterval(state.timerInterval);
+                        state.timerInterval = null;
+                    }
+                }
+                
+                saveState();
+            });
+            
+            startBtn.addEventListener('click', () => {
+                state.powerOn = true;
+                powerToggle.classList.add('on');
+                powerLabel.textContent = 'Dehumidifier On';
+                statusDisplay.textContent = 'Removing Moisture...';
+                startTimer();
+                saveState();
+            });
+            
+            stopBtn.addEventListener('click', () => {
+                state.powerOn = false;
+                powerToggle.classList.remove('on');
+                powerLabel.textContent = 'Dehumidifier Off';
+                statusDisplay.textContent = 'Dehumidifier Off';
+                
+                if (state.timerInterval) {
+                    clearInterval(state.timerInterval);
+                    state.timerInterval = null;
+                }
+                
+                saveState();
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('dehumidifierUsageTrackerState');
+                    
+                    // Reset to defaults
+                    state.currentHumidity = 50;
+                    state.targetHumidity = 45;
+                    state.tankCapacity = 4;
+                    state.startTime = '08:00';
+                    state.endTime = '22:00';
+                    state.daysActive = 'daily';
+                    state.powerOn = false;
+                    state.usageTime = 0;
+                    state.waterRemoved = 0;
+                    
+                    // Update UI
+                    currentHumiditySlider.value = state.currentHumidity;
+                    targetHumiditySlider.value = state.targetHumidity;
+                    tankCapacitySlider.value = state.tankCapacity;
+                    startTimeInput.value = state.startTime;
+                    endTimeInput.value = state.endTime;
+                    daysActiveSelect.value = state.daysActive;
+                    
+                    currentHumidityValue.textContent = `${state.currentHumidity}%`;
+                    targetHumidityValue.textContent = `${state.targetHumidity}%`;
+                    tankCapacityValue.textContent = `${state.tankCapacity}L`;
+                    startTimeValue.textContent = state.startTime;
+                    endTimeValue.textContent = state.endTime;
+                    daysValue.textContent = daysActiveSelect.options[daysActiveSelect.selectedIndex].text;
+                    statCurrentHumidity.textContent = `${state.currentHumidity}%`;
+                    statTargetHumidity.textContent = `${state.targetHumidity}%`;
+                    statUsageTime.textContent = '0h 0m';
+                    statWaterRemoved.textContent = '0.0L';
+                    timeDisplay.textContent = '00:00:00';
+                    powerToggle.classList.remove('on');
+                    powerLabel.textContent = 'Dehumidifier Off';
+                    statusDisplay.textContent = 'Dehumidifier Off';
+                    
+                    presetButtons.forEach(btn => {
+                        if (btn.dataset.preset === 'basement') {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    updateHumidityVisualization();
+                }
+            });
+            
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    applyPreset(btn.dataset.preset);
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+            createHumidityVisualization();
+        });
+    </script>
+</body>
+</html>

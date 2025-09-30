@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<!-- Category: Entertainment & Events -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seating Chart Designer</title>
+    <meta name="description" content="Design your event seating chart with our interactive designer. Perfect for concerts, theaters, and events.">
+    <meta name="keywords" content="seating chart designer, event planning, concert seating, theater layout, event management, venue design">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --seat-available: #00c9a7;
+            --seat-reserved: #ff7a9d;
+            --seat-vip: #4a90e2;
+            --seat-disabled: #ffcc00;
+            --seat-sold: #6b5b95;
+            --seat-premium: #ff9f1c;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Venue selector */
+        .venue-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .venue-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .venue-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .venue-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .venue-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .venue-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Seating visualization */
+        .seating-container {
+            position: relative;
+            height: 400px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seating-stage {
+            position: absolute;
+            top: 20px;
+            width: 80%;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .seating-grid {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            gap: 5px;
+            padding: 80px 20px 20px;
+        }
+
+        .seat {
+            width: 25px;
+            height: 25px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .seat:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .seat.available {
+            background: var(--seat-available);
+        }
+
+        .seat.reserved {
+            background: var(--seat-reserved);
+        }
+
+        .seat.vip {
+            background: var(--seat-vip);
+        }
+
+        .seat.disabled {
+            background: var(--seat-disabled);
+        }
+
+        .seat.sold {
+            background: var(--seat-sold);
+        }
+
+        .seat.premium {
+            background: var(--seat-premium);
+        }
+
+        .seat.selected {
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .seat-number {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            color: #aaa;
+        }
+
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .seat-type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .seat-type-btn {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(70, 70, 90, 0.7);
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .seat-type-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .seat-type-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: rgba(40, 40, 55, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .available-stat {
+            color: var(--seat-available);
+        }
+
+        .reserved-stat {
+            color: var(--seat-reserved);
+        }
+
+        .vip-stat {
+            color: var(--seat-vip);
+        }
+
+        .sold-stat {
+            color: var(--seat-sold);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .add-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        .export-btn {
+            background: linear-gradient(to right, #ff9a00, #ff6a00);
+        }
+
+        .import-btn {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .seating-container {
+                height: 300px;
+            }
+            
+            .seating-grid {
+                grid-template-columns: repeat(15, 1fr);
+                gap: 3px;
+                padding: 70px 10px 10px;
+            }
+            
+            .seat {
+                width: 20px;
+                height: 20px;
+                font-size: 0.6rem;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .legend {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Seating Chart Designer</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="venue-selector">
+                <div class="venue-title">Venue Templates</div>
+                <div class="venue-buttons">
+                    <div class="venue-btn active" data-venue="theater">Theater</div>
+                    <div class="venue-btn" data-venue="stadium">Stadium</div>
+                    <div class="venue-btn" data-venue="amphitheater">Amphitheater</div>
+                    <div class="venue-btn" data-venue="arena">Arena</div>
+                    <div class="venue-btn" data-venue="custom">Custom</div>
+                </div>
+            </div>
+            
+            <div class="seating-container">
+                <div class="seating-stage">STAGE</div>
+                <div class="seating-grid" id="seating-grid">
+                    <!-- Seats will be generated here -->
+                </div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-available);"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-reserved);"></div>
+                    <span>Reserved</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-vip);"></div>
+                    <span>VIP</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-premium);"></div>
+                    <span>Premium</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-sold);"></div>
+                    <span>Sold</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--seat-disabled);"></div>
+                    <span>Disabled</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-label">Current Action: <span class="control-value">Select Seats</span></div>
+                    <div class="seat-type-selector">
+                        <button class="seat-type-btn active" data-type="available">
+                            <span class="seat-type-color" style="background-color: var(--seat-available);"></span> Available
+                        </button>
+                        <button class="seat-type-btn" data-type="reserved">
+                            <span class="seat-type-color" style="background-color: var(--seat-reserved);"></span> Reserved
+                        </button>
+                        <button class="seat-type-btn" data-type="vip">
+                            <span class="seat-type-color" style="background-color: var(--seat-vip);"></span> VIP
+                        </button>
+                        <button class="seat-type-btn" data-type="premium">
+                            <span class="seat-type-color" style="background-color: var(--seat-premium);"></span> Premium
+                        </button>
+                        <button class="seat-type-btn" data-type="sold">
+                            <span class="seat-type-color" style="background-color: var(--seat-sold);"></span> Sold
+                        </button>
+                        <button class="seat-type-btn" data-type="disabled">
+                            <span class="seat-type-color" style="background-color: var(--seat-disabled);"></span> Disabled
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Venue Details</div>
+                    <div class="form-group">
+                        <label class="control-label">Venue Name</label>
+                        <input type="text" class="form-input" id="venue-name" placeholder="Enter venue name" value="Grand Theater">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Total Seats</label>
+                        <input type="number" class="form-input" id="total-seats" value="300" readonly>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Available</div>
+                    <div class="stat-value available-stat" id="available-count">300</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Reserved</div>
+                    <div class="stat-value reserved-stat" id="reserved-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">VIP Seats</div>
+                    <div class="stat-value vip-stat" id="vip-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sold</div>
+                    <div class="stat-value sold-stat" id="sold-count">0</div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="add-btn" class="add-btn">Save Layout</button>
+                <button id="export-btn" class="export-btn">Export</button>
+                <button id="import-btn" class="import-btn">Import</button>
+                <button id="clear-btn" class="clear-btn">Reset All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                seats: [],
+                currentType: 'available',
+                selectedSeats: [],
+                currentVenue: 'theater'
+            };
+            
+            // DOM elements
+            const seatingGrid = document.getElementById('seating-grid');
+            const addBtn = document.getElementById('add-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const importBtn = document.getElementById('import-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const seatTypeButtons = document.querySelectorAll('.seat-type-btn');
+            const venueButtons = document.querySelectorAll('.venue-btn');
+            const availableCount = document.getElementById('available-count');
+            const reservedCount = document.getElementById('reserved-count');
+            const vipCount = document.getElementById('vip-count');
+            const soldCount = document.getElementById('sold-count');
+            const totalSeatsInput = document.getElementById('total-seats');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('seatingChartState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.seats = parsed.seats || [];
+                    state.currentType = parsed.currentType || 'available';
+                    state.currentVenue = parsed.currentVenue || 'theater';
+                    
+                    // Update UI
+                    seatTypeButtons.forEach(btn => {
+                        if (btn.dataset.type === state.currentType) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    venueButtons.forEach(btn => {
+                        if (btn.dataset.venue === state.currentVenue) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    renderSeats();
+                    updateStats();
+                } else {
+                    // Initialize with default layout
+                    initializeSeats();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('seatingChartState', JSON.stringify({
+                    seats: state.seats,
+                    currentType: state.currentType,
+                    currentVenue: state.currentVenue
+                }));
+            }
+            
+            // Initialize seats
+            function initializeSeats() {
+                state.seats = [];
+                
+                // Create seats based on current venue
+                let seatCount = 300;
+                switch(state.currentVenue) {
+                    case 'stadium':
+                        seatCount = 500;
+                        break;
+                    case 'amphitheater':
+                        seatCount = 400;
+                        break;
+                    case 'arena':
+                        seatCount = 600;
+                        break;
+                    case 'custom':
+                        seatCount = 350;
+                        break;
+                }
+                
+                for (let i = 0; i < seatCount; i++) {
+                    state.seats.push({
+                        id: i,
+                        type: 'available',
+                        selected: false,
+                        row: Math.floor(i / 20),
+                        number: (i % 20) + 1
+                    });
+                }
+                
+                totalSeatsInput.value = seatCount;
+                renderSeats();
+                updateStats();
+            }
+            
+            // Render seats
+            function renderSeats() {
+                seatingGrid.innerHTML = '';
+                
+                state.seats.forEach((seat, index) => {
+                    const seatElement = document.createElement('div');
+                    seatElement.className = `seat ${seat.type}`;
+                    seatElement.dataset.id = seat.id;
+                    
+                    if (seat.selected) {
+                        seatElement.classList.add('selected');
+                    }
+                    
+                    // Add seat number
+                    const seatNumber = document.createElement('div');
+                    seatNumber.className = 'seat-number';
+                    seatNumber.textContent = `${String.fromCharCode(65 + seat.row)}${seat.number}`;
+                    seatElement.appendChild(seatNumber);
+                    
+                    // Add click event
+                    seatElement.addEventListener('click', () => {
+                        if (state.currentType === 'select') {
+                            // Toggle selection
+                            seat.selected = !seat.selected;
+                            seatElement.classList.toggle('selected', seat.selected);
+                        } else {
+                            // Change seat type
+                            seat.type = state.currentType;
+                            seatElement.className = `seat ${seat.type}`;
+                        }
+                        updateStats();
+                        saveState();
+                    });
+                    
+                    seatingGrid.appendChild(seatElement);
+                });
+            }
+            
+            // Update statistics
+            function updateStats() {
+                let available = 0;
+                let reserved = 0;
+                let vip = 0;
+                let sold = 0;
+                let premium = 0;
+                let disabled = 0;
+                
+                state.seats.forEach(seat => {
+                    switch(seat.type) {
+                        case 'available':
+                            available++;
+                            break;
+                        case 'reserved':
+                            reserved++;
+                            break;
+                        case 'vip':
+                            vip++;
+                            break;
+                        case 'sold':
+                            sold++;
+                            break;
+                        case 'premium':
+                            premium++;
+                            break;
+                        case 'disabled':
+                            disabled++;
+                            break;
+                    }
+                });
+                
+                availableCount.textContent = available;
+                reservedCount.textContent = reserved;
+                vipCount.textContent = vip;
+                soldCount.textContent = sold;
+            }
+            
+            // Export layout
+            function exportLayout() {
+                const dataStr = JSON.stringify(state.seats);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `seating-layout-${state.currentVenue}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+            }
+            
+            // Import layout
+            function importLayout() {
+                alert('Import functionality would typically involve file upload. For this demo, we\'ll reset to default.');
+                initializeSeats();
+                saveState();
+            }
+            
+            // Event listeners
+            seatTypeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    seatTypeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentType = btn.dataset.type;
+                });
+            });
+            
+            venueButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    venueButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentVenue = btn.dataset.venue;
+                    initializeSeats();
+                    saveState();
+                });
+            });
+            
+            addBtn.addEventListener('click', () => {
+                alert('Seating chart layout saved successfully!');
+                saveState();
+            });
+            
+            exportBtn.addEventListener('click', exportLayout);
+            
+            importBtn.addEventListener('click', importLayout);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to reset the entire seating chart?')) {
+                    initializeSeats();
+                    saveState();
+                }
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

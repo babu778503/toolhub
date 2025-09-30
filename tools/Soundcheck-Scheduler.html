@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<!-- Category: Entertainment & Events -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soundcheck Scheduler</title>
+    <meta name="description" content="Plan your event soundchecks with our interactive scheduler. Perfect for concerts, festivals, and music events.">
+    <meta name="keywords" content="soundcheck scheduler, event planning, concert scheduling, music event, soundcheck management, artist scheduling">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --artist-color: #00c9a7;
+            --soundcheck-color: #ff7a9d;
+            --stage-color: #4a90e2;
+            --equipment-color: #ffcc00;
+            --conflict-color: #ff416c;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Event selector */
+        .event-selector {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .event-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .event-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .event-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Timeline visualization */
+        .timeline-container {
+            position: relative;
+            height: 250px;
+            margin: 25px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+        }
+
+        .timeline {
+            position: relative;
+            height: 100%;
+            min-width: 1000px;
+            padding: 20px 0;
+        }
+
+        .time-marker {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            border-left: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .time-label {
+            position: absolute;
+            top: 0;
+            left: -15px;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .soundcheck-slot {
+            position: absolute;
+            height: 50px;
+            border-radius: 8px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .soundcheck-slot:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .slot-content {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .slot-equipment {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .conflict-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--conflict-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+        }
+
+        /* Form */
+        .form-container {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Equipment selector */
+        .equipment-selector {
+            margin-top: 10px;
+        }
+
+        .equipment-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .equipment-option input {
+            margin-right: 8px;
+        }
+
+        /* Schedule list */
+        .schedule-list {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .list-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .schedule-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-item:hover {
+            background: rgba(60, 60, 80, 0.7);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: var(--artist-color);
+        }
+
+        .item-time {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        .item-equipment {
+            font-size: 0.8rem;
+            color: var(--equipment-color);
+            margin-top: 3px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+        }
+
+        /* Artist profiles */
+        .artist-profiles {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .profile-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .profile-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .profile-card {
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-card:hover {
+            background: rgba(60, 60, 80, 0.7);
+            transform: translateY(-3px);
+        }
+
+        .profile-name {
+            font-weight: 600;
+            color: var(--artist-color);
+            margin-bottom: 5px;
+        }
+
+        .profile-details {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        /* Conflict detection */
+        .conflicts {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(255, 65, 108, 0.2);
+            border-radius: 10px;
+            border-left: 4px solid var(--conflict-color);
+        }
+
+        .conflict-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--conflict-color);
+            text-align: center;
+        }
+
+        .conflict-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 65, 108, 0.1);
+            border-radius: 5px;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .add-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .delete-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        .export-btn {
+            background: linear-gradient(to right, #ff9a00, #ff6a00);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .timeline-container {
+                height: 200px;
+            }
+            
+            .soundcheck-slot {
+                height: 40px;
+                padding: 5px 10px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .item-actions {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .event-selector {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Soundcheck Scheduler</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="event-selector">
+                <div class="event-btn active" data-event="main">Main Event</div>
+                <div class="event-btn" data-event="afterparty">After Party</div>
+                <div class="event-btn" data-event="soundcheck">Soundcheck Day</div>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline" id="timeline">
+                    <!-- Timeline markers and slots will be added here -->
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <div class="form-title">Add Soundcheck</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Artist/Band Name</label>
+                        <input type="text" class="form-input" id="artist-name" placeholder="Enter artist name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stage</label>
+                        <input type="text" class="form-input" id="stage" placeholder="Enter stage name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-input" id="start-time" value="10:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Duration (minutes)</label>
+                        <input type="number" class="form-input" id="duration" min="15" max="120" value="30">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Required Equipment</label>
+                    <div class="equipment-selector">
+                        <div class="equipment-option">
+                            <input type="checkbox" id="mic" value="Microphone">
+                            <label for="mic">Microphone</label>
+                        </div>
+                        <div class="equipment-option">
+                            <input type="checkbox" id="drums" value="Drums">
+                            <label for="drums">Drums</label>
+                        </div>
+                        <div class="equipment-option">
+                            <input type="checkbox" id="guitar" value="Guitar">
+                            <label for="guitar">Guitar</label>
+                        </div>
+                        <div class="equipment-option">
+                            <input type="checkbox" id="keyboard" value="Keyboard">
+                            <label for="keyboard">Keyboard</label>
+                        </div>
+                        <div class="equipment-option">
+                            <input type="checkbox" id="lights" value="Stage Lights">
+                            <label for="lights">Stage Lights</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="schedule-list">
+                <div class="list-title">Scheduled Soundchecks</div>
+                <div id="schedule-list">
+                    <!-- Schedule items will be added here -->
+                </div>
+            </div>
+            
+            <div class="artist-profiles">
+                <div class="profile-title">Artist Profiles</div>
+                <div class="profile-list" id="profile-list">
+                    <!-- Profile cards will be added here -->
+                </div>
+            </div>
+            
+            <div class="conflicts">
+                <div class="conflict-title">Conflicts Detected</div>
+                <div id="conflict-list">
+                    <!-- Conflict items will be added here -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="add-btn" class="add-btn">Add Soundcheck</button>
+                <button id="export-btn" class="export-btn">Export Schedule</button>
+                <button id="delete-btn" class="delete-btn">Delete Selected</button>
+                <button id="clear-btn" class="clear-btn">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                currentEvent: 'main',
+                soundchecks: {
+                    main: [],
+                    afterparty: [],
+                    soundcheck: []
+                },
+                artists: [
+                    { name: "The Rockers", genre: "Rock", contact: "rock@band.com", equipment: ["Guitar", "Drums"] },
+                    { name: "Jazz Collective", genre: "Jazz", contact: "jazz@band.com", equipment: ["Piano", "Saxophone"] },
+                    { name: "Electronic Pulse", genre: "EDM", contact: "pulse@band.com", equipment: ["Synthesizer", "Drum Machine"] },
+                    { name: "Country Roads", genre: "Country", contact: "country@band.com", equipment: ["Guitar", "Banjo"] }
+                ],
+                selectedSoundcheck: null
+            };
+            
+            // DOM elements
+            const timeline = document.getElementById('timeline');
+            const scheduleList = document.getElementById('schedule-list');
+            const profileList = document.getElementById('profile-list');
+            const conflictList = document.getElementById('conflict-list');
+            const addBtn = document.getElementById('add-btn');
+            const deleteBtn = document.getElementById('delete-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const artistName = document.getElementById('artist-name');
+            const stage = document.getElementById('stage');
+            const startTime = document.getElementById('start-time');
+            const duration = document.getElementById('duration');
+            const eventButtons = document.querySelectorAll('.event-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('soundcheckSchedulerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.soundchecks = parsed.soundchecks || state.soundchecks;
+                    state.artists = parsed.artists || state.artists;
+                    state.currentEvent = parsed.currentEvent || 'main';
+                    
+                    // Update UI
+                    eventButtons.forEach(btn => {
+                        if (btn.dataset.event === state.currentEvent) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    renderTimeline();
+                    renderScheduleList();
+                    renderProfiles();
+                    detectConflicts();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('soundcheckSchedulerState', JSON.stringify({
+                    soundchecks: state.soundchecks,
+                    artists: state.artists,
+                    currentEvent: state.currentEvent
+                }));
+            }
+            
+            // Format time for display
+            function formatTime(date) {
+                return date.toTimeString().substring(0, 5);
+            }
+            
+            // Parse time from string
+            function parseTime(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                const date = new Date();
+                date.setHours(hours, minutes, 0, 0);
+                return date;
+            }
+            
+            // Calculate end time
+            function calculateEndTime(startTime, duration) {
+                const start = parseTime(startTime);
+                const end = new Date(start.getTime() + duration * 60000);
+                return formatTime(end);
+            }
+            
+            // Render timeline
+            function renderTimeline() {
+                // Clear timeline
+                timeline.innerHTML = '';
+                
+                // Add time markers (every 30 minutes)
+                for (let hour = 9; hour <= 18; hour++) {
+                    for (let minute = 0; minute < 60; minute += 30) {
+                        const timeMarker = document.createElement('div');
+                        timeMarker.className = 'time-marker';
+                        
+                        const hourStr = hour.toString().padStart(2, '0');
+                        const minuteStr = minute.toString().padStart(2, '0');
+                        const timeLabel = document.createElement('div');
+                        timeLabel.className = 'time-label';
+                        timeLabel.textContent = `${hourStr}:${minuteStr}`;
+                        
+                        const position = ((hour - 9) * 60 + minute) * 2; // 2px per minute
+                        timeMarker.style.left = `${position}px`;
+                        timeMarker.appendChild(timeLabel);
+                        
+                        timeline.appendChild(timeMarker);
+                    }
+                }
+                
+                // Add soundcheck slots
+                const currentSoundchecks = state.soundchecks[state.currentEvent] || [];
+                currentSoundchecks.forEach((soundcheck, index) => {
+                    const start = parseTime(soundcheck.startTime);
+                    const baseTime = new Date();
+                    baseTime.setHours(9, 0, 0, 0); // 9 AM as base
+                    const position = (start - baseTime) / 60000 * 2; // 2px per minute
+                    const width = soundcheck.duration * 2; // 2px per minute
+                    
+                    const slot = document.createElement('div');
+                    slot.className = 'soundcheck-slot';
+                    slot.style.left = `${position}px`;
+                    slot.style.width = `${width}px`;
+                    slot.style.backgroundColor = `hsl(${(index * 37) % 360}, 70%, 30%)`;
+                    slot.dataset.index = index;
+                    
+                    const slotContent = document.createElement('div');
+                    slotContent.className = 'slot-content';
+                    slotContent.innerHTML = `
+                        <div>${soundcheck.artist}</div>
+                        <div style="font-size: 0.8rem; margin-top: 3px;">${soundcheck.stage}</div>
+                    `;
+                    
+                    slot.appendChild(slotContent);
+                    
+                    // Add equipment indicator
+                    if (soundcheck.equipment && soundcheck.equipment.length > 0) {
+                        const equipmentText = soundcheck.equipment.slice(0, 2).join(', ');
+                        const equipmentIndicator = document.createElement('div');
+                        equipmentIndicator.className = 'slot-equipment';
+                        equipmentIndicator.textContent = equipmentText + (soundcheck.equipment.length > 2 ? '...' : '');
+                        slot.appendChild(equipmentIndicator);
+                    }
+                    
+                    // Add conflict indicator if needed
+                    if (checkConflict(soundcheck)) {
+                        const conflictIndicator = document.createElement('div');
+                        conflictIndicator.className = 'conflict-indicator';
+                        conflictIndicator.textContent = '!';
+                        slot.appendChild(conflictIndicator);
+                    }
+                    
+                    slot.addEventListener('click', () => {
+                        state.selectedSoundcheck = index;
+                        // Highlight selected slot
+                        document.querySelectorAll('.soundcheck-slot').forEach(s => {
+                            s.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+                        });
+                        slot.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.5)';
+                    });
+                    
+                    timeline.appendChild(slot);
+                });
+            }
+            
+            // Check for conflicts
+            function checkConflict(soundcheck) {
+                const currentSoundchecks = state.soundchecks[state.currentEvent] || [];
+                const start = parseTime(soundcheck.startTime);
+                const end = new Date(start.getTime() + soundcheck.duration * 60000);
+                
+                for (const sc of currentSoundchecks) {
+                    if (sc === soundcheck) continue;
+                    
+                    const scStart = parseTime(sc.startTime);
+                    const scEnd = new Date(scStart.getTime() + sc.duration * 60000);
+                    
+                    // Check if times overlap
+                    if (start < scEnd && end > scStart) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+            
+            // Detect conflicts
+            function detectConflicts() {
+                conflictList.innerHTML = '';
+                
+                const currentSoundchecks = state.soundchecks[state.currentEvent] || [];
+                let hasConflicts = false;
+                
+                for (let i = 0; i < currentSoundchecks.length; i++) {
+                    for (let j = i + 1; j < currentSoundchecks.length; j++) {
+                        const sc1 = currentSoundchecks[i];
+                        const sc2 = currentSoundchecks[j];
+                        
+                        const start1 = parseTime(sc1.startTime);
+                        const end1 = new Date(start1.getTime() + sc1.duration * 60000);
+                        const start2 = parseTime(sc2.startTime);
+                        const end2 = new Date(start2.getTime() + sc2.duration * 60000);
+                        
+                        // Check if times overlap
+                        if (start1 < end2 && end1 > start2) {
+                            hasConflicts = true;
+                            
+                            const conflict = document.createElement('div');
+                            conflict.className = 'conflict-item';
+                            conflict.innerHTML = `
+                                <strong>Conflict:</strong> ${sc1.artist} and ${sc2.artist} 
+                                both scheduled at ${sc1.startTime} - ${calculateEndTime(sc1.startTime, sc1.duration)}
+                            `;
+                            
+                            conflictList.appendChild(conflict);
+                        }
+                    }
+                }
+                
+                if (!hasConflicts) {
+                    conflictList.innerHTML = '<div class="conflict-item">No conflicts detected</div>';
+                }
+            }
+            
+            // Render schedule list
+            function renderScheduleList() {
+                scheduleList.innerHTML = '';
+                
+                const currentSoundchecks = state.soundchecks[state.currentEvent] || [];
+                
+                if (currentSoundchecks.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'schedule-item';
+                    emptyItem.innerHTML = '<div style="text-align: center; width: 100%;">No soundchecks scheduled</div>';
+                    scheduleList.appendChild(emptyItem);
+                    return;
+                }
+                
+                currentSoundchecks.forEach((soundcheck, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'schedule-item';
+                    item.dataset.index = index;
+                    
+                    const endTime = calculateEndTime(soundcheck.startTime, soundcheck.duration);
+                    
+                    item.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-name">${soundcheck.artist}</div>
+                            <div class="item-time">${soundcheck.startTime} - ${endTime} | ${soundcheck.stage}</div>
+                            <div class="item-equipment">Equipment: ${soundcheck.equipment ? soundcheck.equipment.join(', ') : 'None'}</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn edit-btn" data-index="${index}">Edit</button>
+                            <button class="action-btn delete-btn" data-index="${index}">Delete</button>
+                        </div>
+                    `;
+                    
+                    scheduleList.appendChild(item);
+                });
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        const soundcheck = currentSoundchecks[index];
+                        
+                        artistName.value = soundcheck.artist;
+                        stage.value = soundcheck.stage;
+                        startTime.value = soundcheck.startTime;
+                        duration.value = soundcheck.duration;
+                        
+                        // Reset equipment checkboxes
+                        document.querySelectorAll('.equipment-option input').forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        
+                        // Check selected equipment
+                        if (soundcheck.equipment) {
+                            soundcheck.equipment.forEach(eq => {
+                                const checkbox = document.querySelector(`input[value="${eq}"]`);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        }
+                        
+                        state.selectedSoundcheck = index;
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        if (confirm('Are you sure you want to delete this soundcheck?')) {
+                            currentSoundchecks.splice(index, 1);
+                            renderTimeline();
+                            renderScheduleList();
+                            detectConflicts();
+                            saveState();
+                        }
+                    });
+                });
+            }
+            
+            // Render artist profiles
+            function renderProfiles() {
+                profileList.innerHTML = '';
+                
+                state.artists.forEach(artist => {
+                    const profile = document.createElement('div');
+                    profile.className = 'profile-card';
+                    profile.innerHTML = `
+                        <div class="profile-name">${artist.name}</div>
+                        <div class="profile-details">Genre: ${artist.genre}</div>
+                        <div class="profile-details">Contact: ${artist.contact}</div>
+                        <div class="profile-details">Equipment: ${artist.equipment.join(', ')}</div>
+                    `;
+                    profileList.appendChild(profile);
+                });
+            }
+            
+            // Add a new soundcheck
+            function addSoundcheck() {
+                const artist = artistName.value.trim();
+                const stageName = stage.value.trim();
+                const startTimeValue = startTime.value;
+                const durationValue = parseInt(duration.value);
+                
+                // Get selected equipment
+                const equipment = [];
+                document.querySelectorAll('.equipment-option input:checked').forEach(checkbox => {
+                    equipment.push(checkbox.value);
+                });
+                
+                if (!artist || !stageName || !startTimeValue || isNaN(durationValue) || durationValue < 15) {
+                    alert('Please fill all fields with valid values');
+                    return;
+                }
+                
+                const soundcheck = {
+                    artist,
+                    stage: stageName,
+                    startTime: startTimeValue,
+                    duration: durationValue,
+                    equipment
+                };
+                
+                const currentSoundchecks = state.soundchecks[state.currentEvent];
+                
+                if (state.selectedSoundcheck !== null) {
+                    // Update existing soundcheck
+                    currentSoundchecks[state.selectedSoundcheck] = soundcheck;
+                    state.selectedSoundcheck = null;
+                } else {
+                    // Add new soundcheck
+                    currentSoundchecks.push(soundcheck);
+                }
+                
+                // Clear form
+                artistName.value = '';
+                stage.value = '';
+                startTime.value = '10:00';
+                duration.value = '30';
+                document.querySelectorAll('.equipment-option input').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                renderTimeline();
+                renderScheduleList();
+                detectConflicts();
+                saveState();
+            }
+            
+            // Export schedule
+            function exportSchedule() {
+                const currentSoundchecks = state.soundchecks[state.currentEvent] || [];
+                
+                if (currentSoundchecks.length === 0) {
+                    alert('No soundchecks to export');
+                    return;
+                }
+                
+                let csv = 'Artist,Stage,Start Time,End Time,Duration,Equipment\n';
+                
+                currentSoundchecks.forEach(soundcheck => {
+                    const endTime = calculateEndTime(soundcheck.startTime, soundcheck.duration);
+                    const equipment = soundcheck.equipment ? soundcheck.equipment.join('; ') : 'None';
+                    
+                    csv += `"${soundcheck.artist}","${soundcheck.stage}","${soundcheck.startTime}","${endTime}","${soundcheck.duration}","${equipment}"\n`;
+                });
+                
+                // Create download link
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `soundcheck-schedule-${state.currentEvent}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('Schedule exported successfully!');
+            }
+            
+            // Event listeners
+            addBtn.addEventListener('click', addSoundcheck);
+            
+            deleteBtn.addEventListener('click', () => {
+                if (state.selectedSoundcheck !== null) {
+                    const currentSoundchecks = state.soundchecks[state.currentEvent];
+                    if (confirm('Are you sure you want to delete this soundcheck?')) {
+                        currentSoundchecks.splice(state.selectedSoundcheck, 1);
+                        state.selectedSoundcheck = null;
+                        renderTimeline();
+                        renderScheduleList();
+                        detectConflicts();
+                        saveState();
+                    }
+                } else {
+                    alert('Please select a soundcheck to delete');
+                }
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all scheduled soundchecks for this event?')) {
+                    state.soundchecks[state.currentEvent] = [];
+                    state.selectedSoundcheck = null;
+                    renderTimeline();
+                    renderScheduleList();
+                    detectConflicts();
+                    saveState();
+                }
+            });
+            
+            exportBtn.addEventListener('click', exportSchedule);
+            
+            eventButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    eventButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentEvent = btn.dataset.event;
+                    renderTimeline();
+                    renderScheduleList();
+                    detectConflicts();
+                    saveState();
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

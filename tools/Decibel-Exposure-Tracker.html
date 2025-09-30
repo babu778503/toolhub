@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<!-- Category: Health & Safety -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decibel Exposure Tracker</title>
+    <meta name="description" content="Track your daily noise exposure with our interactive tracker. Perfect for protecting your hearing and workplace safety.">
+    <meta name="keywords" content="decibel exposure tracker, noise exposure, hearing protection, workplace safety, noise monitoring, daily exposure, audio safety, hearing damage prevention">
+    <meta name="author" content="Health & Safety Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Decibel Exposure Tracker">
+    <meta property="og:description" content="Track your daily noise exposure with our interactive tracker. Perfect for protecting your hearing and workplace safety.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/decibel-exposure-tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --safe-color: #00c9a7;
+            --caution-color: #ffcc00;
+            --danger-color: #ff416c;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Exposure visualization */
+        .exposure-visualization {
+            position: relative;
+            height: 200px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+            gap: 2px;
+        }
+
+        .exposure-bar {
+            flex: 1;
+            background: var(--safe-color);
+            height: 10%;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .exposure-level-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .exposure-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--safe-color);
+            font-weight: bold;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .status-card {
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: var(--safe-color);
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .exposure {
+            color: var(--safe-color);
+        }
+
+        .time {
+            color: var(--caution-color);
+        }
+
+        .threshold {
+            color: var(--danger-color);
+        }
+
+        .risk {
+            color: var(--accent);
+        }
+
+        /* History */
+        .history {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Alerts */
+        .alerts {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .alerts-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .alert-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 65, 108, 0.2);
+            border-radius: 5px;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .start-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .stop-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .exposure-visualization {
+                height: 150px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Decibel Exposure Tracker</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="exposure-visualization" id="exposure-visualization">
+                <!-- Exposure bars will be generated here -->
+            </div>
+            <div class="exposure-level-display" id="exposure-level-display">0 dB</div>
+            <div class="exposure-label" id="exposure-label">Safe Level</div>
+            
+            <div class="status-indicator">
+                <div class="status-card" id="status-card">Exposure Tracking Stopped</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Exposure Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Daily Threshold (dB)</div>
+                    <div class="slider-container">
+                        <input type="range" id="threshold" min="70" max="110" value="85">
+                        <span class="control-value" id="threshold-value">85 dB</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Exposure Duration (min)</div>
+                    <div class="slider-container">
+                        <input type="range" id="duration" min="1" max="120" value="30">
+                        <span class="control-value" id="duration-value">30 min</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Exposure Summary</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Current Exposure</div>
+                        <div class="result-value exposure" id="current-exposure">0.0 dB</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Daily Exposure</div>
+                        <div class="result-value exposure" id="daily-exposure">0.0 dB</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Exposure Time</div>
+                        <div class="result-value time" id="exposure-time">0 min</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Risk Level</div>
+                        <div class="result-value risk" id="risk-level">Low</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history">
+                <div class="history-title">Recent Exposure</div>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+            
+            <div class="alerts">
+                <div class="alerts-title">Safety Alerts</div>
+                <div class="alert-list" id="alert-list">
+                    <div class="alert-item">Exposure levels are within safe limits</div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="start-btn" class="start-btn">Start Tracking</button>
+                <button id="stop-btn" class="stop-btn">Stop Tracking</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                isTracking: false,
+                currentExposure: 0,
+                dailyExposure: 0,
+                exposureTime: 0,
+                threshold: 85,
+                history: [],
+                alerts: [],
+                intervalId: null
+            };
+            
+            // DOM elements
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const thresholdSlider = document.getElementById('threshold');
+            const durationSlider = document.getElementById('duration');
+            const thresholdValue = document.getElementById('threshold-value');
+            const durationValue = document.getElementById('duration-value');
+            const currentExposure = document.getElementById('current-exposure');
+            const dailyExposure = document.getElementById('daily-exposure');
+            const exposureTime = document.getElementById('exposure-time');
+            const riskLevel = document.getElementById('risk-level');
+            const exposureLevelDisplay = document.getElementById('exposure-level-display');
+            const exposureLabel = document.getElementById('exposure-label');
+            const statusCard = document.getElementById('status-card');
+            const historyList = document.getElementById('history-list');
+            const alertList = document.getElementById('alert-list');
+            const exposureVisualization = document.getElementById('exposure-visualization');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('decibelExposureState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.history = parsed.history || [];
+                    state.threshold = parsed.threshold || 85;
+                    state.dailyExposure = parsed.dailyExposure || 0;
+                    state.exposureTime = parsed.exposureTime || 0;
+                    
+                    // Update UI
+                    thresholdSlider.value = state.threshold;
+                    durationSlider.value = 30; // Default duration
+                    thresholdValue.textContent = `${state.threshold} dB`;
+                    durationValue.textContent = `30 min`;
+                    
+                    renderHistory();
+                    updateDisplay();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('decibelExposureState', JSON.stringify({
+                    history: state.history,
+                    threshold: state.threshold,
+                    dailyExposure: state.dailyExposure,
+                    exposureTime: state.exposureTime
+                }));
+            }
+            
+            // Create exposure visualization
+            function createVisualization() {
+                exposureVisualization.innerHTML = '';
+                
+                for (let i = 0; i < 64; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'exposure-bar';
+                    bar.style.height = '5%';
+                    exposureVisualization.appendChild(bar);
+                }
+            }
+            
+            // Update visualization
+            function updateVisualization() {
+                const bars = exposureVisualization.querySelectorAll('.exposure-bar');
+                
+                bars.forEach(bar => {
+                    // Random height for visualization
+                    const height = 10 + Math.random() * 90;
+                    bar.style.height = `${height}%`;
+                    
+                    // Change color based on level
+                    if (state.currentExposure > state.threshold + 20) {
+                        bar.style.background = 'var(--danger-color)';
+                    } else if (state.currentExposure > state.threshold) {
+                        bar.style.background = 'var(--caution-color)';
+                    } else {
+                        bar.style.background = 'var(--safe-color)';
+                    }
+                });
+            }
+            
+            // Update display
+            function updateDisplay() {
+                currentExposure.textContent = `${state.currentExposure.toFixed(1)} dB`;
+                dailyExposure.textContent = `${state.dailyExposure.toFixed(1)} dB`;
+                exposureTime.textContent = `${state.exposureTime} min`;
+                
+                exposureLevelDisplay.textContent = `${state.currentExposure.toFixed(1)} dB`;
+                
+                // Update risk level
+                if (state.currentExposure < state.threshold - 10) {
+                    riskLevel.textContent = 'Low';
+                    exposureLabel.textContent = 'Safe Level';
+                    exposureLabel.style.color = 'var(--safe-color)';
+                    statusCard.style.background = 'var(--safe-color)';
+                } else if (state.currentExposure < state.threshold) {
+                    riskLevel.textContent = 'Moderate';
+                    exposureLabel.textContent = 'Moderate Level';
+                    exposureLabel.style.color = 'var(--caution-color)';
+                    statusCard.style.background = 'var(--caution-color)';
+                } else if (state.currentExposure < state.threshold + 10) {
+                    riskLevel.textContent = 'High';
+                    exposureLabel.textContent = 'High Level';
+                    exposureLabel.style.color = 'var(--danger-color)';
+                    statusCard.style.background = 'var(--danger-color)';
+                } else {
+                    riskLevel.textContent = 'Critical';
+                    exposureLabel.textContent = 'Critical Level';
+                    exposureLabel.style.color = 'var(--danger-color)';
+                    statusCard.style.background = 'var(--danger-color)';
+                }
+                
+                updateVisualization();
+            }
+            
+            // Start tracking
+            function startTracking() {
+                if (state.isTracking) return;
+                
+                state.isTracking = true;
+                state.exposureTime = 0;
+                statusCard.textContent = 'Tracking Exposure...';
+                
+                state.intervalId = setInterval(() => {
+                    // Simulate exposure reading
+                    state.currentExposure = 60 + Math.random() * 50; // Random level between 60-110
+                    state.dailyExposure += state.currentExposure;
+                    
+                    state.exposureTime++;
+                    
+                    updateDisplay();
+                    
+                    // Check for alerts
+                    if (state.currentExposure > state.threshold) {
+                        const alert = {
+                            time: new Date().toLocaleTimeString(),
+                            message: `High exposure detected: ${state.currentExposure.toFixed(1)} dB`
+                        };
+                        
+                        state.alerts.push(alert);
+                        renderAlerts();
+                    }
+                    
+                    // Add to history every 5 minutes
+                    if (state.exposureTime % 5 === 0) {
+                        const reading = {
+                            level: state.currentExposure,
+                            timestamp: new Date().toLocaleTimeString(),
+                            duration: state.exposureTime
+                        };
+                        
+                        state.history.unshift(reading);
+                        
+                        // Keep only last 10 readings
+                        if (state.history.length > 10) {
+                            state.history = state.history.slice(0, 10);
+                        }
+                        
+                        renderHistory();
+                        saveState();
+                    }
+                }, 1000);
+            }
+            
+            // Stop tracking
+            function stopTracking() {
+                if (!state.isTracking) return;
+                
+                state.isTracking = false;
+                clearInterval(state.intervalId);
+                statusCard.textContent = 'Exposure Tracking Stopped';
+            }
+            
+            // Render history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (state.history.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'history-item';
+                    emptyItem.textContent = 'No readings recorded yet';
+                    historyList.appendChild(emptyItem);
+                    return;
+                }
+                
+                state.history.forEach(reading => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div>${reading.timestamp}</div>
+                        <div>${reading.level.toFixed(1)} dB | ${reading.duration} min</div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+            
+            // Render alerts
+            function renderAlerts() {
+                alertList.innerHTML = '';
+                
+                if (state.alerts.length === 0) {
+                    const defaultAlert = document.createElement('div');
+                    defaultAlert.className = 'alert-item';
+                    defaultAlert.textContent = 'Exposure levels are within safe limits';
+                    alertList.appendChild(defaultAlert);
+                    return;
+                }
+                
+                // Show last 3 alerts
+                const recentAlerts = state.alerts.slice(-3);
+                recentAlerts.forEach(alert => {
+                    const item = document.createElement('div');
+                    item.className = 'alert-item';
+                    item.textContent = `${alert.time}: ${alert.message}`;
+                    alertList.appendChild(item);
+                });
+            }
+            
+            // Event listeners
+            startBtn.addEventListener('click', startTracking);
+            
+            stopBtn.addEventListener('click', stopTracking);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    state.history = [];
+                    state.alerts = [];
+                    state.dailyExposure = 0;
+                    state.exposureTime = 0;
+                    
+                    renderHistory();
+                    renderAlerts();
+                    updateDisplay();
+                    saveState();
+                }
+            });
+            
+            thresholdSlider.addEventListener('input', () => {
+                state.threshold = parseInt(thresholdSlider.value);
+                thresholdValue.textContent = `${state.threshold} dB`;
+                saveState();
+            });
+            
+            // Initialize the app
+            loadState();
+            createVisualization();
+            updateDisplay();
+            renderAlerts();
+        });
+    </script>
+</body>
+</html>

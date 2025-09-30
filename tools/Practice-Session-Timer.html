@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<!-- Category: Music Education -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Session Timer</title>
+    <meta name="description" content="Optimize your music practice with our Practice Session Timer. Perfect for musicians, students, and music teachers.">
+    <meta name="keywords" content="practice timer, music timer, pomodoro timer, practice session, music practice, focus timer, productivity timer, music education">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --work-color: #00c9a7;
+            --break-color: #ff7a9d;
+            --progress-bg: #1e1e2e;
+            --session-bg: rgba(30, 30, 40, 0.7);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--session-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Timer display */
+        .timer-display {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .time {
+            font-size: 5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .time.break {
+            color: var(--break-color);
+        }
+
+        .session-type {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--work-color);
+        }
+
+        .session-type.break {
+            color: var(--break-color);
+        }
+
+        /* Progress circle */
+        .progress-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 30px auto;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: var(--progress-bg);
+            stroke-width: 10;
+        }
+
+        .progress-bar {
+            fill: none;
+            stroke: var(--work-color);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .progress-bar.break {
+            stroke: var(--break-color);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Session controls */
+        .session-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .session-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(70, 70, 90, 0.7);
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .session-btn.active {
+            background: var(--work-color);
+            color: white;
+        }
+
+        .session-btn.break.active {
+            background: var(--break-color);
+        }
+
+        /* Presets */
+        .presets {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .preset-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .play-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .stop-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .reset-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #ff9a00, #ff6a00);
+        }
+
+        /* History section */
+        .history {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(40, 40, 55, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .time {
+                font-size: 3.5rem;
+            }
+            
+            .session-type {
+                font-size: 1.5rem;
+            }
+            
+            .progress-container {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .progress-text {
+                font-size: 1.2rem;
+            }
+            
+            .controls {
+                gap: 15px;
+            }
+            
+            .control-label {
+                font-size: 0.85rem;
+            }
+            
+            .slider-container {
+                gap: 5px;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .session-controls {
+                gap: 10px;
+            }
+            
+            .session-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Practice Session Timer</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="timer-display">
+                <div class="session-type" id="session-type">Work</div>
+                <div class="time" id="time">25:00</div>
+            </div>
+            
+            <div class="progress-container">
+                <svg class="progress-circle" width="250" height="250" viewBox="0 0 250 250">
+                    <circle class="progress-bg" cx="125" cy="125" r="115"></circle>
+                    <circle class="progress-bar" cx="125" cy="125" r="115" stroke-dasharray="722.5663103256524" stroke-dashoffset="0"></circle>
+                </svg>
+                <div class="progress-text" id="progress-text">25:00</div>
+            </div>
+            
+            <div class="session-controls">
+                <button class="session-btn active" id="work-btn">Work</button>
+                <button class="session-btn break" id="break-btn">Break</button>
+            </div>
+            
+            <div class="presets">
+                <div class="control-label">
+                    <span>Presets</span>
+                </div>
+                <div class="preset-buttons">
+                    <button class="preset-btn active" data-preset="pomodoro">Pomodoro</button>
+                    <button class="preset-btn" data-preset="music">Music Practice</button>
+                    <button class="preset-btn" data-preset="focus">Focus Mode</button>
+                    <button class="preset-btn" data-preset="quick">Quick Session</button>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Work Duration (min)</span>
+                        <span class="control-value" id="work-value">25</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="work-duration" min="1" max="60" value="25">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Break Duration (min)</span>
+                        <span class="control-value" id="break-value">5</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="break-duration" min="1" max="30" value="5">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="play-btn" class="play-btn">▶ Start</button>
+                <button id="stop-btn" class="stop-btn">⏹ Pause</button>
+                <button id="reset-btn" class="reset-btn">Reset</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Sessions</div>
+                    <div class="stat-value" id="sessions-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Work Time</div>
+                    <div class="stat-value" id="work-time">0h 0m</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Break Time</div>
+                    <div class="stat-value" id="break-time">0h 0m</div>
+                </div>
+            </div>
+            
+            <div class="history">
+                <div class="history-title">Session History</div>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                isRunning: false,
+                isWork: true,
+                workTime: 25 * 60, // in seconds
+                breakTime: 5 * 60, // in seconds
+                currentTime: 25 * 60, // in seconds
+                intervalId: null,
+                audioContext: null,
+                sessionHistory: [],
+                totalSessions: 0,
+                totalWorkTime: 0, // in seconds
+                totalBreakTime: 0 // in seconds
+            };
+            
+            // DOM elements
+            const timeDisplay = document.getElementById('time');
+            const progressText = document.getElementById('progress-text');
+            const sessionType = document.getElementById('session-type');
+            const progressBar = document.querySelector('.progress-bar');
+            const workBtn = document.getElementById('work-btn');
+            const breakBtn = document.getElementById('break-btn');
+            const playBtn = document.getElementById('play-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const workSlider = document.getElementById('work-duration');
+            const breakSlider = document.getElementById('break-duration');
+            const workValue = document.getElementById('work-value');
+            const breakValue = document.getElementById('break-value');
+            const sessionsCount = document.getElementById('sessions-count');
+            const workTimeDisplay = document.getElementById('work-time');
+            const breakTimeDisplay = document.getElementById('break-time');
+            const historyList = document.getElementById('history-list');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('practiceTimerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.workTime = parsed.workTime || 25 * 60;
+                    state.breakTime = parsed.breakTime || 5 * 60;
+                    state.currentTime = state.workTime;
+                    state.isWork = parsed.isWork !== false; // default to true
+                    state.sessionHistory = parsed.sessionHistory || [];
+                    state.totalSessions = parsed.totalSessions || 0;
+                    state.totalWorkTime = parsed.totalWorkTime || 0;
+                    state.totalBreakTime = parsed.totalBreakTime || 0;
+                    
+                    // Update UI
+                    workSlider.value = state.workTime / 60;
+                    breakSlider.value = state.breakTime / 60;
+                    workValue.textContent = state.workTime / 60;
+                    breakValue.textContent = state.breakTime / 60;
+                    
+                    updateDisplay();
+                    updateProgress();
+                    updateSessionType();
+                    updateStats();
+                    renderHistory();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('practiceTimerState', JSON.stringify({
+                    workTime: state.workTime,
+                    breakTime: state.breakTime,
+                    isWork: state.isWork,
+                    sessionHistory: state.sessionHistory,
+                    totalSessions: state.totalSessions,
+                    totalWorkTime: state.totalWorkTime,
+                    totalBreakTime: state.totalBreakTime
+                }));
+            }
+            
+            // Format time as MM:SS
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Format time for display (hours and minutes)
+            function formatTimeDisplay(seconds) {
+                const hours = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                return `${hours}h ${mins}m`;
+            }
+            
+            // Update display
+            function updateDisplay() {
+                timeDisplay.textContent = formatTime(state.currentTime);
+                progressText.textContent = formatTime(state.currentTime);
+                
+                if (!state.isWork) {
+                    timeDisplay.classList.add('break');
+                } else {
+                    timeDisplay.classList.remove('break');
+                }
+            }
+            
+            // Update progress circle
+            function updateProgress() {
+                const totalTime = state.isWork ? state.workTime : state.breakTime;
+                const progress = (totalTime - state.currentTime) / totalTime;
+                const circumference = 2 * Math.PI * 115;
+                const offset = circumference * (1 - progress);
+                
+                progressBar.style.strokeDashoffset = offset;
+                
+                // Change color based on session type
+                if (state.isWork) {
+                    progressBar.classList.remove('break');
+                    progressBar.classList.add('work');
+                    progressBar.style.stroke = 'var(--work-color)';
+                } else {
+                    progressBar.classList.remove('work');
+                    progressBar.classList.add('break');
+                    progressBar.style.stroke = 'var(--break-color)';
+                }
+            }
+            
+            // Update session type display
+            function updateSessionType() {
+                if (state.isWork) {
+                    sessionType.textContent = 'Work';
+                    sessionType.classList.remove('break');
+                    sessionType.classList.add('work');
+                    workBtn.classList.add('active');
+                    breakBtn.classList.remove('active');
+                } else {
+                    sessionType.textContent = 'Break';
+                    sessionType.classList.remove('work');
+                    sessionType.classList.add('break');
+                    workBtn.classList.remove('active');
+                    breakBtn.classList.add('active');
+                }
+            }
+            
+            // Play sound function
+            function playSound() {
+                // Create audio context if needed
+                if (!state.audioContext) {
+                    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Create oscillator
+                const oscillator = state.audioContext.createOscillator();
+                const gainNode = state.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(state.audioContext.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = state.isWork ? 600 : 440;
+                gainNode.gain.value = 0.3;
+                
+                oscillator.start();
+                oscillator.stop(state.audioContext.currentTime + 0.2);
+            }
+            
+            // Add session to history
+            function addSessionToHistory() {
+                const now = new Date();
+                const session = {
+                    date: now.toLocaleDateString(),
+                    time: now.toLocaleTimeString(),
+                    type: state.isWork ? 'Work' : 'Break',
+                    duration: state.isWork ? state.workTime : state.breakTime
+                };
+                
+                state.sessionHistory.unshift(session);
+                
+                // Keep only last 10 sessions
+                if (state.sessionHistory.length > 10) {
+                    state.sessionHistory = state.sessionHistory.slice(0, 10);
+                }
+                
+                renderHistory();
+            }
+            
+            // Render session history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (state.sessionHistory.length === 0) {
+                    historyList.innerHTML = '<div class="history-item">No sessions recorded yet</div>';
+                    return;
+                }
+                
+                state.sessionHistory.forEach(session => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div>${session.date} ${session.time}</div>
+                        <div class="${session.type.toLowerCase()}">${session.type}: ${formatTime(session.duration)}</div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+            
+            // Update statistics
+            function updateStats() {
+                sessionsCount.textContent = state.totalSessions;
+                workTimeDisplay.textContent = formatTimeDisplay(state.totalWorkTime);
+                breakTimeDisplay.textContent = formatTimeDisplay(state.totalBreakTime);
+            }
+            
+            // Timer function
+            function runTimer() {
+                if (!state.isRunning) return;
+                
+                state.currentTime--;
+                
+                if (state.currentTime < 0) {
+                    // Switch to next session
+                    if (state.isWork) {
+                        // Add to break time total
+                        state.totalBreakTime += state.breakTime;
+                    } else {
+                        // Add to work time total and increment session count
+                        state.totalWorkTime += state.workTime;
+                        state.totalSessions++;
+                    }
+                    
+                    // Add to history
+                    addSessionToHistory();
+                    
+                    // Switch session type
+                    state.isWork = !state.isWork;
+                    state.currentTime = state.isWork ? state.workTime : state.breakTime;
+                    
+                    // Play sound
+                    playSound();
+                    
+                    // Update UI
+                    updateSessionType();
+                    updateStats();
+                    saveState();
+                }
+                
+                updateDisplay();
+                updateProgress();
+                
+                // Continue running
+                state.intervalId = setTimeout(runTimer, 1000);
+            }
+            
+            // Apply preset
+            function applyPreset(preset) {
+                switch(preset) {
+                    case 'pomodoro':
+                        state.workTime = 25 * 60;
+                        state.breakTime = 5 * 60;
+                        break;
+                    case 'music':
+                        state.workTime = 45 * 60;
+                        state.breakTime = 15 * 60;
+                        break;
+                    case 'focus':
+                        state.workTime = 50 * 60;
+                        state.breakTime = 10 * 60;
+                        break;
+                    case 'quick':
+                        state.workTime = 15 * 60;
+                        state.breakTime = 3 * 60;
+                        break;
+                }
+                
+                // Update UI
+                workSlider.value = state.workTime / 60;
+                breakSlider.value = state.breakTime / 60;
+                workValue.textContent = state.workTime / 60;
+                breakValue.textContent = state.breakTime / 60;
+                
+                // If in work session, update current time
+                if (state.isWork) {
+                    state.currentTime = state.workTime;
+                } else {
+                    state.currentTime = state.breakTime;
+                }
+                
+                updateDisplay();
+                updateProgress();
+                saveState();
+            }
+            
+            // Event listeners
+            playBtn.addEventListener('click', () => {
+                if (!state.isRunning) {
+                    state.isRunning = true;
+                    playBtn.textContent = '⏸ Pause';
+                    runTimer();
+                } else {
+                    state.isRunning = false;
+                    playBtn.textContent = '▶ Start';
+                    clearTimeout(state.intervalId);
+                }
+            });
+            
+            stopBtn.addEventListener('click', () => {
+                state.isRunning = false;
+                playBtn.textContent = '▶ Start';
+                clearTimeout(state.intervalId);
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                state.isRunning = false;
+                playBtn.textContent = '▶ Start';
+                clearTimeout(state.intervalId);
+                
+                // Reset to current session duration
+                state.currentTime = state.isWork ? state.workTime : state.breakTime;
+                
+                updateDisplay();
+                updateProgress();
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all saved data?')) {
+                    localStorage.removeItem('practiceTimerState');
+                    
+                    // Reset to default values
+                    state.workTime = 25 * 60;
+                    state.breakTime = 5 * 60;
+                    state.currentTime = state.workTime;
+                    state.isWork = true;
+                    state.sessionHistory = [];
+                    state.totalSessions = 0;
+                    state.totalWorkTime = 0;
+                    state.totalBreakTime = 0;
+                    
+                    // Update UI
+                    workSlider.value = 25;
+                    breakSlider.value = 5;
+                    workValue.textContent = '25';
+                    breakValue.textContent = '5';
+                    
+                    updateDisplay();
+                    updateProgress();
+                    updateSessionType();
+                    updateStats();
+                    renderHistory();
+                    
+                    alert('All saved data has been cleared!');
+                }
+            });
+            
+            workSlider.addEventListener('input', () => {
+                state.workTime = parseInt(workSlider.value) * 60;
+                workValue.textContent = workSlider.value;
+                
+                if (state.isWork) {
+                    state.currentTime = state.workTime;
+                    updateDisplay();
+                    updateProgress();
+                }
+                
+                saveState();
+            });
+            
+            breakSlider.addEventListener('input', () => {
+                state.breakTime = parseInt(breakSlider.value) * 60;
+                breakValue.textContent = breakSlider.value;
+                
+                if (!state.isWork) {
+                    state.currentTime = state.breakTime;
+                    updateDisplay();
+                    updateProgress();
+                }
+                
+                saveState();
+            });
+            
+            workBtn.addEventListener('click', () => {
+                if (!state.isRunning) {
+                    state.isWork = true;
+                    state.currentTime = state.workTime;
+                    updateSessionType();
+                    updateDisplay();
+                    updateProgress();
+                    saveState();
+                }
+            });
+            
+            breakBtn.addEventListener('click', () => {
+                if (!state.isRunning) {
+                    state.isWork = false;
+                    state.currentTime = state.breakTime;
+                    updateSessionType();
+                    updateDisplay();
+                    updateProgress();
+                    saveState();
+                }
+            });
+            
+            // Preset buttons
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    applyPreset(btn.dataset.preset);
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<!-- Category: Home Comfort -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Door Draft Finder</title>
+    <meta name="description" content="Find door drafts with our interactive finder. Perfect for improving home energy efficiency and reducing heating costs.">
+    <meta name="keywords" content="door draft finder, energy efficiency, home insulation, draft detection, energy savings, door seal, home energy audit, insulation assessment">
+    <meta name="author" content="Home Comfort Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Door Draft Finder">
+    <meta property="og:description" content="Find door drafts with our interactive finder. Perfect for improving home energy efficiency and reducing heating costs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/door-draft-finder">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --draft-color: #00c9a7;
+            --seal-color: #4a90e2;
+            --savings-color: #ffcc00;
+            --energy-color: #ff416c;
+            --warning-color: #ff9a00;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Door visualization */
+        .door-visualization {
+            position: relative;
+            height: 350px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .door-frame {
+            position: absolute;
+            width: 200px;
+            height: 300px;
+            background: rgba(50, 50, 65, 0.7);
+            border: 8px solid var(--gray);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .door {
+            position: absolute;
+            width: 180px;
+            height: 280px;
+            background: linear-gradient(to right, #8b4513, #a0522d);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.5s ease;
+        }
+
+        .door.open {
+            transform: translateX(150px) rotateY(45deg);
+        }
+
+        .door-handle {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 40px;
+            background: #d3d3d3;
+            border-radius: 3px;
+        }
+
+        .door-knob {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background: #c0c0c0;
+            border-radius: 50%;
+        }
+
+        .draft-indicators {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .draft {
+            position: absolute;
+            width: 10px;
+            height: 30px;
+            background: var(--draft-color);
+            border-radius: 5px;
+            opacity: 0.7;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .draft-top {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .draft-bottom {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .draft-left {
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        .draft-right {
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+        }
+
+        .door-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .door-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--draft-color);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Inspection points */
+        .inspection-points {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .points-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .point-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .point-item {
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .point-item:hover {
+            background: rgba(60, 60, 80, 0.7);
+        }
+
+        .point-item.active {
+            background: rgba(0, 201, 167, 0.3);
+            border: 1px solid var(--draft-color);
+        }
+
+        .point-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--draft-color);
+        }
+
+        .point-name {
+            font-weight: 600;
+            color: var(--draft-color);
+        }
+
+        .point-status {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .status-good {
+            color: var(--seal-color);
+        }
+
+        .status-fair {
+            color: var(--savings-color);
+        }
+
+        .status-poor {
+            color: var(--energy-color);
+        }
+
+        /* Stats */
+        .stats {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .draft-rating {
+            color: var(--draft-color);
+        }
+
+        .seal-quality {
+            color: var(--seal-color);
+        }
+
+        .energy-savings {
+            color: var(--savings-color);
+        }
+
+        .repair-cost {
+            color: var(--energy-color);
+        }
+
+        /* Recommendations */
+        .recommendations {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .recommendations-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .recommendation-item {
+            padding: 12px 15px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .recommendation-item:before {
+            content: "•";
+            color: var(--draft-color);
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        /* Warning panel */
+        .warning-panel {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(255, 154, 0, 0.2);
+            border-radius: 10px;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .warning-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--warning-color);
+            text-align: center;
+        }
+
+        .warning-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .warning-item {
+            padding: 12px 15px;
+            background: rgba(255, 154, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .warning-item:before {
+            content: "⚠️";
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .detect-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        .export-btn {
+            background: linear-gradient(to right, #ff9a00, #ff6a00);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .door-visualization {
+                height: 300px;
+            }
+            
+            .door-frame {
+                width: 180px;
+                height: 250px;
+            }
+            
+            .door {
+                width: 160px;
+                height: 230px;
+            }
+            
+            .point-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendation-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .warning-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Door Draft Finder</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="door-visualization" id="door-visualization">
+                <div class="door-frame">
+                    <div class="door" id="door">
+                        <div class="door-handle"></div>
+                        <div class="door-knob"></div>
+                    </div>
+                </div>
+                <div class="draft-indicators" id="draft-indicators">
+                    <!-- Draft indicators will be added here -->
+                </div>
+                <div class="door-display" id="door-display">0%</div>
+                <div class="door-label" id="door-label">No Drafts Detected</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Door Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Draft Severity</div>
+                    <div class="slider-container">
+                        <input type="range" id="draft-severity" min="0" max="100" value="30">
+                        <span class="control-value" id="draft-severity-value">30%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Door Type</div>
+                    <div class="slider-container">
+                        <select class="form-input" id="door-type">
+                            <option value="exterior">Exterior Door</option>
+                            <option value="interior">Interior Door</option>
+                            <option value="patio">Patio Door</option>
+                            <option value="garage">Garage Door</option>
+                        </select>
+                        <span class="control-value" id="door-type-value">Exterior Door</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Insulation Level</div>
+                    <div class="slider-container">
+                        <input type="range" id="insulation-level" min="1" max="10" value="5">
+                        <span class="control-value" id="insulation-level-value">5</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="inspection-points">
+                <div class="points-title">Inspection Points</div>
+                <div class="point-grid" id="point-grid">
+                    <!-- Inspection points will be added here -->
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stats-title">Draft Analysis</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Draft Rating</div>
+                        <div class="result-value draft-rating" id="draft-rating">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Seal Quality</div>
+                        <div class="result-value seal-quality" id="seal-quality">Excellent</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Savings</div>
+                        <div class="result-value energy-savings" id="annual-savings">$0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Repair Cost</div>
+                        <div class="result-value repair-cost" id="repair-cost">$0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendations">
+                <div class="recommendations-title">Fix Recommendations</div>
+                <div class="recommendation-list" id="recommendation-list">
+                    <!-- Recommendations will be added here -->
+                </div>
+            </div>
+            
+            <div class="warning-panel">
+                <div class="warning-title">Important Notes</div>
+                <div class="warning-content" id="warning-content">
+                    <!-- Warning items will be added here -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="detect-btn" class="detect-btn">Detect Drafts</button>
+                <button id="export-btn" class="export-btn">Export Report</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                draftSeverity: 30,
+                doorType: 'exterior',
+                insulationLevel: 5,
+                inspectionPoints: [
+                    { id: 'top', name: 'Top Gap', icon: '⬆️', status: 'good', active: true },
+                    { id: 'bottom', name: 'Bottom Gap', icon: '⬇️', status: 'fair', active: false },
+                    { id: 'left', name: 'Left Gap', icon: '⬅️', status: 'good', active: false },
+                    { id: 'right', name: 'Right Gap', icon: '➡️', status: 'poor', active: false },
+                    { id: 'handle', name: 'Handle Area', icon: '🚪', status: 'good', active: false },
+                    { id: 'frame', name: 'Door Frame', icon: '🪵', status: 'fair', active: false }
+                ],
+                draftRating: 0,
+                sealQuality: 'Excellent',
+                annualSavings: 0,
+                repairCost: 0,
+                warnings: [],
+                recommendations: [],
+                drafts: []
+            };
+            
+            // DOM elements
+            const doorVisualization = document.getElementById('door-visualization');
+            const draftIndicators = document.getElementById('draft-indicators');
+            const door = document.getElementById('door');
+            const doorDisplay = document.getElementById('door-display');
+            const doorLabel = document.getElementById('door-label');
+            const draftSeveritySlider = document.getElementById('draft-severity');
+            const doorTypeSelect = document.getElementById('door-type');
+            const insulationLevelSlider = document.getElementById('insulation-level');
+            const draftSeverityValue = document.getElementById('draft-severity-value');
+            const doorTypeValue = document.getElementById('door-type-value');
+            const insulationLevelValue = document.getElementById('insulation-level-value');
+            const pointGrid = document.getElementById('point-grid');
+            const draftRating = document.getElementById('draft-rating');
+            const sealQuality = document.getElementById('seal-quality');
+            const annualSavings = document.getElementById('annual-savings');
+            const repairCost = document.getElementById('repair-cost');
+            const recommendationList = document.getElementById('recommendation-list');
+            const warningContent = document.getElementById('warning-content');
+            const detectBtn = document.getElementById('detect-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('doorDraftFinderState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.draftSeverity = parsed.draftSeverity || 30;
+                    state.doorType = parsed.doorType || 'exterior';
+                    state.insulationLevel = parsed.insulationLevel || 5;
+                    state.inspectionPoints = parsed.inspectionPoints || state.inspectionPoints;
+                    state.draftRating = parsed.draftRating || 0;
+                    state.sealQuality = parsed.sealQuality || 'Excellent';
+                    state.annualSavings = parsed.annualSavings || 0;
+                    state.repairCost = parsed.repairCost || 0;
+                    state.warnings = parsed.warnings || [];
+                    state.recommendations = parsed.recommendations || [];
+                    state.drafts = parsed.drafts || [];
+                    
+                    // Update UI
+                    draftSeveritySlider.value = state.draftSeverity;
+                    doorTypeSelect.value = state.doorType;
+                    insulationLevelSlider.value = state.insulationLevel;
+                    draftSeverityValue.textContent = `${state.draftSeverity}%`;
+                    doorTypeValue.textContent = state.doorType.replace(/\b\w/g, l => l.toUpperCase());
+                    insulationLevelValue.textContent = state.insulationLevel;
+                    draftRating.textContent = `${state.draftRating}%`;
+                    sealQuality.textContent = state.sealQuality;
+                    annualSavings.textContent = `$${state.annualSavings}`;
+                    repairCost.textContent = `$${state.repairCost}`;
+                    
+                    renderInspectionPoints();
+                    renderRecommendations();
+                    renderWarnings();
+                    updateDraftVisualization();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('doorDraftFinderState', JSON.stringify({
+                    draftSeverity: state.draftSeverity,
+                    doorType: state.doorType,
+                    insulationLevel: state.insulationLevel,
+                    inspectionPoints: state.inspectionPoints,
+                    draftRating: state.draftRating,
+                    sealQuality: state.sealQuality,
+                    annualSavings: state.annualSavings,
+                    repairCost: state.repairCost,
+                    warnings: state.warnings,
+                    recommendations: state.recommendations,
+                    drafts: state.drafts
+                }));
+            }
+            
+            // Create draft visualization
+            function createDraftVisualization() {
+                draftIndicators.innerHTML = '';
+                state.drafts = [];
+                
+                // Create drafts based on severity
+                const draftCount = Math.floor(state.draftSeverity / 10);
+                
+                for (let i = 0; i < draftCount; i++) {
+                    const draft = document.createElement('div');
+                    draft.className = 'draft';
+                    
+                    // Random position
+                    const positions = ['top', 'bottom', 'left', 'right'];
+                    const position = positions[Math.floor(Math.random() * positions.length)];
+                    draft.classList.add(`draft-${position}`);
+                    
+                    // Random size
+                    const height = 20 + Math.random() * 40;
+                    draft.style.height = `${height}px`;
+                    
+                    // Random animation
+                    const duration = 2 + Math.random() * 3;
+                    draft.style.animation = `float ${duration}s infinite ease-in-out`;
+                    
+                    draftIndicators.appendChild(draft);
+                    state.drafts.push(draft);
+                }
+                
+                // Add CSS for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0); opacity: 0.7; }
+                        50% { transform: translateY(-20px); opacity: 0.9; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Update draft visualization
+            function updateDraftVisualization() {
+                doorDisplay.textContent = `${state.draftSeverity}%`;
+                
+                // Update label based on severity
+                if (state.draftSeverity > 70) {
+                    doorLabel.textContent = 'Severe Drafts Detected';
+                    doorLabel.style.color = 'var(--energy-color)';
+                } else if (state.draftSeverity > 40) {
+                    doorLabel.textContent = 'Moderate Drafts Detected';
+                    doorLabel.style.color = 'var(--savings-color)';
+                } else if (state.draftSeverity > 10) {
+                    doorLabel.textContent = 'Minor Drafts Detected';
+                    doorLabel.style.color = 'var(--seal-color)';
+                } else {
+                    doorLabel.textContent = 'No Significant Drafts';
+                    doorLabel.style.color = 'var(--draft-color)';
+                }
+                
+                // Update door visualization
+                if (state.draftSeverity > 50) {
+                    door.classList.add('open');
+                } else {
+                    door.classList.remove('open');
+                }
+                
+                // Create drafts
+                createDraftVisualization();
+            }
+            
+            // Render inspection points
+            function renderInspectionPoints() {
+                pointGrid.innerHTML = '';
+                
+                state.inspectionPoints.forEach(point => {
+                    const item = document.createElement('div');
+                    item.className = `point-item ${point.active ? 'active' : ''}`;
+                    item.dataset.id = point.id;
+                    
+                    // Status color
+                    let statusClass = '';
+                    switch(point.status) {
+                        case 'good': statusClass = 'status-good'; break;
+                        case 'fair': statusClass = 'status-fair'; break;
+                        case 'poor': statusClass = 'status-poor'; break;
+                    }
+                    
+                    item.innerHTML = `
+                        <div class="point-icon">${point.icon}</div>
+                        <div class="point-name">${point.name}</div>
+                        <div class="point-status ${statusClass}">${point.status.charAt(0).toUpperCase() + point.status.slice(1)}</div>
+                    `;
+                    
+                    pointGrid.appendChild(item);
+                    
+                    // Add click event
+                    item.addEventListener('click', () => {
+                        state.inspectionPoints.forEach(p => p.active = false);
+                        point.active = true;
+                        renderInspectionPoints();
+                        saveState();
+                    });
+                });
+            }
+            
+            // Render recommendations
+            function renderRecommendations() {
+                recommendationList.innerHTML = '';
+                
+                if (state.recommendations.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'recommendation-item';
+                    emptyItem.textContent = 'No recommendations yet. Detect drafts to get suggestions.';
+                    recommendationList.appendChild(emptyItem);
+                    return;
+                }
+                
+                state.recommendations.forEach(rec => {
+                    const item = document.createElement('div');
+                    item.className = 'recommendation-item';
+                    item.textContent = rec;
+                    recommendationList.appendChild(item);
+                });
+            }
+            
+            // Render warnings
+            function renderWarnings() {
+                warningContent.innerHTML = '';
+                
+                if (state.warnings.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'warning-item';
+                    emptyItem.textContent = 'No warnings at this time.';
+                    warningContent.appendChild(emptyItem);
+                    return;
+                }
+                
+                state.warnings.forEach(warning => {
+                    const item = document.createElement('div');
+                    item.className = 'warning-item';
+                    item.textContent = warning;
+                    warningContent.appendChild(item);
+                });
+            }
+            
+            // Analyze drafts
+            function analyzeDrafts() {
+                // Calculate draft rating based on severity and inspection points
+                let rating = state.draftSeverity;
+                
+                // Adjust for door type
+                switch(state.doorType) {
+                    case 'exterior': rating *= 1.2; break;
+                    case 'patio': rating *= 1.5; break;
+                    case 'garage': rating *= 1.3; break;
+                    case 'interior': rating *= 0.8; break;
+                }
+                
+                // Adjust for insulation level
+                rating *= (11 - state.insulationLevel) / 10;
+                
+                // Clamp rating between 0 and 100
+                state.draftRating = Math.max(0, Math.min(100, Math.floor(rating)));
+                
+                // Determine seal quality
+                if (state.draftRating < 20) {
+                    state.sealQuality = 'Excellent';
+                } else if (state.draftRating < 40) {
+                    state.sealQuality = 'Good';
+                } else if (state.draftRating < 60) {
+                    state.sealQuality = 'Fair';
+                } else if (state.draftRating < 80) {
+                    state.sealQuality = 'Poor';
+                } else {
+                    state.sealQuality = 'Very Poor';
+                }
+                
+                // Calculate annual savings
+                state.annualSavings = Math.floor(state.draftRating * 2.5);
+                
+                // Calculate repair cost
+                if (state.draftRating < 20) {
+                    state.repairCost = 0;
+                } else if (state.draftRating < 40) {
+                    state.repairCost = 50;
+                } else if (state.draftRating < 60) {
+                    state.repairCost = 150;
+                } else if (state.draftRating < 80) {
+                    state.repairCost = 300;
+                } else {
+                    state.repairCost = 500;
+                }
+                
+                // Generate recommendations
+                generateRecommendations();
+                
+                // Generate warnings
+                generateWarnings();
+                
+                // Update UI
+                draftRating.textContent = `${state.draftRating}%`;
+                sealQuality.textContent = state.sealQuality;
+                annualSavings.textContent = `$${state.annualSavings}`;
+                repairCost.textContent = `$${state.repairCost}`;
+                
+                updateDraftVisualization();
+                renderRecommendations();
+                renderWarnings();
+                saveState();
+            }
+            
+            // Generate recommendations
+            function generateRecommendations() {
+                state.recommendations = [];
+                
+                // Add recommendations based on draft rating
+                if (state.draftRating < 20) {
+                    state.recommendations.push('Your door seals are in excellent condition. No action needed.');
+                    state.recommendations.push('Regular maintenance is still recommended to preserve seal quality.');
+                } else if (state.draftRating < 40) {
+                    state.recommendations.push('Consider applying weatherstripping to minor gaps.');
+                    state.recommendations.push('Check door sweep for wear and replace if necessary.');
+                } else if (state.draftRating < 60) {
+                    state.recommendations.push('Replace weatherstripping around the door frame.');
+                    state.recommendations.push('Install a door sweep to seal the bottom gap.');
+                    state.recommendations.push('Check for loose hinges and tighten if needed.');
+                } else if (state.draftRating < 80) {
+                    state.recommendations.push('Replace door sweep and weatherstripping entirely.');
+                    state.recommendations.push('Consider installing a door threshold for better sealing.');
+                    state.recommendations.push('Check for warping in the door frame and address if needed.');
+                } else {
+                    state.recommendations.push('Professional assessment recommended for severe drafts.');
+                    state.recommendations.push('Consider replacing the door if it is warped or damaged.');
+                    state.recommendations.push('Install a storm door for additional insulation.');
+                }
+                
+                // Add recommendations based on inspection points
+                state.inspectionPoints.forEach(point => {
+                    if (point.active && point.status === 'poor') {
+                        switch(point.id) {
+                            case 'top':
+                                state.recommendations.push('Install a door header seal to fix top gap.');
+                                break;
+                            case 'bottom':
+                                state.recommendations.push('Replace door sweep with adjustable model.');
+                                break;
+                            case 'left':
+                            case 'right':
+                                state.recommendations.push('Apply weatherstripping to side gaps.');
+                                break;
+                            case 'handle':
+                                state.recommendations.push('Check handle mechanism and replace weatherstripping around it.');
+                                break;
+                            case 'frame':
+                                state.recommendations.push('Inspect frame for warping and consider professional repair.');
+                                break;
+                        }
+                    }
+                });
+            }
+            
+            // Generate warnings
+            function generateWarnings() {
+                state.warnings = [];
+                
+                // Add warnings based on draft rating
+                if (state.draftRating > 80) {
+                    state.warnings.push('Severe drafts detected - energy waste is significant.');
+                    state.warnings.push('Immediate action recommended to prevent increased utility bills.');
+                } else if (state.draftRating > 60) {
+                    state.warnings.push('Moderate drafts detected - consider addressing soon.');
+                    state.warnings.push('Energy efficiency could be improved with simple fixes.');
+                } else if (state.draftRating > 40) {
+                    state.warnings.push('Minor drafts detected - regular maintenance recommended.');
+                }
+                
+                // Add warnings based on door type
+                if (state.doorType === 'exterior' && state.draftRating > 30) {
+                    state.warnings.push('Exterior doors with drafts can lead to significant energy loss.');
+                }
+                
+                if (state.doorType === 'garage' && state.draftRating > 40) {
+                    state.warnings.push('Garage doors with drafts can affect indoor temperatures.');
+                }
+                
+                // Add warnings based on insulation level
+                if (state.insulationLevel < 4 && state.draftRating > 20) {
+                    state.warnings.push('Low insulation level may amplify draft effects.');
+                }
+            }
+            
+            // Export report
+            function exportReport() {
+                alert('Draft analysis report exported successfully!');
+                // In a real application, this would generate a PDF or CSV report
+            }
+            
+            // Event listeners
+            draftSeveritySlider.addEventListener('input', () => {
+                state.draftSeverity = parseInt(draftSeveritySlider.value);
+                draftSeverityValue.textContent = `${state.draftSeverity}%`;
+                updateDraftVisualization();
+                saveState();
+            });
+            
+            doorTypeSelect.addEventListener('change', () => {
+                state.doorType = doorTypeSelect.value;
+                doorTypeValue.textContent = state.doorType.replace(/\b\w/g, l => l.toUpperCase());
+                saveState();
+            });
+            
+            insulationLevelSlider.addEventListener('input', () => {
+                state.insulationLevel = parseInt(insulationLevelSlider.value);
+                insulationLevelValue.textContent = state.insulationLevel;
+                saveState();
+            });
+            
+            detectBtn.addEventListener('click', () => {
+                analyzeDrafts();
+            });
+            
+            exportBtn.addEventListener('click', exportReport);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('doorDraftFinderState');
+                    
+                    // Reset to defaults
+                    state.draftSeverity = 30;
+                    state.doorType = 'exterior';
+                    state.insulationLevel = 5;
+                    state.inspectionPoints = [
+                        { id: 'top', name: 'Top Gap', icon: '⬆️', status: 'good', active: true },
+                        { id: 'bottom', name: 'Bottom Gap', icon: '⬇️', status: 'fair', active: false },
+                        { id: 'left', name: 'Left Gap', icon: '⬅️', status: 'good', active: false },
+                        { id: 'right', name: 'Right Gap', icon: '➡️', status: 'poor', active: false },
+                        { id: 'handle', name: 'Handle Area', icon: '🚪', status: 'good', active: false },
+                        { id: 'frame', name: 'Door Frame', icon: '🪵', status: 'fair', active: false }
+                    ];
+                    state.draftRating = 0;
+                    state.sealQuality = 'Excellent';
+                    state.annualSavings = 0;
+                    state.repairCost = 0;
+                    state.warnings = [];
+                    state.recommendations = [];
+                    state.drafts = [];
+                    
+                    // Update UI
+                    draftSeveritySlider.value = state.draftSeverity;
+                    doorTypeSelect.value = state.doorType;
+                    insulationLevelSlider.value = state.insulationLevel;
+                    draftSeverityValue.textContent = `${state.draftSeverity}%`;
+                    doorTypeValue.textContent = state.doorType.replace(/\b\w/g, l => l.toUpperCase());
+                    insulationLevelValue.textContent = state.insulationLevel;
+                    draftRating.textContent = `${state.draftRating}%`;
+                    sealQuality.textContent = state.sealQuality;
+                    annualSavings.textContent = `$${state.annualSavings}`;
+                    repairCost.textContent = `$${state.repairCost}`;
+                    
+                    renderInspectionPoints();
+                    renderRecommendations();
+                    renderWarnings();
+                    updateDraftVisualization();
+                    saveState();
+                }
+            });
+            
+            // Initialize the app
+            loadState();
+            renderInspectionPoints();
+            renderRecommendations();
+            renderWarnings();
+            updateDraftVisualization();
+        });
+    </script>
+</body>
+</html>

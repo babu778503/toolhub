@@ -1,0 +1,724 @@
+<!-- Category: Environment -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil pH Checker</title>
+    <meta name="description" content="Free soil pH checker tool to determine your soil's acidity level. Test your soil pH and get recommendations for optimal plant growth.">
+    <meta name="keywords" content="soil pH checker, soil pH test, soil acidity, soil testing, gardening tools, plant care">
+    <meta name="author" content="Garden Tools">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Soil pH Checker">
+    <meta property="og:description" content="Test your soil pH and get recommendations for optimal plant growth">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://example.com/soil-ph-checker">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(106, 176, 76, 0.15);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, #558b2f, #7cb342);
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            
+            header {
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            
+            header h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .checker {
+            padding: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #558b2f;
+            font-size: 1.1rem;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container input, 
+        .input-container select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #dcedc8;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-container input:focus, 
+        .input-container select:focus {
+            outline: none;
+            border-color: #7cb342;
+            box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.2);
+        }
+
+        .check-btn {
+            background: linear-gradient(to right, #558b2f, #7cb342);
+            color: white;
+            border: none;
+            padding: 16px 25px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(85, 139, 47, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(85, 139, 47, 0.4);
+        }
+
+        .check-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 25px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            color: #33691e;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+
+        .result-unit {
+            font-size: 1.2rem;
+            color: #558b2f;
+        }
+
+        .ph-scale {
+            height: 20px;
+            background: linear-gradient(to right, #ff5252, #ff9800, #ffeb3b, #8bc34a, #4caf50, #2196f3, #3f51b5);
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .ph-indicator {
+            position: absolute;
+            top: -10px;
+            width: 4px;
+            height: 40px;
+            background: #212121;
+            transform: translateX(-50%);
+        }
+
+        .ph-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #558b2f;
+        }
+
+        .ph-category {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .acidic {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .neutral {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .alkaline {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .recommendations {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 10px;
+        }
+
+        .recommendations h3 {
+            color: #558b2f;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recommendations ul {
+            padding-left: 20px;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .data-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .data-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .save-btn {
+            background: #7cb342;
+            color: white;
+        }
+
+        .clear-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .data-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #7cb342;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box h3 {
+            color: #558b2f;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .ph-details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .ph-detail {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+            margin: 5px;
+        }
+
+        .ph-detail-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .ph-detail-label {
+            font-size: 0.9rem;
+            color: #558b2f;
+        }
+
+        .plant-suggestions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 10px;
+        }
+
+        .plant-suggestions h3 {
+            color: #558b2f;
+            margin-bottom: 10px;
+        }
+
+        .plant-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .plant-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #c8e6c9;
+            font-size: 0.9rem;
+        }
+
+        .plant-item.acidic {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .plant-item.neutral {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .plant-item.alkaline {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .test-methods {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 10px;
+        }
+
+        .test-methods h3 {
+            color: #558b2f;
+            margin-bottom: 10px;
+        }
+
+        .method {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .method i {
+            color: #7cb342;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-seedling"></i> Soil pH Checker</h1>
+        </header>
+        
+        <div class="checker">
+            <div class="input-group">
+                <label for="ph-value">Enter Soil pH Value</label>
+                <div class="input-container">
+                    <input type="number" id="ph-value" placeholder="Enter pH value (0-14)" min="0" max="14" step="0.1" value="7">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="soil-type">Soil Type</label>
+                <select id="soil-type">
+                    <option value="clay">Clay</option>
+                    <option value="sandy">Sandy</option>
+                    <option value="loamy" selected>Loamy</option>
+                    <option value="peaty">Peaty</option>
+                    <option value="chalky">Chalky</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="plant-type">Plant Type</label>
+                <select id="plant-type">
+                    <option value="vegetables">Vegetables</option>
+                    <option value="flowers">Flowers</option>
+                    <option value="shrubs">Shrubs</option>
+                    <option value="trees">Trees</option>
+                    <option value="lawns">Lawns</option>
+                </select>
+            </div>
+            
+            <button class="check-btn" id="check-ph">
+                <i class="fas fa-vial"></i> Check Soil pH Level
+            </button>
+            
+            <div class="data-controls">
+                <button class="data-btn save-btn" id="save-data">
+                    <i class="fas fa-save"></i> Save Data
+                </button>
+                <button class="data-btn clear-btn" id="clear-data">
+                    <i class="fas fa-trash-alt"></i> Clear Data
+                </button>
+            </div>
+            
+            <div class="result-container" id="result">
+                <div class="result-title">Soil pH Result</div>
+                <div class="result-value" id="result-value">7.0</div>
+                <div class="result-unit">pH Level</div>
+                
+                <div class="ph-scale">
+                    <div class="ph-indicator" id="ph-indicator" style="left: 50%;"></div>
+                </div>
+                
+                <div class="ph-labels">
+                    <span>0</span>
+                    <span>3</span>
+                    <span>7</span>
+                    <span>11</span>
+                    <span>14</span>
+                </div>
+                
+                <div class="ph-category" id="ph-category">Neutral</div>
+                
+                <div class="ph-details">
+                    <div class="ph-detail">
+                        <div class="ph-detail-value" id="ph-value-display">7.0</div>
+                        <div class="ph-detail-label">Current pH</div>
+                    </div>
+                    <div class="ph-detail">
+                        <div class="ph-detail-value" id="optimal-ph">6.0-7.0</div>
+                        <div class="ph-detail-label">Optimal Range</div>
+                    </div>
+                    <div class="ph-detail">
+                        <div class="ph-detail-value" id="deviation">0.0</div>
+                        <div class="ph-detail-label">Deviation</div>
+                    </div>
+                </div>
+                
+                <div class="plant-suggestions">
+                    <h3><i class="fas fa-leaf"></i> Recommended Plants</h3>
+                    <div class="plant-list" id="plant-list">
+                        <div class="plant-item neutral">Tomatoes</div>
+                        <div class="plant-item neutral">Roses</div>
+                        <div class="plant-item neutral">Lavender</div>
+                        <div class="plant-item neutral">Basil</div>
+                    </div>
+                </div>
+                
+                <div class="recommendations" id="recommendations">
+                    <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                    <ul>
+                        <li>Your soil pH is optimal for most plants</li>
+                        <li>Continue with regular soil maintenance</li>
+                        <li>Consider testing every 2-3 years</li>
+                    </ul>
+                </div>
+                
+                <div class="test-methods">
+                    <h3><i class="fas fa-flask"></i> Testing Methods</h3>
+                    <div class="method">
+                        <i class="fas fa-droplet"></i>
+                        <span>Soil pH Meter: Quick and accurate digital reading</span>
+                    </div>
+                    <div class="method">
+                        <i class="fas fa-droplet"></i>
+                        <span>Test Strips: Inexpensive but less precise</span>
+                    </div>
+                    <div class="method">
+                        <i class="fas fa-droplet"></i>
+                        <span>Soil Test Kit: Chemical reaction-based testing</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> Soil pH Information</h3>
+                <p>Soil pH affects nutrient availability. Most plants prefer slightly acidic to neutral soil (pH 6.0-7.0). Acidic soil (pH < 7) may require lime to raise pH. Alkaline soil (pH > 7) may benefit from sulfur or organic matter to lower pH.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data if available
+            loadSavedData();
+            
+            // Check button
+            const checkBtn = document.getElementById('check-ph');
+            const resultContainer = document.getElementById('result');
+            const resultValue = document.getElementById('result-value');
+            const phIndicator = document.getElementById('ph-indicator');
+            const phCategory = document.getElementById('ph-category');
+            const recommendations = document.getElementById('recommendations');
+            const phValueDisplay = document.getElementById('ph-value-display');
+            const optimalPh = document.getElementById('optimal-ph');
+            const deviation = document.getElementById('deviation');
+            const plantList = document.getElementById('plant-list');
+            const soilType = document.getElementById('soil-type');
+            const plantType = document.getElementById('plant-type');
+            
+            checkBtn.addEventListener('click', function() {
+                const phValue = parseFloat(document.getElementById('ph-value').value);
+                
+                if (isNaN(phValue) || phValue < 0 || phValue > 14) {
+                    alert('Please enter a valid pH value between 0 and 14');
+                    return;
+                }
+                
+                // Update result value
+                resultValue.textContent = phValue.toFixed(1);
+                phValueDisplay.textContent = phValue.toFixed(1);
+                
+                // Update pH indicator position
+                const position = (phValue / 14) * 100;
+                phIndicator.style.left = position + '%';
+                
+                // Determine pH category
+                let category = '';
+                let categoryClass = '';
+                let recText = '';
+                let plantSuggestions = [];
+                
+                if (phValue < 6.0) {
+                    category = 'Acidic';
+                    categoryClass = 'acidic';
+                    recText = `
+                        <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                        <ul>
+                            <li>Your soil is too acidic for most plants</li>
+                            <li>Add lime to raise pH level</li>
+                            <li>Test soil again after 2-3 months</li>
+                            <li>Consider acid-loving plants like blueberries</li>
+                        </ul>
+                    `;
+                    plantSuggestions = [
+                        {name: 'Blueberries', type: 'acidic'},
+                        {name: 'Azaleas', type: 'acidic'},
+                        {name: 'Rhododendrons', type: 'acidic'},
+                        {name: 'Camellias', type: 'acidic'}
+                    ];
+                    optimalPh.textContent = '4.5-6.0';
+                } else if (phValue >= 6.0 && phValue <= 7.5) {
+                    category = 'Neutral';
+                    categoryClass = 'neutral';
+                    recText = `
+                        <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                        <ul>
+                            <li>Your soil pH is optimal for most plants</li>
+                            <li>Continue with regular soil maintenance</li>
+                            <li>Consider testing every 2-3 years</li>
+                        </ul>
+                    `;
+                    plantSuggestions = [
+                        {name: 'Tomatoes', type: 'neutral'},
+                        {name: 'Roses', type: 'neutral'},
+                        {name: 'Lavender', type: 'neutral'},
+                        {name: 'Basil', type: 'neutral'}
+                    ];
+                    optimalPh.textContent = '6.0-7.0';
+                } else {
+                    category = 'Alkaline';
+                    categoryClass = 'alkaline';
+                    recText = `
+                        <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                        <ul>
+                            <li>Your soil is too alkaline for most plants</li>
+                            <li>Add sulfur or organic matter to lower pH</li>
+                            <li>Test soil again after 2-3 months</li>
+                            <li>Consider alkaline-tolerant plants</li>
+                        </ul>
+                    `;
+                    plantSuggestions = [
+                        {name: 'Lavender', type: 'alkaline'},
+                        {name: 'Clematis', type: 'alkaline'},
+                        {name: 'Boxwood', type: 'alkaline'},
+                        {name: 'Yarrow', type: 'alkaline'}
+                    ];
+                    optimalPh.textContent = '6.5-7.5';
+                }
+                
+                // Calculate deviation from optimal
+                let optimalCenter;
+                if (phValue < 6.0) optimalCenter = 5.25; // Center of 4.5-6.0
+                else if (phValue >= 6.0 && phValue <= 7.5) optimalCenter = 6.5; // Center of 6.0-7.0
+                else optimalCenter = 7.0; // Center of 6.5-7.5
+                
+                const devValue = Math.abs(phValue - optimalCenter).toFixed(1);
+                deviation.textContent = devValue;
+                
+                phCategory.textContent = category;
+                phCategory.className = 'ph-category ' + categoryClass;
+                recommendations.innerHTML = recText;
+                
+                // Update plant suggestions
+                plantList.innerHTML = '';
+                plantSuggestions.forEach(plant => {
+                    const plantEl = document.createElement('div');
+                    plantEl.className = `plant-item ${plant.type}`;
+                    plantEl.textContent = plant.name;
+                    plantList.appendChild(plantEl);
+                });
+                
+                resultContainer.classList.add('show');
+                
+                // Save current value
+                localStorage.setItem('soilPhValue', phValue);
+                localStorage.setItem('soilType', soilType.value);
+                localStorage.setItem('plantType', plantType.value);
+            });
+            
+            // Save data button
+            document.getElementById('save-data').addEventListener('click', function() {
+                const phValue = document.getElementById('ph-value').value;
+                const soilTypeValue = document.getElementById('soil-type').value;
+                const plantTypeValue = document.getElementById('plant-type').value;
+                
+                if (phValue) {
+                    localStorage.setItem('soilPhValue', phValue);
+                    localStorage.setItem('soilType', soilTypeValue);
+                    localStorage.setItem('plantType', plantTypeValue);
+                    
+                    // Show feedback
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 1500);
+                }
+            });
+            
+            // Clear data button
+            document.getElementById('clear-data').addEventListener('click', function() {
+                localStorage.removeItem('soilPhValue');
+                localStorage.removeItem('soilType');
+                localStorage.removeItem('plantType');
+                
+                // Reset form
+                document.getElementById('ph-value').value = 7;
+                document.getElementById('soil-type').value = 'loamy';
+                document.getElementById('plant-type').value = 'vegetables';
+                
+                // Hide result
+                resultContainer.classList.remove('show');
+                
+                // Show feedback
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Cleared!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 1500);
+            });
+            
+            // Load saved data function
+            function loadSavedData() {
+                const savedValue = localStorage.getItem('soilPhValue');
+                const savedSoilType = localStorage.getItem('soilType');
+                const savedPlantType = localStorage.getItem('plantType');
+                
+                if (savedValue) {
+                    document.getElementById('ph-value').value = savedValue;
+                }
+                
+                if (savedSoilType) {
+                    document.getElementById('soil-type').value = savedSoilType;
+                }
+                
+                if (savedPlantType) {
+                    document.getElementById('plant-type').value = savedPlantType;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

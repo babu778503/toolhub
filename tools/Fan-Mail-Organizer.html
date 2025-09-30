@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<!-- Category: Entertainment & Events -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Mail Organizer</title>
+    <meta name="description" content="Organize your fan mail with our interactive organizer. Perfect for artists, celebrities, and public figures.">
+    <meta name="keywords" content="fan mail organizer, fan engagement, mail management, fan communication, celebrity tools, artist tools">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --fan-color: #00c9a7;
+            --response-color: #ff7a9d;
+            --pending-color: #ffcc00;
+            --archived-color: #6b5b95;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mail categories */
+        .categories {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .category-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .category-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Form */
+        .form-container {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Mail list */
+        .mail-list {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .list-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .mail-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--fan-color);
+        }
+
+        .mail-item:hover {
+            background: rgba(60, 60, 80, 0.7);
+        }
+
+        .mail-item.response-pending {
+            border-left: 4px solid var(--pending-color);
+        }
+
+        .mail-item.responded {
+            border-left: 4px solid var(--response-color);
+        }
+
+        .mail-item.archived {
+            border-left: 4px solid var(--archived-color);
+            opacity: 0.7;
+        }
+
+        .mail-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .mail-sender {
+            font-weight: 600;
+            color: var(--fan-color);
+        }
+
+        .mail-date {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .mail-content {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .mail-category {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: rgba(0, 201, 167, 0.2);
+            color: var(--fan-color);
+            margin-top: 10px;
+        }
+
+        .mail-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+        }
+
+        .respond-btn {
+            background: rgba(0, 201, 167, 0.3);
+        }
+
+        .archive-btn {
+            background: rgba(107, 91, 149, 0.3);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: rgba(40, 40, 55, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--fan-color);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .add-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .mail-item {
+                padding: 12px;
+            }
+            
+            .mail-header {
+                flex-direction: column;
+            }
+            
+            .mail-actions {
+                flex-wrap: wrap;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Fan Mail Organizer</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="categories">
+                <div class="category-btn active" data-category="all">All Mail</div>
+                <div class="category-btn" data-category="personal">Personal</div>
+                <div class="category-btn" data-category="business">Business</div>
+                <div class="category-btn" data-category="art">Art/Photos</div>
+                <div class="category-btn" data-category="gift">Gifts</div>
+                <div class="category-btn" data-category="urgent">Urgent</div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-mails">0</div>
+                    <div class="stat-label">Total Mails</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pending-mails">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="responded-mails">0</div>
+                    <div class="stat-label">Responded</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="archived-mails">0</div>
+                    <div class="stat-label">Archived</div>
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <div class="form-title">Add Fan Mail</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Sender Name</label>
+                        <input type="text" class="form-input" id="sender-name" placeholder="Enter sender's name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-input" id="mail-category">
+                            <option value="personal">Personal</option>
+                            <option value="business">Business</option>
+                            <option value="art">Art/Photos</option>
+                            <option value="gift">Gifts</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-textarea" id="mail-message" placeholder="Enter the fan's message"></textarea>
+                </div>
+            </div>
+            
+            <div class="mail-list">
+                <div class="list-title">Fan Mail</div>
+                <div id="mail-list">
+                    <!-- Mail items will be added here -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="add-btn" class="add-btn">Add Mail</button>
+                <button id="clear-btn" class="clear-btn">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                mails: [],
+                currentCategory: 'all',
+                selectedMail: null
+            };
+            
+            // DOM elements
+            const mailList = document.getElementById('mail-list');
+            const addBtn = document.getElementById('add-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const senderName = document.getElementById('sender-name');
+            const mailCategory = document.getElementById('mail-category');
+            const mailMessage = document.getElementById('mail-message');
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const totalMails = document.getElementById('total-mails');
+            const pendingMails = document.getElementById('pending-mails');
+            const respondedMails = document.getElementById('responded-mails');
+            const archivedMails = document.getElementById('archived-mails');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('fanMailOrganizerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.mails = parsed.mails || [];
+                    state.currentCategory = parsed.currentCategory || 'all';
+                    
+                    // Update UI
+                    categoryButtons.forEach(btn => {
+                        if (btn.dataset.category === state.currentCategory) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    renderMailList();
+                    updateStats();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('fanMailOrganizerState', JSON.stringify({
+                    mails: state.mails,
+                    currentCategory: state.currentCategory
+                }));
+            }
+            
+            // Format date for display
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            // Render mail list
+            function renderMailList() {
+                mailList.innerHTML = '';
+                
+                // Filter mails by category
+                const filteredMails = state.mails.filter(mail => {
+                    if (state.currentCategory === 'all') return true;
+                    return mail.category === state.currentCategory;
+                });
+                
+                if (filteredMails.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'mail-item';
+                    emptyItem.innerHTML = '<div style="text-align: center; width: 100%;">No mails in this category</div>';
+                    mailList.appendChild(emptyItem);
+                    return;
+                }
+                
+                filteredMails.forEach((mail, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'mail-item';
+                    
+                    // Add class based on status
+                    if (mail.status === 'responded') {
+                        item.classList.add('responded');
+                    } else if (mail.status === 'archived') {
+                        item.classList.add('archived');
+                    } else {
+                        item.classList.add('response-pending');
+                    }
+                    
+                    item.dataset.index = index;
+                    
+                    item.innerHTML = `
+                        <div class="mail-header">
+                            <div class="mail-sender">${mail.sender}</div>
+                            <div class="mail-date">${formatDate(mail.timestamp)}</div>
+                        </div>
+                        <div class="mail-content">${mail.message}</div>
+                        <div class="mail-category">${mail.category}</div>
+                        <div class="mail-actions">
+                            <button class="action-btn respond-btn" data-index="${index}">Mark Responded</button>
+                            <button class="action-btn archive-btn" data-index="${index}">Archive</button>
+                            <button class="action-btn delete-btn" data-index="${index}">Delete</button>
+                        </div>
+                    `;
+                    
+                    mailList.appendChild(item);
+                });
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.respond-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        state.mails[index].status = 'responded';
+                        renderMailList();
+                        updateStats();
+                        saveState();
+                    });
+                });
+                
+                document.querySelectorAll('.archive-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        state.mails[index].status = 'archived';
+                        renderMailList();
+                        updateStats();
+                        saveState();
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        if (confirm('Are you sure you want to delete this mail?')) {
+                            state.mails.splice(index, 1);
+                            renderMailList();
+                            updateStats();
+                            saveState();
+                        }
+                    });
+                });
+            }
+            
+            // Update statistics
+            function updateStats() {
+                totalMails.textContent = state.mails.length;
+                
+                const pendingCount = state.mails.filter(m => m.status === 'pending').length;
+                pendingMails.textContent = pendingCount;
+                
+                const respondedCount = state.mails.filter(m => m.status === 'responded').length;
+                respondedMails.textContent = respondedCount;
+                
+                const archivedCount = state.mails.filter(m => m.status === 'archived').length;
+                archivedMails.textContent = archivedCount;
+            }
+            
+            // Add a new mail
+            function addMail() {
+                const sender = senderName.value.trim();
+                const category = mailCategory.value;
+                const message = mailMessage.value.trim();
+                
+                if (!sender || !message) {
+                    alert('Please enter sender name and message');
+                    return;
+                }
+                
+                const newMail = {
+                    sender,
+                    category,
+                    message,
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                };
+                
+                state.mails.push(newMail);
+                
+                // Clear form
+                senderName.value = '';
+                mailCategory.value = 'personal';
+                mailMessage.value = '';
+                
+                renderMailList();
+                updateStats();
+                saveState();
+            }
+            
+            // Event listeners
+            addBtn.addEventListener('click', addMail);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all fan mails?')) {
+                    state.mails = [];
+                    renderMailList();
+                    updateStats();
+                    saveState();
+                }
+            });
+            
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    categoryButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.currentCategory = btn.dataset.category;
+                    renderMailList();
+                    saveState();
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<!-- Category: Energy Savings -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooling Cost Estimator</title>
+    <meta name="description" content="Estimate your cooling costs with our interactive estimator. Perfect for saving energy and reducing air conditioning expenses.">
+    <meta name="keywords" content="cooling cost estimator, energy savings, air conditioning cost, cooling efficiency, HVAC cost calculator, energy efficiency, cooling savings, home cooling">
+    <meta name="author" content="Energy Savings Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Cooling Cost Estimator">
+    <meta property="og:description" content="Estimate your cooling costs with our interactive estimator. Perfect for saving energy and reducing air conditioning expenses.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/cooling-cost-estimator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --cooling-color: #00c9a7;
+            --savings-color: #ffcc00;
+            --energy-color: #4a90e2;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Cooling visualization */
+        .cooling-visualization {
+            position: relative;
+            height: 300px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ac-unit {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: var(--gray);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ac-icon {
+            font-size: 3rem;
+            color: var(--cooling-color);
+        }
+
+        .snowflakes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .snowflake {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--cooling-color);
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        .cooling-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .cooling-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--cooling-color);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .current-cost {
+            color: var(--cooling-color);
+        }
+
+        .savings {
+            color: var(--savings-color);
+        }
+
+        .energy {
+            color: var(--energy-color);
+        }
+
+        .upgrade-cost {
+            color: var(--accent);
+        }
+
+        /* Comparison */
+        .comparison {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .comparison-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .comparison-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .current {
+            color: var(--energy-color);
+        }
+
+        .upgrade {
+            color: var(--cooling-color);
+        }
+
+        /* Savings calculator */
+        .savings-calculator {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .calculator-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .calculator-group {
+            margin-bottom: 15px;
+        }
+
+        .calculator-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .calculator-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .calculator-result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--savings-color);
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .cooling-visualization {
+                height: 250px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Cooling Cost Estimator</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="cooling-visualization" id="cooling-visualization">
+                <div class="ac-unit">
+                    <div class="ac-icon">❄️</div>
+                </div>
+                <div class="snowflakes" id="snowflakes"></div>
+                <div class="cooling-display" id="cooling-display">$0.00</div>
+                <div class="cooling-label" id="cooling-label">Cooling Cost</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Cooling Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Current AC Efficiency (SEER)</div>
+                    <div class="slider-container">
+                        <input type="range" id="current-efficiency" min="8" max="25" value="14">
+                        <span class="control-value" id="current-efficiency-value">14 SEER</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Upgrade AC Efficiency (SEER)</div>
+                    <div class="slider-container">
+                        <input type="range" id="upgrade-efficiency" min="16" max="30" value="22">
+                        <span class="control-value" id="upgrade-efficiency-value">22 SEER</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Monthly Energy Usage (kWh)</div>
+                    <div class="slider-container">
+                        <input type="range" id="monthly-usage" min="200" max="2000" value="800">
+                        <span class="control-value" id="monthly-usage-value">800 kWh</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Cost Estimates</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Current Monthly Cost</div>
+                        <div class="result-value current-cost" id="current-monthly-cost">$120</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Potential Savings</div>
+                        <div class="result-value savings" id="potential-savings">$45/month</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Energy Saved</div>
+                        <div class="result-value energy" id="annual-energy-saved">640 kWh</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Upgrade Investment</div>
+                        <div class="result-value upgrade-cost" id="upgrade-investment">$3,500</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-title">Efficiency Comparison</div>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-label">Current AC Unit</div>
+                        <div class="comparison-value current" id="current-ac">14 SEER</div>
+                        <div class="comparison-label">Annual Cost: $1,440</div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-label">Upgraded AC Unit</div>
+                        <div class="comparison-value upgrade" id="upgraded-ac">22 SEER</div>
+                        <div class="comparison-label">Annual Cost: $900</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="savings-calculator">
+                <div class="calculator-title">Savings Calculator</div>
+                <div class="calculator-grid">
+                    <div class="calculator-group">
+                        <div class="calculator-label">Electricity Rate ($/kWh)</div>
+                        <input type="number" class="calculator-input" id="electricity-rate" min="0.05" max="1.00" step="0.01" value="0.15">
+                    </div>
+                    <div class="calculator-group">
+                        <div class="calculator-label">Cooling Hours/Day</div>
+                        <input type="number" class="calculator-input" id="cooling-hours" min="1" max="24" value="10">
+                    </div>
+                    <div class="calculator-group">
+                        <div class="calculator-label">Days/Year Cooled</div>
+                        <input type="number" class="calculator-input" id="cooling-days" min="1" max="365" value="120">
+                    </div>
+                    <div class="calculator-group">
+                        <div class="calculator-label">AC Unit Age (years)</div>
+                        <input type="number" class="calculator-input" id="ac-age" min="1" max="25" value="8">
+                    </div>
+                </div>
+                <div class="calculator-result" id="calculator-result">
+                    Potential Annual Savings: $540
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn" class="calculate-btn">Calculate Costs</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                currentEfficiency: 14,
+                upgradeEfficiency: 22,
+                monthlyUsage: 800,
+                electricityRate: 0.15,
+                coolingHours: 10,
+                coolingDays: 120,
+                acAge: 8,
+                snowflakes: []
+            };
+            
+            // DOM elements
+            const currentEfficiencySlider = document.getElementById('current-efficiency');
+            const upgradeEfficiencySlider = document.getElementById('upgrade-efficiency');
+            const monthlyUsageSlider = document.getElementById('monthly-usage');
+            const currentEfficiencyValue = document.getElementById('current-efficiency-value');
+            const upgradeEfficiencyValue = document.getElementById('upgrade-efficiency-value');
+            const monthlyUsageValue = document.getElementById('monthly-usage-value');
+            const coolingDisplay = document.getElementById('cooling-display');
+            const coolingLabel = document.getElementById('cooling-label');
+            const currentMonthlyCost = document.getElementById('current-monthly-cost');
+            const potentialSavings = document.getElementById('potential-savings');
+            const annualEnergySaved = document.getElementById('annual-energy-saved');
+            const upgradeInvestment = document.getElementById('upgrade-investment');
+            const currentAc = document.getElementById('current-ac');
+            const upgradedAc = document.getElementById('upgraded-ac');
+            const electricityRateInput = document.getElementById('electricity-rate');
+            const coolingHoursInput = document.getElementById('cooling-hours');
+            const coolingDaysInput = document.getElementById('cooling-days');
+            const acAgeInput = document.getElementById('ac-age');
+            const calculatorResult = document.getElementById('calculator-result');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const snowflakes = document.getElementById('snowflakes');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('coolingCostEstimatorState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.currentEfficiency = parsed.currentEfficiency || 14;
+                    state.upgradeEfficiency = parsed.upgradeEfficiency || 22;
+                    state.monthlyUsage = parsed.monthlyUsage || 800;
+                    state.electricityRate = parsed.electricityRate || 0.15;
+                    state.coolingHours = parsed.coolingHours || 10;
+                    state.coolingDays = parsed.coolingDays || 120;
+                    state.acAge = parsed.acAge || 8;
+                    
+                    // Update UI
+                    currentEfficiencySlider.value = state.currentEfficiency;
+                    upgradeEfficiencySlider.value = state.upgradeEfficiency;
+                    monthlyUsageSlider.value = state.monthlyUsage;
+                    electricityRateInput.value = state.electricityRate;
+                    coolingHoursInput.value = state.coolingHours;
+                    coolingDaysInput.value = state.coolingDays;
+                    acAgeInput.value = state.acAge;
+                    
+                    currentEfficiencyValue.textContent = `${state.currentEfficiency} SEER`;
+                    upgradeEfficiencyValue.textContent = `${state.upgradeEfficiency} SEER`;
+                    monthlyUsageValue.textContent = `${state.monthlyUsage} kWh`;
+                    
+                    calculateResults();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('coolingCostEstimatorState', JSON.stringify({
+                    currentEfficiency: state.currentEfficiency,
+                    upgradeEfficiency: state.upgradeEfficiency,
+                    monthlyUsage: state.monthlyUsage,
+                    electricityRate: state.electricityRate,
+                    coolingHours: state.coolingHours,
+                    coolingDays: state.coolingDays,
+                    acAge: state.acAge
+                }));
+            }
+            
+            // Create snowflakes visualization
+            function createSnowflakes() {
+                snowflakes.innerHTML = '';
+                state.snowflakes = [];
+                
+                // Create snowflakes based on efficiency
+                const flakeCount = Math.floor(state.currentEfficiency * 2);
+                
+                for (let i = 0; i < flakeCount; i++) {
+                    const flake = document.createElement('div');
+                    flake.className = 'snowflake';
+                    
+                    // Random position
+                    const left = Math.random() * 100;
+                    const top = Math.random() * 100;
+                    
+                    flake.style.left = `${left}%`;
+                    flake.style.top = `${top}%`;
+                    
+                    // Random size
+                    const size = 6 + Math.random() * 12;
+                    flake.style.width = `${size}px`;
+                    flake.style.height = `${size}px`;
+                    
+                    // Random animation
+                    const duration = 3 + Math.random() * 5;
+                    flake.style.animation = `fall ${duration}s linear infinite`;
+                    
+                    snowflakes.appendChild(flake);
+                    state.snowflakes.push(flake);
+                }
+                
+                // Add CSS for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fall {
+                        0% { transform: translateY(-100%); opacity: 0.7; }
+                        100% { transform: translateY(100vh); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Calculate results
+            function calculateResults() {
+                // Calculate annual energy consumption
+                const annualUsage = state.monthlyUsage * 12;
+                
+                // Calculate current annual cost
+                const currentAnnualCost = annualUsage * state.electricityRate;
+                const currentMonthly = currentAnnualCost / 12;
+                
+                // Calculate upgraded annual cost
+                const upgradeRatio = state.currentEfficiency / state.upgradeEfficiency;
+                const upgradedAnnualCost = currentAnnualCost * upgradeRatio;
+                const upgradedMonthly = upgradedAnnualCost / 12;
+                
+                // Calculate savings
+                const annualSavings = currentAnnualCost - upgradedAnnualCost;
+                const monthlySavings = annualSavings / 12;
+                
+                // Calculate energy saved
+                const energySaved = annualUsage * (1 - upgradeRatio);
+                
+                // Calculate upgrade investment (based on unit age)
+                const upgradeCost = Math.max(2000, 5000 - (state.acAge * 150));
+                
+                // Update UI
+                currentMonthlyCost.textContent = `$${currentMonthly.toFixed(0)}`;
+                potentialSavings.textContent = `$${monthlySavings.toFixed(0)}/month`;
+                annualEnergySaved.textContent = `${energySaved.toFixed(0)} kWh`;
+                upgradeInvestment.textContent = `$${upgradeCost.toFixed(0)}`;
+                
+                currentAc.textContent = `${state.currentEfficiency} SEER`;
+                upgradedAc.textContent = `${state.upgradeEfficiency} SEER`;
+                
+                // Update cooling display
+                coolingDisplay.textContent = `$${currentMonthly.toFixed(0)}`;
+                
+                if (currentMonthly > 150) {
+                    coolingLabel.textContent = 'High Cooling Cost';
+                    coolingLabel.style.color = '#ff416c';
+                } else if (currentMonthly > 100) {
+                    coolingLabel.textContent = 'Moderate Cooling Cost';
+                    coolingLabel.style.color = '#ffcc00';
+                } else {
+                    coolingLabel.textContent = 'Low Cooling Cost';
+                    coolingLabel.style.color = '#00c9a7';
+                }
+                
+                // Update calculator result
+                calculatorResult.textContent = `Potential Annual Savings: $${annualSavings.toFixed(0)}`;
+                
+                // Update snowflakes
+                createSnowflakes();
+                
+                // Save state
+                saveState();
+            }
+            
+            // Event listeners
+            currentEfficiencySlider.addEventListener('input', () => {
+                state.currentEfficiency = parseInt(currentEfficiencySlider.value);
+                currentEfficiencyValue.textContent = `${state.currentEfficiency} SEER`;
+                calculateResults();
+            });
+            
+            upgradeEfficiencySlider.addEventListener('input', () => {
+                state.upgradeEfficiency = parseInt(upgradeEfficiencySlider.value);
+                upgradeEfficiencyValue.textContent = `${state.upgradeEfficiency} SEER`;
+                calculateResults();
+            });
+            
+            monthlyUsageSlider.addEventListener('input', () => {
+                state.monthlyUsage = parseInt(monthlyUsageSlider.value);
+                monthlyUsageValue.textContent = `${state.monthlyUsage} kWh`;
+                calculateResults();
+            });
+            
+            electricityRateInput.addEventListener('input', () => {
+                state.electricityRate = parseFloat(electricityRateInput.value) || 0.15;
+                calculateResults();
+            });
+            
+            coolingHoursInput.addEventListener('input', () => {
+                state.coolingHours = parseInt(coolingHoursInput.value) || 10;
+                calculateResults();
+            });
+            
+            coolingDaysInput.addEventListener('input', () => {
+                state.coolingDays = parseInt(coolingDaysInput.value) || 120;
+                calculateResults();
+            });
+            
+            acAgeInput.addEventListener('input', () => {
+                state.acAge = parseInt(acAgeInput.value) || 8;
+                calculateResults();
+            });
+            
+            calculateBtn.addEventListener('click', calculateResults);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('coolingCostEstimatorState');
+                    
+                    // Reset to defaults
+                    state.currentEfficiency = 14;
+                    state.upgradeEfficiency = 22;
+                    state.monthlyUsage = 800;
+                    state.electricityRate = 0.15;
+                    state.coolingHours = 10;
+                    state.coolingDays = 120;
+                    state.acAge = 8;
+                    
+                    // Update UI
+                    currentEfficiencySlider.value = state.currentEfficiency;
+                    upgradeEfficiencySlider.value = state.upgradeEfficiency;
+                    monthlyUsageSlider.value = state.monthlyUsage;
+                    electricityRateInput.value = state.electricityRate;
+                    coolingHoursInput.value = state.coolingHours;
+                    coolingDaysInput.value = state.coolingDays;
+                    acAgeInput.value = state.acAge;
+                    
+                    currentEfficiencyValue.textContent = `${state.currentEfficiency} SEER`;
+                    upgradeEfficiencyValue.textContent = `${state.upgradeEfficiency} SEER`;
+                    monthlyUsageValue.textContent = `${state.monthlyUsage} kWh`;
+                    
+                    calculateResults();
+                }
+            });
+            
+            // Initialize the app
+            loadState();
+            createSnowflakes();
+        });
+    </script>
+</body>
+</html>

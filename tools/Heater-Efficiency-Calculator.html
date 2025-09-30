@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<!-- Category: Energy Savings -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heater Efficiency Calculator</title>
+    <meta name="description" content="Calculate your heater efficiency with our interactive calculator. Perfect for saving energy and reducing heating costs.">
+    <meta name="keywords" content="heater efficiency calculator, energy savings, heating cost calculator, furnace efficiency, boiler efficiency, energy efficiency, heating savings, home heating">
+    <meta name="author" content="Energy Savings Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Heater Efficiency Calculator">
+    <meta property="og:description" content="Calculate your heater efficiency with our interactive calculator. Perfect for saving energy and reducing heating costs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/heater-efficiency-calculator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --efficiency-color: #00c9a7;
+            --savings-color: #ffcc00;
+            --energy-color: #4a90e2;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Efficiency visualization */
+        .efficiency-visualization {
+            position: relative;
+            height: 300px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .heater {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .heater-icon {
+            font-size: 3rem;
+            color: var(--efficiency-color);
+        }
+
+        .heat-rays {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .heat-ray {
+            position: absolute;
+            width: 100px;
+            height: 8px;
+            background: var(--efficiency-color);
+            border-radius: 4px;
+            opacity: 0.7;
+            transform-origin: left center;
+        }
+
+        .efficiency-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .efficiency-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--efficiency-color);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .efficiency {
+            color: var(--efficiency-color);
+        }
+
+        .savings {
+            color: var(--savings-color);
+        }
+
+        .energy {
+            color: var(--energy-color);
+        }
+
+        .cost {
+            color: var(--accent);
+        }
+
+        /* Comparison */
+        .comparison {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .comparison-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .comparison-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .comparison-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .current {
+            color: var(--energy-color);
+        }
+
+        .upgrade {
+            color: var(--efficiency-color);
+        }
+
+        /* Savings calculator */
+        .savings-calculator {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .calculator-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .calculator-group {
+            margin-bottom: 15px;
+        }
+
+        .calculator-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .calculator-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .calculator-result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--savings-color);
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .efficiency-visualization {
+                height: 250px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Heater Efficiency Calculator</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="efficiency-visualization" id="efficiency-visualization">
+                <div class="heater">
+                    <div class="heater-icon">🔥</div>
+                </div>
+                <div class="heat-rays" id="heat-rays"></div>
+                <div class="efficiency-display" id="efficiency-display">85%</div>
+                <div class="efficiency-label" id="efficiency-label">High Efficiency</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Heater Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Current Efficiency (%)</div>
+                    <div class="slider-container">
+                        <input type="range" id="current-efficiency" min="50" max="100" value="85">
+                        <span class="control-value" id="current-efficiency-value">85%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Upgrade Efficiency (%)</div>
+                    <div class="slider-container">
+                        <input type="range" id="upgrade-efficiency" min="80" max="100" value="95">
+                        <span class="control-value" id="upgrade-efficiency-value">95%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Monthly Energy Usage (kWh)</div>
+                    <div class="slider-container">
+                        <input type="range" id="monthly-usage" min="100" max="2000" value="800">
+                        <span class="control-value" id="monthly-usage-value">800 kWh</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Efficiency Results</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Current Efficiency</div>
+                        <div class="result-value efficiency" id="result-current-efficiency">85%</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Potential Savings</div>
+                        <div class="result-value savings" id="result-savings">$120/month</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Energy Saved</div>
+                        <div class="result-value energy" id="result-energy-saved">1,200 kWh</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Upgrade Cost</div>
+                        <div class="result-value cost" id="result-upgrade-cost">$2,500</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-title">Efficiency Comparison</div>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-label">Current Heater</div>
+                        <div class="comparison-value current" id="current-heater">85% Efficiency</div>
+                        <div class="comparison-label">Annual Cost: $850</div>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-label">Upgraded Heater</div>
+                        <div class="comparison-value upgrade" id="upgraded-heater">95% Efficiency</div>
+                        <div class="comparison-label">Annual Cost: $730</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="savings-calculator">
+                <div class="calculator-title">Savings Calculator</div>
+                <div class="calculator-grid">
+                    <div class="calculator-group">
+                        <div class="calculator-label">Electricity Rate ($/kWh)</div>
+                        <input type="number" class="calculator-input" id="electricity-rate" min="0.05" max="1.00" step="0.01" value="0.12">
+                    </div>
+                    <div class="calculator-group">
+                        <div class="calculator-label">Heating Hours/Day</div>
+                        <input type="number" class="calculator-input" id="heating-hours" min="1" max="24" value="8">
+                    </div>
+                    <div class="calculator-group">
+                        <div class="calculator-label">Days/Year Heated</div>
+                        <input type="number" class="calculator-input" id="heating-days" min="1" max="365" value="180">
+                    </div>
+                    <div class="calculator-group">
+                        <div class="calculator-label">Current Heater Age (years)</div>
+                        <input type="number" class="calculator-input" id="heater-age" min="1" max="30" value="10">
+                    </div>
+                </div>
+                <div class="calculator-result" id="calculator-result">
+                    Potential Annual Savings: $120
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="calculate-btn" class="calculate-btn">Calculate Efficiency</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                currentEfficiency: 85,
+                upgradeEfficiency: 95,
+                monthlyUsage: 800,
+                electricityRate: 0.12,
+                heatingHours: 8,
+                heatingDays: 180,
+                heaterAge: 10,
+                heatRays: []
+            };
+            
+            // DOM elements
+            const currentEfficiencySlider = document.getElementById('current-efficiency');
+            const upgradeEfficiencySlider = document.getElementById('upgrade-efficiency');
+            const monthlyUsageSlider = document.getElementById('monthly-usage');
+            const currentEfficiencyValue = document.getElementById('current-efficiency-value');
+            const upgradeEfficiencyValue = document.getElementById('upgrade-efficiency-value');
+            const monthlyUsageValue = document.getElementById('monthly-usage-value');
+            const efficiencyDisplay = document.getElementById('efficiency-display');
+            const efficiencyLabel = document.getElementById('efficiency-label');
+            const resultCurrentEfficiency = document.getElementById('result-current-efficiency');
+            const resultSavings = document.getElementById('result-savings');
+            const resultEnergySaved = document.getElementById('result-energy-saved');
+            const resultUpgradeCost = document.getElementById('result-upgrade-cost');
+            const currentHeater = document.getElementById('current-heater');
+            const upgradedHeater = document.getElementById('upgraded-heater');
+            const electricityRateInput = document.getElementById('electricity-rate');
+            const heatingHoursInput = document.getElementById('heating-hours');
+            const heatingDaysInput = document.getElementById('heating-days');
+            const heaterAgeInput = document.getElementById('heater-age');
+            const calculatorResult = document.getElementById('calculator-result');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const heatRays = document.getElementById('heat-rays');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('heaterEfficiencyCalculatorState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.currentEfficiency = parsed.currentEfficiency || 85;
+                    state.upgradeEfficiency = parsed.upgradeEfficiency || 95;
+                    state.monthlyUsage = parsed.monthlyUsage || 800;
+                    state.electricityRate = parsed.electricityRate || 0.12;
+                    state.heatingHours = parsed.heatingHours || 8;
+                    state.heatingDays = parsed.heatingDays || 180;
+                    state.heaterAge = parsed.heaterAge || 10;
+                    
+                    // Update UI
+                    currentEfficiencySlider.value = state.currentEfficiency;
+                    upgradeEfficiencySlider.value = state.upgradeEfficiency;
+                    monthlyUsageSlider.value = state.monthlyUsage;
+                    electricityRateInput.value = state.electricityRate;
+                    heatingHoursInput.value = state.heatingHours;
+                    heatingDaysInput.value = state.heatingDays;
+                    heaterAgeInput.value = state.heaterAge;
+                    
+                    currentEfficiencyValue.textContent = `${state.currentEfficiency}%`;
+                    upgradeEfficiencyValue.textContent = `${state.upgradeEfficiency}%`;
+                    monthlyUsageValue.textContent = `${state.monthlyUsage} kWh`;
+                    
+                    efficiencyDisplay.textContent = `${state.currentEfficiency}%`;
+                    
+                    if (state.currentEfficiency > 90) {
+                        efficiencyLabel.textContent = 'Excellent Efficiency';
+                    } else if (state.currentEfficiency > 80) {
+                        efficiencyLabel.textContent = 'High Efficiency';
+                    } else if (state.currentEfficiency > 70) {
+                        efficiencyLabel.textContent = 'Good Efficiency';
+                    } else {
+                        efficiencyLabel.textContent = 'Low Efficiency';
+                    }
+                    
+                    calculateResults();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('heaterEfficiencyCalculatorState', JSON.stringify({
+                    currentEfficiency: state.currentEfficiency,
+                    upgradeEfficiency: state.upgradeEfficiency,
+                    monthlyUsage: state.monthlyUsage,
+                    electricityRate: state.electricityRate,
+                    heatingHours: state.heatingHours,
+                    heatingDays: state.heatingDays,
+                    heaterAge: state.heaterAge
+                }));
+            }
+            
+            // Create heat rays visualization
+            function createHeatRays() {
+                heatRays.innerHTML = '';
+                state.heatRays = [];
+                
+                // Create heat rays based on efficiency
+                const rayCount = Math.floor(state.currentEfficiency / 5);
+                
+                for (let i = 0; i < rayCount; i++) {
+                    const ray = document.createElement('div');
+                    ray.className = 'heat-ray';
+                    
+                    // Random position and rotation
+                    const angle = Math.random() * 360;
+                    const length = 50 + Math.random() * 100;
+                    
+                    ray.style.width = `${length}px`;
+                    ray.style.transform = `rotate(${angle}deg)`;
+                    ray.style.left = '50%';
+                    ray.style.top = '50%';
+                    ray.style.marginLeft = `-${length/2}px`;
+                    ray.style.marginTop = '-4px';
+                    
+                    // Random animation
+                    const duration = 1 + Math.random() * 2;
+                    ray.style.animation = `pulse ${duration}s infinite alternate`;
+                    
+                    heatRays.appendChild(ray);
+                    state.heatRays.push(ray);
+                }
+                
+                // Add CSS for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0% { opacity: 0.3; }
+                        100% { opacity: 0.8; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Calculate results
+            function calculateResults() {
+                // Calculate annual energy consumption
+                const annualUsage = state.monthlyUsage * 12;
+                
+                // Calculate current annual cost
+                const currentAnnualCost = annualUsage * state.electricityRate;
+                
+                // Calculate upgraded annual cost
+                const upgradeRatio = state.currentEfficiency / state.upgradeEfficiency;
+                const upgradedAnnualCost = currentAnnualCost * upgradeRatio;
+                
+                // Calculate savings
+                const annualSavings = currentAnnualCost - upgradedAnnualCost;
+                const monthlySavings = annualSavings / 12;
+                
+                // Calculate energy saved
+                const energySaved = annualUsage * (1 - upgradeRatio);
+                
+                // Calculate upgrade cost (based on heater age)
+                const upgradeCost = Math.max(500, 3000 - (state.heaterAge * 100));
+                
+                // Update UI
+                resultCurrentEfficiency.textContent = `${state.currentEfficiency}%`;
+                resultSavings.textContent = `$${monthlySavings.toFixed(0)}/month`;
+                resultEnergySaved.textContent = `${energySaved.toFixed(0)} kWh`;
+                resultUpgradeCost.textContent = `$${upgradeCost.toFixed(0)}`;
+                
+                currentHeater.textContent = `${state.currentEfficiency}% Efficiency`;
+                upgradedHeater.textContent = `${state.upgradeEfficiency}% Efficiency`;
+                
+                // Update calculator result
+                calculatorResult.textContent = `Potential Annual Savings: $${annualSavings.toFixed(0)}`;
+                
+                // Update efficiency display
+                efficiencyDisplay.textContent = `${state.currentEfficiency}%`;
+                
+                if (state.currentEfficiency > 90) {
+                    efficiencyLabel.textContent = 'Excellent Efficiency';
+                } else if (state.currentEfficiency > 80) {
+                    efficiencyLabel.textContent = 'High Efficiency';
+                } else if (state.currentEfficiency > 70) {
+                    efficiencyLabel.textContent = 'Good Efficiency';
+                } else {
+                    efficiencyLabel.textContent = 'Low Efficiency';
+                }
+                
+                // Update heat rays
+                createHeatRays();
+                
+                // Save state
+                saveState();
+            }
+            
+            // Event listeners
+            currentEfficiencySlider.addEventListener('input', () => {
+                state.currentEfficiency = parseInt(currentEfficiencySlider.value);
+                currentEfficiencyValue.textContent = `${state.currentEfficiency}%`;
+                calculateResults();
+            });
+            
+            upgradeEfficiencySlider.addEventListener('input', () => {
+                state.upgradeEfficiency = parseInt(upgradeEfficiencySlider.value);
+                upgradeEfficiencyValue.textContent = `${state.upgradeEfficiency}%`;
+                calculateResults();
+            });
+            
+            monthlyUsageSlider.addEventListener('input', () => {
+                state.monthlyUsage = parseInt(monthlyUsageSlider.value);
+                monthlyUsageValue.textContent = `${state.monthlyUsage} kWh`;
+                calculateResults();
+            });
+            
+            electricityRateInput.addEventListener('input', () => {
+                state.electricityRate = parseFloat(electricityRateInput.value) || 0.12;
+                calculateResults();
+            });
+            
+            heatingHoursInput.addEventListener('input', () => {
+                state.heatingHours = parseInt(heatingHoursInput.value) || 8;
+                calculateResults();
+            });
+            
+            heatingDaysInput.addEventListener('input', () => {
+                state.heatingDays = parseInt(heatingDaysInput.value) || 180;
+                calculateResults();
+            });
+            
+            heaterAgeInput.addEventListener('input', () => {
+                state.heaterAge = parseInt(heaterAgeInput.value) || 10;
+                calculateResults();
+            });
+            
+            calculateBtn.addEventListener('click', calculateResults);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('heaterEfficiencyCalculatorState');
+                    
+                    // Reset to defaults
+                    state.currentEfficiency = 85;
+                    state.upgradeEfficiency = 95;
+                    state.monthlyUsage = 800;
+                    state.electricityRate = 0.12;
+                    state.heatingHours = 8;
+                    state.heatingDays = 180;
+                    state.heaterAge = 10;
+                    
+                    // Update UI
+                    currentEfficiencySlider.value = state.currentEfficiency;
+                    upgradeEfficiencySlider.value = state.upgradeEfficiency;
+                    monthlyUsageSlider.value = state.monthlyUsage;
+                    electricityRateInput.value = state.electricityRate;
+                    heatingHoursInput.value = state.heatingHours;
+                    heatingDaysInput.value = state.heatingDays;
+                    heaterAgeInput.value = state.heaterAge;
+                    
+                    currentEfficiencyValue.textContent = `${state.currentEfficiency}%`;
+                    upgradeEfficiencyValue.textContent = `${state.upgradeEfficiency}%`;
+                    monthlyUsageValue.textContent = `${state.monthlyUsage} kWh`;
+                    
+                    calculateResults();
+                }
+            });
+            
+            // Initialize the app
+            loadState();
+            createHeatRays();
+        });
+    </script>
+</body>
+</html>

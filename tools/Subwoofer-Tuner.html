@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<!-- Category: Audio Engineering -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subwoofer Tuner</title>
+    <meta name="description"content="Optimize your subwoofer with our interactive tuner. Perfect for home theaters, car audio, and studio setups.">
+    <meta name="keywords"content="subwoofer tuner, subwoofer setup, bass tuning, audio crossover, subwoofer phase, bass management, home theater setup, car audio tuning">
+    <meta name="author"content="Audio Engineering Tools">
+    <meta name="robots"content="index, follow">
+    <meta name="revisit-after"content="7 days">
+    <meta property="og:title"content="Subwoofer Tuner">
+    <meta property="og:description" content="Optimize your subwoofer with our interactive tuner. Perfect for home theaters, car audio, and studio setups.">
+    <meta property="og:type"content="website">
+    <meta property="og:url"content="https://toolshub365.com/subwoofer-tuner">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --sub-color: #00c9a7;
+            --result-color: #4a90e2;
+            --control-color: #ff7a9d;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Subwoofer visualization */
+        .sub-visualization {
+            position: relative;
+            height: 250px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .subwoofer {
+            width: 120px;
+            height: 120px;
+            background: var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--sub-color);
+        }
+
+        .sub-cone {
+            width: 80px;
+            height: 80px;
+            background: var(--sub-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .sub-cone.moving {
+            transform: scale(1.1);
+            background: var(--accent);
+        }
+
+        .sub-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .frequency-display {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--sub-color);
+            font-weight: bold;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Presets */
+        .presets {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .presets-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .preset-btn.active {
+            background: var(--sub-color);
+            color: white;
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .frequency {
+            color: var(--sub-color);
+        }
+
+        .phase {
+            color: var(--result-color);
+        }
+
+        .crossover {
+            color: var(--control-color);
+        }
+
+        .level {
+            color: var(--accent);
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .tune-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .sub-visualization {
+                height: 200px;
+            }
+            
+            .subwoofer {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .sub-cone {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Subwoofer Tuner</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="sub-visualization">
+                <div class="subwoofer">
+                    <div class="sub-cone" id="sub-cone">
+                        <div class="sub-label">SUB</div>
+                    </div>
+                </div>
+                <div class="frequency-display" id="frequency-display">60 Hz</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Tuning Controls</div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Frequency (Hz)</span>
+                        <span class="control-value" id="freq-value">60</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="frequency" min="20" max="200" value="60">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Phase (°)</span>
+                        <span class="control-value" id="phase-value">0</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="phase" min="0" max="360" value="0">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Crossover (Hz)</span>
+                        <span class="control-value" id="crossover-value">80</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="crossover" min="40" max="150" value="80">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Level (dB)</span>
+                        <span class="control-value" id="level-value">0</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="level" min="-10" max="10" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="presets">
+                <div class="presets-title">Preset Settings</div>
+                <div class="preset-buttons">
+                    <div class="preset-btn active" data-preset="music">Music</div>
+                    <div class="preset-btn" data-preset="movie">Movie</div>
+                    <div class="preset-btn" data-preset="gaming">Gaming</div>
+                    <div class="preset-btn" data-preset="vocal">Vocal</div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Tuning Results</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Frequency</div>
+                        <div class="result-value frequency" id="result-freq">60 Hz</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Phase</div>
+                        <div class="result-value phase" id="result-phase">0°</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Crossover</div>
+                        <div class="result-value crossover" id="result-crossover">80 Hz</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Level</div>
+                        <div class="result-value level" id="result-level">0 dB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="tune-btn" class="tune-btn">Tune Subwoofer</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                frequency: 60,
+                phase: 0,
+                crossover: 80,
+                level: 0
+            };
+            
+            // DOM elements
+            const tuneBtn = document.getElementById('tune-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const frequencySlider = document.getElementById('frequency');
+            const phaseSlider = document.getElementById('phase');
+            const crossoverSlider = document.getElementById('crossover');
+            const levelSlider = document.getElementById('level');
+            const freqValue = document.getElementById('freq-value');
+            const phaseValue = document.getElementById('phase-value');
+            const crossoverValue = document.getElementById('crossover-value');
+            const levelValue = document.getElementById('level-value');
+            const resultFreq = document.getElementById('result-freq');
+            const resultPhase = document.getElementById('result-phase');
+            const resultCrossover = document.getElementById('result-crossover');
+            const resultLevel = document.getElementById('result-level');
+            const frequencyDisplay = document.getElementById('frequency-display');
+            const subCone = document.getElementById('sub-cone');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('subwooferTunerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.frequency = parsed.frequency || 60;
+                    state.phase = parsed.phase || 0;
+                    state.crossover = parsed.crossover || 80;
+                    state.level = parsed.level || 0;
+                    
+                    // Update UI
+                    frequencySlider.value = state.frequency;
+                    phaseSlider.value = state.phase;
+                    crossoverSlider.value = state.crossover;
+                    levelSlider.value = state.level;
+                    
+                    updateDisplay();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('subwooferTunerState', JSON.stringify({
+                    frequency: state.frequency,
+                    phase: state.phase,
+                    crossover: state.crossover,
+                    level: state.level
+                }));
+            }
+            
+            // Update display
+            function updateDisplay() {
+                freqValue.textContent = state.frequency;
+                phaseValue.textContent = state.phase;
+                crossoverValue.textContent = state.crossover;
+                levelValue.textContent = state.level;
+                
+                resultFreq.textContent = `${state.frequency} Hz`;
+                resultPhase.textContent = `${state.phase}°`;
+                resultCrossover.textContent = `${state.crossover} Hz`;
+                resultLevel.textContent = `${state.level} dB`;
+                
+                frequencyDisplay.textContent = `${state.frequency} Hz`;
+                
+                // Animate subwoofer
+                subCone.classList.add('moving');
+                setTimeout(() => {
+                    subCone.classList.remove('moving');
+                }, 200);
+            }
+            
+            // Apply preset
+            function applyPreset(preset) {
+                switch(preset) {
+                    case 'music':
+                        state.frequency = 60;
+                        state.phase = 0;
+                        state.crossover = 80;
+                        state.level = 0;
+                        break;
+                    case 'movie':
+                        state.frequency = 50;
+                        state.phase = 180;
+                        state.crossover = 100;
+                        state.level = 2;
+                        break;
+                    case 'gaming':
+                        state.frequency = 55;
+                        state.phase = 0;
+                        state.crossover = 85;
+                        state.level = 1;
+                        break;
+                    case 'vocal':
+                        state.frequency = 70;
+                        state.phase = 0;
+                        state.crossover = 120;
+                        state.level = -2;
+                        break;
+                }
+                
+                // Update UI
+                frequencySlider.value = state.frequency;
+                phaseSlider.value = state.phase;
+                crossoverSlider.value = state.crossover;
+                levelSlider.value = state.level;
+                
+                updateDisplay();
+                saveState();
+            }
+            
+            // Event listeners
+            frequencySlider.addEventListener('input', () => {
+                state.frequency = parseInt(frequencySlider.value);
+                updateDisplay();
+                saveState();
+            });
+            
+            phaseSlider.addEventListener('input', () => {
+                state.phase = parseInt(phaseSlider.value);
+                updateDisplay();
+                saveState();
+            });
+            
+            crossoverSlider.addEventListener('input', () => {
+                state.crossover = parseInt(crossoverSlider.value);
+                updateDisplay();
+                saveState();
+            });
+            
+            levelSlider.addEventListener('input', () => {
+                state.level = parseInt(levelSlider.value);
+                updateDisplay();
+                saveState();
+            });
+            
+            tuneBtn.addEventListener('click', () => {
+                // Simulate tuning process
+                subCone.classList.add('moving');
+                setTimeout(() => {
+                    subCone.classList.remove('moving');
+                    alert('Subwoofer tuned successfully!');
+                }, 1000);
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all settings?')) {
+                    localStorage.removeItem('subwooferTunerState');
+                    
+                    // Reset to defaults
+                    state.frequency = 60;
+                    state.phase = 0;
+                    state.crossover = 80;
+                    state.level = 0;
+                    
+                    // Update UI
+                    frequencySlider.value = state.frequency;
+                    phaseSlider.value = state.phase;
+                    crossoverSlider.value = state.crossover;
+                    levelSlider.value = state.level;
+                    
+                    updateDisplay();
+                }
+            });
+            
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    applyPreset(btn.dataset.preset);
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+        });
+    </script>
+</body>
+</html>

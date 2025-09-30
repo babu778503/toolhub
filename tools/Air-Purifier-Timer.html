@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<!-- Category: Indoor Air Quality -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Purifier Timer</title>
+    <meta name="description" content="Control your air purifier with our interactive timer. Perfect for improving indoor air quality and health.">
+    <meta name="keywords" content="air purifier timer, air quality, indoor air quality, air purification, health timer, air cleaner, HEPA filter, air filtration">
+    <meta name="author" content="Indoor Air Quality Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Air Purifier Timer">
+    <meta property="og:description" content="Control your air purifier with our interactive timer. Perfect for improving indoor air quality and health.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/air-purifier-timer">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --air-color: #00c9a7;
+            --filter-color: #4a90e2;
+            --quality-color: #ffcc00;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Air quality visualization */
+        .air-visualization {
+            position: relative;
+            height: 300px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room {
+            position: absolute;
+            width: 80%;
+            height: 70%;
+            background: rgba(50, 50, 65, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .purifier {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 120px;
+            background: var(--gray);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .purifier-icon {
+            font-size: 2.5rem;
+            color: var(--air-color);
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        .clean-air {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--air-color);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-40px) translateX(-10px); }
+            75% { transform: translateY(-20px) translateX(-20px); }
+        }
+
+        .air-quality-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .air-quality-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--air-color);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Timer settings */
+        .timer-settings {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .settings-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .setting-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .setting-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-input {
+            width: 80px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Presets */
+        .presets {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .presets-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .preset-btn.active {
+            background: var(--air-color);
+            color: white;
+        }
+
+        /* Timer display */
+        .timer-display {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .timer-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .time-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--air-color);
+            margin: 10px 0;
+        }
+
+        .status-display {
+            font-size: 1.2rem;
+            color: var(--quality-color);
+            font-weight: 600;
+        }
+
+        /* Power control */
+        .power-control {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .power-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .power-toggle {
+            width: 100px;
+            height: 50px;
+            background: var(--gray);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+
+        .power-toggle.on {
+            background: var(--air-color);
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .power-toggle.on .toggle-handle {
+            left: 55px;
+        }
+
+        .power-label {
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* Sound controls */
+        .sound-controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .sound-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .sound-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sound-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            background: var(--gray);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sound-btn:hover {
+            background: var(--accent);
+        }
+
+        .sound-btn.active {
+            background: var(--accent);
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .start-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .stop-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .air-visualization {
+                height: 250px;
+            }
+            
+            .preset-buttons {
+                justify-content: center;
+            }
+            
+            .sound-buttons {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Air Purifier Timer</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="air-visualization" id="air-visualization">
+                <div class="room"></div>
+                <div class="purifier">
+                    <div class="purifier-icon">💨</div>
+                </div>
+                <div class="particles" id="particles"></div>
+                <div class="air-quality-display" id="air-quality-display">0%</div>
+                <div class="air-quality-label" id="air-quality-label">Air Quality: Good</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Purifier Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Fan Speed</div>
+                    <div class="slider-container">
+                        <input type="range" id="fan-speed" min="1" max="5" value="3">
+                        <span class="control-value" id="fan-speed-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Filter Life</div>
+                    <div class="slider-container">
+                        <input type="range" id="filter-life" min="0" max="100" value="85">
+                        <span class="control-value" id="filter-life-value">85%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Room Size (sq ft)</div>
+                    <div class="slider-container">
+                        <input type="range" id="room-size" min="100" max="2000" value="500">
+                        <span class="control-value" id="room-size-value">500 sq ft</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timer-settings">
+                <div class="settings-title">Timer Settings</div>
+                <div class="setting-group">
+                    <div class="setting-label">Run Time (hours)</div>
+                    <div class="setting-container">
+                        <input type="number" class="time-input" id="run-hours" min="0" max="24" value="2">
+                        <span>:</span>
+                        <input type="number" class="time-input" id="run-minutes" min="0" max="59" value="30">
+                        <span class="setting-value" id="run-time-value">2h 30m</span>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <div class="setting-label">Cycle Interval</div>
+                    <div class="setting-container">
+                        <select class="time-input" id="cycle-interval">
+                            <option value="continuous">Continuous</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60" selected>1 hour</option>
+                            <option value="120">2 hours</option>
+                            <option value="180">3 hours</option>
+                        </select>
+                        <span class="setting-value" id="interval-value">1 hour</span>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <div class="setting-label">Sleep Mode</div>
+                    <div class="setting-container">
+                        <select class="time-input" id="sleep-mode">
+                            <option value="off">Off</option>
+                            <option value="8pm">8:00 PM</option>
+                            <option value="9pm" selected>9:00 PM</option>
+                            <option value="10pm">10:00 PM</option>
+                            <option value="11pm">11:00 PM</option>
+                        </select>
+                        <span class="setting-value" id="sleep-value">9:00 PM</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sound-controls">
+                <div class="sound-title">Sound Simulation</div>
+                <div class="sound-buttons">
+                    <button class="sound-btn" id="low-sound">Low Fan</button>
+                    <button class="sound-btn" id="medium-sound">Medium Fan</button>
+                    <button class="sound-btn" id="high-sound">High Fan</button>
+                    <button class="sound-btn" id="hum-sound">Motor Hum</button>
+                    <button class="sound-btn" id="stop-sound">Stop Sound</button>
+                </div>
+            </div>
+            
+            <div class="presets">
+                <div class="presets-title">Quick Presets</div>
+                <div class="preset-buttons">
+                    <div class="preset-btn active" data-preset="auto">Auto Mode</div>
+                    <div class="preset-btn" data-preset="allergies">Allergy Relief</div>
+                    <div class="preset-btn" data-preset="pollen">High Pollen</div>
+                    <div class="preset-btn" data-preset="smoke">Smoke Removal</div>
+                    <div class="preset-btn" data-preset="night">Night Mode</div>
+                </div>
+            </div>
+            
+            <div class="timer-display">
+                <div class="timer-title">Timer Status</div>
+                <div class="time-display" id="time-display">00:00:00</div>
+                <div class="status-display" id="status-display">Purifier Off</div>
+            </div>
+            
+            <div class="power-control">
+                <div class="power-title">Power Control</div>
+                <div class="power-toggle" id="power-toggle">
+                    <div class="toggle-handle"></div>
+                </div>
+                <div class="power-label" id="power-label">Purifier Off</div>
+            </div>
+            
+            <div class="buttons">
+                <button id="start-btn" class="start-btn">▶ Start Purifier</button>
+                <button id="stop-btn" class="stop-btn">⏹ Stop Purifier</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                fanSpeed: 3,
+                filterLife: 85,
+                roomSize: 500,
+                runHours: 2,
+                runMinutes: 30,
+                cycleInterval: '60',
+                sleepMode: '9pm',
+                powerOn: false,
+                timerActive: false,
+                timerInterval: null,
+                airQuality: 85,
+                particles: [],
+                cleanAir: [],
+                audioContext: null,
+                soundSource: null,
+                gainNode: null
+            };
+            
+            // DOM elements
+            const fanSpeedSlider = document.getElementById('fan-speed');
+            const filterLifeSlider = document.getElementById('filter-life');
+            const roomSizeSlider = document.getElementById('room-size');
+            const fanSpeedValue = document.getElementById('fan-speed-value');
+            const filterLifeValue = document.getElementById('filter-life-value');
+            const roomSizeValue = document.getElementById('room-size-value');
+            const runHoursInput = document.getElementById('run-hours');
+            const runMinutesInput = document.getElementById('run-minutes');
+            const cycleIntervalSelect = document.getElementById('cycle-interval');
+            const sleepModeSelect = document.getElementById('sleep-mode');
+            const runTimeValue = document.getElementById('run-time-value');
+            const intervalValue = document.getElementById('interval-value');
+            const sleepValue = document.getElementById('sleep-value');
+            const airQualityDisplay = document.getElementById('air-quality-display');
+            const airQualityLabel = document.getElementById('air-quality-label');
+            const timeDisplay = document.getElementById('time-display');
+            const statusDisplay = document.getElementById('status-display');
+            const powerToggle = document.getElementById('power-toggle');
+            const powerLabel = document.getElementById('power-label');
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const particlesContainer = document.getElementById('particles');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            const soundButtons = document.querySelectorAll('.sound-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('airPurifierTimerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.fanSpeed = parsed.fanSpeed || 3;
+                    state.filterLife = parsed.filterLife || 85;
+                    state.roomSize = parsed.roomSize || 500;
+                    state.runHours = parsed.runHours || 2;
+                    state.runMinutes = parsed.runMinutes || 30;
+                    state.cycleInterval = parsed.cycleInterval || '60';
+                    state.sleepMode = parsed.sleepMode || '9pm';
+                    state.powerOn = parsed.powerOn || false;
+                    
+                    // Update UI
+                    fanSpeedSlider.value = state.fanSpeed;
+                    filterLifeSlider.value = state.filterLife;
+                    roomSizeSlider.value = state.roomSize;
+                    runHoursInput.value = state.runHours;
+                    runMinutesInput.value = state.runMinutes;
+                    cycleIntervalSelect.value = state.cycleInterval;
+                    sleepModeSelect.value = state.sleepMode;
+                    
+                    fanSpeedValue.textContent = state.fanSpeed;
+                    filterLifeValue.textContent = `${state.filterLife}%`;
+                    roomSizeValue.textContent = `${state.roomSize} sq ft`;
+                    runTimeValue.textContent = `${state.runHours}h ${state.runMinutes}m`;
+                    intervalValue.textContent = cycleIntervalSelect.options[cycleIntervalSelect.selectedIndex].text;
+                    sleepValue.textContent = sleepModeSelect.options[sleepModeSelect.selectedIndex].text;
+                    
+                    if (state.powerOn) {
+                        powerToggle.classList.add('on');
+                        powerLabel.textContent = 'Purifier On';
+                        statusDisplay.textContent = 'Purifying Air...';
+                    }
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('airPurifierTimerState', JSON.stringify({
+                    fanSpeed: state.fanSpeed,
+                    filterLife: state.filterLife,
+                    roomSize: state.roomSize,
+                    runHours: state.runHours,
+                    runMinutes: state.runMinutes,
+                    cycleInterval: state.cycleInterval,
+                    sleepMode: state.sleepMode,
+                    powerOn: state.powerOn
+                }));
+            }
+            
+            // Initialize audio context
+            function initAudio() {
+                if (!state.audioContext) {
+                    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            
+            // Create sound source
+            function createSoundSource(type) {
+                if (!state.audioContext) return null;
+                
+                // Stop existing sound source if running
+                if (state.soundSource) {
+                    state.soundSource.stop();
+                    state.soundSource.disconnect();
+                }
+                
+                // Create buffer source
+                state.soundSource = state.audioContext.createBufferSource();
+                
+                // Create buffer with appropriate sound
+                const bufferSize = 2 * state.audioContext.sampleRate;
+                const buffer = state.audioContext.createBuffer(1, bufferSize, state.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Generate appropriate waveform based on sound type
+                for (let i = 0; i < bufferSize; i++) {
+                    let value = 0;
+                    
+                    switch(type) {
+                        case 'low':
+                            // Low frequency hum
+                            value = Math.sin(i * 0.0005) * 0.3;
+                            break;
+                        case 'medium':
+                            // Medium frequency fan noise
+                            value = Math.sin(i * 0.001) * 0.4;
+                            break;
+                        case 'high':
+                            // High frequency fan noise
+                            value = Math.sin(i * 0.002) * 0.5;
+                            break;
+                        case 'hum':
+                            // Motor hum
+                            value = Math.sin(i * 0.0003) * 0.6;
+                            break;
+                        default:
+                            value = 0;
+                    }
+                    
+                    data[i] = value;
+                }
+                
+                state.soundSource.buffer = buffer;
+                state.soundSource.loop = true;
+                
+                // Create gain node to control volume
+                state.gainNode = state.audioContext.createGain();
+                state.gainNode.gain.value = 0; // Start with no sound
+                
+                // Connect nodes
+                state.soundSource.connect(state.gainNode);
+                state.gainNode.connect(state.audioContext.destination);
+                
+                // Start sound source
+                state.soundSource.start();
+                
+                return state.gainNode;
+            }
+            
+            // Play sound
+            function playSound(type) {
+                initAudio();
+                const gainNode = createSoundSource(type);
+                
+                if (gainNode) {
+                    // Set volume based on type
+                    let volume = 0;
+                    switch(type) {
+                        case 'low': volume = 0.2; break;
+                        case 'medium': volume = 0.4; break;
+                        case 'high': volume = 0.6; break;
+                        case 'hum': volume = 0.3; break;
+                    }
+                    
+                    gainNode.gain.value = volume;
+                }
+            }
+            
+            // Stop sound
+            function stopSound() {
+                if (state.gainNode) {
+                    state.gainNode.gain.value = 0;
+                }
+                
+                if (state.soundSource) {
+                    state.soundSource.stop();
+                    state.soundSource.disconnect();
+                    state.soundSource = null;
+                }
+            }
+            
+            // Create air particles
+            function createParticles() {
+                particlesContainer.innerHTML = '';
+                state.particles = [];
+                state.cleanAir = [];
+                
+                // Create dirty particles
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.animation = `float ${5 + Math.random() * 10}s infinite ease-in-out`;
+                    particlesContainer.appendChild(particle);
+                    state.particles.push(particle);
+                }
+                
+                // Create clean air bubbles
+                for (let i = 0; i < 15; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'clean-air';
+                    bubble.style.left = `${Math.random() * 100}%`;
+                    bubble.style.top = `${Math.random() * 100}%`;
+                    particlesContainer.appendChild(bubble);
+                    state.cleanAir.push(bubble);
+                }
+            }
+            
+            // Update air quality visualization
+            function updateAirQuality() {
+                // Calculate air quality based on fan speed and filter life
+                const quality = Math.min(100, Math.floor(
+                    (state.fanSpeed * 15) + 
+                    (state.filterLife * 0.5) + 
+                    (state.powerOn ? 20 : 0)
+                ));
+                
+                state.airQuality = quality;
+                airQualityDisplay.textContent = `${quality}%`;
+                
+                // Update label based on quality
+                if (quality >= 80) {
+                    airQualityLabel.textContent = 'Air Quality: Excellent';
+                    airQualityLabel.style.color = '#00c9a7';
+                } else if (quality >= 60) {
+                    airQualityLabel.textContent = 'Air Quality: Good';
+                    airQualityLabel.style.color = '#4a90e2';
+                } else if (quality >= 40) {
+                    airQualityLabel.textContent = 'Air Quality: Fair';
+                    airQualityLabel.style.color = '#ffcc00';
+                } else {
+                    airQualityLabel.textContent = 'Air Quality: Poor';
+                    airQualityLabel.style.color = '#ff416c';
+                }
+                
+                // Update particle visibility based on air quality
+                state.particles.forEach((particle, index) => {
+                    if (index < (30 * (100 - quality) / 100)) {
+                        particle.style.opacity = '0.7';
+                    } else {
+                        particle.style.opacity = '0';
+                    }
+                });
+                
+                // Update clean air visibility
+                state.cleanAir.forEach((bubble, index) => {
+                    if (index < (15 * quality / 100)) {
+                        bubble.style.opacity = '0.5';
+                    } else {
+                        bubble.style.opacity = '0';
+                    }
+                });
+            }
+            
+            // Start timer
+            function startTimer() {
+                if (state.timerInterval) {
+                    clearInterval(state.timerInterval);
+                }
+                
+                // Calculate total seconds
+                const totalSeconds = (state.runHours * 3600) + (state.runMinutes * 60);
+                let secondsRemaining = totalSeconds;
+                
+                // Update display immediately
+                updateTimerDisplay(secondsRemaining);
+                
+                state.timerInterval = setInterval(() => {
+                    secondsRemaining--;
+                    
+                    if (secondsRemaining <= 0) {
+                        clearInterval(state.timerInterval);
+                        state.timerActive = false;
+                        state.powerOn = false;
+                        powerToggle.classList.remove('on');
+                        powerLabel.textContent = 'Purifier Off';
+                        statusDisplay.textContent = 'Purifier Off';
+                        timeDisplay.textContent = '00:00:00';
+                        saveState();
+                        return;
+                    }
+                    
+                    updateTimerDisplay(secondsRemaining);
+                }, 1000);
+                
+                state.timerActive = true;
+            }
+            
+            // Update timer display
+            function updateTimerDisplay(seconds) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                timeDisplay.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Apply preset
+            function applyPreset(preset) {
+                switch(preset) {
+                    case 'auto':
+                        state.fanSpeed = 3;
+                        state.cycleInterval = '60';
+                        state.sleepMode = '9pm';
+                        break;
+                    case 'allergies':
+                        state.fanSpeed = 5;
+                        state.cycleInterval = '30';
+                        state.sleepMode = '8pm';
+                        break;
+                    case 'pollen':
+                        state.fanSpeed = 4;
+                        state.cycleInterval = '30';
+                        state.sleepMode = '9pm';
+                        break;
+                    case 'smoke':
+                        state.fanSpeed = 5;
+                        state.cycleInterval = 'continuous';
+                        state.sleepMode = 'off';
+                        break;
+                    case 'night':
+                        state.fanSpeed = 2;
+                        state.cycleInterval = '120';
+                        state.sleepMode = '10pm';
+                        break;
+                }
+                
+                // Update UI
+                fanSpeedSlider.value = state.fanSpeed;
+                cycleIntervalSelect.value = state.cycleInterval;
+                sleepModeSelect.value = state.sleepMode;
+                
+                fanSpeedValue.textContent = state.fanSpeed;
+                intervalValue.textContent = cycleIntervalSelect.options[cycleIntervalSelect.selectedIndex].text;
+                sleepValue.textContent = sleepModeSelect.options[sleepModeSelect.selectedIndex].text;
+                
+                updateAirQuality();
+                saveState();
+            }
+            
+            // Event listeners
+            fanSpeedSlider.addEventListener('input', () => {
+                state.fanSpeed = parseInt(fanSpeedSlider.value);
+                fanSpeedValue.textContent = state.fanSpeed;
+                updateAirQuality();
+                saveState();
+            });
+            
+            filterLifeSlider.addEventListener('input', () => {
+                state.filterLife = parseInt(filterLifeSlider.value);
+                filterLifeValue.textContent = `${state.filterLife}%`;
+                updateAirQuality();
+                saveState();
+            });
+            
+            roomSizeSlider.addEventListener('input', () => {
+                state.roomSize = parseInt(roomSizeSlider.value);
+                roomSizeValue.textContent = `${state.roomSize} sq ft`;
+                saveState();
+            });
+            
+            runHoursInput.addEventListener('change', () => {
+                state.runHours = parseInt(runHoursInput.value) || 0;
+                runTimeValue.textContent = `${state.runHours}h ${state.runMinutes}m`;
+                saveState();
+            });
+            
+            runMinutesInput.addEventListener('change', () => {
+                state.runMinutes = parseInt(runMinutesInput.value) || 0;
+                runTimeValue.textContent = `${state.runHours}h ${state.runMinutes}m`;
+                saveState();
+            });
+            
+            cycleIntervalSelect.addEventListener('change', () => {
+                state.cycleInterval = cycleIntervalSelect.value;
+                intervalValue.textContent = cycleIntervalSelect.options[cycleIntervalSelect.selectedIndex].text;
+                saveState();
+            });
+            
+            sleepModeSelect.addEventListener('change', () => {
+                state.sleepMode = sleepModeSelect.value;
+                sleepValue.textContent = sleepModeSelect.options[sleepModeSelect.selectedIndex].text;
+                saveState();
+            });
+            
+            powerToggle.addEventListener('click', () => {
+                state.powerOn = !state.powerOn;
+                
+                if (state.powerOn) {
+                    powerToggle.classList.add('on');
+                    powerLabel.textContent = 'Purifier On';
+                    statusDisplay.textContent = 'Purifying Air...';
+                    startTimer();
+                    
+                    // Play sound based on fan speed
+                    if (state.fanSpeed <= 2) {
+                        playSound('low');
+                    } else if (state.fanSpeed <= 4) {
+                        playSound('medium');
+                    } else {
+                        playSound('high');
+                    }
+                } else {
+                    powerToggle.classList.remove('on');
+                    powerLabel.textContent = 'Purifier Off';
+                    statusDisplay.textContent = 'Purifier Off';
+                    
+                    if (state.timerInterval) {
+                        clearInterval(state.timerInterval);
+                        state.timerInterval = null;
+                        timeDisplay.textContent = '00:00:00';
+                    }
+                    
+                    stopSound();
+                }
+                
+                updateAirQuality();
+                saveState();
+            });
+            
+            startBtn.addEventListener('click', () => {
+                state.powerOn = true;
+                powerToggle.classList.add('on');
+                powerLabel.textContent = 'Purifier On';
+                statusDisplay.textContent = 'Purifying Air...';
+                startTimer();
+                
+                // Play sound based on fan speed
+                if (state.fanSpeed <= 2) {
+                    playSound('low');
+                } else if (state.fanSpeed <= 4) {
+                    playSound('medium');
+                } else {
+                    playSound('high');
+                }
+                
+                updateAirQuality();
+                saveState();
+            });
+            
+            stopBtn.addEventListener('click', () => {
+                state.powerOn = false;
+                powerToggle.classList.remove('on');
+                powerLabel.textContent = 'Purifier Off';
+                statusDisplay.textContent = 'Purifier Off';
+                
+                if (state.timerInterval) {
+                    clearInterval(state.timerInterval);
+                    state.timerInterval = null;
+                    timeDisplay.textContent = '00:00:00';
+                }
+                
+                stopSound();
+                updateAirQuality();
+                saveState();
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('airPurifierTimerState');
+                    
+                    // Reset to defaults
+                    state.fanSpeed = 3;
+                    state.filterLife = 85;
+                    state.roomSize = 500;
+                    state.runHours = 2;
+                    state.runMinutes = 30;
+                    state.cycleInterval = '60';
+                    state.sleepMode = '9pm';
+                    state.powerOn = false;
+                    
+                    // Update UI
+                    fanSpeedSlider.value = state.fanSpeed;
+                    filterLifeSlider.value = state.filterLife;
+                    roomSizeSlider.value = state.roomSize;
+                    runHoursInput.value = state.runHours;
+                    runMinutesInput.value = state.runMinutes;
+                    cycleIntervalSelect.value = state.cycleInterval;
+                    sleepModeSelect.value = state.sleepMode;
+                    
+                    fanSpeedValue.textContent = state.fanSpeed;
+                    filterLifeValue.textContent = `${state.filterLife}%`;
+                    roomSizeValue.textContent = `${state.roomSize} sq ft`;
+                    runTimeValue.textContent = `${state.runHours}h ${state.runMinutes}m`;
+                    intervalValue.textContent = cycleIntervalSelect.options[cycleIntervalSelect.selectedIndex].text;
+                    sleepValue.textContent = sleepModeSelect.options[sleepModeSelect.selectedIndex].text;
+                    timeDisplay.textContent = '00:00:00';
+                    powerToggle.classList.remove('on');
+                    powerLabel.textContent = 'Purifier Off';
+                    statusDisplay.textContent = 'Purifier Off';
+                    
+                    presetButtons.forEach(btn => {
+                        if (btn.dataset.preset === 'auto') {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    stopSound();
+                    updateAirQuality();
+                }
+            });
+            
+            // Sound buttons
+            document.getElementById('low-sound').addEventListener('click', () => playSound('low'));
+            document.getElementById('medium-sound').addEventListener('click', () => playSound('medium'));
+            document.getElementById('high-sound').addEventListener('click', () => playSound('high'));
+            document.getElementById('hum-sound').addEventListener('click', () => playSound('hum'));
+            document.getElementById('stop-sound').addEventListener('click', stopSound);
+            
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    applyPreset(btn.dataset.preset);
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+            createParticles();
+            updateAirQuality();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Panel Output Estimator</title>
+    <meta name="description" content="Estimate solar panel output based on location, panel specifications, and environmental factors. Calculate energy production and savings.">
+    <meta name="keywords" content="solar panel output estimator, solar energy calculator, solar panel efficiency, solar power calculator, renewable energy, solar installation, solar savings">
+    <meta name="author" content="Solar Solutions">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Solar Panel Output Estimator">
+    <meta property="og:description" content="Estimate solar panel output based on location, panel specifications, and environmental factors">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://example.com/solar-panel-estimator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            height: 50px;
+            background-color: #0d1b2a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Desktop Header */
+        .desktop-header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .desktop-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            width: 100%;
+            padding: 0;
+        }
+
+        .estimator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: rgba(220, 20, 60, 0.2);
+        }
+
+        .btn-reset:hover {
+            background: rgba(220, 20, 60, 0.3);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .data-controls {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-controls h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .data-btn {
+            padding: 8px 15px;
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .data-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .savings-tips {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .savings-tips h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .savings-tips ul {
+            padding-left: 20px;
+        }
+
+        .savings-tips li {
+            margin-bottom: 8px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .progress-container {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            width: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .time-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .time-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn.active {
+            background: rgba(255, 215, 0, 0.5);
+        }
+
+        .time-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .location-input {
+            position: relative;
+        }
+
+        .location-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 0 0 8px 8px;
+            z-index: 100;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .location-suggestion {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .location-suggestion:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .panel-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .config-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .config-item h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .config-item .form-group {
+            margin-bottom: 10px;
+        }
+
+        .config-item .form-group label {
+            font-size: 0.9rem;
+        }
+
+        .config-item .form-group input {
+            padding: 8px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ffd700;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .savings-progress {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .savings-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+            
+            .desktop-header {
+                display: none;
+            }
+            
+            .estimator-container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-selector {
+                flex-wrap: wrap;
+            }
+            
+            .panel-config {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .desktop-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header (50px height) -->
+    <div class="mobile-header">Solar Panel Output Estimator</div>
+    
+    <!-- Desktop Header -->
+    <div class="desktop-header">
+        <h1>Solar Panel Output Estimator</h1>
+    </div>
+    
+    <div class="container">
+        <div class="estimator-container">
+            <div class="time-selector">
+                <button class="time-btn active">Daily</button>
+                <button class="time-btn">Monthly</button>
+                <button class="time-btn">Yearly</button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Solar Panel Specifications</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="panelCount">Number of Panels</label>
+                        <input type="number" id="panelCount" placeholder="e.g. 10" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="panelWattage">Panel Wattage (W)</label>
+                        <input type="number" id="panelWattage" placeholder="e.g. 300" value="300">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group location-input">
+                        <label for="location">Location (City, State)</label>
+                        <input type="text" id="location" placeholder="e.g. Phoenix, AZ">
+                        <div class="location-suggestions" id="locationSuggestions" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="panelEfficiency">Panel Efficiency (%)</label>
+                        <input type="number" id="panelEfficiency" placeholder="e.g. 20" value="20" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sunlightHours">Average Sunlight Hours</label>
+                        <input type="number" id="sunlightHours" placeholder="e.g. 5" value="5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="electricityCost">Electricity Cost ($/kWh)</label>
+                        <input type="number" id="electricityCost" placeholder="e.g. 0.15" step="0.01" value="0.15">
+                    </div>
+                </div>
+                
+                <div class="panel-config">
+                    <div class="config-item">
+                        <h4>Roof Configuration</h4>
+                        <div class="form-group">
+                            <label for="roofAngle">Roof Angle (degrees)</label>
+                            <input type="number" id="roofAngle" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="roofDirection">Roof Direction</label>
+                            <select id="roofDirection">
+                                <option value="south">South</option>
+                                <option value="east">East</option>
+                                <option value="west">West</option>
+                                <option value="north">North</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <h4>Environmental Factors</h4>
+                        <div class="form-group">
+                            <label for="temperatureCoef">Temperature Coefficient (%/°C)</label>
+                            <input type="number" id="temperatureCoef" value="-0.4" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Shading Factor</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="shadingToggle">
+                                <span class="slider"></span>
+                            </div>
+                            <label for="shadingToggle" style="display: inline-block; margin-left: 10px;">Shading Present</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn" id="calculateBtn">Calculate Output</button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Results</h2>
+                <div class="results">
+                    <div class="result-card">
+                        <div class="result-label">Total Power</div>
+                        <div class="result-value" id="totalPower">0 W</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Daily Output</div>
+                        <div class="result-value" id="dailyOutput">0 kWh</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Monthly Savings</div>
+                        <div class="result-value" id="monthlySavings">$0.00</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Annual Savings</div>
+                        <div class="result-value" id="annualSavings">$0.00</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Panels</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Efficiency</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2.4 kWh</div>
+                        <div class="stat-label">Avg/Day</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">15%</div>
+                        <div class="stat-label">Savings</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 70%; left: 10%;"></div>
+                    <div class="chart-bar" style="height: 50%; left: 25%;"></div>
+                    <div class="chart-bar" style="height: 90%; left: 40%;"></div>
+                    <div class="chart-bar" style="height: 60%; left: 55%;"></div>
+                    <div class="chart-bar" style="height: 40%; left: 70%;"></div>
+                    <div class="chart-bar" style="height: 30%; left: 85%;"></div>
+                    <div class="chart-label" style="left: 10%;">Jan</div>
+                    <div class="chart-label" style="left: 25%;">Feb</div>
+                    <div class="chart-label" style="left: 40%;">Mar</div>
+                    <div class="chart-label" style="left: 55%;">Apr</div>
+                    <div class="chart-label" style="left: 70%;">May</div>
+                    <div class="chart-label" style="left: 85%;">Jun</div>
+                </div>
+                
+                <div class="savings-tips">
+                    <h3>Savings Progress</h3>
+                    <div class="savings-progress">
+                        <div class="savings-progress-bar" id="savingsProgress"></div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Based on your location and panel configuration</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Solar Savings Tips</h2>
+                <div class="savings-tips">
+                    <h3>Maximize Your Solar Savings</h3>
+                    <ul>
+                        <li>Install panels facing south for maximum sun exposure</li>
+                        <li>Keep panels clean and free of debris</li>
+                        <li>Consider battery storage to store excess energy</li>
+                        <li>Use energy-efficient appliances to maximize savings</li>
+                        <li>Time your energy usage to coincide with peak production</li>
+                    </ul>
+                </div>
+                
+                <div class="data-controls">
+                    <h3>Data Management</h3>
+                    <div class="data-actions">
+                        <button class="data-btn" id="saveData">Save Data</button>
+                        <button class="data-btn" id="loadData">Load Data</button>
+                        <button class="data-btn" id="clearData">Clear Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Calculation completed successfully!</div>
+
+    <script>
+        // DOM elements
+        const panelCountInput = document.getElementById('panelCount');
+        const panelWattageInput = document.getElementById('panelWattage');
+        const panelEfficiencyInput = document.getElementById('panelEfficiency');
+        const sunlightHoursInput = document.getElementById('sunlightHours');
+        const electricityCostInput = document.getElementById('electricityCost');
+        const roofAngleInput = document.getElementById('roofAngle');
+        const roofDirectionInput = document.getElementById('roofDirection');
+        const temperatureCoefInput = document.getElementById('temperatureCoef');
+        const shadingToggle = document.getElementById('shadingToggle');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const totalPowerEl = document.getElementById('totalPower');
+        const dailyOutputEl = document.getElementById('dailyOutput');
+        const monthlySavingsEl = document.getElementById('monthlySavings');
+        const annualSavingsEl = document.getElementById('annualSavings');
+        const saveDataBtn = document.getElementById('saveData');
+        const loadDataBtn = document.getElementById('loadData');
+        const clearDataBtn = document.getElementById('clearData');
+        const notification = document.getElementById('notification');
+        const locationInput = document.getElementById('location');
+        const locationSuggestions = document.getElementById('locationSuggestions');
+        const savingsProgress = document.getElementById('savingsProgress');
+        
+        // Sample location suggestions
+        const locations = [
+            "Phoenix, AZ", "Las Vegas, NV", "Los Angeles, CA", "San Diego, CA", 
+            "Miami, FL", "Austin, TX", "Denver, CO", "Sacramento, CA",
+            "Tucson, AZ", "Albuquerque, NM", "El Paso, TX", "Fresno, CA"
+        ];
+        
+        // Location input functionality
+        locationInput.addEventListener('input', function() {
+            const input = this.value.toLowerCase();
+            locationSuggestions.innerHTML = '';
+            
+            if (input.length > 0) {
+                const filteredLocations = locations.filter(loc => 
+                    loc.toLowerCase().includes(input)
+                );
+                
+                if (filteredLocations.length > 0) {
+                    locationSuggestions.style.display = 'block';
+                    
+                    filteredLocations.forEach(loc => {
+                        const suggestion = document.createElement('div');
+                        suggestion.className = 'location-suggestion';
+                        suggestion.textContent = loc;
+                        suggestion.addEventListener('click', function() {
+                            locationInput.value = this.textContent;
+                            locationSuggestions.style.display = 'none';
+                        });
+                        locationSuggestions.appendChild(suggestion);
+                    });
+                } else {
+                    locationSuggestions.style.display = 'none';
+                }
+            } else {
+                locationSuggestions.style.display = 'none';
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== locationInput) {
+                locationSuggestions.style.display = 'none';
+            }
+        });
+        
+        // Calculate solar output function
+        calculateBtn.addEventListener('click', function() {
+            const panelCount = parseFloat(panelCountInput.value);
+            const panelWattage = parseFloat(panelWattageInput.value);
+            const panelEfficiency = parseFloat(panelEfficiencyInput.value);
+            const sunlightHours = parseFloat(sunlightHoursInput.value);
+            const electricityCost = parseFloat(electricityCostInput.value);
+            const roofAngle = parseFloat(roofAngleInput.value);
+            const temperatureCoef = parseFloat(temperatureCoefInput.value);
+            const shadingFactor = shadingToggle.checked ? 0.2 : 0;
+            
+            if (isNaN(panelCount) || isNaN(panelWattage) || isNaN(panelEfficiency) || 
+                isNaN(sunlightHours) || isNaN(electricityCost) || isNaN(roofAngle) || 
+                isNaN(temperatureCoef)) {
+                showNotification('Please fill in all fields with valid values');
+                return;
+            }
+            
+            // Calculate total power
+            const totalPower = panelCount * panelWattage;
+            
+            // Calculate daily output considering efficiency, roof angle, and environmental factors
+            let efficiencyFactor = panelEfficiency / 100;
+            
+            // Adjust for roof angle (optimal is 30 degrees)
+            const angleAdjustment = 1 - Math.abs(30 - roofAngle) / 100;
+            efficiencyFactor *= angleAdjustment;
+            
+            // Adjust for roof direction
+            const directionAdjustment = roofDirectionInput.value === 'south' ? 1 : 
+                                      roofDirectionInput.value === 'east' || roofDirectionInput.value === 'west' ? 0.9 : 0.7;
+            efficiencyFactor *= directionAdjustment;
+            
+            // Adjust for shading
+            efficiencyFactor *= (1 - shadingFactor);
+            
+            // Calculate daily output
+            const dailyOutput = (totalPower * sunlightHours * efficiencyFactor) / 1000;
+            
+            // Calculate monthly and annual savings
+            const monthlySavings = dailyOutput * 30 * electricityCost;
+            const annualSavings = monthlySavings * 12;
+            
+            // Update UI
+            totalPowerEl.textContent = `${totalPower.toFixed(0)} W`;
+            dailyOutputEl.textContent = `${dailyOutput.toFixed(2)} kWh`;
+            monthlySavingsEl.textContent = `$${monthlySavings.toFixed(2)}`;
+            annualSavingsEl.textContent = `$${annualSavings.toFixed(2)}`;
+            
+            // Animate savings progress
+            savingsProgress.style.width = '0%';
+            setTimeout(() => {
+                savingsProgress.style.width = `${Math.min(100, annualSavings / 10)}%`;
+            }, 100);
+            
+            showNotification('Solar output calculated successfully!');
+        });
+        
+        // Data management functions
+        saveDataBtn.addEventListener('click', function() {
+            const dataToSave = {
+                panelCount: panelCountInput.value,
+                panelWattage: panelWattageInput.value,
+                panelEfficiency: panelEfficiencyInput.value,
+                sunlightHours: sunlightHoursInput.value,
+                electricityCost: electricityCostInput.value,
+                roofAngle: roofAngleInput.value,
+                roofDirection: roofDirectionInput.value,
+                temperatureCoef: temperatureCoefInput.value,
+                shading: shadingToggle.checked,
+                location: locationInput.value,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('solarPanelData', JSON.stringify(dataToSave));
+            showNotification('Data saved successfully!');
+        });
+        
+        loadDataBtn.addEventListener('click', function() {
+            const savedData = localStorage.getItem('solarPanelData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                panelCountInput.value = data.panelCount || '10';
+                panelWattageInput.value = data.panelWattage || '300';
+                panelEfficiencyInput.value = data.panelEfficiency || '20';
+                sunlightHoursInput.value = data.sunlightHours || '5';
+                electricityCostInput.value = data.electricityCost || '0.15';
+                roofAngleInput.value = data.roofAngle || '30';
+                roofDirectionInput.value = data.roofDirection || 'south';
+                temperatureCoefInput.value = data.temperatureCoef || '-0.4';
+                shadingToggle.checked = data.shading || false;
+                locationInput.value = data.location || '';
+                
+                // Trigger calculation
+                calculateBtn.click();
+                
+                showNotification('Data loaded successfully!');
+            } else {
+                showNotification('No saved data found!');
+            }
+        });
+        
+        clearDataBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('solarPanelData');
+                
+                // Reset form to defaults
+                panelCountInput.value = '10';
+                panelWattageInput.value = '300';
+                panelEfficiencyInput.value = '20';
+                sunlightHoursInput.value = '5';
+                electricityCostInput.value = '0.15';
+                roofAngleInput.value = '30';
+                roofDirectionInput.value = 'south';
+                temperatureCoefInput.value = '-0.4';
+                shadingToggle.checked = false;
+                locationInput.value = '';
+                
+                // Reset results
+                totalPowerEl.textContent = '0 W';
+                dailyOutputEl.textContent = '0 kWh';
+                monthlySavingsEl.textContent = '$0.00';
+                annualSavingsEl.textContent = '$0.00';
+                
+                // Reset progress
+                savingsProgress.style.width = '0%';
+                
+                showNotification('All data cleared!');
+            }
+        });
+        
+        // Show notification function
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize with saved data if available
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('solarPanelData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                panelCountInput.value = data.panelCount || '10';
+                panelWattageInput.value = data.panelWattage || '300';
+                panelEfficiencyInput.value = data.panelEfficiency || '20';
+                sunlightHoursInput.value = data.sunlightHours || '5';
+                electricityCostInput.value = data.electricityCost || '0.15';
+                roofAngleInput.value = data.roofAngle || '30';
+                roofDirectionInput.value = data.roofDirection || 'south';
+                temperatureCoefInput.value = data.temperatureCoef || '-0.4';
+                shadingToggle.checked = data.shading || false;
+                locationInput.value = data.location || '';
+                
+                console.log('Loaded data from localStorage:', data);
+            }
+        });
+        
+        // Simulate chart animation
+        document.querySelectorAll('.chart-bar').forEach(bar => {
+            const currentHeight = parseInt(bar.style.height);
+            const newHeight = Math.max(10, Math.min(100, currentHeight + (Math.random() * 20 - 10)));
+            bar.style.height = newHeight + '%';
+        });
+    </script>
+</body>
+</html>

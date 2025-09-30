@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<!-- Category: Audio Engineering -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acoustic Echo Tester</title>
+    <meta name="description" content="Test and measure acoustic echo in your environment with our interactive tester. Perfect for audio engineers, musicians, and venues.">
+    <meta name="keywords" content="acoustic echo tester, echo measurement, audio testing, acoustic analysis, sound reflection, echo cancellation">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --echo-color: #00c9a7;
+            --visualizer-color: #ff7a9d;
+            --result-color: #4a90e2;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Visualizer */
+        .visualizer-container {
+            position: relative;
+            height: 200px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+        }
+
+        .visualizer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+            gap: 2px;
+        }
+
+        .bar {
+            flex: 1;
+            background: var(--visualizer-color);
+            height: 10%;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.2s ease;
+        }
+
+        .echo-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: var(--echo-color);
+            text-align: center;
+        }
+
+        /* Test controls */
+        .test-controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .echo-level {
+            color: var(--echo-color);
+        }
+
+        .delay {
+            color: var(--visualizer-color);
+        }
+
+        .strength {
+            color: var(--result-color);
+        }
+
+        .quality {
+            color: var(--accent);
+        }
+
+        /* Test history */
+        .history {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .test-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .visualizer-container {
+                height: 150px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Acoustic Echo Tester</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="visualizer-container">
+                <div class="visualizer" id="visualizer">
+                    <!-- Visualizer bars will be generated here -->
+                </div>
+                <div class="echo-indicator" id="echo-indicator">Echo Level: 0ms</div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="controls-title">Test Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Test Duration (seconds)</div>
+                    <div class="slider-container">
+                        <input type="range" id="duration" min="1" max="10" value="5">
+                        <span class="control-value" id="duration-value">5s</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Volume Threshold</div>
+                    <div class="slider-container">
+                        <input type="range" id="threshold" min="0" max="100" value="30">
+                        <span class="control-value" id="threshold-value">30%</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Frequency Range</div>
+                    <div class="slider-container">
+                        <input type="range" id="frequency" min="100" max="8000" value="1000">
+                        <span class="control-value" id="frequency-value">1000Hz</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Test Results</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Echo Level</div>
+                        <div class="result-value echo-level" id="echo-level">0.0 ms</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Delay</div>
+                        <div class="result-value delay" id="delay">0.0 ms</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Echo Strength</div>
+                        <div class="result-value strength" id="strength">0.0 dB</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Quality</div>
+                        <div class="result-value quality" id="quality">Excellent</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history">
+                <div class="history-title">Test History</div>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="test-btn" class="test-btn">Start Test</button>
+                <button id="clear-btn" class="clear-btn">Clear History</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                isTesting: false,
+                testHistory: [],
+                visualizerBars: [],
+                audioContext: null,
+                oscillator: null,
+                gainNode: null,
+                analyser: null
+            };
+            
+            // DOM elements
+            const visualizer = document.getElementById('visualizer');
+            const echoIndicator = document.getElementById('echo-indicator');
+            const testBtn = document.getElementById('test-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const durationSlider = document.getElementById('duration');
+            const thresholdSlider = document.getElementById('threshold');
+            const frequencySlider = document.getElementById('frequency');
+            const durationValue = document.getElementById('duration-value');
+            const thresholdValue = document.getElementById('threshold-value');
+            const frequencyValue = document.getElementById('frequency-value');
+            const echoLevel = document.getElementById('echo-level');
+            const delay = document.getElementById('delay');
+            const strength = document.getElementById('strength');
+            const quality = document.getElementById('quality');
+            const historyList = document.getElementById('history-list');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('acousticEchoState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.testHistory = parsed.testHistory || [];
+                    renderHistory();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('acousticEchoState', JSON.stringify({
+                    testHistory: state.testHistory
+                }));
+            }
+            
+            // Create visualizer
+            function createVisualizer() {
+                visualizer.innerHTML = '';
+                state.visualizerBars = [];
+                
+                for (let i = 0; i < 64; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = '5%';
+                    visualizer.appendChild(bar);
+                    state.visualizerBars.push(bar);
+                }
+            }
+            
+            // Initialize audio context
+            function initAudio() {
+                if (!state.audioContext) {
+                    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    state.analyser = state.audioContext.createAnalyser();
+                    state.analyser.fftSize = 256;
+                    
+                    // Create gain node for volume control
+                    state.gainNode = state.audioContext.createGain();
+                    state.gainNode.connect(state.analyser);
+                    state.analyser.connect(state.audioContext.destination);
+                }
+            }
+            
+            // Play test tone
+            function playTestTone() {
+                if (!state.audioContext) return;
+                
+                // Stop any existing oscillator
+                if (state.oscillator) {
+                    state.oscillator.stop();
+                    state.oscillator.disconnect();
+                }
+                
+                // Create new oscillator
+                state.oscillator = state.audioContext.createOscillator();
+                state.oscillator.type = 'sine';
+                state.oscillator.frequency.value = parseInt(frequencySlider.value);
+                
+                // Connect to gain node
+                state.oscillator.connect(state.gainNode);
+                
+                // Set volume based on threshold
+                const volume = parseInt(thresholdSlider.value) / 100;
+                state.gainNode.gain.value = volume * 0.5;
+                
+                // Start oscillator
+                state.oscillator.start();
+                
+                // Stop after duration
+                setTimeout(() => {
+                    if (state.oscillator) {
+                        state.oscillator.stop();
+                        state.oscillator.disconnect();
+                        state.oscillator = null;
+                    }
+                }, parseInt(durationSlider.value) * 1000);
+            }
+            
+            // Update visualizer
+            function updateVisualizer() {
+                if (!state.analyser) return;
+                
+                const bufferLength = state.analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                state.analyser.getByteFrequencyData(dataArray);
+                
+                // Update visualizer bars
+                for (let i = 0; i < state.visualizerBars.length; i++) {
+                    const value = dataArray[i % bufferLength];
+                    const height = (value / 255) * 100;
+                    state.visualizerBars[i].style.height = `${height}%`;
+                }
+            }
+            
+            // Simulate echo test
+            function runEchoTest() {
+                if (state.isTesting) return;
+                
+                state.isTesting = true;
+                testBtn.textContent = 'Testing...';
+                
+                // Initialize audio context if needed
+                initAudio();
+                
+                // Play test tone
+                playTestTone();
+                
+                // Get current settings
+                const duration = parseInt(durationSlider.value);
+                
+                // Simulate test for the specified duration
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 100 / (duration * 10); // 10 updates per second
+                    
+                    // Update visualizer
+                    updateVisualizer();
+                    
+                    // Update echo indicator
+                    const echoTime = Math.min(100, progress * 0.5);
+                    echoIndicator.textContent = `Echo Level: ${echoTime.toFixed(1)}ms`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        completeTest();
+                    }
+                }, 100);
+            }
+            
+            // Complete test and show results
+            function completeTest() {
+                state.isTesting = false;
+                testBtn.textContent = 'Start Test';
+                
+                // Generate random results for demo
+                const echoTime = (Math.random() * 100).toFixed(1);
+                const delay = (Math.random() * 50).toFixed(1);
+                const strength = (Math.random() * 20 - 10).toFixed(1);
+                
+                // Update results
+                echoLevel.textContent = `${echoTime} ms`;
+                delay.textContent = `${delay} ms`;
+                strength.textContent = `${strength} dB`;
+                
+                // Determine quality based on echo time
+                let qualityText = 'Excellent';
+                if (echoTime > 70) qualityText = 'Poor';
+                else if (echoTime > 40) qualityText = 'Fair';
+                else if (echoTime > 20) qualityText = 'Good';
+                
+                quality.textContent = qualityText;
+                
+                // Add to history
+                const now = new Date();
+                const testResult = {
+                    date: now.toLocaleDateString(),
+                    time: now.toLocaleTimeString(),
+                    echoTime: parseFloat(echoTime),
+                    delay: parseFloat(delay),
+                    strength: parseFloat(strength),
+                    quality: qualityText
+                };
+                
+                state.testHistory.unshift(testResult);
+                
+                // Keep only last 10 tests
+                if (state.testHistory.length > 10) {
+                    state.testHistory = state.testHistory.slice(0, 10);
+                }
+                
+                renderHistory();
+                saveState();
+            }
+            
+            // Render test history
+            function renderHistory() {
+                historyList.innerHTML = '';
+                
+                if (state.testHistory.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'history-item';
+                    emptyItem.textContent = 'No tests performed yet';
+                    historyList.appendChild(emptyItem);
+                    return;
+                }
+                
+                state.testHistory.forEach(test => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div>${test.date} ${test.time}</div>
+                        <div>${test.echoTime}ms | ${test.quality}</div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+            
+            // Event listeners
+            testBtn.addEventListener('click', runEchoTest);
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all test history?')) {
+                    state.testHistory = [];
+                    renderHistory();
+                    saveState();
+                }
+            });
+            
+            durationSlider.addEventListener('input', () => {
+                durationValue.textContent = `${durationSlider.value}s`;
+            });
+            
+            thresholdSlider.addEventListener('input', () => {
+                thresholdValue.textContent = `${thresholdSlider.value}%`;
+            });
+            
+            frequencySlider.addEventListener('input', () => {
+                frequencyValue.textContent = `${frequencySlider.value}Hz`;
+            });
+            
+            // Initialize the app
+            createVisualizer();
+            loadState();
+        });
+    </script>
+</body>
+</html>

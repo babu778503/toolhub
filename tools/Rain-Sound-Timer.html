@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<!-- Category: Sleep & Relaxation -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rain Sound Timer</title>
+    <meta name="description" content="Experience realistic rain sounds with our interactive timer. Perfect for sleep, relaxation, and meditation.">
+    <meta name="keywords" content="rain sound timer, rain sounds, sleep sounds, relaxation sounds, meditation sounds, nature sounds, sound therapy, sleep aid">
+    <meta name="author" content="Sleep & Relaxation Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Rain Sound Timer">
+    <meta property="og:description" content="Experience realistic rain sounds with our interactive timer. Perfect for sleep, relaxation, and meditation.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/rain-sound-timer">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --rain-color: #00c9a7;
+            --cloud-color: #a0d2eb;
+            --storm-color: #4a90e2;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Visualization */
+        .visualization {
+            position: relative;
+            height: 200px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+            gap: 2px;
+        }
+
+        .visual-bar {
+            flex: 1;
+            background: var(--rain-color);
+            height: 10%;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .rain-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .rain-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: var(--rain-color);
+            font-weight: bold;
+        }
+
+        /* Rain visualization */
+        .rain-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: var(--rain-color);
+            border-radius: 0 0 2px 2px;
+            opacity: 0.7;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        /* Rain types */
+        .rain-types {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .types-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .type-item {
+            background: rgba(50, 50, 65, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .type-item:hover {
+            background: rgba(60, 60, 80, 0.7);
+        }
+
+        .type-item.active {
+            background: rgba(0, 201, 167, 0.3);
+            border: 1px solid var(--rain-color);
+        }
+
+        .type-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .type-name {
+            font-weight: 600;
+            color: var(--rain-color);
+        }
+
+        /* Timer */
+        .timer {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .timer-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .timer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .timer-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .timer-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .timer-display {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--rain-color);
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .play-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .stop-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .visualization {
+                height: 150px;
+            }
+            
+            .type-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timer-controls {
+                justify-content: center;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Rain Sound Timer</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="visualization" id="visualization">
+                <div class="rain-animation" id="rain-animation"></div>
+                <div class="rain-display" id="rain-display">0%</div>
+                <div class="rain-label" id="rain-label">Light Drizzle</div>
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">Rain Settings</div>
+                <div class="control-group">
+                    <div class="control-label">Rain Intensity</div>
+                    <div class="slider-container">
+                        <input type="range" id="intensity" min="1" max="100" value="50">
+                        <span class="control-value" id="intensity-value">50%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-label">Volume Level</div>
+                    <div class="slider-container">
+                        <input type="range" id="volume" min="0" max="100" value="70">
+                        <span class="control-value" id="volume-value">70%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rain-types">
+                <div class="types-title">Rain Types</div>
+                <div class="type-grid" id="type-grid">
+                    <!-- Rain types will be generated here -->
+                </div>
+            </div>
+            
+            <div class="timer">
+                <div class="timer-title">Sleep Timer</div>
+                <div class="timer-controls">
+                    <div class="timer-btn active" data-minutes="15">15 min</div>
+                    <div class="timer-btn" data-minutes="30">30 min</div>
+                    <div class="timer-btn" data-minutes="60">60 min</div>
+                    <div class="timer-btn" data-minutes="90">90 min</div>
+                    <div class="timer-btn" data-minutes="0">Off</div>
+                </div>
+                <div class="timer-display" id="timer-display">00:00</div>
+            </div>
+            
+            <div class="buttons">
+                <button id="play-btn" class="play-btn">▶ Play Rain</button>
+                <button id="stop-btn" class="stop-btn">⏹ Stop Rain</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                rainTypes: [
+                    { id: 'drizzle', name: 'Drizzle', icon: '🌦️', intensity: 20, active: true },
+                    { id: 'light', name: 'Light Rain', icon: '🌧️', intensity: 40, active: false },
+                    { id: 'medium', name: 'Medium Rain', icon: '🌧️', intensity: 60, active: false },
+                    { id: 'heavy', name: 'Heavy Rain', icon: '🌧️', intensity: 80, active: false },
+                    { id: 'storm', name: 'Thunderstorm', icon: '⛈️', intensity: 100, active: false },
+                    { id: 'tropical', name: 'Tropical', icon: '🌴', intensity: 70, active: false }
+                ],
+                intensity: 50,
+                volume: 70,
+                timerMinutes: 0,
+                timerActive: false,
+                timerInterval: null,
+                audioContext: null,
+                rainSource: null,
+                gainNode: null,
+                raindrops: []
+            };
+            
+            // DOM elements
+            const playBtn = document.getElementById('play-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const intensitySlider = document.getElementById('intensity');
+            const volumeSlider = document.getElementById('volume');
+            const intensityValue = document.getElementById('intensity-value');
+            const volumeValue = document.getElementById('volume-value');
+            const typeGrid = document.getElementById('type-grid');
+            const timerDisplay = document.getElementById('timer-display');
+            const rainDisplay = document.getElementById('rain-display');
+            const rainLabel = document.getElementById('rain-label');
+            const visualization = document.getElementById('visualization');
+            const rainAnimation = document.getElementById('rain-animation');
+            const timerButtons = document.querySelectorAll('.timer-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('rainSoundTimerState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.rainTypes = parsed.rainTypes || state.rainTypes;
+                    state.intensity = parsed.intensity || 50;
+                    state.volume = parsed.volume || 70;
+                    state.timerMinutes = parsed.timerMinutes || 0;
+                    
+                    // Update UI
+                    intensitySlider.value = state.intensity;
+                    volumeSlider.value = state.volume;
+                    intensityValue.textContent = `${state.intensity}%`;
+                    volumeValue.textContent = `${state.volume}%`;
+                    
+                    timerButtons.forEach(btn => {
+                        if (parseInt(btn.dataset.minutes) === state.timerMinutes) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    renderRainTypes();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('rainSoundTimerState', JSON.stringify({
+                    rainTypes: state.rainTypes,
+                    intensity: state.intensity,
+                    volume: state.volume,
+                    timerMinutes: state.timerMinutes
+                }));
+            }
+            
+            // Initialize audio context
+            function initAudio() {
+                if (!state.audioContext) {
+                    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            
+            // Create rain sound
+            function createRainSound() {
+                if (!state.audioContext) return null;
+                
+                // Create buffer source
+                const bufferSize = 2 * state.audioContext.sampleRate;
+                const buffer = state.audioContext.createBuffer(1, bufferSize, state.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Generate rain sound based on intensity
+                for (let i = 0; i < bufferSize; i++) {
+                    // Base rain sound
+                    let value = Math.random() * 2 - 1;
+                    
+                    // Add intensity variation
+                    const intensityFactor = state.intensity / 100;
+                    value *= intensityFactor;
+                    
+                    // Add some randomness for natural feel
+                    if (Math.random() < 0.01) {
+                        value += (Math.random() * 2 - 1) * intensityFactor;
+                    }
+                    
+                    data[i] = value;
+                }
+                
+                return buffer;
+            }
+            
+            // Play rain sound
+            function playRain() {
+                // Stop existing rain if playing
+                if (state.rainSource) {
+                    state.rainSource.stop();
+                    state.rainSource.disconnect();
+                }
+                
+                // Initialize audio context
+                initAudio();
+                
+                // Create rain sound
+                const rainBuffer = createRainSound();
+                if (!rainBuffer) return;
+                
+                // Create source
+                state.rainSource = state.audioContext.createBufferSource();
+                state.rainSource.buffer = rainBuffer;
+                state.rainSource.loop = true;
+                
+                // Create gain node for volume control
+                state.gainNode = state.audioContext.createGain();
+                state.gainNode.gain.value = state.volume / 100;
+                
+                // Connect nodes
+                state.rainSource.connect(state.gainNode);
+                state.gainNode.connect(state.audioContext.destination);
+                
+                // Start rain
+                state.rainSource.start();
+                
+                // Update display
+                const activeType = state.rainTypes.find(type => type.active);
+                if (activeType) {
+                    rainLabel.textContent = activeType.name;
+                }
+                
+                // Start rain animation
+                startRainAnimation();
+            }
+            
+            // Stop rain sound
+            function stopRain() {
+                if (state.rainSource) {
+                    state.rainSource.stop();
+                    state.rainSource.disconnect();
+                    state.rainSource = null;
+                    state.gainNode = null;
+                }
+                
+                if (state.timerInterval) {
+                    clearInterval(state.timerInterval);
+                    state.timerInterval = null;
+                }
+                
+                // Stop rain animation
+                stopRainAnimation();
+                
+                timerDisplay.textContent = '00:00';
+            }
+            
+            // Start rain animation
+            function startRainAnimation() {
+                // Clear existing raindrops
+                rainAnimation.innerHTML = '';
+                state.raindrops = [];
+                
+                // Create raindrops based on intensity
+                const dropCount = Math.floor(state.intensity * 2);
+                
+                for (let i = 0; i < dropCount; i++) {
+                    const raindrop = document.createElement('div');
+                    raindrop.className = 'raindrop';
+                    
+                    // Random position
+                    const left = Math.random() * 100;
+                    const top = Math.random() * 100;
+                    
+                    raindrop.style.left = `${left}%`;
+                    raindrop.style.top = `${top}%`;
+                    
+                    // Random size
+                    const height = 10 + Math.random() * 20;
+                    raindrop.style.height = `${height}px`;
+                    
+                    // Random animation
+                    const duration = 0.5 + Math.random() * 1.5;
+                    raindrop.style.animation = `fall ${duration}s linear infinite`;
+                    
+                    rainAnimation.appendChild(raindrop);
+                    state.raindrops.push(raindrop);
+                }
+                
+                // Add CSS for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fall {
+                        0% { transform: translateY(-100%); }
+                        100% { transform: translateY(100vh); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Stop rain animation
+            function stopRainAnimation() {
+                rainAnimation.innerHTML = '';
+                state.raindrops = [];
+            }
+            
+            // Update visualization
+            function updateVisualization() {
+                const bars = visualization.querySelectorAll('.visual-bar');
+                
+                bars.forEach(bar => {
+                    // Random height for visualization
+                    const height = 10 + Math.random() * 90;
+                    bar.style.height = `${height}%`;
+                });
+            }
+            
+            // Render rain types
+            function renderRainTypes() {
+                typeGrid.innerHTML = '';
+                
+                state.rainTypes.forEach(type => {
+                    const typeItem = document.createElement('div');
+                    typeItem.className = `type-item ${type.active ? 'active' : ''}`;
+                    typeItem.dataset.id = type.id;
+                    
+                    typeItem.innerHTML = `
+                        <div class="type-icon">${type.icon}</div>
+                        <div class="type-name">${type.name}</div>
+                    `;
+                    
+                    typeGrid.appendChild(typeItem);
+                    
+                    // Add click event
+                    typeItem.addEventListener('click', () => {
+                        // Deactivate all types
+                        state.rainTypes.forEach(t => t.active = false);
+                        
+                        // Activate clicked type
+                        type.active = true;
+                        
+                        // Update intensity based on type
+                        state.intensity = type.intensity;
+                        intensitySlider.value = state.intensity;
+                        intensityValue.textContent = `${state.intensity}%`;
+                        
+                        // Update UI
+                        renderRainTypes();
+                        
+                        // Play if currently playing
+                        if (state.rainSource) {
+                            playRain();
+                        }
+                        
+                        saveState();
+                    });
+                });
+            }
+            
+            // Start timer
+            function startTimer(minutes) {
+                if (state.timerInterval) {
+                    clearInterval(state.timerInterval);
+                }
+                
+                if (minutes === 0) {
+                    timerDisplay.textContent = 'Off';
+                    return;
+                }
+                
+                let seconds = minutes * 60;
+                
+                state.timerInterval = setInterval(() => {
+                    seconds--;
+                    
+                    const mins = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    
+                    timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(state.timerInterval);
+                        stopRain();
+                        playBtn.textContent = '▶ Play Rain';
+                    }
+                }, 1000);
+            }
+            
+            // Create visualization
+            function createVisualization() {
+                visualization.innerHTML = '';
+                
+                for (let i = 0; i < 64; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'visual-bar';
+                    bar.style.height = '5%';
+                    visualization.appendChild(bar);
+                }
+            }
+            
+            // Event listeners
+            playBtn.addEventListener('click', () => {
+                playRain();
+                
+                // Start timer if set
+                if (state.timerMinutes > 0) {
+                    startTimer(state.timerMinutes);
+                }
+                
+                playBtn.textContent = '⏸ Pause Rain';
+            });
+            
+            stopBtn.addEventListener('click', () => {
+                stopRain();
+                playBtn.textContent = '▶ Play Rain';
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data?')) {
+                    localStorage.removeItem('rainSoundTimerState');
+                    
+                    // Reset to defaults
+                    state.rainTypes = [
+                        { id: 'drizzle', name: 'Drizzle', icon: '🌦️', intensity: 20, active: true },
+                        { id: 'light', name: 'Light Rain', icon: '🌧️', intensity: 40, active: false },
+                        { id: 'medium', name: 'Medium Rain', icon: '🌧️', intensity: 60, active: false },
+                        { id: 'heavy', name: 'Heavy Rain', icon: '🌧️', intensity: 80, active: false },
+                        { id: 'storm', name: 'Thunderstorm', icon: '⛈️', intensity: 100, active: false },
+                        { id: 'tropical', name: 'Tropical', icon: '🌴', intensity: 70, active: false }
+                    ];
+                    state.intensity = 50;
+                    state.volume = 70;
+                    state.timerMinutes = 0;
+                    
+                    // Update UI
+                    intensitySlider.value = state.intensity;
+                    volumeSlider.value = state.volume;
+                    intensityValue.textContent = `${state.intensity}%`;
+                    volumeValue.textContent = `${state.volume}%`;
+                    
+                    timerButtons.forEach(btn => {
+                        if (parseInt(btn.dataset.minutes) === 0) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    renderRainTypes();
+                    saveState();
+                }
+            });
+            
+            intensitySlider.addEventListener('input', () => {
+                state.intensity = parseInt(intensitySlider.value);
+                intensityValue.textContent = `${state.intensity}%`;
+                
+                // Update volume if playing
+                if (state.gainNode) {
+                    state.gainNode.gain.value = state.volume / 100;
+                }
+                
+                // Update rain animation
+                if (state.rainSource) {
+                    startRainAnimation();
+                }
+                
+                saveState();
+            });
+            
+            volumeSlider.addEventListener('input', () => {
+                state.volume = parseInt(volumeSlider.value);
+                volumeValue.textContent = `${state.volume}%`;
+                
+                // Update volume if playing
+                if (state.gainNode) {
+                    state.gainNode.gain.value = state.volume / 100;
+                }
+                
+                saveState();
+            });
+            
+            timerButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    timerButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.timerMinutes = parseInt(btn.dataset.minutes);
+                    saveState();
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+            createVisualization();
+            renderRainTypes();
+        });
+    </script>
+</body>
+</html>

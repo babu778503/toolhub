@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<!-- Category: Audio Engineering -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equalizer Preset Generator</title>
+    <meta name="description" content="Create and manage equalizer presets with our interactive generator. Perfect for music production, live sound, and audio engineering.">
+    <meta name="keywords" content="equalizer preset generator, audio equalizer, EQ settings, audio engineering, music production, sound design, audio filters, frequency response">
+    <meta name="author" content="Audio Engineering Tools">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta property="og:title" content="Equalizer Preset Generator">
+    <meta property="og:description" content="Create and manage equalizer presets with our interactive generator. Perfect for music production, live sound, and audio engineering.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com/equalizer-preset-generator">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --gray: #2a2a2a;
+            --card-bg: rgba(30, 30, 40, 0.7);
+            --eq-color: #00c9a7;
+            --result-color: #4a90e2;
+            --preset-color: #ff7a9d;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed header with tool name */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .content {
+            background: var(--card-bg);
+            border-radius: 0;
+            padding: 20px 15px;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* EQ Visualization */
+        .eq-visualization {
+            position: relative;
+            height: 200px;
+            margin: 25px 0;
+            border-radius: 10px;
+            background: rgba(40, 40, 55, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+            gap: 5px;
+        }
+
+        .eq-bar {
+            flex: 1;
+            background: var(--eq-color);
+            height: 10%;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s ease;
+            position: relative;
+        }
+
+        .eq-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        /* Controls */
+        .controls {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .controls-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 45, 117, 0.5);
+        }
+
+        .eq-sliders {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .eq-slider-group {
+            text-align: center;
+        }
+
+        .eq-slider-label {
+            font-size: 0.7rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        /* Presets */
+        .presets {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .presets-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(70, 70, 90, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(100, 100, 130, 0.7);
+        }
+
+        .preset-btn.active {
+            background: var(--preset-color);
+            color: white;
+        }
+
+        /* Results */
+        .results {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.5);
+            border-radius: 10px;
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-card {
+            background: rgba(50, 50, 65, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .preset-name {
+            color: var(--preset-color);
+        }
+
+        .frequency {
+            color: var(--eq-color);
+        }
+
+        .gain {
+            color: var(--result-color);
+        }
+
+        .type {
+            color: var(--accent);
+        }
+
+        /* Buttons */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .generate-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .header {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+                margin-top: 50px;
+            }
+            
+            .eq-visualization {
+                height: 150px;
+            }
+            
+            .eq-sliders {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed header with tool name -->
+    <div class="header">
+        <h1>Equalizer Preset Generator</h1>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="eq-visualization" id="eq-visualization">
+                <!-- EQ bars will be generated here -->
+            </div>
+            
+            <div class="controls">
+                <div class="controls-title">EQ Controls</div>
+                <div class="control-group">
+                    <div class="control-label">Preset Name</div>
+                    <input type="text" class="form-input" id="preset-name" value="Custom EQ" placeholder="Enter preset name">
+                </div>
+                
+                <div class="eq-sliders" id="eq-sliders">
+                    <!-- EQ sliders will be generated here -->
+                </div>
+            </div>
+            
+            <div class="presets">
+                <div class="presets-title">Preset Library</div>
+                <div class="preset-buttons">
+                    <div class="preset-btn active" data-preset="flat">Flat</div>
+                    <div class="preset-btn" data-preset="rock">Rock</div>
+                    <div class="preset-btn" data-preset="pop">Pop</div>
+                    <div class="preset-btn" data-preset="classical">Classical</div>
+                    <div class="preset-btn" data-preset="jazz">Jazz</div>
+                    <div class="preset-btn" data-preset="electronic">Electronic</div>
+                    <div class="preset-btn" data-preset="vocal">Vocal</div>
+                    <div class="preset-btn" data-preset="bass">Bass Boost</div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="results-title">Preset Information</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label">Preset Name</div>
+                        <div class="result-value preset-name" id="result-name">Custom EQ</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Frequency Range</div>
+                        <div class="result-value frequency" id="result-range">20Hz - 20kHz</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Max Gain</div>
+                        <div class="result-value gain" id="result-gain">±12dB</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">EQ Type</div>
+                        <div class="result-value type" id="result-type">Parametric</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="generate-btn" class="generate-btn">Generate Preset</button>
+                <button id="clear-btn" class="clear-btn">Clear Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            const state = {
+                presetName: 'Custom EQ',
+                bands: [
+                    { freq: 31, gain: 0, q: 1.0 },
+                    { freq: 62, gain: 0, q: 1.0 },
+                    { freq: 125, gain: 0, q: 1.0 },
+                    { freq: 250, gain: 0, q: 1.0 },
+                    { freq: 500, gain: 0, q: 1.0 },
+                    { freq: 1000, gain: 0, q: 1.0 },
+                    { freq: 2000, gain: 0, q: 1.0 },
+                    { freq: 4000, gain: 0, q: 1.0 },
+                    { freq: 8000, gain: 0, q: 1.0 },
+                    { freq: 16000, gain: 0, q: 1.0 }
+                ]
+            };
+            
+            // DOM elements
+            const generateBtn = document.getElementById('generate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const presetNameInput = document.getElementById('preset-name');
+            const eqVisualization = document.getElementById('eq-visualization');
+            const eqSliders = document.getElementById('eq-sliders');
+            const resultName = document.getElementById('result-name');
+            const resultRange = document.getElementById('result-range');
+            const resultGain = document.getElementById('result-gain');
+            const resultType = document.getElementById('result-type');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            
+            // Initialize from saved data
+            function loadState() {
+                const savedState = localStorage.getItem('eqPresetState');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.presetName = parsed.presetName || 'Custom EQ';
+                    state.bands = parsed.bands || state.bands;
+                    
+                    // Update UI
+                    presetNameInput.value = state.presetName;
+                    
+                    updateVisualization();
+                    updateSliders();
+                    updateResults();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('eqPresetState', JSON.stringify({
+                    presetName: state.presetName,
+                    bands: state.bands
+                }));
+            }
+            
+            // Update visualization
+            function updateVisualization() {
+                eqVisualization.innerHTML = '';
+                
+                state.bands.forEach((band, index) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'eq-bar';
+                    
+                    // Calculate height based on gain (with 50% as center)
+                    const height = 50 + (band.gain * 3); // 3px per dB
+                    bar.style.height = `${height}%`;
+                    
+                    const label = document.createElement('div');
+                    label.className = 'eq-label';
+                    label.textContent = `${band.freq}Hz`;
+                    
+                    bar.appendChild(label);
+                    eqVisualization.appendChild(bar);
+                });
+            }
+            
+            // Update sliders
+            function updateSliders() {
+                eqSliders.innerHTML = '';
+                
+                state.bands.forEach((band, index) => {
+                    const sliderGroup = document.createElement('div');
+                    sliderGroup.className = 'eq-slider-group';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'eq-slider-label';
+                    label.textContent = `${band.freq}Hz`;
+                    
+                    const slider = document.createElement('input');
+                    slider.type = 'range';
+                    slider.min = '-12';
+                    slider.max = '12';
+                    slider.value = band.gain;
+                    slider.className = 'eq-slider';
+                    slider.dataset.index = index;
+                    
+                    slider.addEventListener('input', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        state.bands[idx].gain = parseInt(e.target.value);
+                        updateVisualization();
+                        updateResults();
+                        saveState();
+                    });
+                    
+                    sliderGroup.appendChild(label);
+                    sliderGroup.appendChild(slider);
+                    eqSliders.appendChild(sliderGroup);
+                });
+            }
+            
+            // Update results
+            function updateResults() {
+                resultName.textContent = state.presetName;
+            }
+            
+            // Apply preset
+            function applyPreset(preset) {
+                switch(preset) {
+                    case 'flat':
+                        state.bands.forEach(band => band.gain = 0);
+                        break;
+                    case 'rock':
+                        state.bands[0].gain = 2;  // 31Hz
+                        state.bands[1].gain = 1;  // 62Hz
+                        state.bands[2].gain = -1; // 125Hz
+                        state.bands[3].gain = -2; // 250Hz
+                        state.bands[4].gain = 1;  // 500Hz
+                        state.bands[5].gain = 2;  // 1000Hz
+                        state.bands[6].gain = 3;  // 2000Hz
+                        state.bands[7].gain = 2;  // 4000Hz
+                        state.bands[8].gain = 1;  // 8000Hz
+                        state.bands[9].gain = 0;  // 16000Hz
+                        break;
+                    case 'pop':
+                        state.bands[0].gain = 1;  // 31Hz
+                        state.bands[1].gain = 1;  // 62Hz
+                        state.bands[2].gain = 0;  // 125Hz
+                        state.bands[3].gain = -1; // 250Hz
+                        state.bands[4].gain = 0;  // 500Hz
+                        state.bands[5].gain = 1;  // 1000Hz
+                        state.bands[6].gain = 2;  // 2000Hz
+                        state.bands[7].gain = 1;  // 4000Hz
+                        state.bands[8].gain = 0;  // 8000Hz
+                        state.bands[9].gain = -1; // 16000Hz
+                        break;
+                    case 'classical':
+                        state.bands[0].gain = 1;  // 31Hz
+                        state.bands[1].gain = 0;  // 62Hz
+                        state.bands[2].gain = -1; // 125Hz
+                        state.bands[3].gain = -2; // 250Hz
+                        state.bands[4].gain = -1; // 500Hz
+                        state.bands[5].gain = 0;  // 1000Hz
+                        state.bands[6].gain = 1;  // 2000Hz
+                        state.bands[7].gain = 2;  // 4000Hz
+                        state.bands[8].gain = 3;  // 8000Hz
+                        state.bands[9].gain = 2;  // 16000Hz
+                        break;
+                    case 'jazz':
+                        state.bands[0].gain = 1;  // 31Hz
+                        state.bands[1].gain = 0;  // 62Hz
+                        state.bands[2].gain = -1; // 125Hz
+                        state.bands[3].gain = -2; // 250Hz
+                        state.bands[4].gain = -1; // 500Hz
+                        state.bands[5].gain = 0;  // 1000Hz
+                        state.bands[6].gain = 1;  // 2000Hz
+                        state.bands[7].gain = 2;  // 4000Hz
+                        state.bands[8].gain = 1;  // 8000Hz
+                        state.bands[9].gain = 0;  // 16000Hz
+                        break;
+                    case 'electronic':
+                        state.bands[0].gain = 3;  // 31Hz
+                        state.bands[1].gain = 2;  // 62Hz
+                        state.bands[2].gain = 1;  // 125Hz
+                        state.bands[3].gain = 0;  // 250Hz
+                        state.bands[4].gain = -1; // 500Hz
+                        state.bands[5].gain = 0;  // 1000Hz
+                        state.bands[6].gain = 1;  // 2000Hz
+                        state.bands[7].gain = 2;  // 4000Hz
+                        state.bands[8].gain = 3;  // 8000Hz
+                        state.bands[9].gain = 2;  // 16000Hz
+                        break;
+                    case 'vocal':
+                        state.bands[0].gain = -1; // 31Hz
+                        state.bands[1].gain = -1; // 62Hz
+                        state.bands[2].gain = 0;  // 125Hz
+                        state.bands[3].gain = 1;  // 250Hz
+                        state.bands[4].gain = 2;  // 500Hz
+                        state.bands[5].gain = 3;  // 1000Hz
+                        state.bands[6].gain = 2;  // 2000Hz
+                        state.bands[7].gain = 1;  // 4000Hz
+                        state.bands[8].gain = 0;  // 8000Hz
+                        state.bands[9].gain = -1; // 16000Hz
+                        break;
+                    case 'bass':
+                        state.bands[0].gain = 4;  // 31Hz
+                        state.bands[1].gain = 3;  // 62Hz
+                        state.bands[2].gain = 2;  // 125Hz
+                        state.bands[3].gain = 1;  // 250Hz
+                        state.bands[4].gain = 0;  // 500Hz
+                        state.bands[5].gain = -1; // 1000Hz
+                        state.bands[6].gain = -2; // 2000Hz
+                        state.bands[7].gain = -1; // 4000Hz
+                        state.bands[8].gain = 0;  // 8000Hz
+                        state.bands[9].gain = 1;  // 16000Hz
+                        break;
+                }
+                
+                updateVisualization();
+                updateSliders();
+                updateResults();
+                saveState();
+            }
+            
+            // Event listeners
+            generateBtn.addEventListener('click', () => {
+                state.presetName = presetNameInput.value || 'Custom EQ';
+                updateResults();
+                saveState();
+                alert(`Preset "${state.presetName}" generated successfully!`);
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all settings?')) {
+                    localStorage.removeItem('eqPresetState');
+                    
+                    // Reset to defaults
+                    state.presetName = 'Custom EQ';
+                    state.bands.forEach(band => band.gain = 0);
+                    
+                    // Update UI
+                    presetNameInput.value = state.presetName;
+                    updateVisualization();
+                    updateSliders();
+                    updateResults();
+                }
+            });
+            
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    applyPreset(btn.dataset.preset);
+                });
+            });
+            
+            // Initialize the app
+            loadState();
+            updateVisualization();
+            updateSliders();
+            updateResults();
+        });
+    </script>
+</body>
+</html>

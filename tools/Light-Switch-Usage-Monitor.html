@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<!-- Category: Environment -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Switch Usage Monitor | Track & Analyze Energy Consumption</title>
+    <meta name="description" content="Monitor and analyze your light switch usage patterns to optimize energy consumption. Real-time tracking, usage statistics, and energy-saving insights.">
+    <meta name="keywords" content="light switch monitor, energy usage tracker, electricity consumption, home automation, energy efficiency, smart home, power monitoring, light control, energy management">
+    <meta name="author" content="Energy Monitoring Solutions">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Light Switch Usage Monitor">
+    <meta property="og:description" content="Track and analyze your light switch usage to save energy and reduce costs">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://example.com/light-switch-monitor">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            height: 50px;
+            background-color: #0d1b2a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Desktop Header */
+        .desktop-header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .desktop-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .desktop-header p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .container {
+            width: 100%;
+            padding: 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            font-size: 1.5rem;
+        }
+
+        .switch-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .switch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .switch-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .switch-name {
+            font-weight: 500;
+        }
+
+        .switch-stats {
+            text-align: right;
+        }
+
+        .usage-time {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .usage-percentage {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 110px;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 215, 0, 0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: rgba(220, 20, 60, 0.2);
+        }
+
+        .btn-reset:hover {
+            background: rgba(220, 20, 60, 0.3);
+        }
+
+        .chart-container {
+            height: 180px;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 25px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            width: 25px;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+
+        .time-selector {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0;
+            padding: 0 10px;
+        }
+
+        .time-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn.active {
+            background: rgba(255, 215, 0, 0.5);
+        }
+
+        .time-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+            
+            .desktop-header {
+                display: none;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 15px;
+                padding: 5px;
+            }
+            
+            .card {
+                padding: 12px;
+                margin: 0 5px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .time-selector {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                min-width: auto;
+            }
+            
+            body {
+                padding: 0;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none;
+            }
+            
+            .desktop-header {
+                display: block;
+            }
+        }
+
+        .switch-status {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-on {
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        .status-off {
+            background: #ef4444;
+        }
+        
+        .data-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-controls h3 {
+            margin-bottom: 12px;
+            color: #ffd700;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .data-btn {
+            padding: 6px 12px;
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .data-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        .switch-item.active {
+            border-left: 4px solid #ffd700;
+        }
+        
+        .progress-container {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border-radius: 4px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4ade80;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .add-switch-form {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header (50px height) -->
+    <div class="mobile-header">Light Switch Usage Monitor</div>
+    
+    <!-- Desktop Header -->
+    <div class="desktop-header">
+        <h1>Light Switch Usage Monitor</h1>
+        <p>Track and analyze the usage of your light switches in real-time</p>
+    </div>
+    
+    <div class="container">
+        <div class="time-selector">
+            <button class="time-btn active">Today</button>
+            <button class="time-btn">Week</button>
+            <button class="time-btn">Month</button>
+            <button class="time-btn">Year</button>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h2 class="card-title">Switch Usage Overview</h2>
+                <div class="switch-list" id="switchList">
+                    <div class="switch-item active">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Living Room Main</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">12h 30m</div>
+                            <div class="usage-percentage">35%</div>
+                        </div>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Kitchen Lights</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">8h 15m</div>
+                            <div class="usage-percentage">24%</div>
+                        </div>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Bedroom Main</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">6h 45m</div>
+                            <div class="usage-percentage">19%</div>
+                        </div>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Bathroom Light</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">4h 20m</div>
+                            <div class="usage-percentage">12%</div>
+                        </div>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Porch Light</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">3h 10m</div>
+                            <div class="usage-percentage">9%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Switches</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Efficiency</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2.4 kWh</div>
+                        <div class="stat-label">Avg/Day</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">15%</div>
+                        <div class="stat-label">Savings</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Usage Distribution</h2>
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 70%; left: 8%;"></div>
+                    <div class="chart-bar" style="height: 50%; left: 23%;"></div>
+                    <div class="chart-bar" style="height: 90%; left: 38%;"></div>
+                    <div class="chart-bar" style="height: 60%; left: 53%;"></div>
+                    <div class="chart-bar" style="height: 40%; left: 68%;"></div>
+                    <div class="chart-bar" style="height: 30%; left: 83%;"></div>
+                    <div class="chart-label" style="left: 8%;">Living</div>
+                    <div class="chart-label" style="left: 23%;">Kitchen</div>
+                    <div class="chart-label" style="left: 38%;">Bedroom</div>
+                    <div class="chart-label" style="left: 53%;">Bathroom</div>
+                    <div class="chart-label" style="left: 68%;">Porch</div>
+                    <div class="chart-label" style="left: 83%;">Garage</div>
+                </div>
+                
+                <h2 class="card-title" style="margin-top: 25px;">Real-time Status</h2>
+                <div class="switch-list">
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Living Room Main</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Kitchen Lights</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Bedroom Main</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💡</div>
+                            <div class="switch-name">Bathroom Light</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Controls</h2>
+                <div class="controls">
+                    <button class="btn" id="addSwitchBtn">Add New Switch</button>
+                    <button class="btn">Edit Configuration</button>
+                    <button class="btn btn-reset">Reset All Data</button>
+                </div>
+                
+                <div class="add-switch-form" id="addSwitchForm">
+                    <div class="form-group">
+                        <label for="switchName">Switch Name</label>
+                        <input type="text" id="switchName" placeholder="e.g. Living Room Light">
+                    </div>
+                    <div class="form-group">
+                        <label for="switchLocation">Location</label>
+                        <input type="text" id="switchLocation" placeholder="e.g. Living Room">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn" id="saveSwitchBtn">Save Switch</button>
+                        <button class="btn btn-reset" id="cancelSwitchBtn">Cancel</button>
+                    </div>
+                </div>
+                
+                <h2 class="card-title" style="margin-top: 20px;">Energy Consumption</h2>
+                <div class="switch-list">
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">⚡</div>
+                            <div class="switch-name">Daily Usage</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">12.5 kWh</div>
+                        </div>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">💰</div>
+                            <div class="switch-name">Monthly Cost</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">$24.75</div>
+                        </div>
+                    </div>
+                    <div class="switch-item">
+                        <div class="switch-info">
+                            <div class="switch-icon">🌍</div>
+                            <div class="switch-name">CO₂ Emissions</div>
+                        </div>
+                        <div class="switch-stats">
+                            <div class="usage-time">8.2 kg</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls" style="margin-top: 20px;">
+                    <button class="btn">Export Report</button>
+                    <button class="btn">Set Alerts</button>
+                </div>
+                
+                <div class="data-controls">
+                    <h3>Data Management</h3>
+                    <div class="data-actions">
+                        <button class="data-btn" id="saveData">Save Data</button>
+                        <button class="data-btn" id="loadData">Load Data</button>
+                        <button class="data-btn" id="clearData">Clear Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Data saved successfully!</div>
+
+    <script>
+        // Time selector functionality
+        document.querySelectorAll('.time-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.time-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Simulate real-time updates for switch status
+        setInterval(() => {
+            document.querySelectorAll('.switch-status').forEach(status => {
+                if (Math.random() > 0.7) {
+                    status.classList.toggle('status-on');
+                    status.classList.toggle('status-off');
+                }
+            });
+        }, 5000);
+
+        // Simulate chart animation
+        document.querySelectorAll('.chart-bar').forEach(bar => {
+            const currentHeight = parseInt(bar.style.height);
+            const newHeight = Math.max(10, Math.min(100, currentHeight + (Math.random() * 20 - 10)));
+            bar.style.height = newHeight + '%';
+        });
+
+        // Data management functions
+        document.getElementById('saveData').addEventListener('click', function() {
+            const dataToSave = {
+                switches: Array.from(document.querySelectorAll('.switch-item')).map(item => {
+                    return {
+                        name: item.querySelector('.switch-name').textContent,
+                        time: item.querySelector('.usage-time').textContent,
+                        percentage: item.querySelector('.usage-percentage').textContent
+                    };
+                }),
+                energy: {
+                    daily: document.querySelector('.switch-item:nth-child(1) .usage-time').textContent,
+                    monthly: document.querySelector('.switch-item:nth-child(2) .usage-time').textContent,
+                    emissions: document.querySelector('.switch-item:nth-child(3) .usage-time').textContent
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('lightSwitchData', JSON.stringify(dataToSave));
+            showNotification('Data saved successfully!');
+        });
+
+        document.getElementById('loadData').addEventListener('click', function() {
+            const savedData = localStorage.getItem('lightSwitchData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // Update switch data
+                document.querySelectorAll('.switch-item').forEach((item, index) => {
+                    if (data.switches[index]) {
+                        item.querySelector('.switch-name').textContent = data.switches[index].name;
+                        item.querySelector('.usage-time').textContent = data.switches[index].time;
+                        item.querySelector('.usage-percentage').textContent = data.switches[index].percentage;
+                    }
+                });
+                
+                // Update energy data
+                document.querySelector('.switch-item:nth-child(1) .usage-time').textContent = data.energy.daily;
+                document.querySelector('.switch-item:nth-child(2) .usage-time').textContent = data.energy.monthly;
+                document.querySelector('.switch-item:nth-child(3) .usage-time').textContent = data.energy.emissions;
+                
+                showNotification('Data loaded successfully!');
+            } else {
+                showNotification('No saved data found!');
+            }
+        });
+
+        document.getElementById('clearData').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('lightSwitchData');
+                showNotification('All data cleared!');
+            }
+        });
+
+        // Toggle switch functionality
+        document.querySelectorAll('.toggle-switch input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const switchName = this.closest('.switch-item').querySelector('.switch-name').textContent;
+                const status = this.checked ? 'turned on' : 'turned off';
+                showNotification(`Switch "${switchName}" ${status}`);
+            });
+        });
+
+        // Show notification function
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize with saved data if available
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('lightSwitchData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                console.log('Loaded data from localStorage:', data);
+            }
+        });
+
+        // Add new switch functionality
+        document.getElementById('addSwitchBtn').addEventListener('click', function() {
+            document.getElementById('addSwitchForm').style.display = 'block';
+        });
+
+        document.getElementById('cancelSwitchBtn').addEventListener('click', function() {
+            document.getElementById('addSwitchForm').style.display = 'none';
+            document.getElementById('switchName').value = '';
+            document.getElementById('switchLocation').value = '';
+        });
+
+        document.getElementById('saveSwitchBtn').addEventListener('click', function() {
+            const name = document.getElementById('switchName').value;
+            const location = document.getElementById('switchLocation').value;
+            
+            if (name.trim() === '') {
+                showNotification('Please enter a switch name');
+                return;
+            }
+            
+            // Create new switch item
+            const switchList = document.getElementById('switchList');
+            const newSwitchItem = document.createElement('div');
+            newSwitchItem.className = 'switch-item';
+            newSwitchItem.innerHTML = `
+                <div class="switch-info">
+                    <div class="switch-icon">💡</div>
+                    <div class="switch-name">${name}</div>
+                </div>
+                <div class="switch-stats">
+                    <div class="usage-time">0h 0m</div>
+                    <div class="usage-percentage">0%</div>
+                </div>
+            `;
+            
+            switchList.appendChild(newSwitchItem);
+            
+            // Reset form and hide
+            document.getElementById('switchName').value = '';
+            document.getElementById('switchLocation').value = '';
+            document.getElementById('addSwitchForm').style.display = 'none';
+            
+            showNotification(`Switch "${name}" added successfully!`);
+        });
+
+        // Real-time usage simulation
+        function updateUsageData() {
+            const switches = document.querySelectorAll('.switch-item');
+            switches.forEach(item => {
+                const timeElement = item.querySelector('.usage-time');
+                const percentageElement = item.querySelector('.usage-percentage');
+                
+                // Parse current time
+                const timeText = timeElement.textContent;
+                const [hours, minutes] = timeText.split(' ').map(part => {
+                    if (part.includes('h')) return parseInt(part.replace('h', ''));
+                    if (part.includes('m')) return parseInt(part.replace('m', ''));
+                    return 0;
+                });
+                
+                // Increment time randomly
+                const increment = Math.random() > 0.7 ? 1 : 0;
+                const newHours = hours + Math.floor(increment / 60);
+                const newMinutes = (minutes + increment) % 60;
+                
+                // Update time display
+                timeElement.textContent = `${newHours}h ${newMinutes}m`;
+                
+                // Calculate new percentage based on random increase
+                const currentPercentage = parseFloat(percentageElement.textContent);
+                const newPercentage = Math.min(100, currentPercentage + (Math.random() * 0.1));
+                percentageElement.textContent = `${newPercentage.toFixed(1)}%`;
+            });
+            
+            // Update chart bars
+            document.querySelectorAll('.chart-bar').forEach(bar => {
+                const currentHeight = parseInt(bar.style.height);
+                const newHeight = Math.max(10, Math.min(100, currentHeight + (Math.random() * 5 - 2.5)));
+                bar.style.height = newHeight + '%';
+            });
+        }
+
+        // Update usage data every 10 seconds
+        setInterval(updateUsageData, 10000);
+    </script>
+</body>
+</html>
