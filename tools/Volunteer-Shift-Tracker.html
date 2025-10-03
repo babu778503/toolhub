@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<!-- Category: Community -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Shift Tracker</title>
+    <meta name="description" content="Track your volunteer shifts with our Volunteer Shift Tracker. Manage your schedule, hours, and activities efficiently.">
+    <meta name="keywords" content="volunteer shift tracker, volunteer hours, volunteer management, community service, volunteer schedule, volunteer tracking, volunteer time">
+    <meta name="author" content="CommunityTools">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Volunteer Shift Tracker">
+    <meta property="og:description" content="Track your volunteer shifts with our Volunteer Shift Tracker. Manage your schedule, hours, and activities efficiently.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Volunteer Shift Tracker">
+    <meta name="twitter:description" content="Track your volunteer shifts with our Volunteer Shift Tracker. Manage your schedule, hours, and activities efficiently.">
+    <link rel="canonical" href="https://toolshub365.com/volunteer-shift-tracker">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2e7d32;
+            --secondary: #4caf50;
+            --accent: #8bc34a;
+            --light: #e8f5e9;
+            --dark: #1b5e20;
+            --text: #212121;
+            --light-text: #f5f5f5;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Header styling */
+        header {
+            background: linear-gradient(to right, var(--primary), var(--dark));
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-radius: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .mobile-header {
+            height: 50px;
+            padding: 0 15px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .desktop-header {
+            height: 80px;
+            padding: 0 20px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-top: 80px; /* Adjust for fixed header */
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 60px; /* Adjust for mobile header */
+                border-radius: 0;
+            }
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        /* Button styling */
+        button {
+            background: linear-gradient(to right, var(--primary), var(--dark));
+            color: white;
+            border: none;
+            padding: 16px 25px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+        }
+
+        .secondary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        /* Results section */
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: var(--light);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .shift-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .shift-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .shift-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .shift-header {
+            background: var(--secondary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .shift-time {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .shift-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--warning);
+            color: white;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .shift-body {
+            padding: 15px;
+        }
+
+        .shift-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shift-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .shift-org {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .shift-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .shift-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .shift-actions .edit-btn {
+            background: var(--light);
+            color: var(--primary);
+            border: 1px solid var(--secondary);
+        }
+
+        .shift-actions .complete-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+        }
+
+        .shift-actions .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+        }
+
+        .completed {
+            opacity: 0.7;
+            background-color: #f9f9f9;
+        }
+
+        .completed .shift-title {
+            text-decoration: line-through;
+        }
+
+        .completed .shift-header {
+            background: #9e9e9e;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .progress-container {
+            margin: 25px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Data management section */
+        .data-management {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .data-management button {
+            background: linear-gradient(to right, #f44336, #d32f2f);
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            width: auto;
+            display: inline-block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: row; /* Single line for mobile */
+                gap: 10px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .shift-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .shift-actions {
+                flex-direction: column;
+            }
+            
+            .filter-container {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0 10px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Footer note */
+        .footer-note {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile header (50px height) -->
+    <header class="mobile-header">
+        <div class="header-content">
+            <h1>Volunteer Shift Tracker</h1>
+        </div>
+    </header>
+
+    <!-- Desktop header (80px height) -->
+    <header class="desktop-header">
+        <div class="header-content">
+            <h1>Volunteer Shift Tracker</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <form id="shift-form">
+                <div class="form-group">
+                    <label for="org-name">Organization</label>
+                    <input type="text" id="org-name" placeholder="Enter organization name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="shift-type">Shift Type</label>
+                    <select id="shift-type" required>
+                        <option value="">Select shift type</option>
+                        <option value="food-bank">Food Bank</option>
+                        <option value="animal-shelter">Animal Shelter</option>
+                        <option value="elderly-care">Elderly Care</option>
+                        <option value="environment">Environmental</option>
+                        <option value="education">Education</option>
+                        <option value="homeless-shelter">Homeless Shelter</option>
+                        <option value="hospital">Hospital</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="start-time">Start Time</label>
+                    <input type="time" id="start-time" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="end-time">End Time</label>
+                    <input type="time" id="end-time" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" required>
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+
+                <button type="submit">Add to Schedule</button>
+            </form>
+
+            <div class="results" id="results">
+                <h2 class="result-title">Your Volunteer Schedule</h2>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-shifts">0</div>
+                        <div class="stat-label">Total Shifts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pending-shifts">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completed-shifts">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-hours">0</div>
+                        <div class="stat-label">Total Hours</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Completion Progress</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">All Shifts</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                    <button class="filter-btn" data-filter="today">Today</button>
+                </div>
+                
+                <div class="shift-list" id="shift-list">
+                    <!-- Shift cards will be generated here -->
+                </div>
+            </div>
+            
+            <div class="data-management">
+                <p>Your schedule is automatically saved to your device. You can clear your saved data below:</p>
+                <button id="clear-data">Clear Saved Data</button>
+            </div>
+            
+            <div class="footer-note">
+                Track your volunteer contributions and make a positive impact in your community.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const form = document.getElementById('shift-form');
+            const resultsDiv = document.getElementById('results');
+            const shiftList = document.getElementById('shift-list');
+            const clearDataBtn = document.getElementById('clear-data');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const totalShiftsEl = document.getElementById('total-shifts');
+            const pendingShiftsEl = document.getElementById('pending-shifts');
+            const completedShiftsEl = document.getElementById('completed-shifts');
+            const totalHoursEl = document.getElementById('total-hours');
+            const progressFill = document.getElementById('progress-fill');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            // Initialize with sample data if none exists
+            if (!localStorage.getItem('volunteerShiftData')) {
+                const sampleData = [
+                    {
+                        id: 1,
+                        orgName: "City Food Bank",
+                        shiftType: "food-bank",
+                        date: "2023-06-15",
+                        startTime: "09:00",
+                        endTime: "12:00",
+                        priority: "medium",
+                        completed: false
+                    },
+                    {
+                        id: 2,
+                        orgName: "Animal Shelter",
+                        shiftType: "animal-shelter",
+                        date: "2023-06-16",
+                        startTime: "14:00",
+                        endTime: "16:00",
+                        priority: "high",
+                        completed: false
+                    },
+                    {
+                        id: 3,
+                        orgName: "Community Garden",
+                        shiftType: "environment",
+                        date: "2023-06-14",
+                        startTime: "10:00",
+                        endTime: "13:00",
+                        priority: "urgent",
+                        completed: true
+                    }
+                ];
+                localStorage.setItem('volunteerShiftData', JSON.stringify(sampleData));
+            }
+            
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const orgName = document.getElementById('org-name').value;
+                const shiftType = document.getElementById('shift-type').value;
+                const date = document.getElementById('date').value;
+                const startTime = document.getElementById('start-time').value;
+                const endTime = document.getElementById('end-time').value;
+                const priority = document.getElementById('priority').value;
+                
+                // Validate inputs
+                if (!orgName || !shiftType || !date || !startTime || !endTime) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Validate time
+                if (new Date(`2000-01-01T${startTime}`) >= new Date(`2000-01-01T${endTime}`)) {
+                    alert('End time must be after start time');
+                    return;
+                }
+                
+                // Calculate duration in hours
+                const start = new Date(`2000-01-01T${startTime}`);
+                const end = new Date(`2000-01-01T${endTime}`);
+                const duration = (end - start) / (1000 * 60 * 60);
+                
+                // Create new shift item
+                const newShiftItem = {
+                    id: Date.now(), // Unique ID
+                    orgName,
+                    shiftType,
+                    date,
+                    startTime,
+                    endTime,
+                    priority,
+                    completed: false,
+                    duration: duration.toFixed(2)
+                };
+                
+                // Add to existing schedule
+                const existingSchedule = JSON.parse(localStorage.getItem('volunteerShiftData')) || [];
+                existingSchedule.push(newShiftItem);
+                localStorage.setItem('volunteerShiftData', JSON.stringify(existingSchedule));
+                
+                // Clear form
+                form.reset();
+                
+                // Reload schedule
+                loadSchedule();
+                
+                // Show results if not already visible
+                resultsDiv.classList.add('active');
+                
+                // Scroll to results
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Function to load and display schedule
+            function loadSchedule(filter = 'all') {
+                const shiftData = JSON.parse(localStorage.getItem('volunteerShiftData')) || [];
+                
+                // Calculate statistics
+                const totalShifts = shiftData.length;
+                const completedShifts = shiftData.filter(item => item.completed).length;
+                const pendingShifts = totalShifts - completedShifts;
+                
+                // Calculate total hours
+                const totalHours = shiftData.reduce((total, item) => total + parseFloat(item.duration), 0).toFixed(2);
+                
+                // Update statistics
+                totalShiftsEl.textContent = totalShifts;
+                pendingShiftsEl.textContent = pendingShifts;
+                completedShiftsEl.textContent = completedShifts;
+                totalHoursEl.textContent = totalHours;
+                
+                // Calculate completion percentage
+                const completionPercent = totalShifts > 0 ? Math.round((completedShifts / totalShifts) * 100) : 0;
+                progressFill.style.width = `${completionPercent}%`;
+                progressPercent.textContent = `${completionPercent}%`;
+                
+                // Filter data based on selected filter
+                let filteredData = [...shiftData];
+                
+                if (filter === 'pending') {
+                    filteredData = shiftData.filter(item => !item.completed);
+                } else if (filter === 'completed') {
+                    filteredData = shiftData.filter(item => item.completed);
+                } else if (filter === 'today') {
+                    const today = new Date().toISOString().split('T')[0];
+                    filteredData = shiftData.filter(item => item.date === today);
+                }
+                
+                // Sort by date and time
+                filteredData.sort((a, b) => {
+                    const dateA = new Date(`${a.date}T${a.startTime}`);
+                    const dateB = new Date(`${b.date}T${b.startTime}`);
+                    return dateA - dateB;
+                });
+                
+                shiftList.innerHTML = '';
+                
+                if (filteredData.length === 0) {
+                    shiftList.innerHTML = '<p>No scheduled shifts match your filter. Add shifts using the form above.</p>';
+                    return;
+                }
+                
+                filteredData.forEach(item => {
+                    const shiftCard = document.createElement('div');
+                    shiftCard.className = `shift-card ${item.completed ? 'completed' : ''}`;
+                    
+                    // Format shift type for display
+                    const shiftLabels = {
+                        'food-bank': 'Food Bank',
+                        'animal-shelter': 'Animal Shelter',
+                        'elderly-care': 'Elderly Care',
+                        'environment': 'Environmental',
+                        'education': 'Education',
+                        'homeless-shelter': 'Homeless Shelter',
+                        'hospital': 'Hospital',
+                        'other': 'Other'
+                    };
+                    
+                    // Format priority badge
+                    const priorityBadges = {
+                        'low': { text: 'Low', color: '#9e9e9e' },
+                        'medium': { text: 'Medium', color: '#ff9800' },
+                        'high': { text: 'High', color: '#f57c00' },
+                        'urgent': { text: 'Urgent', color: '#d32f2f' }
+                    };
+                    
+                    const priorityBadge = priorityBadges[item.priority];
+                    
+                    // Determine if shift is today
+                    const today = new Date().toISOString().split('T')[0];
+                    const isToday = item.date === today;
+                    
+                    shiftCard.innerHTML = `
+                        <div class="shift-header" style="background: ${item.completed ? '#9e9e9e' : 'var(--secondary)'}">
+                            <div class="shift-time">${item.startTime} - ${item.endTime}</div>
+                            <div class="shift-badge" style="background: ${priorityBadge.color}">${priorityBadge.text}</div>
+                        </div>
+                        <div class="shift-body">
+                            <div class="shift-title">
+                                <i class="fas fa-${getShiftIcon(item.shiftType)}"></i>
+                                ${shiftLabels[item.shiftType]}
+                            </div>
+                            <div class="shift-details">${item.orgName}</div>
+                            <div class="shift-org">
+                                <i class="fas fa-calendar"></i>
+                                <span>${formatDate(item.date)}</span>
+                            </div>
+                            <div class="shift-org">
+                                <i class="fas fa-clock"></i>
+                                <span>${item.duration} hours</span>
+                            </div>
+                            ${isToday ? '<div class="shift-org"><i class="fas fa-star" style="color: var(--warning);"></i> <span>Today\'s Shift</span></div>' : ''}
+                            <div class="shift-actions">
+                                <button class="edit-btn" onclick="editShift(${item.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="complete-btn" onclick="toggleComplete(${item.id})">
+                                    <i class="fas fa-${item.completed ? 'undo' : 'check'}"></i> ${item.completed ? 'Undo' : 'Complete'}
+                                </button>
+                                <button class="delete-btn" onclick="deleteShift(${item.id})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    shiftList.appendChild(shiftCard);
+                });
+            }
+            
+            // Function to get shift icon
+            function getShiftIcon(shiftType) {
+                const icons = {
+                    'food-bank': 'utensils',
+                    'animal-shelter': 'paw',
+                    'elderly-care': 'user-friends',
+                    'environment': 'tree',
+                    'education': 'graduation-cap',
+                    'homeless-shelter': 'home',
+                    'hospital': 'hospital',
+                    'other': 'hand-holding-heart'
+                };
+                return icons[shiftType] || 'hand-holding-heart';
+            }
+            
+            // Function to toggle shift completion
+            function toggleComplete(id) {
+                const shiftData = JSON.parse(localStorage.getItem('volunteerShiftData')) || [];
+                const itemIndex = shiftData.findIndex(item => item.id === id);
+                
+                if (itemIndex !== -1) {
+                    shiftData[itemIndex].completed = !shiftData[itemIndex].completed;
+                    localStorage.setItem('volunteerShiftData', JSON.stringify(shiftData));
+                    loadSchedule(); // Reload with current filter
+                }
+            }
+            
+            // Function to delete shift item
+            function deleteShift(id) {
+                if (confirm('Are you sure you want to delete this shift?')) {
+                    const shiftData = JSON.parse(localStorage.getItem('volunteerShiftData')) || [];
+                    const updatedSchedule = shiftData.filter(item => item.id !== id);
+                    localStorage.setItem('volunteerShiftData', JSON.stringify(updatedSchedule));
+                    loadSchedule(); // Reload with current filter
+                }
+            }
+            
+            // Function to edit shift item
+            function editShift(id) {
+                const shiftData = JSON.parse(localStorage.getItem('volunteerShiftData')) || [];
+                const item = shiftData.find(item => item.id === id);
+                
+                if (item) {
+                    document.getElementById('org-name').value = item.orgName;
+                    document.getElementById('shift-type').value = item.shiftType;
+                    document.getElementById('date').value = item.date;
+                    document.getElementById('start-time').value = item.startTime;
+                    document.getElementById('end-time').value = item.endTime;
+                    document.getElementById('priority').value = item.priority;
+                    
+                    // Remove the item from the list
+                    const updatedSchedule = shiftData.filter(item => item.id !== id);
+                    localStorage.setItem('volunteerShiftData', JSON.stringify(updatedSchedule));
+                    
+                    // Reload schedule
+                    loadSchedule();
+                }
+            }
+            
+            // Function to format date for display
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            // Filter buttons event listeners
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Load schedule with selected filter
+                    const filter = this.getAttribute('data-filter');
+                    loadSchedule(filter);
+                });
+            });
+            
+            // Clear saved data
+            clearDataBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear your saved schedule? This cannot be undone.')) {
+                    localStorage.removeItem('volunteerShiftData');
+                    shiftList.innerHTML = '<p>No scheduled shifts. Add shifts using the form above.</p>';
+                    totalShiftsEl.textContent = '0';
+                    pendingShiftsEl.textContent = '0';
+                    completedShiftsEl.textContent = '0';
+                    totalHoursEl.textContent = '0';
+                    progressFill.style.width = '0%';
+                    progressPercent.textContent = '0%';
+                    alert('Your schedule has been cleared.');
+                }
+            });
+            
+            // Load schedule when page loads
+            loadSchedule();
+            
+            // Handle responsive design - show only one header based on screen size
+            function updateHeaderVisibility() {
+                const mobileHeader = document.querySelector('.mobile-header');
+                const desktopHeader = document.querySelector('.desktop-header');
+                
+                if (window.innerWidth <= 768) {
+                    mobileHeader.style.display = 'flex';
+                    desktopHeader.style.display = 'none';
+                } else {
+                    mobileHeader.style.display = 'none';
+                    desktopHeader.style.display = 'flex';
+                }
+            }
+            
+            // Initialize header visibility
+            updateHeaderVisibility();
+            
+            // Add event listener for window resize
+            window.addEventListener('resize', updateHeaderVisibility);
+        });
+    </script>
+</body>
+</html>
