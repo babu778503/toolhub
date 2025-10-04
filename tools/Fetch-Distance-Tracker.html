@@ -1,0 +1,577 @@
+<!-- Category: Dog Training -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Distance Tracker</title>
+    <meta name="description" content="Free Fetch Distance Tracker for dog training. Measure and track your dog's fetch distances with this intuitive tool. Perfect for agility trainers and dog owners.">
+    <meta name="keywords" content="fetch distance tracker, dog training, dog agility, fetch distance, dog sports, pet training, distance measurement, dog exercises, training tools">
+    <meta name="author" content="Dog Training Tools">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Fetch Distance Tracker">
+    <meta property="og:description" content="Measure and track your dog's fetch distances with this free tool. Perfect for agility trainers and dog owners.">
+    <meta property="og:type" content="tool">
+    <meta property="og:url" content="https://toolshub365.com/fetch-distance-tracker">
+    <link rel="canonical" href="https://toolshub365.com/fetch-distance-tracker">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* Header styling */
+        .header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            position: relative;
+        }
+
+        .mobile-header {
+            height: 50px;
+            display: none;
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* Main content */
+        .content {
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .distance-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .distance-display.zero {
+            color: #95a5a6;
+            background: none;
+            -webkit-text-fill-color: #95a5a6;
+        }
+
+        .distance-display.counting {
+            transform: scale(1.1);
+            color: #e74c3c;
+            -webkit-text-fill-color: #e74c3c;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            min-width: 100px;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-increment {
+            background: linear-gradient(to right, #2ecc71, #1abc9c);
+            color: white;
+        }
+
+        .btn-decrement {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-reset {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-clear {
+            background: linear-gradient(to right, #f39c12, #d35400);
+            color: white;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .distance-input {
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid #3498db;
+            border-radius: 50px;
+            width: 150px;
+            text-align: center;
+            outline: none;
+        }
+
+        .unit-selector {
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid #3498db;
+            border-radius: 50px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            background: #f1f2f6;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .progress-container {
+            background: #ecf0f1;
+            border-radius: 10px;
+            height: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #2ecc71, #3498db);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .history {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .history-list {
+            list-style-type: none;
+        }
+
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .instructions {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            color: #34495e;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .header {
+                display: none;
+            }
+            
+            .mobile-header {
+                display: flex;
+            }
+            
+            .content {
+                padding: 15px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                margin-top: 50px;
+            }
+            
+            .distance-display {
+                font-size: 3rem;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                min-width: 80px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .input-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .distance-input, .unit-selector {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .distance-display {
+                font-size: 2.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 3px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Fetch Distance Tracker</h1>
+        </div>
+        
+        <div class="mobile-header">
+            Fetch Distance Tracker
+        </div>
+        
+        <div class="content">
+            <div class="distance-display zero" id="distance">0.0</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="avg-distance">0.0</div>
+                    <div class="stat-label">Avg Distance</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="max-distance">0.0</div>
+                    <div class="stat-label">Max Distance</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="total-throws">0</div>
+                    <div class="stat-label">Total Throws</div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="number" class="distance-input" id="distance-input" placeholder="Enter distance" step="0.1" min="0">
+                <select class="unit-selector" id="unit-selector">
+                    <option value="m">Meters</option>
+                    <option value="ft">Feet</option>
+                    <option value="yd">Yards</option>
+                </select>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-increment" id="add-distance">Add Distance</button>
+                <button class="btn btn-reset" id="reset">Reset Session</button>
+                <button class="btn btn-clear" id="clear">Clear All Data</button>
+            </div>
+            
+            <div class="history">
+                <h3>Recent Throws</h3>
+                <ul class="history-list" id="history-list">
+                    <!-- History items will be added here -->
+                </ul>
+            </div>
+            
+            <div class="instructions">
+                <h3>How to Use:</h3>
+                <ul>
+                    <li>Enter the distance your dog fetched in the input field</li>
+                    <li>Select the unit of measurement (meters, feet, or yards)</li>
+                    <li>Click "Add Distance" to record the throw</li>
+                    <li>"Reset Session" clears the current session but keeps history</li>
+                    <li>"Clear All Data" removes all data including history</li>
+                    <li>Track your dog's progress with the stats panel</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const distanceDisplay = document.getElementById('distance');
+            const addDistanceBtn = document.getElementById('add-distance');
+            const resetBtn = document.getElementById('reset');
+            const clearBtn = document.getElementById('clear');
+            const distanceInput = document.getElementById('distance-input');
+            const unitSelector = document.getElementById('unit-selector');
+            const progressBar = document.getElementById('progress-bar');
+            const avgDistanceEl = document.getElementById('avg-distance');
+            const maxDistanceEl = document.getElementById('max-distance');
+            const totalThrowsEl = document.getElementById('total-throws');
+            const historyList = document.getElementById('history-list');
+            
+            let currentDistance = 0.0;
+            let distances = [];
+            let maxDistance = 0;
+            let totalDistance = 0;
+            let totalThrows = 0;
+            
+            // Load saved data from localStorage
+            function loadData() {
+                const savedData = localStorage.getItem('fetchDistanceData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    distances = data.distances || [];
+                    maxDistance = data.maxDistance || 0;
+                    totalDistance = data.totalDistance || 0;
+                    totalThrows = data.totalThrows || 0;
+                    
+                    updateStats();
+                    updateHistory();
+                }
+            }
+            
+            // Save data to localStorage
+            function saveData() {
+                const data = {
+                    distances: distances,
+                    maxDistance: maxDistance,
+                    totalDistance: totalDistance,
+                    totalThrows: totalThrows
+                };
+                localStorage.setItem('fetchDistanceData', JSON.stringify(data));
+            }
+            
+            // Update stats display
+            function updateStats() {
+                if (distances.length > 0) {
+                    const avg = totalDistance / distances.length;
+                    avgDistanceEl.textContent = avg.toFixed(1);
+                    maxDistanceEl.textContent = maxDistance.toFixed(1);
+                } else {
+                    avgDistanceEl.textContent = "0.0";
+                    maxDistanceEl.textContent = "0.0";
+                }
+                
+                totalThrowsEl.textContent = totalThrows;
+                
+                // Update progress bar based on max distance (assuming 50m is 100%)
+                const progress = Math.min(100, (maxDistance / 50) * 100);
+                progressBar.style.width = `${progress}%`;
+                
+                saveData();
+            }
+            
+            // Update history list
+            function updateHistory() {
+                historyList.innerHTML = '';
+                
+                // Show last 10 throws in reverse order (most recent first)
+                const recentThrows = [...distances].reverse().slice(0, 10);
+                
+                recentThrows.forEach((dist, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.innerHTML = `
+                        <span>Throw #${distances.length - index}</span>
+                        <span>${dist.toFixed(1)} ${unitSelector.value}</span>
+                    `;
+                    historyList.appendChild(li);
+                });
+                
+                if (distances.length === 0) {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.textContent = 'No throws recorded yet';
+                    historyList.appendChild(li);
+                }
+            }
+            
+            // Add distance to the tracker
+            function addDistance() {
+                const inputVal = parseFloat(distanceInput.value);
+                
+                if (isNaN(inputVal) || inputVal <= 0) {
+                    alert('Please enter a valid positive number');
+                    return;
+                }
+                
+                distances.push(inputVal);
+                totalDistance += inputVal;
+                totalThrows++;
+                
+                if (inputVal > maxDistance) {
+                    maxDistance = inputVal;
+                }
+                
+                // Update display
+                distanceDisplay.textContent = inputVal.toFixed(1);
+                distanceDisplay.classList.remove('zero', 'counting');
+                void distanceDisplay.offsetWidth; // Trigger reflow
+                distanceDisplay.classList.add('counting');
+                
+                setTimeout(() => {
+                    distanceDisplay.classList.remove('counting');
+                }, 300);
+                
+                updateStats();
+                updateHistory();
+                
+                // Clear input
+                distanceInput.value = '';
+            }
+            
+            // Reset current session (keep history)
+            function resetSession() {
+                currentDistance = 0.0;
+                distanceDisplay.textContent = currentDistance.toFixed(1);
+                distanceDisplay.classList.add('zero');
+                distanceInput.value = '';
+            }
+            
+            // Clear all data
+            function clearAllData() {
+                distances = [];
+                maxDistance = 0;
+                totalDistance = 0;
+                totalThrows = 0;
+                
+                resetSession();
+                updateStats();
+                updateHistory();
+                localStorage.removeItem('fetchDistanceData');
+            }
+            
+            // Event listeners
+            addDistanceBtn.addEventListener('click', addDistance);
+            
+            resetBtn.addEventListener('click', resetSession);
+            
+            clearBtn.addEventListener('click', clearAllData);
+            
+            // Allow Enter key to add distance
+            distanceInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addDistance();
+                }
+            });
+            
+            // Initialize
+            loadData();
+            updateStats();
+            updateHistory();
+        });
+    </script>
+</body>
+</html>
