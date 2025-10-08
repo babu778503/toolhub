@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainHeader = document.querySelector('.main-header');
     const hamburgerMenu = document.getElementById('hamburger-menu');
     const mainNav = document.getElementById('main-nav');
-    // REMOVED: navLinks selector is no longer needed as we use a single handler
     const footerLinks = document.querySelectorAll('.footer-links-bottom a[data-view]');
     const logoLink = document.querySelector('.logo');
     const signInModal = document.getElementById('signInModal');
@@ -35,13 +34,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const GUEST_BOOKMARK_LIMIT = 20;
     const RECENTLY_USED_LIMIT = 100;
     let lastScrollTop = 0;
-    // REMOVED: profileLink selector is no longer needed here
     const profileSignInModal = document.getElementById('profileSignInModal');
     const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
     let userProfile = null;
     let userPreferences = {};
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
-    const unlockAudio = () => { alarmSound.play().catch(() => {}); alarmSound.pause(); alarmSound.currentTime = 0; };
+    const unlockAudio = () => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Clear any previous utterances
+        }
+        alarmSound.play().catch(() => {});
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+    };
     document.body.addEventListener('click', unlockAudio, { once: true });
     const saveBookmarks = () => localStorage.setItem('toolHubBookmarks', JSON.stringify(bookmarks));
     const saveRecentlyUsed = () => localStorage.setItem('toolHubRecent', JSON.stringify(recentlyUsed));
@@ -83,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function updateUIForLogin() {
         if (!userProfile) return;
-        const profileLink = document.getElementById('profile-link'); // Get the link here
+        const profileLink = document.getElementById('profile-link');
         profileLink.innerHTML = `<img src="${userProfile.picture}" alt="User profile picture"> ${sanitizeHTML(userProfile.given_name)}`;
         profileLink.title = `Signed in as ${userProfile.name}. Click to view profile.`;
         profileLink.classList.add('logged-in');
@@ -94,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userPreferences = {};
         localStorage.removeItem('toolHubUserProfile');
         localStorage.removeItem('toolHubUserPreferences');
-        const profileLink = document.getElementById('profile-link'); // Get the link here
+        const profileLink = document.getElementById('profile-link');
         profileLink.innerHTML = `<i class="fas fa-user-circle"></i> Profile`;
         profileLink.title = '';
         profileLink.classList.remove('logged-in');
@@ -284,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentView = view;
         window.scrollTo({ top: 0, behavior: 'auto' });
         
-        // Update active nav link
         mainNav.querySelectorAll('a[data-view]').forEach(link => {
             link.classList.toggle('active', link.dataset.view === view);
         });
@@ -308,6 +312,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mainNav.classList.contains('active')) mainNav.classList.remove('active');
     };
 
+    // NEW: Function for the 15-minute voice pre-alarm
+    const triggerPreAlarm = (toolName) => {
+        if (!('speechSynthesis' in window) || !userPreferences.notifications) {
+            return; // Exit if speech is not supported or notifications are off
+        }
+        const userName = userProfile ? userProfile.given_name : 'there';
+        const message = `Hi ${userName}, you have a reminder for ${toolName} in 15 minutes.`;
+        
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.volume = 1; // Max volume
+        utterance.rate = 1;   // Normal speed
+        utterance.pitch = 1;  // Normal pitch
+        
+        window.speechSynthesis.speak(utterance);
+    };
+
     const triggerAlarm = (alarmId) => {
         const alarmData = activeAlarms[alarmId]; if (!alarmData) return;
         if (alarmSound && userPreferences.notifications) { alarmSound.play().catch(e => console.error("Error playing sound:", e)); }
@@ -321,16 +341,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentView === 'your-work') renderYourWorkView();
     };
 
+    // MODIFIED: Added pre-alarm scheduling
     const setAlarmWithDate = (toolId, toolName, scheduledDate, frequency) => {
         const scheduledTime = scheduledDate.getTime();
         if (isNaN(scheduledTime) || scheduledTime <= Date.now()) { alert("Invalid date. The date must be in the future."); return; }
         const alarmId = `${toolId}-${scheduledTime}-${Math.random().toString(36).substr(2, 5)}`;
         activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false };
         saveAlarms(); updateYourWorkBadge();
+        
+        // Schedule main alarm
         setTimeout(() => triggerAlarm(alarmId), scheduledTime - Date.now());
+
+        // NEW: Schedule pre-alarm 15 minutes before
+        const preAlarmTime = scheduledTime - (15 * 60 * 1000);
+        if (preAlarmTime > Date.now()) {
+            const preAlarmDelay = preAlarmTime - Date.now();
+            setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay);
+        }
+
         if (currentView === 'your-tools') renderYourToolsView(); if (currentView === 'your-work') { calendarDisplayDate = new Date(scheduledTime); renderYourWorkView(); }
     };
 
+    // MODIFIED: Added pre-alarm scheduling for loaded alarms
     const loadAndScheduleAlarms = () => {
         const storedAlarms = JSON.parse(localStorage.getItem('toolHubAlarms')) || {};
         const now = Date.now();
@@ -343,8 +375,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 while (nextDate.getTime() < now) { const updatedDate = getNextOccurrence(nextDate, alarm.frequency, alarm.startTime); if (!updatedDate) { nextDate = null; break; } nextDate = updatedDate; }
                 if (nextDate) { alarm.nextOccurrence = nextDate.getTime(); alarmsChanged = true; }
             }
+            
             const remainingTime = alarm.nextOccurrence - now;
-            if (remainingTime > 0 && !(alarm.triggered && alarm.frequency === 'one-time')) { setTimeout(() => triggerAlarm(alarmId), remainingTime); }
+            if (remainingTime > 0 && !(alarm.triggered && alarm.frequency === 'one-time')) {
+                // Schedule main alarm
+                setTimeout(() => triggerAlarm(alarmId), remainingTime);
+
+                // NEW: Schedule pre-alarm for loaded alarms
+                const preAlarmTime = alarm.nextOccurrence - (15 * 60 * 1000);
+                if (preAlarmTime > now) {
+                    const preAlarmDelay = preAlarmTime - now;
+                    setTimeout(() => triggerPreAlarm(alarm.toolName), preAlarmDelay);
+                }
+            }
         });
         activeAlarms = storedAlarms;
         if (alarmsChanged) { saveAlarms(); }
@@ -408,7 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerMenu.addEventListener('click', () => mainNav.classList.toggle('active'));
     logoLink.addEventListener('click', (e) => { e.preventDefault(); history.pushState({view: 'home'}, '', '/'); switchView('home'); });
     
-    // *** CORRECTED: UNIFIED NAVIGATION HANDLER ***
     const handleDataViewClick = (e) => {
         const link = e.target.closest('a[data-view]');
         if (!link) return;
@@ -416,7 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const view = link.dataset.view;
 
-        // Special case for the profile link
         if (view === 'profile') {
             if (userProfile) {
                 history.pushState({ view: 'profile' }, '', '/profile');
@@ -424,19 +465,16 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 profileSignInModal.classList.add('show');
             }
-            return; // Stop execution here for the profile case
+            return;
         }
 
-        // Default case for all other links
         const newPath = view === 'home' ? '/' : `/${view}`;
         history.pushState({ view: view }, '', newPath);
         switchView(view);
     };
 
-    // Attach the single, unified handler to the main navigation and footer
     mainNav.addEventListener('click', handleDataViewClick);
     footerLinks.forEach(link => link.addEventListener('click', handleDataViewClick));
-    // *** END OF CORRECTION ***
 
     const showModal = () => signInModal.classList.add('show'); const hideModal = () => signInModal.classList.remove('show');
     modalCloseBtn.addEventListener('click', hideModal); signInModal.addEventListener('click', (e) => { if (e.target === signInModal) hideModal(); });
@@ -468,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             hideTool(false);
-            const validViews = ['home', 'categories', 'popular', 'your-tools', 'your-work', 'profile']; // Corrected
+            const validViews = ['home', 'categories', 'popular', 'your-tools', 'your-work', 'profile'];
             let view = path.substring(1) || 'home';
             if (!validViews.includes(view)) {
                 view = 'home';
@@ -579,7 +617,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (categoryCard) showCategoryTools(categoryCard.dataset.categoryName); 
         if (backToCategoriesBtn) hideCategoryTools();
 
-        // Profile Page event handlers
         if (e.target.id === 'profile-save-btn') {
             const birthdayInput = document.getElementById('profile-birthday');
             const notificationsInput = document.getElementById('notification-toggle');
