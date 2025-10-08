@@ -39,15 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let userProfile = null;
     let userPreferences = {};
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
+
+    // *** CORRECTED: This function now properly unlocks both audio and speech synthesis ***
     const unlockAudio = () => {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Clear any previous utterances
-        }
+        // 1. Unlock the <audio> element for the bell sound
         alarmSound.play().catch(() => {});
         alarmSound.pause();
         alarmSound.currentTime = 0;
+
+        // 2. Prime the speech synthesis engine by playing a silent utterance
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance('');
+            utterance.volume = 0; // Make it inaudible
+            window.speechSynthesis.speak(utterance);
+            // It's good practice to cancel immediately to clear the queue
+            window.speechSynthesis.cancel(); 
+        }
     };
+    // This listener remains the same and is correct
     document.body.addEventListener('click', unlockAudio, { once: true });
+
     const saveBookmarks = () => localStorage.setItem('toolHubBookmarks', JSON.stringify(bookmarks));
     const saveRecentlyUsed = () => localStorage.setItem('toolHubRecent', JSON.stringify(recentlyUsed));
     const saveAlarms = () => localStorage.setItem('toolHubAlarms', JSON.stringify(activeAlarms));
@@ -312,18 +323,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mainNav.classList.contains('active')) mainNav.classList.remove('active');
     };
 
-    // NEW: Function for the 15-minute voice pre-alarm
     const triggerPreAlarm = (toolName) => {
         if (!('speechSynthesis' in window) || !userPreferences.notifications) {
-            return; // Exit if speech is not supported or notifications are off
+            return;
         }
         const userName = userProfile ? userProfile.given_name : 'there';
         const message = `Hi ${userName}, you have a reminder for ${toolName} in 15 minutes.`;
         
         const utterance = new SpeechSynthesisUtterance(message);
-        utterance.volume = 1; // Max volume
-        utterance.rate = 1;   // Normal speed
-        utterance.pitch = 1;  // Normal pitch
+        utterance.volume = 1;
+        utterance.rate = 1;
+        utterance.pitch = 1;
         
         window.speechSynthesis.speak(utterance);
     };
@@ -341,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentView === 'your-work') renderYourWorkView();
     };
 
-    // MODIFIED: Added pre-alarm scheduling
     const setAlarmWithDate = (toolId, toolName, scheduledDate, frequency) => {
         const scheduledTime = scheduledDate.getTime();
         if (isNaN(scheduledTime) || scheduledTime <= Date.now()) { alert("Invalid date. The date must be in the future."); return; }
@@ -349,10 +358,8 @@ document.addEventListener('DOMContentLoaded', () => {
         activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false };
         saveAlarms(); updateYourWorkBadge();
         
-        // Schedule main alarm
         setTimeout(() => triggerAlarm(alarmId), scheduledTime - Date.now());
 
-        // NEW: Schedule pre-alarm 15 minutes before
         const preAlarmTime = scheduledTime - (15 * 60 * 1000);
         if (preAlarmTime > Date.now()) {
             const preAlarmDelay = preAlarmTime - Date.now();
@@ -362,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentView === 'your-tools') renderYourToolsView(); if (currentView === 'your-work') { calendarDisplayDate = new Date(scheduledTime); renderYourWorkView(); }
     };
 
-    // MODIFIED: Added pre-alarm scheduling for loaded alarms
     const loadAndScheduleAlarms = () => {
         const storedAlarms = JSON.parse(localStorage.getItem('toolHubAlarms')) || {};
         const now = Date.now();
@@ -378,10 +384,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const remainingTime = alarm.nextOccurrence - now;
             if (remainingTime > 0 && !(alarm.triggered && alarm.frequency === 'one-time')) {
-                // Schedule main alarm
                 setTimeout(() => triggerAlarm(alarmId), remainingTime);
 
-                // NEW: Schedule pre-alarm for loaded alarms
                 const preAlarmTime = alarm.nextOccurrence - (15 * 60 * 1000);
                 if (preAlarmTime > now) {
                     const preAlarmDelay = preAlarmTime - now;
