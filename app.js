@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoriesView = document.getElementById('categories-view');
     const yourToolsView = document.getElementById('your-tools-view');
     const yourWorkView = document.getElementById('your-work-view');
-    const profileView = document.getElementById('profile-view'); // New
+    const profileView = document.getElementById('profile-view'); // NEW: Get profile view element
     const searchInput = document.getElementById('searchInput');
     const searchResultsView = document.getElementById('search-results-view');
     const searchResultsGrid = document.getElementById('search-results-grid');
@@ -39,14 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileSignInModal = document.getElementById('profileSignInModal');
     const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
     let userProfile = null;
-    let userPreferences = {}; // New
+    let userPreferences = {}; // NEW: To store user settings
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
     const unlockAudio = () => { alarmSound.play().catch(() => {}); alarmSound.pause(); alarmSound.currentTime = 0; };
     document.body.addEventListener('click', unlockAudio, { once: true });
     const saveBookmarks = () => localStorage.setItem('toolHubBookmarks', JSON.stringify(bookmarks));
     const saveRecentlyUsed = () => localStorage.setItem('toolHubRecent', JSON.stringify(recentlyUsed));
     const saveAlarms = () => localStorage.setItem('toolHubAlarms', JSON.stringify(activeAlarms));
-    const saveUserPreferences = () => localStorage.setItem('toolHubUserPreferences', JSON.stringify(userPreferences)); // New
+    const saveUserPreferences = () => localStorage.setItem('toolHubUserPreferences', JSON.stringify(userPreferences)); // NEW: Function to save preferences
 
     function decodeJwtResponse(token) {
         try {
@@ -66,14 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfile = decodeJwtResponse(response.credential);
         if (userProfile) {
             localStorage.setItem('toolHubUserProfile', JSON.stringify(userProfile));
-            loadUserPreferences(); // New
+            loadUserPreferences(); // NEW: Load preferences on login
             updateUIForLogin();
             profileSignInModal.classList.remove('show');
             alert(`Welcome, ${userProfile.given_name}!`);
+            switchView('home'); // Go to home after login
         }
     }
     
-    // New: Function to load user preferences from localStorage
+    // NEW: Function to load user preferences from localStorage
     function loadUserPreferences() {
         userPreferences = JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {
             notifications: true,
@@ -90,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateUIForLogout() {
         userProfile = null;
-        userPreferences = {}; // New
+        userPreferences = {}; // NEW: Clear preferences on logout
         localStorage.removeItem('toolHubUserProfile');
-        localStorage.removeItem('toolHubUserPreferences'); // New
+        localStorage.removeItem('toolHubUserPreferences'); // NEW: Remove from storage
         profileLink.innerHTML = `<i class="fas fa-user-circle"></i> Profile`;
         profileLink.title = '';
         profileLink.classList.remove('logged-in');
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             google.accounts.id.disableAutoSelect();
         }
         updateUIForLogout();
-        switchView('home'); // Redirect to home after signing out
+        switchView('home');
         alert("You have been signed out.");
     }
 
@@ -240,11 +241,11 @@ document.addEventListener('DOMContentLoaded', () => {
         yourWorkView.innerHTML = `<div class="container"><h2><i class="fas fa-briefcase" style="color:#7c3aed;"></i> My Work</h2><div class="your-work-controls"><button id="calendar-today-btn">Today</button><button id="calendar-prev-btn"><i class="fas fa-chevron-left"></i></button><button id="calendar-next-btn"><i class="fas fa-chevron-right"></i></button><span class="your-work-date-range">${formatRange(startOfView, endRangeDate)}</span></div><div class="calendar-container"><div class="calendar-grid">${calendarHtml}</div></div></div>`;
     };
 
-    // New: Function to render the profile page
+    // NEW: Function to render the profile page
     const renderProfileView = () => {
         if (!userProfile) {
             profileSignInModal.classList.add('show');
-            switchView('home');
+            switchView('home'); // Redirect to home if not logged in
             return;
         }
 
@@ -289,12 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (view === 'categories' && !categoriesView.innerHTML) renderCategoriesView();
         if (view === 'your-tools') renderYourToolsView();
         if (view === 'your-work') renderYourWorkView();
-        if (view === 'profile') renderProfileView(); // New
+        if (view === 'profile') renderProfileView(); // MODIFIED: Call render function
         if (mainNav.classList.contains('active')) mainNav.classList.remove('active');
     };
+
+    // MODIFIED: Alarm now respects user notification preferences
     const triggerAlarm = (alarmId) => {
         const alarmData = activeAlarms[alarmId]; if (!alarmData) return;
-        if (alarmSound) { alarmSound.play().catch(e => console.error("Error playing sound:", e)); }
+        if (alarmSound && userPreferences.notifications) { alarmSound.play().catch(e => console.error("Error playing sound:", e)); }
         if (Notification.permission === 'granted' && userPreferences.notifications) { new Notification('ToolHub Reminder', { body: `Your reminder for "${alarmData.toolName}" is now!`, icon: 'https://img.icons8.com/plasticine/100/000000/alarm-clock.png' }); }
         if (alarmData.frequency === 'one-time') { alarmData.triggered = true; } else {
             const nextDate = getNextOccurrence(new Date(alarmData.nextOccurrence), alarmData.frequency, alarmData.startTime);
@@ -304,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentView === 'your-tools') renderYourToolsView(); 
         if (currentView === 'your-work') renderYourWorkView();
     };
+
     const setAlarmWithDate = (toolId, toolName, scheduledDate, frequency) => {
         const scheduledTime = scheduledDate.getTime();
         if (isNaN(scheduledTime) || scheduledTime <= Date.now()) { alert("Invalid date. The date must be in the future."); return; }
@@ -392,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const handleDataViewClick = (e) => {
         const link = e.target.closest('a[data-view]');
+        // MODIFIED: This now handles all nav clicks except the special profile link
         if (link && link.id !== 'profile-link') {
             e.preventDefault();
             const view = link.dataset.view;
@@ -414,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Updated: Profile link now navigates to the profile view
+    // MODIFIED: Profile link click behavior is now corrected
     profileLink.addEventListener('click', (e) => {
         e.preventDefault();
         if (userProfile) {
@@ -432,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === profileSignInModal) profileSignInModal.classList.remove('show');
     });
     
+    // MODIFIED: Added 'profile' to the list of valid views
     const handleRouteChange = () => {
         const path = window.location.pathname;
         const toolMatch = path.match(/^\/tool\/([a-zA-Z0-9-]+)/);
@@ -446,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             hideTool(false);
-            const validViews = ['home', 'categories', 'popular', 'your-tools', 'your-work', 'profile']; // Updated
+            const validViews = ['home', 'categories', 'popular', 'your-tools', 'your-work', 'profile']; // MODIFIED
             let view = path.substring(1) || 'home';
             if (!validViews.includes(view)) {
                 view = 'home';
@@ -541,6 +547,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const { toolId, toolTitle } = button.dataset; const url = `${window.location.origin}/tool/${toolId}`; const shareData = { title: `Check out: ${toolTitle}`, text: `I found a great free tool on ToolHub: ${toolTitle}`, url };
         try { await navigator.share(shareData); } catch (err) { try { await navigator.clipboard.writeText(url); const originalIcon = button.innerHTML; button.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => { button.innerHTML = originalIcon; }, 2000); } catch (err) { alert('Could not copy URL. Please copy it manually: ' + url); } }
     };
+
+    // MODIFIED: Main click handler now includes profile page buttons
     document.body.addEventListener('click', (e) => {
         const openBtn = e.target.closest('.btn-open'); const bookmarkBtn = e.target.closest('.btn-bookmark'); const shareBtn = e.target.closest('.btn-share'); const backBtn = e.target.closest('#back-to-tools-btn'); const categoryCard = e.target.closest('.category-card'); const backToCategoriesBtn = e.target.closest('#back-to-categories-btn');
         if (openBtn) { 
@@ -556,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (categoryCard) showCategoryTools(categoryCard.dataset.categoryName); 
         if (backToCategoriesBtn) hideCategoryTools();
 
-        // New: Profile Page event handlers
+        // NEW: Profile Page event handlers
         if (e.target.id === 'profile-save-btn') {
             const birthdayInput = document.getElementById('profile-birthday');
             const notificationsInput = document.getElementById('notification-toggle');
@@ -566,7 +574,9 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Preferences saved!');
         }
         if (e.target.id === 'profile-sign-out-btn') {
-            signOut();
+            if (confirm('Are you sure you want to sign out?')) {
+                signOut();
+            }
         }
 
         if (currentView === 'your-work') {
@@ -594,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const storedProfile = localStorage.getItem('toolHubUserProfile');
         if (storedProfile) {
             userProfile = JSON.parse(storedProfile);
-            loadUserPreferences(); // New
+            loadUserPreferences(); // NEW: Load preferences for existing session
             updateUIForLogin();
         }
 
