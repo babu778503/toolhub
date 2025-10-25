@@ -278,7 +278,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
             calendarHtml += `<div class="calendar-day ${isTodayClass} ${isActiveDateClass} ${isEmptyClass}"><div class="mobile-event-sidebar"><span>My Work (task)</span></div><div class="mobile-event-main-content"><div class="calendar-day-full-date">${fullDateStr}</div><div class="calendar-day-header"><span class="day-name">${dayName}</span><span class="day-number">${dayDate}</span></div><div class="calendar-events-container">${eventsHtml}</div></div></div>`;
         }
-        yourWorkView.innerHTML = `<div class="container"><h2><i class="fas fa-briefcase" style="color:#7c3aed;"></i> My Work</h2><div class="your-work-controls"><button id="calendar-today-btn">Today</button><button id="calendar-prev-btn"><i class="fas fa-chevron-left"></i></button><button id="calendar-next-btn"><i class="fas fa-chevron-right"></i></button><span class="your-work-date-range">${formatRange(startOfView, endRangeDate)}</span>${alarmControlsHTML}</div><div class="calendar-container"><div class="calendar-grid">${calendarHtml}</div></div></div>`;
+        yourWorkView.innerHTML = `<div class="container">
+            <div class="your-work-header">
+                <h2><i class="fas fa-briefcase" style="color:#7c3aed;"></i> My Work</h2>
+                ${alarmControlsHTML}
+            </div>
+            <div class="your-work-controls">
+                <button id="calendar-today-btn">Today</button>
+                <button id="calendar-prev-btn"><i class="fas fa-chevron-left"></i></button>
+                <button id="calendar-next-btn"><i class="fas fa-chevron-right"></i></button>
+                <span class="your-work-date-range">${formatRange(startOfView, endRangeDate)}</span>
+            </div>
+            <div class="calendar-container">
+                <div class="calendar-grid">${calendarHtml}</div>
+            </div>
+        </div>`;
     };
 
     const renderProfileView = () => {
@@ -722,10 +736,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeApp(data) {
         toolsData = data;
         
+        loadUserPreferences(); 
+        
         const storedProfile = localStorage.getItem('toolHubUserProfile');
         if (storedProfile) {
             userProfile = JSON.parse(storedProfile);
-            loadUserPreferences();
             updateUIForLogin();
         }
 
