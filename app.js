@@ -85,10 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function loadUserPreferences() {
-        userPreferences = JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {
-            notifications: true,
-            birthday: ''
-        };
+        userPreferences = JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {};
+        if (userPreferences.notifications === undefined) userPreferences.notifications = true;
+        if (userPreferences.preAlarms === undefined) userPreferences.preAlarms = true;
+        if (userPreferences.birthday === undefined) userPreferences.birthday = '';
     }
     
     function updateUIForLogin() {
@@ -215,6 +215,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const endRangeDate = new Date(startOfView);
         endRangeDate.setDate(startOfView.getDate() + 2);
         const formatRange = (start, end) => { const options = { month: 'short', day: 'numeric' }; return `${start.toLocaleDateString(undefined, options)} - ${end.toLocaleDateString(undefined, {...options, year: 'numeric'})}`; }
+        
+        const alarmControlsHTML = `
+            <div class="alarm-controls-wrapper">
+                <div class="alarm-control">
+                    <i class="fas fa-bell"></i>
+                    <label class="on-off-switch">
+                        <input type="checkbox" id="main-alarm-toggle" ${userPreferences.notifications ? 'checked' : ''}>
+                        <span></span>
+                    </label>
+                </div>
+                <div class="alarm-control">
+                    <i class="fas fa-bullhorn"></i>
+                    <label class="on-off-switch">
+                        <input type="checkbox" id="pre-alarm-toggle" ${userPreferences.preAlarms ? 'checked' : ''}>
+                        <span></span>
+                    </label>
+                </div>
+            </div>`;
+
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
             if (alarm.triggered && alarm.frequency === 'one-time') return;
@@ -259,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
             calendarHtml += `<div class="calendar-day ${isTodayClass} ${isActiveDateClass} ${isEmptyClass}"><div class="mobile-event-sidebar"><span>My Work (task)</span></div><div class="mobile-event-main-content"><div class="calendar-day-full-date">${fullDateStr}</div><div class="calendar-day-header"><span class="day-name">${dayName}</span><span class="day-number">${dayDate}</span></div><div class="calendar-events-container">${eventsHtml}</div></div></div>`;
         }
-        yourWorkView.innerHTML = `<div class="container"><h2><i class="fas fa-briefcase" style="color:#7c3aed;"></i> My Work</h2><div class="your-work-controls"><button id="calendar-today-btn">Today</button><button id="calendar-prev-btn"><i class="fas fa-chevron-left"></i></button><button id="calendar-next-btn"><i class="fas fa-chevron-right"></i></button><span class="your-work-date-range">${formatRange(startOfView, endRangeDate)}</span></div><div class="calendar-container"><div class="calendar-grid">${calendarHtml}</div></div></div>`;
+        yourWorkView.innerHTML = `<div class="container"><h2><i class="fas fa-briefcase" style="color:#7c3aed;"></i> My Work</h2><div class="your-work-controls"><button id="calendar-today-btn">Today</button><button id="calendar-prev-btn"><i class="fas fa-chevron-left"></i></button><button id="calendar-next-btn"><i class="fas fa-chevron-right"></i></button><span class="your-work-date-range">${formatRange(startOfView, endRangeDate)}</span>${alarmControlsHTML}</div><div class="calendar-container"><div class="calendar-grid">${calendarHtml}</div></div></div>`;
     };
 
     const renderProfileView = () => {
@@ -328,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const triggerPreAlarm = (toolName) => {
-        if (!('speechSynthesis' in window) || !userPreferences.notifications) {
+        if (!('speechSynthesis' in window) || !userPreferences.preAlarms) {
             return;
         }
         const userName = userProfile ? userProfile.given_name : 'there';
@@ -346,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const alarmData = activeAlarms[alarmId]; if (!alarmData) return;
 
         if (alarmSound && userPreferences.notifications) { 
-            alarmSound.play().catch(e => console.error("Error playing sound. The browser may require user interaction.", e)); 
+            alarmSound.play().catch(e => console.error("Error playing sound.", e)); 
         }
 
         if (Notification.permission === 'granted' && userPreferences.notifications) { 
@@ -378,12 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
         if ('Notification' in window && Notification.permission === 'default') {
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-                alert('Notifications are disabled. Alarms may not be reliable when the app is in the background or the screen is off.');
-            }
-        } else if ('Notification' in window && Notification.permission === 'denied') {
-            alert('Notifications are blocked in your browser settings. Alarms may not be reliable when the app is in the background or the screen is off.');
+            await Notification.requestPermission();
         }
     
         const scheduledTime = scheduledDate.getTime();
@@ -395,8 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
         activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false };
         saveAlarms();
         updateYourWorkBadge();
-        
-        console.log(`Alarm scheduled for ${toolName} at ${scheduledDate}. Note: Timers may be delayed by the browser if the page is in the background or the device is asleep.`);
     
         setTimeout(() => triggerAlarm(alarmId), scheduledTime - Date.now());
     
@@ -680,6 +692,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentView === 'your-work') {
+            if (e.target.id === 'main-alarm-toggle') {
+                userPreferences.notifications = e.target.checked;
+                saveUserPreferences();
+            }
+            if (e.target.id === 'pre-alarm-toggle') {
+                userPreferences.preAlarms = e.target.checked;
+                saveUserPreferences();
+            }
+
             const deleteEventBtn = e.target.closest('.delete-event-btn'); 
             const calendarEvent = e.target.closest('.calendar-event');
             if (e.target.closest('#calendar-today-btn')) { calendarDisplayDate = new Date(); renderYourWorkView(); }
