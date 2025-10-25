@@ -209,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderCategoriesView = () => { const categories = [...new Set(toolsData.map(tool => tool.Category))].sort(); categoriesView.innerHTML = `<div class="container"><h2><i class="fas fa-list" style="color:#6366f1;"></i> All Categories</h2><div class="category-grid">${categories.map(cat => `<div class="category-card" data-category-name="${sanitizeHTML(cat)}">${sanitizeHTML(cat)}</div>`).join('')}</div></div>`; };
     const renderYourToolsView = () => { const bookmarkedTools = toolsData.filter(tool => bookmarks.includes(tool.id)); const gridId = 'your-tools-grid'; yourToolsView.innerHTML = `<div class="container"><h2><i class="fas fa-bookmark" style="color:#ef4444;"></i> My Tools</h2><div class="tool-grid" id="${gridId}"></div></div>`; renderTools(document.getElementById(gridId), bookmarkedTools, false, 'You have no bookmarked tools yet.', true); };
     const renderCategoryToolsView = (categoryName) => { const filteredTools = toolsData.filter(tool => tool.Category === categoryName); const gridId = 'category-tools-grid'; categoryToolsView.innerHTML = `<div class="container"><div class="sub-view-header"><button id="back-to-categories-btn" class="btn-back"><i class="fas fa-arrow-left"></i></button><h2>${sanitizeHTML(categoryName)} Tools</h2></div><div class="tool-grid" id="${gridId}"></div></div>`; renderTools(document.getElementById(gridId), filteredTools, false); };
+    
     const renderYourWorkView = () => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -254,13 +255,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const eventsForDay = allEvents.filter(event => event.date.getFullYear() === day.getFullYear() && event.date.getMonth() === day.getMonth() && event.date.getDate() === day.getDate()).sort((a,b) => a.date - b.date);
             const isEmptyClass = eventsForDay.length === 0 ? 'is-empty' : '';
             let eventsHtml = eventsForDay.map(event => {
-                const timeString = event.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-                return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${event.name}">
-                    <span class="event-text-wrapper" title="${sanitizeHTML(event.name)}">${sanitizeHTML(event.name)}</span>
-                    <div class="event-actions">
-                        <span class="event-time">${timeString}</span>
-                        <button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button>
+                const timeString = event.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                const words = event.name.split(' ');
+                const truncatedName = words.slice(0, 3).join(' ') + (words.length > 3 ? '...' : '');
+
+                return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${event.name}" title="${sanitizeHTML(event.name)} at ${timeString}">
+                    <div class="event-text-wrapper">
+                         <span class="event-time">${timeString}</span>
+                         <span class="event-name">${sanitizeHTML(truncatedName)}</span>
                     </div>
+                    <button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button>
                 </div>`;
             }).join('');
             calendarHtml += `<div class="calendar-day ${isTodayClass} ${isActiveDateClass} ${isEmptyClass}"><div class="mobile-event-sidebar"><span>My Work (task)</span></div><div class="mobile-event-main-content"><div class="calendar-day-full-date">${fullDateStr}</div><div class="calendar-day-header"><span class="day-name">${dayName}</span><span class="day-number">${dayDate}</span></div><div class="calendar-events-container">${eventsHtml}</div></div></div>`;
