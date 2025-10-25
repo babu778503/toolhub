@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const GOOGLE_CLIENT_ID = '16129359964-5l1olas9egpamj181gnr6goll0vudctc.apps.googleusercontent.com';
     let toolsData = [];
@@ -214,13 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const startOfView = new Date(calendarDisplayDate);
-        startOfView.setDate(calendarDisplayDate.getDate() - 2); 
+        startOfView.setDate(calendarDisplayDate.getDate() - 1); // Start 1 day before the selected date
         startOfView.setHours(0, 0, 0, 0);
         const endOfView = new Date(startOfView);
-        endOfView.setDate(startOfView.getDate() + 5);
+        endOfView.setDate(startOfView.getDate() + 3); // Show 3 days in total
         endOfView.setSeconds(endOfView.getSeconds() - 1);
         const endRangeDate = new Date(startOfView);
-        endRangeDate.setDate(startOfView.getDate() + 4);
+        endRangeDate.setDate(startOfView.getDate() + 2); // Adjust range display for 3 days
         const formatRange = (start, end) => { const options = { month: 'short', day: 'numeric' }; return `${start.toLocaleDateString(undefined, options)} - ${end.toLocaleDateString(undefined, {...options, year: 'numeric'})}`; }
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
@@ -244,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         let calendarHtml = '';
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) { // Loop for 3 days
             const day = new Date(startOfView);
             day.setDate(startOfView.getDate() + i);
             const dayDate = day.getDate();
