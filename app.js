@@ -345,38 +345,82 @@ document.addEventListener('DOMContentLoaded', () => {
         utterance.rate = 1;
         utterance.pitch = 1;
         
+        // This may still be silenced by the browser if the tab is not active.
         window.speechSynthesis.speak(utterance);
     };
 
     const triggerAlarm = (alarmId) => {
         const alarmData = activeAlarms[alarmId]; if (!alarmData) return;
-        if (alarmSound && userPreferences.notifications) { alarmSound.play().catch(e => console.error("Error playing sound:", e)); }
-        if (Notification.permission === 'granted' && userPreferences.notifications) { new Notification('ToolHub Reminder', { body: `Your reminder for "${alarmData.toolName}" is now!`, icon: 'https://img.icons8.com/plasticine/100/000000/alarm-clock.png' }); }
-        if (alarmData.frequency === 'one-time') { alarmData.triggered = true; } else {
-            const nextDate = getNextOccurrence(new Date(alarmData.nextOccurrence), alarmData.frequency, alarmData.startTime);
-            if (nextDate) { alarmData.nextOccurrence = nextDate.getTime(); const delay = alarmData.nextOccurrence - Date.now(); if (delay > 0) { setTimeout(() => triggerAlarm(alarmId), delay); } } else { alarmData.triggered = true; }
+
+        // Play sound if notifications are on and the page is active
+        if (alarmSound && userPreferences.notifications) { 
+            alarmSound.play().catch(e => console.error("Error playing sound. The browser may require user interaction.", e)); 
         }
-        saveAlarms(); updateYourWorkBadge();
+
+        // Show a system notification. This is the most reliable part.
+        if (Notification.permission === 'granted' && userPreferences.notifications) { 
+            new Notification('Toolshub 365 Reminder', { 
+                body: `Your reminder for "${alarmData.toolName}" is now!`, 
+                icon: '/logo.png' 
+            }); 
+        }
+
+        if (alarmData.frequency === 'one-time') { 
+            alarmData.triggered = true; 
+        } else {
+            const nextDate = getNextOccurrence(new Date(alarmData.nextOccurrence), alarmData.frequency, alarmData.startTime);
+            if (nextDate) { 
+                alarmData.nextOccurrence = nextDate.getTime(); 
+                const delay = alarmData.nextOccurrence - Date.now(); 
+                if (delay > 0) { 
+                    setTimeout(() => triggerAlarm(alarmId), delay); 
+                } 
+            } else { 
+                alarmData.triggered = true; 
+            }
+        }
+        saveAlarms(); 
+        updateYourWorkBadge();
         if (currentView === 'your-tools') renderYourToolsView(); 
         if (currentView === 'your-work') renderYourWorkView();
     };
 
-    const setAlarmWithDate = (toolId, toolName, scheduledDate, frequency) => {
+    const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
+        // First, ensure we have permission for notifications for reliability.
+        if ('Notification' in window && Notification.permission === 'default') {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                alert('Notifications are disabled. Alarms may not be reliable when the app is in the background or the screen is off.');
+            }
+        } else if ('Notification' in window && Notification.permission === 'denied') {
+            alert('Notifications are blocked in your browser settings. Alarms may not be reliable when the app is in the background or the screen is off.');
+        }
+    
         const scheduledTime = scheduledDate.getTime();
-        if (isNaN(scheduledTime) || scheduledTime <= Date.now()) { alert("Invalid date. The date must be in the future."); return; }
+        if (isNaN(scheduledTime) || scheduledTime <= Date.now()) {
+            alert("Invalid date. The date must be in the future.");
+            return;
+        }
         const alarmId = `${toolId}-${scheduledTime}-${Math.random().toString(36).substr(2, 5)}`;
         activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false };
-        saveAlarms(); updateYourWorkBadge();
+        saveAlarms();
+        updateYourWorkBadge();
         
+        console.log(`Alarm scheduled for ${toolName} at ${scheduledDate}. Note: Timers may be delayed by the browser if the page is in the background or the device is asleep.`);
+    
         setTimeout(() => triggerAlarm(alarmId), scheduledTime - Date.now());
-
+    
         const preAlarmTime = scheduledTime - (15 * 60 * 1000);
         if (preAlarmTime > Date.now()) {
             const preAlarmDelay = preAlarmTime - Date.now();
             setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay);
         }
-
-        if (currentView === 'your-tools') renderYourToolsView(); if (currentView === 'your-work') { calendarDisplayDate = new Date(scheduledTime); renderYourWorkView(); }
+    
+        if (currentView === 'your-tools') renderYourToolsView();
+        if (currentView === 'your-work') {
+            calendarDisplayDate = new Date(scheduledTime);
+            renderYourWorkView();
+        }
     };
 
     const loadAndScheduleAlarms = () => {
