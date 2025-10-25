@@ -1,4 +1,3 @@
---- START OF FILE app.js ---
 
 document.addEventListener('DOMContentLoaded', () => {
     const GOOGLE_CLIENT_ID = '16129359964-5l1olas9egpamj181gnr6goll0vudctc.apps.googleusercontent.com';
@@ -256,12 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const isEmptyClass = eventsForDay.length === 0 ? 'is-empty' : '';
             let eventsHtml = eventsForDay.map(event => {
                 const timeString = event.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-                return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${event.name}" title="${sanitizeHTML(event.name)} at ${timeString}">
-                    <span class="event-text-wrapper">
+                return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${event.name}">
+                    <span class="event-text-wrapper" title="${sanitizeHTML(event.name)}">${sanitizeHTML(event.name)}</span>
+                    <div class="event-actions">
                         <span class="event-time">${timeString}</span>
-                        ${sanitizeHTML(event.name)}
-                    </span>
-                    <button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button>
+                        <button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button>
+                    </div>
                 </div>`;
             }).join('');
             calendarHtml += `<div class="calendar-day ${isTodayClass} ${isActiveDateClass} ${isEmptyClass}"><div class="mobile-event-sidebar"><span>My Work (task)</span></div><div class="mobile-event-main-content"><div class="calendar-day-full-date">${fullDateStr}</div><div class="calendar-day-header"><span class="day-name">${dayName}</span><span class="day-number">${dayDate}</span></div><div class="calendar-events-container">${eventsHtml}</div></div></div>`;
