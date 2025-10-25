@@ -40,23 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let userPreferences = {};
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
 
-    // *** CORRECTED: This function now properly unlocks both audio and speech synthesis ***
     const unlockAudio = () => {
-        // 1. Unlock the <audio> element for the bell sound
         alarmSound.play().catch(() => {});
         alarmSound.pause();
         alarmSound.currentTime = 0;
-
-        // 2. Prime the speech synthesis engine by playing a silent utterance
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance('');
-            utterance.volume = 0; // Make it inaudible
+            utterance.volume = 0;
             window.speechSynthesis.speak(utterance);
-            // It's good practice to cancel immediately to clear the queue
             window.speechSynthesis.cancel(); 
         }
     };
-    // This listener remains the same and is correct
     document.body.addEventListener('click', unlockAudio, { once: true });
 
     const saveBookmarks = () => localStorage.setItem('toolHubBookmarks', JSON.stringify(bookmarks));
@@ -345,19 +339,16 @@ document.addEventListener('DOMContentLoaded', () => {
         utterance.rate = 1;
         utterance.pitch = 1;
         
-        // This may still be silenced by the browser if the tab is not active.
         window.speechSynthesis.speak(utterance);
     };
 
     const triggerAlarm = (alarmId) => {
         const alarmData = activeAlarms[alarmId]; if (!alarmData) return;
 
-        // Play sound if notifications are on and the page is active
         if (alarmSound && userPreferences.notifications) { 
             alarmSound.play().catch(e => console.error("Error playing sound. The browser may require user interaction.", e)); 
         }
 
-        // Show a system notification. This is the most reliable part.
         if (Notification.permission === 'granted' && userPreferences.notifications) { 
             new Notification('Toolshub 365 Reminder', { 
                 body: `Your reminder for "${alarmData.toolName}" is now!`, 
@@ -386,7 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
-        // First, ensure we have permission for notifications for reliability.
         if ('Notification' in window && Notification.permission === 'default') {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
