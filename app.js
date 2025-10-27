@@ -382,7 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alarmSound.play().catch(e => console.error("Error playing sound.", e));
         }
 
-        // This function will show a notification for ANY user who has granted permission.
         if (Notification.permission === 'granted' && userPreferences.notifications) {
             new Notification('Toolshub 365 Reminder', {
                 body: `Your reminder for "${alarmData.toolName}" is now!`,
@@ -411,7 +410,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
-        // This is the universal prompt. It asks ANY user for permission the first time they set a reminder.
         if ('Notification' in window && Notification.permission === 'default') {
             await Notification.requestPermission();
         }
@@ -430,7 +428,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const preAlarmTime = scheduledTime - (15 * 60 * 1000);
         if (preAlarmTime > Date.now()) {
-            const preAlarmDelay = preAlarmTime - now();
+            // *** FIX APPLIED HERE ***
+            // Changed `now()` to the correct `Date.now()` to properly schedule the pre-alarm.
+            const preAlarmDelay = preAlarmTime - Date.now();
             setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay);
         }
 
