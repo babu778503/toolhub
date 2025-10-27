@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             while (occurrence <= endOfView) {
-                if (occurrence >= startOfView) { allEvents.push({ alarmId, date: new Date(occurrence), name: alarm.toolName, toolId: alarm.toolId, isCompleted: occurrence.getTime() < now.getTime(), frequency: alarm.frequency }); }
+                if (occurrence >= startOfView) { allEvents.push({ alarmId, date: new Date(occurrence), name: alarm.toolName, toolId: alarm.toolId, isCompleted: occurrence.getTime() < now.getTime() }); }
                 if (alarm.frequency === 'one-time') break;
                 const nextOccurrence = getNextOccurrence(occurrence, alarm.frequency, alarm.startTime);
                 if (!nextOccurrence || nextOccurrence <= occurrence) break; 
@@ -256,17 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         let calendarHtml = '';
-        const getFrequencyIconHTML = (frequency) => {
-            let iconClass = 'fas fa-clock';
-            let title = 'One-time';
-            switch (frequency) {
-                case 'daily': iconClass = 'fas fa-history'; title = 'Daily'; break;
-                case 'weekly': iconClass = 'fas fa-calendar-week'; title = 'Weekly'; break;
-                case 'monthly': iconClass = 'fas fa-calendar-alt'; title = 'Monthly'; break;
-                case 'yearly': iconClass = 'fas fa-calendar-check'; title = 'Yearly'; break;
-            }
-            return `<i class="${iconClass}" title="${title}" style="margin-right: 6px; font-size: 0.9em; opacity: 0.9; vertical-align: middle;"></i>`;
-        };
         for (let i = 0; i < 3; i++) {
             const day = new Date(startOfView);
             day.setDate(startOfView.getDate() + i);
@@ -279,11 +268,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const isEmptyClass = eventsForDay.length === 0 ? 'is-empty' : '';
             let eventsHtml = eventsForDay.map(event => {
                 const timeString = event.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
-                const frequencyIcon = getFrequencyIconHTML(event.frequency);
                 return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${sanitizeHTML(event.name)}" title="${sanitizeHTML(event.name)} at ${timeString}">
                     <span class="event-name">${sanitizeHTML(event.name)}</span>
                     <div class="event-actions">
-                        ${frequencyIcon}
                         <span class="event-time">${timeString}</span>
                         <button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button>
                     </div>
