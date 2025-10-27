@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainNav = document.getElementById('main-nav');
     const logoLink = document.querySelector('.logo');
     const signInModal = document.getElementById('signInModal');
+    const profileSignInModal = document.getElementById('profileSignInModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
     const popularGrid = document.getElementById('popular-tools-grid');
     const newGrid = document.getElementById('new-tools-grid');
     const toolViewerContainer = document.getElementById('tool-viewer-container');
@@ -100,14 +102,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // *** FIX: New centralized UI update function ***
+    const refreshUI = () => {
+        loadAndScheduleAlarms();
+        updateYourWorkBadge();
+        
+        // Re-render the current view if it's data-dependent
+        switch(currentView) {
+            case 'your-tools':
+                renderYourToolsView();
+                break;
+            case 'your-work':
+                renderYourWorkView();
+                break;
+            case 'profile':
+                renderProfileView();
+                break;
+        }
+    };
+
+    // *** FIX: Rewritten auth handler for clean data separation ***
     auth.onAuthStateChanged(async (user) => {
+        // ALWAYS start by cleaning up the state of the previous session.
+        clearAllAlarms();
+        if (firestoreListener) firestoreListener();
+        
+        // Reset all in-memory data to a pristine state.
+        bookmarks = [];
+        recentlyUsed = [];
+        activeAlarms = {};
+        userPreferences = {};
+
         if (user) {
-            // User is signed in.
+            // --- USER IS LOGGING IN ---
             userProfile = user;
             updateUIForLogin();
             
-            if (firestoreListener) firestoreListener();
-
+            // Show a loading state or clear the view immediately
+            if (['your-tools', 'your-work', 'profile'].includes(currentView)) {
+                 renderYourWorkView(); // Render an empty view
+            }
+            
             firestoreListener = db.collection('users').doc(user.uid).onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -116,43 +151,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeAlarms = data.activeAlarms || {};
                     userPreferences = data.userPreferences || {};
                 } else {
-                    console.log("New user, merging guest data.");
-                    bookmarks = [...new Set([...bookmarks, ...(JSON.parse(localStorage.getItem('toolHubGuestBookmarks')) || [])])];
-                    saveDataToFirestore();
+                    // This is a brand new user. They start with a clean slate.
+                    console.log("New user, creating fresh profile.");
+                    saveDataToFirestore(); 
                 }
                 
-                loadAndScheduleAlarms();
-                updateYourWorkBadge();
-                if(currentView === 'your-tools') renderYourToolsView();
-                if(currentView === 'your-work') renderYourWorkView();
-                if(currentView === 'profile') renderProfileView();
+                // Now that data is loaded, update the entire UI.
+                refreshUI();
 
             }, (error) => {
                 console.error("Error with Firestore listener:", error);
             });
 
         } else {
-            // User is signed out.
+            // --- USER IS LOGGING OUT ---
             userProfile = null;
             updateUIForLogout();
             
-            if (firestoreListener) firestoreListener();
-            
-            // *** FIX: Clear all timers and in-memory data on logout ***
-            clearAllAlarms();
-            bookmarks = [];
-            recentlyUsed = [];
-            activeAlarms = {};
-            userPreferences = {};
-            
             loadGuestData();
-            loadAndScheduleAlarms();
-            updateYourWorkBadge();
-            if(currentView === 'your-tools' || currentView === 'your-work' || currentView === 'profile') {
+            refreshUI();
+
+            if (['your-tools', 'your-work', 'profile'].includes(currentView)) {
                 switchView('home');
-            } else {
-                 if(currentView === 'your-tools') renderYourToolsView();
-                 if(currentView === 'your-work') renderYourWorkView();
             }
         }
     });
@@ -167,7 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUIForLogin() {
         if (!userProfile) return;
         const profileLink = document.getElementById('profile-link');
-        profileLink.innerHTML = `<img src="${userProfile.photoURL}" alt="User profile picture"> ${sanitizeHTML(userProfile.displayName.split(' ')[0])}`;
+        const userName = userProfile.displayName ? userProfile.displayName.split(' ')[0] : 'User';
+        profileLink.innerHTML = `<img src="${userProfile.photoURL}" alt="User profile picture"> ${sanitizeHTML(userName)}`;
         profileLink.title = `Signed in as ${userProfile.displayName}. Click to view profile.`;
         profileLink.classList.add('logged-in');
         profileSignInModal.classList.remove('show');
@@ -216,15 +237,18 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('bookmarked');
         }
 
-        userProfile ? saveDataToFirestore() : saveGuestData();
-        if (currentView === 'your-tools') renderYourToolsView();
+        if (userProfile) {
+            saveDataToFirestore();
+        } else {
+            saveGuestData();
+            refreshUI(); // Manually refresh for guest
+        }
     };
     
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
         if ('Notification' in window && Notification.permission === 'default') {
             await Notification.requestPermission();
         }
-
         const scheduledTime = scheduledDate.getTime();
         if (isNaN(scheduledTime) || scheduledTime <= Date.now()) {
             alert("Invalid date. The date must be in the future.");
@@ -233,18 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const alarmId = `${toolId}-${scheduledTime}-${Math.random().toString(36).substr(2, 5)}`;
         activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false };
         
-        userProfile ? saveDataToFirestore() : saveGuestData();
-        
-        // Reschedule all alarms to include the new one
-        loadAndScheduleAlarms();
-        updateYourWorkBadge();
-    
-        if (currentView === 'your-tools') renderYourToolsView();
-        if (currentView === 'your-work') {
-            calendarDisplayDate = new Date(scheduledTime);
-            renderYourWorkView();
+        if (userProfile) {
+            saveDataToFirestore();
+        } else {
+            saveGuestData();
+            refreshUI(); // Manually refresh for guest
         }
     };
+    
+    // The rest of the functions remain largely the same...
 
     const unlockAudio = () => {
         alarmSound.play().catch(() => {});
@@ -281,14 +302,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.values(activeAlarms).forEach(alarm => {
             if (alarm.triggered && alarm.frequency === 'one-time') return;
-            
             const nextOccurrenceTime = alarm.nextOccurrence;
-            
             if (nextOccurrenceTime > now.getTime() && nextOccurrenceTime < todayEnd.getTime()) {
                 remainingTasksCount++;
             }
         });
-
         badge.textContent = remainingTasksCount > 0 ? remainingTasksCount : '';
     };
 
@@ -477,17 +495,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const triggerPreAlarm = (toolName) => {
-        if (!('speechSynthesis' in window) || !userPreferences.preAlarms) {
-            return;
-        }
+        if (!('speechSynthesis' in window) || !userPreferences.preAlarms) return;
         const userName = userProfile ? userProfile.displayName.split(' ')[0] : 'there';
         const message = `Hi ${userName}, you have a reminder for ${toolName} in 15 minutes.`;
-        
         const utterance = new SpeechSynthesisUtterance(message);
-        utterance.volume = 1;
-        utterance.rate = 1;
-        utterance.pitch = 1;
-        
+        utterance.volume = 1; utterance.rate = 1; utterance.pitch = 1;
         window.speechSynthesis.speak(utterance);
     };
 
@@ -515,15 +527,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.triggered = true; 
             }
         }
-        userProfile ? saveDataToFirestore() : saveGuestData();
-        loadAndScheduleAlarms();
-        updateYourWorkBadge();
-        if (currentView === 'your-tools') renderYourToolsView(); 
-        if (currentView === 'your-work') renderYourWorkView();
+        
+        if (userProfile) {
+            saveDataToFirestore(); // This will trigger the listener, which calls refreshUI()
+        } else {
+            saveGuestData();
+            refreshUI(); // Manually refresh for guest
+        }
     };
 
     const loadAndScheduleAlarms = () => {
-        // *** FIX: Clear all previous timers before setting new ones ***
         clearAllAlarms();
         const now = Date.now();
         let alarmsChanged = false;
@@ -539,16 +552,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const remainingTime = alarm.nextOccurrence - now;
             if (remainingTime > 0 && !(alarm.triggered && alarm.frequency === 'one-time')) {
-                // *** FIX: Track the new timer ID ***
-                const mainTimerId = setTimeout(() => triggerAlarm(alarmId), remainingTime);
-                activeTimers.push(mainTimerId);
+                activeTimers.push(setTimeout(() => triggerAlarm(alarmId), remainingTime));
 
                 const preAlarmTime = alarm.nextOccurrence - (15 * 60 * 1000);
                 if (preAlarmTime > now) {
                     const preAlarmDelay = preAlarmTime - now;
-                    // *** FIX: Track the new pre-alarm timer ID ***
-                    const preAlarmTimerId = setTimeout(() => triggerPreAlarm(alarm.toolName), preAlarmDelay);
-                    activeTimers.push(preAlarmTimerId);
+                    activeTimers.push(setTimeout(() => triggerPreAlarm(alarm.toolName), preAlarmDelay));
                 }
             }
         });
@@ -616,26 +625,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleDataViewClick = (e) => {
         const link = e.target.closest('a[data-view]');
         if (!link) return;
-
         e.preventDefault();
         const view = link.dataset.view;
-
-        if (view === 'profile') {
-            if (userProfile) {
-                history.pushState({ view: 'profile' }, '', '/profile');
-                switchView('profile');
-            } else {
-                profileSignInModal.classList.add('show');
-            }
+        if (view === 'profile' && !userProfile) {
+            profileSignInModal.classList.add('show');
             return;
         }
-
         const newPath = view === 'home' ? '/' : `/${view}`;
         history.pushState({ view: view }, '', newPath);
         switchView(view);
     };
 
     mainNav.addEventListener('click', handleDataViewClick);
+    const footerLinks = document.querySelectorAll('.footer-links-bottom a[data-view]');
+    footerLinks.forEach(link => link.addEventListener('click', handleDataViewClick));
+
 
     const showModal = () => signInModal.classList.add('show'); const hideModal = () => signInModal.classList.remove('show');
     modalCloseBtn.addEventListener('click', hideModal); signInModal.addEventListener('click', (e) => { if (e.target === signInModal) hideModal(); });
@@ -807,7 +811,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const alarmId = deleteEventBtn.dataset.alarmId; 
                 const alarm = activeAlarms[alarmId]; 
                 const message = (alarm && alarm.frequency !== 'one-time') ? 'Are you sure you want to delete this recurring reminder and all its future occurrences?' : 'Are you sure you want to delete this reminder?';
-                if (alarmId && confirm(message)) { delete activeAlarms[alarmId]; userProfile ? saveDataToFirestore() : saveGuestData(); updateYourWorkBadge(); renderYourWorkView(); }
+                if (alarmId && confirm(message)) { 
+                    delete activeAlarms[alarmId];
+                    if(userProfile) {
+                        saveDataToFirestore();
+                    } else {
+                        saveGuestData();
+                        refreshUI();
+                    }
+                }
             } else if (calendarEvent && !calendarEvent.classList.contains('is-completed')) { 
                 const { toolId, toolName } = calendarEvent.dataset; 
                 if (toolId && toolName) showTool(toolId, toolName, true); 
@@ -818,6 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initializeApp(data) {
         toolsData = data;
         loadGuestData(); // Load guest data by default
+        refreshUI();
         
         const shuffledTools = [...data].sort(() => 0.5 - Math.random());
         const numPopular = 18;
