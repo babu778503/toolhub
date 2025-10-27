@@ -236,10 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
-            // *** KEY LOGIC HERE ***
-            // This line checks if an alarm is a one-time alarm AND if it has already been triggered.
-            // If both are true, the `return` statement skips this alarm, effectively hiding it from the "My Work" view.
-            if (alarm.triggered && alarm.frequency === 'one-time') return;
+            // *** CHANGE MADE HERE ***
+            // The line that was hiding triggered one-time reminders has been removed.
+            // Now, they will be processed and displayed just like any other event.
+            // The `isCompleted` flag below will handle the visual styling.
 
             let occurrence = new Date(alarm.startTime);
             const searchStart = new Date(startOfView.getTime() - 31 * 24*60*60*1000);
@@ -393,9 +393,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // *** KEY LOGIC HERE ***
-        // If the alarm is a "one-time" event, we mark it as triggered.
-        // This flag is then used by `renderYourWorkView` to hide it.
         if (alarmData.frequency === 'one-time') {
             alarmData.triggered = true;
         } else {
@@ -435,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const preAlarmTime = scheduledTime - (15 * 60 * 1000);
         if (preAlarmTime > Date.now()) {
-            const preAlarmDelay = preAlarmTime - Date.now();
+            const preAlarmDelay = preAlarmTime - now();
             setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay);
         }
 
