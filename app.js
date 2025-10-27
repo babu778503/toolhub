@@ -248,13 +248,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             while (occurrence <= endOfView) {
-                if (occurrence >= startOfView) { allEvents.push({ alarmId, date: new Date(occurrence), name: alarm.toolName, toolId: alarm.toolId, isCompleted: occurrence.getTime() < now.getTime() }); }
+                if (occurrence >= startOfView) { allEvents.push({ alarmId, date: new Date(occurrence), name: alarm.toolName, toolId: alarm.toolId, isCompleted: occurrence.getTime() < now.getTime(), frequency: alarm.frequency }); }
                 if (alarm.frequency === 'one-time') break;
                 const nextOccurrence = getNextOccurrence(occurrence, alarm.frequency, alarm.startTime);
                 if (!nextOccurrence || nextOccurrence <= occurrence) break; 
                 occurrence = nextOccurrence;
             }
         });
+        
+        const getFrequencyIconHTML = (frequency) => {
+            const iconContainerStyle = 'style="display: inline-block; width: 28px; text-align: center; vertical-align: middle; margin-right: 4px;"';
+            switch (frequency) {
+                case 'daily':
+                    return `<span ${iconContainerStyle} title="Daily">
+                                <span class="fa-stack fa-sm">
+                                    <i class="fas fa-sync-alt fa-stack-1x"></i>
+                                    <strong class="fa-stack-1x" style="font-size:0.6em; line-height:1; margin-top:-1px;">24</strong>
+                                </span>
+                            </span>`;
+                case 'weekly':
+                    return `<span ${iconContainerStyle} title="Weekly"><i class="fas fa-calendar-week"></i></span>`;
+                case 'monthly':
+                    return `<span ${iconContainerStyle} title="Monthly"><i class="fas fa-calendar-alt"></i></span>`;
+                case 'yearly':
+                     return `<span ${iconContainerStyle} title="Yearly">
+                                <span class="fa-stack fa-sm">
+                                    <i class="far fa-calendar-alt fa-stack-1x"></i>
+                                    <strong class="fa-stack-1x" style="font-size:0.5em; line-height:1; margin-top:2px;">365</strong>
+                                </span>
+                            </span>`;
+                case 'one-time':
+                default:
+                    return `<span ${iconContainerStyle} title="One-time">
+                                <span class="fa-stack fa-sm">
+                                    <i class="far fa-clock fa-stack-1x"></i>
+                                    <strong class="fa-stack-1x" style="font-size:0.7em; line-height:1; margin-top:1px;">1</strong>
+                                </span>
+                            </span>`;
+            }
+        };
+
         let calendarHtml = '';
         for (let i = 0; i < 3; i++) {
             const day = new Date(startOfView);
@@ -268,9 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const isEmptyClass = eventsForDay.length === 0 ? 'is-empty' : '';
             let eventsHtml = eventsForDay.map(event => {
                 const timeString = event.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                const frequencyIcon = getFrequencyIconHTML(event.frequency);
                 return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${sanitizeHTML(event.name)}" title="${sanitizeHTML(event.name)} at ${timeString}">
                     <span class="event-name">${sanitizeHTML(event.name)}</span>
                     <div class="event-actions">
+                        ${frequencyIcon}
                         <span class="event-time">${timeString}</span>
                         <button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button>
                     </div>
