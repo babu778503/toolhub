@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainHeader = document.querySelector('.main-header');
     const hamburgerMenu = document.getElementById('hamburger-menu');
     const mainNav = document.getElementById('main-nav');
+    
+    // *** FIX IS HERE: The missing logoLink variable is now defined. ***
+    const logoLink = document.querySelector('.logo');
+
     const signInModal = document.getElementById('signInModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
     const popularGrid = document.getElementById('popular-tools-grid');
@@ -46,25 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let previousView = 'home';
     let calendarDisplayDate = new Date();
 
-    // Data variables - these will be populated from localStorage or Firestore
     let bookmarks = [];
     let recentlyUsed = [];
     let activeAlarms = {};
     let userPreferences = {};
-
     let userProfile = null;
-    let firestoreListener = null; // To hold the real-time listener
+    let firestoreListener = null;
 
     const GUEST_BOOKMARK_LIMIT = 20;
     const RECENTLY_USED_LIMIT = 100;
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
 
-
-    // =================================================================
-    // DATA STORAGE LOGIC (NOW HANDLES GUEST vs. LOGGED-IN USER)
-    // =================================================================
-
-    // Loads guest data from localStorage. This is the default state.
     const loadGuestData = () => {
         bookmarks = JSON.parse(localStorage.getItem('toolHubGuestBookmarks')) || [];
         recentlyUsed = JSON.parse(localStorage.getItem('toolHubGuestRecent')) || [];
@@ -74,16 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userPreferences.preAlarms === undefined) userPreferences.preAlarms = true;
     };
 
-    // Saves data to localStorage ONLY for guest users.
     const saveGuestData = () => {
-        if (userProfile) return; // Do not save to guest storage if a user is logged in
+        if (userProfile) return;
         localStorage.setItem('toolHubGuestBookmarks', JSON.stringify(bookmarks));
         localStorage.setItem('toolHubGuestRecent', JSON.stringify(recentlyUsed));
         localStorage.setItem('toolHubGuestAlarms', JSON.stringify(activeAlarms));
         localStorage.setItem('toolHubGuestUserPreferences', JSON.stringify(userPreferences));
     };
 
-    // Saves the current state of the app's data to Firestore for the logged-in user.
     const saveDataToFirestore = async () => {
         if (!userProfile) return;
         const userData = {
@@ -100,38 +94,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
-    // =================================================================
-    // AUTHENTICATION AND DATA SYNCING LOGIC
-    // =================================================================
-
-    // This function runs whenever the user's auth state changes (login/logout).
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            // User is signed in.
             userProfile = user;
             updateUIForLogin();
             
-            // Detach any existing listener to avoid duplicates.
             if (firestoreListener) firestoreListener();
 
-            // Set up a real-time listener for this user's data.
             firestoreListener = db.collection('users').doc(user.uid).onSnapshot((doc) => {
                 if (doc.exists) {
-                    // Data exists in the cloud, load it into the app.
                     const data = doc.data();
                     bookmarks = data.bookmarks || [];
                     recentlyUsed = data.recentlyUsed || [];
                     activeAlarms = data.activeAlarms || {};
                     userPreferences = data.userPreferences || {};
                 } else {
-                    // New user. Merge guest data with cloud.
                     console.log("New user, merging guest data.");
                     bookmarks = [...new Set([...bookmarks, ...(JSON.parse(localStorage.getItem('toolHubGuestBookmarks')) || [])])];
-                    saveDataToFirestore(); // Save merged data to cloud
+                    saveDataToFirestore();
                 }
                 
-                // Refresh the entire UI with the synced data.
                 loadAndScheduleAlarms();
                 updateYourWorkBadge();
                 if(currentView === 'your-tools') renderYourToolsView();
@@ -143,14 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } else {
-            // User is signed out.
             userProfile = null;
             updateUIForLogout();
             
-            // Detach the real-time listener.
             if (firestoreListener) firestoreListener();
             
-            // Revert to guest data from localStorage.
             loadGuestData();
             loadAndScheduleAlarms();
             updateYourWorkBadge();
@@ -191,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("You have been signed out.");
     }
 
-    // This part stays the same for initializing the Google Sign-In button
     window.onload = function () {
         if (typeof google === 'undefined') {
             console.warn("Google Identity Services script not loaded.");
@@ -206,10 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { theme: "outline", size: "large", width: "280" }
         );
     };
-
-    // =================================================================
-    // MODIFIED CORE APP FUNCTIONS
-    // =================================================================
 
     const handleBookmarkClick = (button) => {
         const toolId = button.dataset.toolId; if (!toolId) return;
@@ -261,11 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderYourWorkView();
         }
     };
-
-
-    // The rest of your app.js file remains largely the same, only the data saving/loading parts are changed.
-    // All functions that call `saveBookmarks()`, `saveAlarms()` etc. are now replaced by `saveGuestData()` or `saveDataToFirestore()`
-    // Here is the rest of the file for completeness, with minor modifications where data is written.
 
     const unlockAudio = () => {
         alarmSound.play().catch(() => {});
