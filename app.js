@@ -236,10 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
-            // *** CHANGE MADE HERE ***
-            // The line that was hiding triggered one-time reminders has been removed.
-            // Now, they will be processed and displayed just like any other event.
-            // The `isCompleted` flag below will handle the visual styling.
 
             let occurrence = new Date(alarm.startTime);
             const searchStart = new Date(startOfView.getTime() - 31 * 24*60*60*1000);
@@ -386,6 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alarmSound.play().catch(e => console.error("Error playing sound.", e));
         }
 
+        // This function will show a notification for ANY user who has granted permission.
         if (Notification.permission === 'granted' && userPreferences.notifications) {
             new Notification('Toolshub 365 Reminder', {
                 body: `Your reminder for "${alarmData.toolName}" is now!`,
@@ -414,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
+        // This is the universal prompt. It asks ANY user for permission the first time they set a reminder.
         if ('Notification' in window && Notification.permission === 'default') {
             await Notification.requestPermission();
         }
