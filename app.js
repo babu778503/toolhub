@@ -24,10 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainHeader = document.querySelector('.main-header');
     const hamburgerMenu = document.getElementById('hamburger-menu');
     const mainNav = document.getElementById('main-nav');
-    
-    // *** FIX IS HERE: The missing logoLink variable is now defined. ***
     const logoLink = document.querySelector('.logo');
-
     const signInModal = document.getElementById('signInModal');
     const modalCloseBtn = document.getElementById('modalCloseBtn');
     const popularGrid = document.getElementById('popular-tools-grid');
@@ -57,9 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let userProfile = null;
     let firestoreListener = null;
 
+    // *** FIX: Array to track all active timers ***
+    let activeTimers = [];
+
     const GUEST_BOOKMARK_LIMIT = 20;
     const RECENTLY_USED_LIMIT = 100;
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
+
+    // *** FIX: New function to cancel all pending alarms ***
+    const clearAllAlarms = () => {
+        activeTimers.forEach(timerId => clearTimeout(timerId));
+        activeTimers = [];
+    };
 
     const loadGuestData = () => {
         bookmarks = JSON.parse(localStorage.getItem('toolHubGuestBookmarks')) || [];
@@ -96,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
+            // User is signed in.
             userProfile = user;
             updateUIForLogin();
             
@@ -125,10 +132,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } else {
+            // User is signed out.
             userProfile = null;
             updateUIForLogout();
             
             if (firestoreListener) firestoreListener();
+            
+            // *** FIX: Clear all timers and in-memory data on logout ***
+            clearAllAlarms();
+            bookmarks = [];
+            recentlyUsed = [];
+            activeAlarms = {};
+            userPreferences = {};
             
             loadGuestData();
             loadAndScheduleAlarms();
@@ -219,15 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
         activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false };
         
         userProfile ? saveDataToFirestore() : saveGuestData();
+        
+        // Reschedule all alarms to include the new one
+        loadAndScheduleAlarms();
         updateYourWorkBadge();
-    
-        setTimeout(() => triggerAlarm(alarmId), scheduledTime - Date.now());
-    
-        const preAlarmTime = scheduledTime - (15 * 60 * 1000);
-        if (preAlarmTime > Date.now()) {
-            const preAlarmDelay = preAlarmTime - Date.now();
-            setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay);
-        }
     
         if (currentView === 'your-tools') renderYourToolsView();
         if (currentView === 'your-work') {
@@ -501,23 +511,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const nextDate = getNextOccurrence(new Date(alarmData.nextOccurrence), alarmData.frequency, alarmData.startTime);
             if (nextDate) { 
                 alarmData.nextOccurrence = nextDate.getTime(); 
-                const delay = alarmData.nextOccurrence - Date.now(); 
-                if (delay > 0) { 
-                    setTimeout(() => triggerAlarm(alarmId), delay); 
-                } 
             } else { 
                 alarmData.triggered = true; 
             }
         }
         userProfile ? saveDataToFirestore() : saveGuestData();
+        loadAndScheduleAlarms();
         updateYourWorkBadge();
         if (currentView === 'your-tools') renderYourToolsView(); 
         if (currentView === 'your-work') renderYourWorkView();
     };
 
     const loadAndScheduleAlarms = () => {
+        // *** FIX: Clear all previous timers before setting new ones ***
+        clearAllAlarms();
         const now = Date.now();
         let alarmsChanged = false;
+
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
             if (!alarm || typeof alarm.nextOccurrence !== 'number' || !alarm.toolId) { delete activeAlarms[alarmId]; alarmsChanged = true; return; }
             if (alarm.triggered && alarm.frequency === 'one-time') { if (alarm.nextOccurrence < now - (7 * 24 * 60 * 60 * 1000)) { delete activeAlarms[alarmId]; alarmsChanged = true; return; } }
@@ -529,12 +539,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const remainingTime = alarm.nextOccurrence - now;
             if (remainingTime > 0 && !(alarm.triggered && alarm.frequency === 'one-time')) {
-                setTimeout(() => triggerAlarm(alarmId), remainingTime);
+                // *** FIX: Track the new timer ID ***
+                const mainTimerId = setTimeout(() => triggerAlarm(alarmId), remainingTime);
+                activeTimers.push(mainTimerId);
 
                 const preAlarmTime = alarm.nextOccurrence - (15 * 60 * 1000);
                 if (preAlarmTime > now) {
                     const preAlarmDelay = preAlarmTime - now;
-                    setTimeout(() => triggerPreAlarm(alarm.toolName), preAlarmDelay);
+                    // *** FIX: Track the new pre-alarm timer ID ***
+                    const preAlarmTimerId = setTimeout(() => triggerPreAlarm(alarm.toolName), preAlarmDelay);
+                    activeTimers.push(preAlarmTimerId);
                 }
             }
         });
@@ -854,4 +868,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadData();
 });
-
