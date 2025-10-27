@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    const GOOGLE_CLIENT_ID = '16129359964-5l1olas9egpamj181gnr6goll0vudctc.apps.googleusercontent.com';
+    const GOOGLE_CLIENT_ID = '208793911052-4eeuooehop93nmjdbc672vlk0am737bf.apps.googleusercontent.com';
     let toolsData = [];
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const mainHeader = document.querySelector('.main-header');
@@ -854,3 +854,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadData();
 });
+
