@@ -147,34 +147,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return next;
     };
 
+    // *** MODIFIED FUNCTION ***
+    // This function's logic has been updated to count only REMAINING tasks for today.
     const updateYourWorkBadge = () => {
         const badge = document.getElementById('your-work-badge');
         if (!badge) return;
         const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-        let todayRemindersCount = 0;
+        // Set the end of the day to midnight of the *next* day to capture the full 24-hour period of "today".
+        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        let remainingTasksCount = 0;
+
         Object.values(activeAlarms).forEach(alarm => {
-            if (alarm.triggered && alarm.frequency === 'one-time') return;
-            const alarmStartDate = new Date(alarm.startTime);
-            if (alarmStartDate > todayEnd) return;
-            if (alarm.frequency === 'one-time') {
-                if (alarm.nextOccurrence >= todayStart.getTime() && alarm.nextOccurrence < todayEnd.getTime()) { todayRemindersCount++; }
-            } else {
-                let occurrence = new Date(alarm.startTime);
-                if (occurrence < todayStart) {
-                    switch (alarm.frequency) {
-                        case 'daily': occurrence = new Date(todayStart.getTime()); occurrence.setHours(alarmStartDate.getHours(), alarmStartDate.getMinutes(), alarmStartDate.getSeconds()); break;
-                        case 'weekly': const daysUntil = (alarmStartDate.getDay() - todayStart.getDay() + 7) % 7; occurrence = new Date(todayStart.getTime() + daysUntil * 24 * 60 * 60 * 1000); occurrence.setHours(alarmStartDate.getHours(), alarmStartDate.getMinutes(), alarmStartDate.getSeconds()); break;
-                        case 'monthly': occurrence = new Date(todayStart); occurrence.setDate(alarmStartDate.getDate()); occurrence.setHours(alarmStartDate.getHours(), alarmStartDate.getMinutes(), alarmStartDate.getSeconds()); if(occurrence < todayStart) occurrence.setMonth(occurrence.getMonth()+1); break;
-                        case 'yearly': occurrence = new Date(todayStart.getFullYear(), alarmStartDate.getMonth(), alarmStartDate.getDate()); occurrence.setHours(alarmStartDate.getHours(), alarmStartDate.getMinutes(), alarmStartDate.getSeconds()); if (occurrence < todayStart) occurrence.setFullYear(occurrence.getFullYear() + 1); break;
-                    }
-                }
-                if (occurrence.getTime() >= todayStart.getTime() && occurrence.getTime() < todayEnd.getTime()) { todayRemindersCount++; }
+            // First, skip any one-time alarm that has already been triggered.
+            if (alarm.triggered && alarm.frequency === 'one-time') {
+                return;
+            }
+
+            // Get the timestamp for the next scheduled occurrence of the alarm.
+            const nextOccurrenceTime = alarm.nextOccurrence;
+
+            // The core logic: Count the alarm only if its next occurrence is
+            // 1. In the future (later than the current time).
+            // 2. Before the end of the current day.
+            if (nextOccurrenceTime > now.getTime() && nextOccurrenceTime < todayEnd.getTime()) {
+                remainingTasksCount++;
             }
         });
-        badge.textContent = todayRemindersCount > 0 ? todayRemindersCount : '';
+
+        // Display the count if it's greater than zero, otherwise, the badge is hidden.
+        badge.textContent = remainingTasksCount > 0 ? remainingTasksCount : '';
     };
+
     const isBookmarked = (toolId) => bookmarks.includes(toolId);
     const addRecentTool = (toolId) => {
         recentlyUsed = recentlyUsed.filter(item => item.id !== toolId);
@@ -428,8 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const preAlarmTime = scheduledTime - (15 * 60 * 1000);
         if (preAlarmTime > Date.now()) {
-            // *** FIX APPLIED HERE ***
-            // Changed `now()` to the correct `Date.now()` to properly schedule the pre-alarm.
             const preAlarmDelay = preAlarmTime - Date.now();
             setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay);
         }
