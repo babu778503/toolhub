@@ -236,7 +236,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const allEvents = [];
         Object.entries(activeAlarms).forEach(([alarmId, alarm]) => {
+            // *** KEY LOGIC HERE ***
+            // This line checks if an alarm is a one-time alarm AND if it has already been triggered.
+            // If both are true, the `return` statement skips this alarm, effectively hiding it from the "My Work" view.
             if (alarm.triggered && alarm.frequency === 'one-time') return;
+
             let occurrence = new Date(alarm.startTime);
             const searchStart = new Date(startOfView.getTime() - 31 * 24*60*60*1000);
             if (occurrence > endOfView) return;
@@ -382,7 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alarmSound.play().catch(e => console.error("Error playing sound.", e));
         }
 
-        // NEW: Show a push notification if permission is granted and notifications are enabled
         if (Notification.permission === 'granted' && userPreferences.notifications) {
             new Notification('Toolshub 365 Reminder', {
                 body: `Your reminder for "${alarmData.toolName}" is now!`,
@@ -390,6 +393,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // *** KEY LOGIC HERE ***
+        // If the alarm is a "one-time" event, we mark it as triggered.
+        // This flag is then used by `renderYourWorkView` to hide it.
         if (alarmData.frequency === 'one-time') {
             alarmData.triggered = true;
         } else {
@@ -411,7 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => {
-        // NEW: Request permission from the user if it hasn't been granted or denied yet
         if ('Notification' in window && Notification.permission === 'default') {
             await Notification.requestPermission();
         }
