@@ -1,5 +1,7 @@
+// DIAGNOSTIC VERSION - PLEASE COPY THIS ENTIRE FILE
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Add the loading class to the body right away
+    console.log('[DEBUG] DOM Content Loaded. App starting...');
     document.body.classList.add('app-loading');
 
     // =====================================================================
@@ -16,11 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     try {
+        console.log('[DEBUG] Initializing Firebase...');
         firebase.initializeApp(firebaseConfig);
+        console.log('[DEBUG] Firebase initialized successfully.');
     } catch(e) {
-        console.error("Firebase initialization failed. Make sure the Firebase SDK scripts are correctly included in your index.html file before app.js.", e);
+        console.error("[FATAL ERROR] Firebase initialization failed. Make sure the Firebase SDK scripts are correctly included in your index.html file before app.js.", e);
         alert("A critical error occurred while loading the application. Please try again later.");
-        document.body.classList.remove('app-loading'); // Re-enable interaction on error
+        document.body.classList.remove('app-loading');
         return;
     }
 
@@ -73,16 +77,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
 
     // =====================================================================
-    // ======= 3. AUTHENTICATION & DATA SYNC LOGIC (CORRECTED) =============
+    // ======= 3. AUTHENTICATION & DATA SYNC LOGIC (WITH LOGGING) ===========
     // =====================================================================
     const updateUserDocInFirestore = async (data) => {
         const currentUser = auth.currentUser;
-        if (!currentUser) return;
+        if (!currentUser) {
+            console.warn('[DEBUG] Attempted to write to Firestore, but no user is signed in.');
+            return;
+        }
+        console.log('[DEBUG] Preparing to write to Firestore for user:', currentUser.uid, 'Data:', data);
         try {
             await db.collection('users').doc(currentUser.uid).set(data, { merge: true });
+            console.log('[DEBUG] Successfully wrote data to Firestore.');
         } catch (error) {
-            console.error("Error updating Firestore document:", error);
-            // This is the alert you are seeing
+            console.error("[WRITE ERROR] Error updating Firestore document:", error);
             alert("There was an error syncing your data. Please check your connection.");
         }
     };
@@ -90,16 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveAlarms = () => { auth.currentUser ? updateUserDocInFirestore({ activeAlarms }) : localStorage.setItem('toolHubAlarms', JSON.stringify(activeAlarms)); };
     const saveUserPreferences = () => { auth.currentUser ? updateUserDocInFirestore({ preferences: userPreferences }) : localStorage.setItem('toolHubUserPreferences', JSON.stringify(userPreferences)); };
     const saveRecentlyUsed = () => localStorage.setItem('toolHubRecent', JSON.stringify(recentlyUsed));
-    const loadGuestData = () => { bookmarks = JSON.parse(localStorage.getItem('toolHubBookmarks')) || []; recentlyUsed = JSON.parse(localStorage.getItem('toolHubRecent')) || []; activeAlarms = JSON.parse(localStorage.getItem('toolHubAlarms')) || {}; loadUserPreferences(JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {}); };
+    const loadGuestData = () => { console.log('[DEBUG] Loading data for GUEST user from localStorage.'); bookmarks = JSON.parse(localStorage.getItem('toolHubBookmarks')) || []; recentlyUsed = JSON.parse(localStorage.getItem('toolHubRecent')) || []; activeAlarms = JSON.parse(localStorage.getItem('toolHubAlarms')) || {}; loadUserPreferences(JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {}); };
 
     async function handleCredentialResponse(response) {
+        console.log('[DEBUG] Google Sign-In successful. Received credential.');
         try {
             const idToken = response.credential;
             const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+            console.log('[DEBUG] Attempting to sign in to Firebase...');
             await auth.signInWithCredential(credential);
+            console.log('[DEBUG] Firebase sign-in successful.');
             profileSignInModal.classList.remove('show');
         } catch (error) {
-            console.error("Firebase sign-in error:", error);
+            console.error("[AUTH ERROR] Firebase sign-in error:", error);
             alert("Could not sign in. Please try again.");
         }
     }
@@ -108,62 +119,80 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.google && google.accounts.id) {
             google.accounts.id.disableAutoSelect();
         }
+        console.log('[DEBUG] Signing out of Firebase...');
         await auth.signOut();
         switchView('home');
         alert("You have been signed out.");
     }
 
     auth.onAuthStateChanged(async (user) => {
+        console.log('[DEBUG] Firebase auth state has changed.');
         if (user) {
-            console.log("Firebase auth state changed: User is logged in.", user);
+            console.log('[DEBUG] Auth state is LOGGED IN. User UID:', user.uid);
             userProfile = { name: user.displayName, given_name: user.displayName.split(' ')[0], picture: user.photoURL, email: user.email };
             localStorage.setItem('toolHubUserProfile', JSON.stringify(userProfile));
             updateUIForLogin();
             await syncWithFirestore(user);
         } else {
-            console.log("Firebase auth state changed: User is logged out.");
+            console.log('[DEBUG] Auth state is LOGGED OUT.');
             userProfile = null;
-            if (firestoreListener) firestoreListener();
+            if (firestoreListener) {
+                console.log('[DEBUG] Detaching old Firestore listener.');
+                firestoreListener();
+                firestoreListener = null;
+            }
             localStorage.removeItem('toolHubUserProfile');
             loadGuestData();
             updateUIForLogout();
             updateYourWorkBadge();
         }
-        // *** THE FIX ***
-        // Remove the loading class now that we know the auth state for sure.
+        console.log('[DEBUG] Auth check complete. Re-enabling UI.');
         document.body.classList.remove('app-loading');
     });
 
     const syncWithFirestore = async (firebaseUser) => {
         const userId = firebaseUser.uid;
+        console.log('[DEBUG] Starting data sync for user:', userId);
         const userDocRef = db.collection('users').doc(userId);
-        if (firestoreListener) firestoreListener();
+        if (firestoreListener) {
+            console.log('[DEBUG] Detaching previous listener before starting new one.');
+            firestoreListener();
+        }
         
         const doc = await userDocRef.get();
         if (!doc.exists) {
-            console.log("First time login for this user. Migrating guest data to Firestore.");
+            console.log("[DEBUG] This is a first-time login. Creating user document in Firestore and migrating guest data...");
             const guestBookmarks = JSON.parse(localStorage.getItem('toolHubBookmarks')) || [];
             const guestAlarms = JSON.parse(localStorage.getItem('toolHubAlarms')) || {};
             const guestPreferences = JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {};
-            await userDocRef.set({ email: firebaseUser.email, name: firebaseUser.displayName, createdAt: firebase.firestore.FieldValue.serverTimestamp(), bookmarks: guestBookmarks, activeAlarms: guestAlarms, preferences: guestPreferences });
-            localStorage.removeItem('toolHubBookmarks');
-            localStorage.removeItem('toolHubAlarms');
-            localStorage.removeItem('toolHubUserPreferences');
+            try {
+                await userDocRef.set({ email: firebaseUser.email, name: firebaseUser.displayName, createdAt: firebase.firestore.FieldValue.serverTimestamp(), bookmarks: guestBookmarks, activeAlarms: guestAlarms, preferences: guestPreferences });
+                console.log("[DEBUG] Successfully created new user document.");
+                localStorage.removeItem('toolHubBookmarks');
+                localStorage.removeItem('toolHubAlarms');
+                localStorage.removeItem('toolHubUserPreferences');
+            } catch (e) {
+                console.error("[WRITE ERROR] Failed to create initial user document:", e);
+            }
         }
 
+        console.log('[DEBUG] Attaching real-time listener to user document...');
         firestoreListener = userDocRef.onSnapshot(doc => {
-            console.log("Received real-time update from Firestore.");
+            console.log('%c[REAL-TIME UPDATE] Received data from Firestore!', 'color: green; font-weight: bold;');
             if (doc.exists) {
                 const data = doc.data();
                 bookmarks = data.bookmarks || [];
                 activeAlarms = data.activeAlarms || {};
                 loadUserPreferences(data.preferences || {});
+                console.log('[DEBUG] Local data updated. Re-rendering UI elements...');
                 updateYourWorkBadge();
                 if (currentView === 'your-tools') renderYourToolsView();
                 if (currentView === 'your-work') renderYourWorkView();
+            } else {
+                console.warn('[DEBUG] Firestore listener fired, but the document does not exist.');
             }
         }, error => {
-            console.error("Error with Firestore listener:", error);
+            console.error("[LISTENER ERROR] Error with Firestore listener:", error);
         });
     };
     function updateUIForLogin() { if (!userProfile) return; const profileLink = document.getElementById('profile-link'); profileLink.innerHTML = `<img src="${userProfile.picture}" alt="User profile picture"> ${sanitizeHTML(userProfile.given_name)}`; profileLink.title = `Signed in as ${userProfile.name}. Click to view profile.`; profileLink.classList.add('logged-in'); }
@@ -240,9 +269,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const bannerRotator = document.getElementById('mobile-top-banner-ad-rotator'); if (bannerRotator) { const banners = bannerRotator.querySelectorAll('.banner-link-wrapper'); if (banners.length > 1) { let currentIndex = 0; const rotateBanners = () => { banners[currentIndex].classList.remove('active'); currentIndex = (currentIndex + 1) % banners.length; banners[currentIndex].classList.add('active'); }; setInterval(rotateBanners, 4000); } }
     
     async function loadData() { 
+        console.log('[DEBUG] Fetching tools.json...');
         try { 
             const response = await fetch(`/tools.json`); 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); 
+            console.log('[DEBUG] tools.json fetched successfully. Initializing app...');
             initializeApp(await response.json()); 
         } catch (error) { 
             console.error("Failed to load tools data:", error); 
