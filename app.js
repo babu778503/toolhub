@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Add the loading class to the body right away
+    document.body.classList.add('app-loading');
+
     // =====================================================================
     // ======= 1. YOUR FIREBASE CONFIGURATION ==============================
     // =====================================================================
@@ -12,13 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
       measurementId: "G-1MPE96CKD2"
     };
 
-    // Initialize Firebase and add error handling
     try {
         firebase.initializeApp(firebaseConfig);
     } catch(e) {
         console.error("Firebase initialization failed. Make sure the Firebase SDK scripts are correctly included in your index.html file before app.js.", e);
         alert("A critical error occurred while loading the application. Please try again later.");
-        return; // Stop the script if Firebase fails to initialize
+        document.body.classList.remove('app-loading'); // Re-enable interaction on error
+        return;
     }
 
     const db = firebase.firestore();
@@ -57,19 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentView = 'home';
     let previousView = 'home';
     let calendarDisplayDate = new Date();
-
-    // App's state variables
     let bookmarks = [];
     let recentlyUsed = [];
     let activeAlarms = {};
     let userPreferences = {};
-
     const GUEST_BOOKMARK_LIMIT = 20;
     const RECENTLY_USED_LIMIT = 100;
     let lastScrollTop = 0;
     const profileSignInModal = document.getElementById('profileSignInModal');
     const profileModalCloseBtn = document.getElementById('profileModalCloseBtn');
-    let userProfile = null; // This will hold the Google profile info for UI display
+    let userProfile = null;
     const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
 
     // =====================================================================
@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await db.collection('users').doc(currentUser.uid).set(data, { merge: true });
         } catch (error) {
             console.error("Error updating Firestore document:", error);
+            // This is the alert you are seeing
             alert("There was an error syncing your data. Please check your connection.");
         }
     };
@@ -96,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const idToken = response.credential;
             const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
             await auth.signInWithCredential(credential);
-            // The onAuthStateChanged listener will handle the UI updates and data sync.
             profileSignInModal.classList.remove('show');
         } catch (error) {
             console.error("Firebase sign-in error:", error);
@@ -109,41 +109,35 @@ document.addEventListener('DOMContentLoaded', () => {
             google.accounts.id.disableAutoSelect();
         }
         await auth.signOut();
-        // The onAuthStateChanged listener will handle UI cleanup.
         switchView('home');
         alert("You have been signed out.");
     }
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            // User is signed in to Firebase.
             console.log("Firebase auth state changed: User is logged in.", user);
-            // Set user profile for UI elements
-            userProfile = {
-                name: user.displayName,
-                given_name: user.displayName.split(' ')[0],
-                picture: user.photoURL,
-                email: user.email
-            };
+            userProfile = { name: user.displayName, given_name: user.displayName.split(' ')[0], picture: user.photoURL, email: user.email };
             localStorage.setItem('toolHubUserProfile', JSON.stringify(userProfile));
             updateUIForLogin();
             await syncWithFirestore(user);
         } else {
-            // User is signed out of Firebase.
             console.log("Firebase auth state changed: User is logged out.");
             userProfile = null;
             if (firestoreListener) firestoreListener();
             localStorage.removeItem('toolHubUserProfile');
-            loadGuestData(); // Load any data saved as a guest
+            loadGuestData();
             updateUIForLogout();
             updateYourWorkBadge();
         }
+        // *** THE FIX ***
+        // Remove the loading class now that we know the auth state for sure.
+        document.body.classList.remove('app-loading');
     });
 
     const syncWithFirestore = async (firebaseUser) => {
-        const userId = firebaseUser.uid; // Use the secure Firebase UID
+        const userId = firebaseUser.uid;
         const userDocRef = db.collection('users').doc(userId);
-        if (firestoreListener) firestoreListener(); // Detach old listener
+        if (firestoreListener) firestoreListener();
         
         const doc = await userDocRef.get();
         if (!doc.exists) {
@@ -151,21 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const guestBookmarks = JSON.parse(localStorage.getItem('toolHubBookmarks')) || [];
             const guestAlarms = JSON.parse(localStorage.getItem('toolHubAlarms')) || {};
             const guestPreferences = JSON.parse(localStorage.getItem('toolHubUserPreferences')) || {};
-            await userDocRef.set({
-                email: firebaseUser.email,
-                name: firebaseUser.displayName,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                bookmarks: guestBookmarks,
-                activeAlarms: guestAlarms,
-                preferences: guestPreferences
-            });
-            // Clean up local data after migration
+            await userDocRef.set({ email: firebaseUser.email, name: firebaseUser.displayName, createdAt: firebase.firestore.FieldValue.serverTimestamp(), bookmarks: guestBookmarks, activeAlarms: guestAlarms, preferences: guestPreferences });
             localStorage.removeItem('toolHubBookmarks');
             localStorage.removeItem('toolHubAlarms');
             localStorage.removeItem('toolHubUserPreferences');
         }
 
-        // Attach the real-time listener for live updates
         firestoreListener = userDocRef.onSnapshot(doc => {
             console.log("Received real-time update from Firestore.");
             if (doc.exists) {
@@ -173,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 bookmarks = data.bookmarks || [];
                 activeAlarms = data.activeAlarms || {};
                 loadUserPreferences(data.preferences || {});
-                // Refresh UI with new data
                 updateYourWorkBadge();
                 if (currentView === 'your-tools') renderYourToolsView();
                 if (currentView === 'your-work') renderYourWorkView();
@@ -182,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error with Firestore listener:", error);
         });
     };
-
     function updateUIForLogin() { if (!userProfile) return; const profileLink = document.getElementById('profile-link'); profileLink.innerHTML = `<img src="${userProfile.picture}" alt="User profile picture"> ${sanitizeHTML(userProfile.given_name)}`; profileLink.title = `Signed in as ${userProfile.name}. Click to view profile.`; profileLink.classList.add('logged-in'); }
     function updateUIForLogout() { const profileLink = document.getElementById('profile-link'); profileLink.innerHTML = `<i class="fas fa-user-circle"></i> Profile`; profileLink.title = ''; profileLink.classList.remove('logged-in'); }
 
@@ -239,8 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function initializeApp(data) {
         toolsData = data;
-        // The onAuthStateChanged listener handles loading initial user data,
-        // so we only need to schedule alarms and render the static tool lists here.
         loadAndScheduleAlarms();
         updateYourWorkBadge();
         const shuffledTools = [...data].sort(() => 0.5 - Math.random());
@@ -270,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     }
     
-    // This is the final function that starts everything.
     loadData();
     const unlockAudio = () => {
         alarmSound.play().catch(() => {});
