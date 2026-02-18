@@ -1,4 +1,4 @@
-// FINAL & COMPLETE app.js - Includes mobile timing fix
+// FINAL & COMPLETE app.js - Includes mobile timing fix & Dynamic Title
 
 document.addEventListener('DOMContentLoaded', () => {
     // *** THE FIX: Part 1 ***
@@ -83,8 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentUser = auth.currentUser;
         if (!currentUser) {
             console.warn('Attempted to write to Firestore, but auth state not ready.');
-            // We show the alert here because this function should only be callable
-            // when the UI is unlocked, meaning the user should be logged in.
             alert("There was an error syncing your data. Please check your connection.");
             return;
         }
@@ -176,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUIForLogout() { const profileLink = document.getElementById('profile-link'); profileLink.innerHTML = `<i class="fas fa-user-circle"></i> Profile`; profileLink.title = ''; profileLink.classList.remove('logged-in'); }
 
     // =====================================================================
-    // ======= 4. ALL ORIGINAL APPLICATION LOGIC & FUNCTIONS ===============
+    // ======= 4. ALL APPLICATION LOGIC & FUNCTIONS ========================
     // =====================================================================
     function loadUserPreferences(prefs = {}) { userPreferences = prefs; if (userPreferences.notifications === undefined) userPreferences.notifications = true; if (userPreferences.preAlarms === undefined) userPreferences.preAlarms = true; if (userPreferences.birthday === undefined) userPreferences.birthday = ''; }
     window.onload = function () { if (typeof google === 'undefined') { console.warn("Google Identity Services script not loaded."); return; } google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredentialResponse }); google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "outline", size: "large", width: "280" }); };
@@ -195,14 +193,67 @@ document.addEventListener('DOMContentLoaded', () => {
     let calendarHtml = ''; for (let i = 0; i < 3; i++) { const day = new Date(startOfView); day.setDate(startOfView.getDate() + i); const dayDate = day.getDate(); const dayName = day.toLocaleDateString(undefined, { weekday: 'short' }); const fullDateStr = day.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const isTodayClass = day.getTime() === today.getTime() ? 'is-today' : ''; const isActiveDateClass = day.getTime() === new Date(calendarDisplayDate.getFullYear(), calendarDisplayDate.getMonth(), calendarDisplayDate.getDate()).getTime() ? 'is-active-date' : ''; const eventsForDay = allEvents.filter(event => event.date.getFullYear() === day.getFullYear() && event.date.getMonth() === day.getMonth() && event.date.getDate() === day.getDate()).sort((a,b) => a.date - b.date); const isEmptyClass = eventsForDay.length === 0 ? 'is-empty' : ''; let eventsHtml = eventsForDay.map(event => { const timeString = event.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }); return `<div class="calendar-event ${event.isCompleted ? 'is-completed' : ''}" data-tool-id="${event.toolId}" data-tool-name="${sanitizeHTML(event.name)}" title="${sanitizeHTML(event.name)} at ${timeString}"><span class="event-name">${sanitizeHTML(event.name)}</span><div class="event-actions"><span class="event-time">${timeString}</span><button class="delete-event-btn" data-alarm-id="${event.alarmId}">&times;</button></div></div>`; }).join(''); calendarHtml += `<div class="calendar-day ${isTodayClass} ${isActiveDateClass} ${isEmptyClass}"><div class="mobile-event-sidebar"><span>My Work (task)</span></div><div class="mobile-event-main-content"><div class="calendar-day-full-date">${fullDateStr}</div><div class="calendar-day-header"><span class="day-name">${dayName}</span><span class="day-number">${dayDate}</span></div><div class="calendar-events-container">${eventsHtml}</div></div></div>`; }
     yourWorkView.innerHTML = `<div class="container"><div class="your-work-header"><h2><i class="fas fa-briefcase" style="color:#7c3aed;"></i> My Work</h2>${alarmControlsHTML}</div><div class="your-work-controls"><button id="calendar-today-btn">Today</button><button id="calendar-prev-btn"><i class="fas fa-chevron-left"></i></button><button id="calendar-next-btn"><i class="fas fa-chevron-right"></i></button><span class="your-work-date-range">${formatRange(startOfView, endRangeDate)}</span></div><div class="calendar-container"><div class="calendar-grid">${calendarHtml}</div></div></div>`;};
     const renderProfileView = () => { if (!auth.currentUser) { profileSignInModal.classList.add('show'); switchView('home'); return; } const checkedAttribute = userPreferences.notifications ? 'checked' : ''; profileView.innerHTML = `<div class="container"><div class="profile-card"><div class="profile-header"><img src="${auth.currentUser.photoURL}" alt="User profile avatar" class="profile-avatar"><h2 class="profile-name">${sanitizeHTML(auth.currentUser.displayName)}</h2><p class="profile-email">${sanitizeHTML(auth.currentUser.email)}</p></div><div class="profile-form"><div class="form-group"><label for="profile-birthday">Birthday</label><input type="date" id="profile-birthday" value="${userPreferences.birthday || ''}"></div><div class="form-group form-group-inline"><label for="notification-toggle">App Notifications</label><label class="toggle-switch"><input type="checkbox" id="notification-toggle" ${checkedAttribute}><span class="slider"></span></label></div></div><div class="profile-actions"><button class="btn-save" id="profile-save-btn">Save Changes</button><button class="btn-sign-out" id="profile-sign-out-btn">Sign Out</button></div></div></div>`; };
-    const switchView = (view) => { if (currentView !== view) { previousView = currentView; } currentView = view; window.scrollTo({ top: 0, behavior: 'auto' }); mainNav.querySelectorAll('a[data-view]').forEach(link => { link.classList.toggle('active', link.dataset.view === view); }); allPageSections.forEach(section => { section.style.display = section.dataset.viewGroup.includes(view) ? '' : 'none'; }); if (searchInput.value !== '') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); } hideTool(false); hideCategoryTools(); if (view === 'categories' && !categoriesView.innerHTML) renderCategoriesView(); if (view === 'your-tools') renderYourToolsView(); if (view === 'your-work') renderYourWorkView(); if (view === 'profile') renderProfileView(); if (mainNav.classList.contains('active')) mainNav.classList.remove('active'); };
+    
+    const switchView = (view) => { 
+        if (currentView !== view) { previousView = currentView; } 
+        currentView = view; 
+        
+        // Reset Document Title if not viewing a tool
+        if (view !== 'tool') {
+             document.title = 'Toolshub 365 - 50,000+ Free Online Tools';
+        }
+
+        window.scrollTo({ top: 0, behavior: 'auto' }); 
+        mainNav.querySelectorAll('a[data-view]').forEach(link => { link.classList.toggle('active', link.dataset.view === view); }); 
+        allPageSections.forEach(section => { section.style.display = section.dataset.viewGroup.includes(view) ? '' : 'none'; }); 
+        if (searchInput.value !== '') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); } 
+        hideTool(false); 
+        hideCategoryTools(); 
+        if (view === 'categories' && !categoriesView.innerHTML) renderCategoriesView(); 
+        if (view === 'your-tools') renderYourToolsView(); 
+        if (view === 'your-work') renderYourWorkView(); 
+        if (view === 'profile') renderProfileView(); 
+        if (mainNav.classList.contains('active')) mainNav.classList.remove('active'); 
+    };
+
     const triggerPreAlarm = (toolName) => { if (!('speechSynthesis' in window) || !userPreferences.preAlarms) { return; } const userName = auth.currentUser ? auth.currentUser.displayName.split(' ')[0] : 'there'; const message = `Hi ${userName}, you have a reminder for ${toolName} in 15 minutes.`; const utterance = new SpeechSynthesisUtterance(message); utterance.volume = 1; utterance.rate = 1; utterance.pitch = 1; window.speechSynthesis.speak(utterance); };
     const triggerAlarm = (alarmId) => { const alarmData = activeAlarms[alarmId]; if (!alarmData) return; if (alarmSound && userPreferences.notifications) { alarmSound.play().catch(e => console.error("Error playing sound.", e)); } if (Notification.permission === 'granted' && userPreferences.notifications) { new Notification('Toolshub 365 Reminder', { body: `Your reminder for "${alarmData.toolName}" is now!`, icon: '/logo.png' }); } if (alarmData.frequency === 'one-time') { alarmData.triggered = true; } else { const nextDate = getNextOccurrence(new Date(alarmData.nextOccurrence), alarmData.frequency, alarmData.startTime); if (nextDate) { alarmData.nextOccurrence = nextDate.getTime(); const delay = alarmData.nextOccurrence - Date.now(); if (delay > 0) { setTimeout(() => triggerAlarm(alarmId), delay); } } else { alarmData.triggered = true; } } saveAlarms(); updateYourWorkBadge(); if (currentView === 'your-tools') renderYourToolsView(); if (currentView === 'your-work') renderYourWorkView(); };
     const setAlarmWithDate = async (toolId, toolName, scheduledDate, frequency) => { if ('Notification' in window && Notification.permission === 'default') { await Notification.requestPermission(); } const scheduledTime = scheduledDate.getTime(); if (isNaN(scheduledTime) || scheduledTime <= Date.now()) { alert("Invalid date. The date must be in the future."); return; } const alarmId = `${toolId}-${scheduledTime}-${Math.random().toString(36).substr(2, 5)}`; activeAlarms[alarmId] = { startTime: scheduledTime, nextOccurrence: scheduledTime, toolName, toolId, frequency: frequency || 'one-time', triggered: false }; saveAlarms(); updateYourWorkBadge(); setTimeout(() => triggerAlarm(alarmId), scheduledTime - Date.now()); const preAlarmTime = scheduledTime - (15 * 60 * 1000); if (preAlarmTime > Date.now()) { const preAlarmDelay = preAlarmTime - Date.now(); setTimeout(() => triggerPreAlarm(toolName), preAlarmDelay); } if (currentView === 'your-tools') renderYourToolsView(); if (currentView === 'your-work') { calendarDisplayDate = new Date(scheduledTime); renderYourWorkView(); } };
     const loadAndScheduleAlarms = () => { const now = Date.now(); Object.entries(activeAlarms).forEach(([alarmId, alarm]) => { if (!alarm || typeof alarm.nextOccurrence !== 'number' || !alarm.toolId) { delete activeAlarms[alarmId]; return; } if (alarm.triggered && alarm.frequency === 'one-time') { if (alarm.nextOccurrence < now - (7 * 24 * 60 * 60 * 1000)) { delete activeAlarms[alarmId]; return; } } if (alarm.frequency && alarm.frequency !== 'one-time' && alarm.nextOccurrence < now) { let nextDate = new Date(alarm.nextOccurrence); while (nextDate.getTime() < now) { const updatedDate = getNextOccurrence(nextDate, alarm.frequency, alarm.startTime); if (!updatedDate) { nextDate = null; break; } nextDate = updatedDate; } if (nextDate) { alarm.nextOccurrence = nextDate.getTime(); } } const remainingTime = alarm.nextOccurrence - now; if (remainingTime > 0 && !(alarm.triggered && alarm.frequency === 'one-time')) { setTimeout(() => triggerAlarm(alarmId), remainingTime); const preAlarmTime = alarm.nextOccurrence - (15 * 60 * 1000); if (preAlarmTime > now) { const preAlarmDelay = preAlarmTime - now; setTimeout(() => triggerPreAlarm(alarm.toolName), preAlarmDelay); } } }); };
-    const createToolViewerHTML = (toolId, toolName) => { const saneToolName = sanitizeHTML(toolName); return `<div class="container"><div class="sub-view-header"><button id="back-to-tools-btn" class="btn-back" aria-label="Go back"><i class="fas fa-arrow-left"></i></button><div class="reminder-controls-desktop"><input type="datetime-local" id="reminderInput"><select id="reminderFrequencyDesktop"><option value="one-time">One time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select><button id="setReminderBtn">My Work & Set Reminder</button></div><button class="add-event-mobile-btn" title="Add Event" aria-label="Add event or reminder"><i class="fas fa-calendar-plus"></i></button></div><div class="tool-viewer-content"><div id="loader" class="iframe-loader"></div><iframe id="tool-iframe" src="/tools/${toolId}.html" title="${saneToolName}" frameborder="0" style="display:none;" onload="document.getElementById('loader').style.display='none'; this.style.display='block';"></iframe></div></div>`; };
-    const showTool = (toolId, toolName, saveHistory = true) => { document.body.classList.add('tool-view-active'); mainContentWrapper.style.display = 'none'; toolViewerContainer.innerHTML = createToolViewerHTML(toolId, toolName); toolViewerContainer.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); if (saveHistory) { history.pushState({ toolId: toolId }, toolName, `/tool/${toolId}`); } const reminderInput = document.getElementById('reminderInput'); const setReminderBtn = document.getElementById('setReminderBtn'); const frequencySelect = document.getElementById('reminderFrequencyDesktop'); const addEventMobileBtn = document.querySelector('.add-event-mobile-btn'); const handleReminderSet = () => { if (!reminderInput.value) { if (window.getComputedStyle(setReminderBtn).display !== 'none') { alert('Pick a date & time first'); } return; } const when = new Date(reminderInput.value); if (isNaN(when.getTime()) || when <= new Date()) { alert('Choose a future date/time'); reminderInput.value = ''; return; } setAlarmWithDate(toolId, toolName, when, frequencySelect.value); alert('Reminder set for ' + when.toLocaleString()); reminderInput.value = ''; }; if(setReminderBtn) setReminderBtn.addEventListener('click', handleReminderSet); if(addEventMobileBtn) { addEventMobileBtn.addEventListener('click', () => { showDatePickerModal(toolId, toolName); }); } if (saveHistory) addRecentTool(toolId); };
-    const hideTool = (updateHistory = true) => { if (toolViewerContainer.style.display !== 'none') { document.body.classList.remove('tool-view-active'); toolViewerContainer.style.display = 'none'; toolViewerContainer.innerHTML = ''; mainContentWrapper.style.display = 'block'; if (updateHistory) { history.pushState({ view: currentView }, '', '/'); } } };
+    
+    // UPDATED: Added error handling div
+    const createToolViewerHTML = (toolId, toolName) => { 
+        const saneToolName = sanitizeHTML(toolName); 
+        return `<div class="container"><div class="sub-view-header"><button id="back-to-tools-btn" class="btn-back" aria-label="Go back"><i class="fas fa-arrow-left"></i></button><div class="reminder-controls-desktop"><input type="datetime-local" id="reminderInput"><select id="reminderFrequencyDesktop"><option value="one-time">One time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select><button id="setReminderBtn">My Work & Set Reminder</button></div><button class="add-event-mobile-btn" title="Add Event" aria-label="Add event or reminder"><i class="fas fa-calendar-plus"></i></button></div><div class="tool-viewer-content"><div id="loader" class="iframe-loader"></div><div id="error-msg" style="display:none; text-align:center; padding:20px;">Tool failed to load. <button onclick="location.reload()" style="padding:5px 10px; cursor:pointer;">Retry</button></div><iframe id="tool-iframe" src="/tools/${toolId}.html" title="${saneToolName}" frameborder="0" style="display:none;" onerror="document.getElementById('loader').style.display='none'; document.getElementById('error-msg').style.display='block';" onload="document.getElementById('loader').style.display='none'; this.style.display='block';"></iframe></div></div>`; 
+    };
+
+    const showTool = (toolId, toolName, saveHistory = true) => { 
+        // Update Title for Browser History/Tabs
+        document.title = `${sanitizeHTML(toolName)} - Toolshub 365`;
+
+        document.body.classList.add('tool-view-active'); 
+        mainContentWrapper.style.display = 'none'; 
+        toolViewerContainer.innerHTML = createToolViewerHTML(toolId, toolName); 
+        toolViewerContainer.style.display = 'block'; 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        if (saveHistory) { history.pushState({ toolId: toolId }, toolName, `/tool/${toolId}`); } 
+        const reminderInput = document.getElementById('reminderInput'); 
+        const setReminderBtn = document.getElementById('setReminderBtn'); 
+        const frequencySelect = document.getElementById('reminderFrequencyDesktop'); 
+        const addEventMobileBtn = document.querySelector('.add-event-mobile-btn'); 
+        const handleReminderSet = () => { if (!reminderInput.value) { if (window.getComputedStyle(setReminderBtn).display !== 'none') { alert('Pick a date & time first'); } return; } const when = new Date(reminderInput.value); if (isNaN(when.getTime()) || when <= new Date()) { alert('Choose a future date/time'); reminderInput.value = ''; return; } setAlarmWithDate(toolId, toolName, when, frequencySelect.value); alert('Reminder set for ' + when.toLocaleString()); reminderInput.value = ''; }; if(setReminderBtn) setReminderBtn.addEventListener('click', handleReminderSet); if(addEventMobileBtn) { addEventMobileBtn.addEventListener('click', () => { showDatePickerModal(toolId, toolName); }); } if (saveHistory) addRecentTool(toolId); 
+    };
+
+    const hideTool = (updateHistory = true) => { 
+        if (toolViewerContainer.style.display !== 'none') { 
+            document.body.classList.remove('tool-view-active'); 
+            toolViewerContainer.style.display = 'none'; 
+            toolViewerContainer.innerHTML = ''; 
+            mainContentWrapper.style.display = 'block'; 
+            if (updateHistory) { history.pushState({ view: currentView }, '', '/'); } 
+        } 
+    };
+
     const showCategoryTools = (categoryName) => { renderCategoryToolsView(categoryName); mainContentWrapper.style.display = 'none'; categoryToolsView.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); };
     const hideCategoryTools = () => { if (categoryToolsView.style.display !== 'none') { categoryToolsView.style.display = 'none'; categoryToolsView.innerHTML = ''; mainContentWrapper.style.display = 'block'; } };
     hamburgerMenu.addEventListener('click', () => mainNav.classList.toggle('active'));
