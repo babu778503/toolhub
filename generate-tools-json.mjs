@@ -3,22 +3,24 @@ import path from 'path';
 
 const toolsDir = 'tools';
 const outputFile = 'tools.json';
+const sitemapFile = 'sitemap.xml';
+const baseUrl = 'https://toolshub365.com';
 
 try {
     // Check if the tools directory exists
     if (!fs.existsSync(toolsDir)) {
-        console.warn(`Warning: Directory '${toolsDir}' not found. Creating an empty tools.json.`);
+        console.warn(`Warning: Directory '${toolsDir}' not found. Creating empty files.`);
         fs.writeFileSync(outputFile, JSON.stringify([], null, 2));
-        process.exit(0); // Exit successfully
+        process.exit(0);
     }
 
     console.log(`Scanning directory: ${toolsDir}`);
     const files = fs.readdirSync(toolsDir).filter(file => file.endsWith('.html'));
     
     if (files.length === 0) {
-        console.warn(`Warning: No HTML files found in '${toolsDir}'. Creating an empty tools.json.`);
+        console.warn(`Warning: No HTML files found in '${toolsDir}'. Creating empty files.`);
         fs.writeFileSync(outputFile, JSON.stringify([], null, 2));
-        process.exit(0); // Exit successfully
+        process.exit(0);
     }
 
     console.log(`Found ${files.length} HTML tool files.`);
@@ -31,9 +33,9 @@ try {
         const titleMatch = content.match(/<title>(.*?)<\/title>/i);
         const name = titleMatch ? titleMatch[1].trim() : 'Unnamed Tool';
 
-        // 2. Extract category from the specific comment format: <!-- Category: ... -->
+        // 2. Extract category from the specific comment format
         const categoryMatch = content.match(/<!--\s*Category:\s*(.*?)\s*-->/i);
-        const category = categoryMatch ? categoryMatch[1].trim() : 'Utility'; // Default to 'Utility' if not found
+        const category = categoryMatch ? categoryMatch[1].trim() : 'Utility';
 
         // 3. Use the filename (without .html) as the unique ID
         const id = path.basename(file, '.html');
@@ -41,15 +43,41 @@ try {
         return { id, Name: name, Category: category };
     });
 
-    // Sort all tools alphabetically by their name for a consistent order
+    // Sort tools alphabetically
     toolsData.sort((a, b) => a.Name.localeCompare(b.Name));
     
-    // Write the sorted data to the JSON file with pretty formatting (2-space indentation)
+    // 1. Write tools.json
     fs.writeFileSync(outputFile, JSON.stringify(toolsData, null, 2));
     
-    console.log(`✅ Successfully generated ${outputFile} with ${toolsData.length} tools.`);
+    // 2. Generate Sitemap XML
+    const currentDate = new Date().toISOString();
+    let sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}/</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>`;
+
+    toolsData.forEach(tool => {
+        // XML Escape utility (basic)
+        const safeId = tool.id.replace(/&/g, '&amp;').replace(/'/g, '&apos;').replace(/"/g, '&quot;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
+        sitemapContent += `
+  <url>
+    <loc>${baseUrl}/tool/${safeId}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    });
+
+    sitemapContent += `\n</urlset>`;
+    fs.writeFileSync(sitemapFile, sitemapContent);
+
+    console.log(`✅ Successfully generated ${outputFile} and ${sitemapFile} with ${toolsData.length} tools.`);
 
 } catch (error) {
-    console.error('❌ Error generating tools.json:', error);
-    process.exit(1); // Exit with an error code to fail the build process
+    console.error('❌ Error generating files:', error);
+    process.exit(1);
 }
