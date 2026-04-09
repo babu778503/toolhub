@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<!-- Category: Excel -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel PivotTable formulas & calculations</title>
+    
+    <!-- SEO Optimization -->
+    <meta name="description" content="Master Excel PivotTable formulas & calculations. Comprehensive reference for calculated fields, GETPIVOTDATA, Show Values As, and advanced data modeling features.">
+    <meta name="keywords" content="Excel PivotTable formulas & calculations, GETPIVOTDATA, Calculated Fields, PivotTable filtering, Data Model functions, toolshub365.com">
+    <meta name="author" content="toolshub365.com">
+    <link rel="canonical" href="https://toolshub365.com/excel-pivottable-formulas-and-calculations">
+    
+    <!-- Technical SEO AI Crawler Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Excel PivotTable formulas & calculations",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "url": "https://toolshub365.com/excel-pivottable-formulas-and-calculations",
+      "description": "Interactive guide and reference for Excel PivotTable formulas, calculated fields, aggregation functions, and advanced data grouping.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "ToolsHub365",
+        "url": "https://toolshub365.com"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --excel-green: #107c41;
+            --excel-dark: #0b5a2f;
+            --bg-color: #f3f2f1;
+            --card-bg: #ffffff;
+            --border-color: #e1dfdd;
+            --text-main: #323130;
+            --text-muted: #605e5c;
+            --code-bg: #f8f8f8;
+            --code-color: #d83b01;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            /* Fixed top padding strictly equals header height */
+            padding-top: 50px; 
+        }
+
+        /* Fixed Header: Exact 50px Height */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--excel-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Desktop Container: Max 1200px */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Search Bar */
+        .search-wrapper {
+            margin-bottom: 20px;
+            position: sticky;
+            top: 60px;
+            z-index: 999;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: border 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--excel-green);
+        }
+
+        /* Accordion Categories */
+        .category-block {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .category-header {
+            padding: 15px 20px;
+            background-color: #edebe9;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .category-header:hover {
+            background-color: #e1dfdd;
+        }
+
+        .category-header::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+
+        .category-block.active .category-header::after {
+            transform: rotate(-180deg);
+        }
+
+        .func-list {
+            display: none;
+            list-style: none;
+        }
+
+        .category-block.active .func-list {
+            display: block;
+        }
+
+        /* Function Items */
+        .func-item {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .func-header {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--excel-green);
+            background: #faf9f8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .func-header:hover {
+            background: #f3f2f1;
+        }
+
+        .func-header::after {
+            content: '+';
+            font-size: 1.2rem;
+            color: var(--excel-green);
+            font-weight: bold;
+        }
+
+        .func-item.active .func-header::after {
+            content: '-';
+        }
+
+        /* Function Details */
+        .func-details {
+            display: none;
+            padding: 20px;
+            background: var(--card-bg);
+        }
+
+        .func-item.active .func-details {
+            display: block;
+        }
+
+        .detail-section {
+            margin-bottom: 15px;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-section h4 {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-section p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .detail-section code {
+            display: block;
+            background: var(--code-bg);
+            color: var(--code-color);
+            padding: 10px;
+            border-radius: 4px;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--excel-green);
+            word-wrap: break-word;
+        }
+
+        /* Mobile Adjustments: Remove both side blank space */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 10px 0 0 0; /* Remove left and right padding completely */
+            }
+            .search-wrapper {
+                padding: 0 10px; /* Slight padding for search input to remain usable */
+            }
+            .category-block {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Excel PivotTable formulas & calculations</h1>
+    </header>
+
+    <div class="container">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search formulas (e.g. GETPIVOTDATA, Calculated Field, Sum)...">
+        </div>
+        <div id="dataContainer"></div>
+    </div>
+
+    <script>
+        // Data Structure: [Category, [ [Name, Purpose, Return, Syntax, Example], ... ]]
+        const excelData = [
+            ["✅ Core PivotTable Calculations", [
+                ["Subtotals", "Calculates the aggregate for nested groups within the PivotTable hierarchy.", "Numeric aggregate.", "Design Tab -> Subtotals", "Show all Subtotals at Bottom of Group"],
+                ["Grand Totals", "Calculates the overall aggregate for all rows and/or columns.", "Numeric aggregate.", "Design Tab -> Grand Totals", "On for Rows and Columns"]
+            ]],
+            ["✅ Built-in Value Field Calculations", [
+                ["Sum", "Adds up all numeric values within a specific category or grouping.", "Numeric sum.", "Value Field Settings -> Summarize Values By -> Sum", "Sum of Revenue"],
+                ["Count", "Counts the total number of items or rows within a grouping.", "Integer.", "Value Field Settings -> Summarize Values By -> Count", "Count of Sales Orders"],
+                ["Average", "Calculates the arithmetic mean of values in a specific category.", "Numeric average.", "Value Field Settings -> Summarize Values By -> Average", "Average of Unit Price"],
+                ["Max", "Finds the highest single value within a group.", "Numeric maximum.", "Value Field Settings -> Summarize Values By -> Max", "Max of Employee Salary"],
+                ["Min", "Finds the lowest single value within a group.", "Numeric minimum.", "Value Field Settings -> Summarize Values By -> Min", "Min of Daily Temperature"],
+                ["Product", "Multiplies all numerical values within the specific grouping.", "Numeric product.", "Value Field Settings -> Summarize Values By -> Product", "Product of Growth Multipliers"],
+                ["Count Numbers", "Counts only the cells that contain numeric values (ignores text/blanks).", "Integer.", "Value Field Settings -> Summarize Values By -> Count Numbers", "Count Numbers of Transaction ID"],
+                ["StdDev", "Estimates standard deviation based on a sample subset.", "Numeric deviation.", "Value Field Settings -> Summarize Values By -> StdDev", "StdDev of Test Scores"],
+                ["StdDevp", "Calculates standard deviation based on the entire population.", "Numeric deviation.", "Value Field Settings -> Summarize Values By -> StdDevp", "StdDevp of Test Scores"],
+                ["Var", "Estimates variance based on a sample subset.", "Numeric variance.", "Value Field Settings -> Summarize Values By -> Var", "Var of Component Tolerances"],
+                ["Varp", "Calculates variance based on the entire population.", "Numeric variance.", "Value Field Settings -> Summarize Values By -> Varp", "Varp of Component Tolerances"]
+            ]],
+            ["✅ Show Values As (Important Pivot Calculations)", [
+                ["% of Grand Total", "Displays the value as a percentage of the overall grand total of the PivotTable.", "Percentage (%).", "Value Field Settings -> Show Values As -> % of Grand Total", "15.50%"],
+                ["% of Column Total", "Displays the value as a percentage of the total for its specific column.", "Percentage (%).", "Value Field Settings -> Show Values As -> % of Column Total", "25.00%"],
+                ["% of Row Total", "Displays the value as a percentage of the total for its specific row.", "Percentage (%).", "Value Field Settings -> Show Values As -> % of Row Total", "50.00%"],
+                ["% Of (Specific Field)", "Calculates the percentage relative to a specified base field and base item.", "Percentage (%).", "Value Field Settings -> Show Values As -> % Of -> [Base Field]", "% Of 'January' Sales"],
+                ["Difference From", "Shows the absolute numerical difference from a chosen base item.", "Numeric difference.", "Value Field Settings -> Show Values As -> Difference From", "+$500 vs Previous Month"],
+                ["% Difference From", "Shows the percentage difference (variance) from a chosen base item.", "Percentage (%).", "Value Field Settings -> Show Values As -> % Difference From", "+10% vs 2023"],
+                ["Running Total In", "Calculates a cumulative numeric sum across a continuous field (like Dates).", "Numeric cumulative.", "Value Field Settings -> Show Values As -> Running Total In", "$100 -> $250 -> $400"],
+                ["% Running Total In", "Calculates a cumulative sum expressed as a percentage of the total.", "Percentage (%).", "Value Field Settings -> Show Values As -> % Running Total In", "25% -> 60% -> 100%"],
+                ["Rank Smallest to Largest", "Assigns a rank from lowest (1) to highest within a specific group.", "Integer rank.", "Value Field Settings -> Show Values As -> Rank Smallest to Largest", "Rank 1, 2, 3..."],
+                ["Rank Largest to Smallest", "Assigns a rank from highest (1) to lowest within a specific group.", "Integer rank.", "Value Field Settings -> Show Values As -> Rank Largest to Smallest", "Rank 1 for Top Salesperson"]
+            ]],
+            ["✅ Calculated Field Formulas", [
+                ["Calculated Field (Custom Formula)", "Creates a new PivotTable field using mathematical operations on existing fields.", "Calculated numeric value.", "PivotTable Analyze -> Fields, Items, & Sets -> Calculated Field", "= Revenue - Cost"],
+                ["IF (in Pivot)", "Applies conditional logic within a Calculated Field formula.", "Custom based on logical test.", "=IF(Condition, True_Value, False_Value)", "=IF(Sales > 1000, Sales * 0.1, 0)"],
+                ["SUM (in Pivot Formula)", "Hardcodes an explicit summation within a Calculated Field context.", "Numeric sum.", "=SUM(Field1, Field2)", "=SUM(Q1_Sales, Q2_Sales)"],
+                ["COUNT (in Pivot Formula)", "Counts occurrences explicitly within a calculated field context.", "Integer count.", "=COUNT(Field_Name)", "=COUNT(Bonus_Eligible)"]
+            ]],
+            ["✅ Calculated Item (Advanced)", [
+                ["Calculated Item", "Creates a new item inside an existing field using custom formulas combining other items.", "Custom combined value.", "PivotTable Analyze -> Fields, Items, & Sets -> Calculated Item", "= 'Jan' + 'Feb' + 'Mar'"],
+                ["Custom Group Calculation", "Allows manual grouping of text/items and calculates the aggregate for that specific group.", "Grouped aggregate.", "Select Items -> Right Click -> Group", "Group1 (Apples, Oranges)"]
+            ]],
+            ["✅ Grouping Functions in Pivot", [
+                ["Group (Date/Number/Text)", "Combines multiple items, numerical brackets, or dates into customized groupings.", "Grouped field.", "Right Click Item -> Group", "Age 10-19, Age 20-29"],
+                ["Ungroup", "Breaks apart previously grouped items back into their raw, individual states.", "Individual items.", "Right Click Grouped Item -> Ungroup", "Restores original individual dates/values"],
+                ["Auto Group (Dates)", "Automatically rolls up raw dates into Months, Quarters, and Years natively.", "Date hierarchy.", "Drag Date field to Rows (Auto-groups)", "Years -> Quarters -> Months"]
+            ]],
+            ["✅ PivotTable Filters & Logic", [
+                ["Label Filters", "Filters PivotTable rows or columns based on their text or label values.", "Filtered view.", "Row Labels dropdown -> Label Filters", "Begins With 'A'"],
+                ["Value Filters", "Filters PivotTable items based on their aggregated mathematical values.", "Filtered view.", "Row Labels dropdown -> Value Filters", "Sum of Sales is Greater Than 1000"],
+                ["Top 10 Filter", "Shows only the top or bottom 'N' items based on a specific aggregated value.", "Filtered Top/Bottom N view.", "Row Labels dropdown -> Value Filters -> Top 10", "Top 5 Items by Revenue"],
+                ["Date Filters", "Filters date-based fields using relative or absolute timeframes.", "Filtered date view.", "Row Labels dropdown -> Date Filters", "This Month, Next Quarter, Last Year"]
+            ]],
+            ["✅ PivotTable Tools Functions", [
+                ["GETPIVOTDATA", "Extracts specific, reliable aggregated data directly from a PivotTable.", "Numeric value from PivotTable.", "=GETPIVOTDATA(data_field, pivot_table, [field1, item1]...)", "=GETPIVOTDATA(\"Sales\", $A$3, \"Region\", \"East\")"],
+                ["CUBEVALUE (for Power Pivot / Data Model)", "Returns an aggregated value directly from the Excel Data Model (Power Pivot).", "Numeric value.", "=CUBEVALUE(connection, [member_expression1]...)", "=CUBEVALUE(\"ThisWorkbookDataModel\", \"[Measures].[TotalSales]\")"],
+                ["CUBEMEMBER", "Returns a distinct member or tuple string from the Data Model.", "String/Member name.", "=CUBEMEMBER(connection, member_expression)", "=CUBEMEMBER(\"ThisWorkbookDataModel\", \"[DimDate].[Year].&[2023]\")"],
+                ["CUBESET", "Defines a structured set of members or tuples from the Data Model for iteration.", "Set of members.", "=CUBESET(connection, set_expression, [caption])", "=CUBESET(\"ThisWorkbookDataModel\", \"[Product].[Category].Children\")"]
+            ]],
+            ["✅ Time-Based Pivot Calculations", [
+                ["Month Grouping", "Groups granular daily dates strictly into monthly analytical buckets.", "Monthly aggregate.", "Right Click Date -> Group -> Months", "Jan, Feb, Mar..."],
+                ["Quarter Grouping", "Groups dates into financial or calendar quarters for high-level review.", "Quarterly aggregate.", "Right Click Date -> Group -> Quarters", "Q1, Q2, Q3, Q4..."],
+                ["Year Grouping", "Groups dates into yearly buckets to analyze long-term trends.", "Yearly aggregate.", "Right Click Date -> Group -> Years", "2022, 2023, 2024..."],
+                ["Running Total by Date", "Calculates a cumulative sum chronologically to track growth over time.", "Cumulative numeric.", "Value Field Settings -> Show Values As -> Running Total In -> [Date Field]", "Jan: 100, Feb: 250, Mar: 500"]
+            ]],
+            ["🔥 Bonus Pivot Techniques", [
+                ["Dynamic Pivot Calculation", "Using Slicers or OFFSET to make PivotTable calculations react dynamically to UI clicks.", "Dynamic interactive output.", "Insert -> Slicer / Timeline", "Interactive visual dashboard filtering"],
+                ["KPI Calculation (Pivot + IF)", "Using Calculated Fields to create target thresholds returning boolean flags.", "Custom KPI status (1 or 0).", "=IF(Actual_Sales > Target_Sales, 1, 0)", "KPI Output: 1 (Met Target) or 0 (Missed)"],
+                ["Percentage Contribution", "Using '% of Column Total' to analyze the weight/share of sub-categories to the whole.", "Percentage breakdown.", "Value Field Settings -> Show Values As -> % of Column Total", "Shoes: 40%, Shirts: 60%"],
+                ["Trend Analysis (Running Total)", "Visualizing growth over a timeframe using cumulative sums.", "Trend trajectory data.", "Value Field Settings -> Show Values As -> Running Total In -> Date", "YTD Growth trajectory visualization"],
+                ["Ranking in Pivot", "Dynamically ranking items based on a dataset that changes when filtered.", "Dynamic integer rank.", "Value Field Settings -> Show Values As -> Rank Largest to Smallest", "1, 2, 3 (Auto-updates on Slicer click)"]
+            ]]
+        ];
+
+        const container = document.getElementById('dataContainer');
+        const searchInput = document.getElementById('searchInput');
+
+        // Render Data into DOM
+        function renderUI() {
+            container.innerHTML = '';
+            
+            excelData.forEach((category, catIndex) => {
+                const catName = category[0];
+                const functions = category[1];
+
+                // Create Category Block
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category-block active'; // Default open initially to populate layout
+                catDiv.dataset.catName = catName.toLowerCase();
+
+                // Header
+                const catHeader = document.createElement('div');
+                catHeader.className = 'category-header';
+                catHeader.textContent = catName;
+                catHeader.onclick = () => {
+                    catDiv.classList.toggle('active');
+                };
+
+                // Function List
+                const funcList = document.createElement('ul');
+                funcList.className = 'func-list';
+
+                functions.forEach((func) => {
+                    const [fName, fPurpose, fReturn, fSyntax, fExample] = func;
+
+                    const funcItem = document.createElement('li');
+                    funcItem.className = 'func-item';
+                    funcItem.dataset.funcName = fName.toLowerCase();
+                    funcItem.dataset.funcDesc = fPurpose.toLowerCase();
+
+                    // Func Header wrapper
+                    const funcHeader = document.createElement('div');
+                    funcHeader.className = 'func-header';
+                    funcHeader.textContent = fName;
+
+                    funcHeader.onclick = () => {
+                        funcItem.classList.toggle('active');
+                    };
+
+                    // Func Details
+                    const funcDetails = document.createElement('div');
+                    funcDetails.className = 'func-details';
+                    
+                    // Escape < and > to prevent HTML rendering breakage in code blocks
+                    const safeSyntax = fSyntax.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const safeExample = fExample.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                    funcDetails.innerHTML = `
+                        <div class="detail-section">
+                            <h4>Purpose</h4>
+                            <p>${fPurpose}</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Return value</h4>
+                            <p>${fReturn}</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Syntax</h4>
+                            <code>${safeSyntax}</code>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Examples</h4>
+                            <code>${safeExample}</code>
+                        </div>
+                    `;
+
+                    funcItem.appendChild(funcHeader);
+                    funcItem.appendChild(funcDetails);
+                    funcList.appendChild(funcItem);
+                });
+
+                catDiv.appendChild(catHeader);
+                catDiv.appendChild(funcList);
+                container.appendChild(catDiv);
+            });
+        }
+
+        // Live Search/Filter functionality
+        function filterUI() {
+            const query = searchInput.value.toLowerCase().trim();
+            const categories = document.querySelectorAll('.category-block');
+
+            categories.forEach(cat => {
+                let hasVisibleItems = false;
+                const items = cat.querySelectorAll('.func-item');
+
+                items.forEach(item => {
+                    const fName = item.dataset.funcName;
+                    const fDesc = item.dataset.funcDesc;
+                    
+                    if (fName.includes(query) || fDesc.includes(query)) {
+                        item.style.display = 'block';
+                        hasVisibleItems = true;
+                        // Auto-expand item if query is descriptive enough
+                        if(query.length > 2) {
+                            item.classList.add('active');
+                        }
+                    } else {
+                        item.style.display = 'none';
+                        item.classList.remove('active');
+                    }
+                });
+
+                if (hasVisibleItems) {
+                    cat.style.display = 'block';
+                    if(query.length > 0) cat.classList.add('active');
+                } else {
+                    cat.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterUI);
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUI();
+            // Start with only the first category open for a clean UI upon loading
+            const cats = document.querySelectorAll('.category-block');
+            cats.forEach((cat, index) => {
+                if(index !== 0) cat.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
