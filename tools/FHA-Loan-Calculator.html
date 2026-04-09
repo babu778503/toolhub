@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHA Loan Calculator</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Free FHA Loan Calculator by ToolsHub365. Calculate monthly FHA payments including UFMIP, annual MIP, taxes, and insurance. Auto-save feature included.">
+    <meta name="keywords" content="FHA Loan Calculator, FHA Payment Calculator, FHA Mortgage Calculator, UFMIP Calculator, Real Estate Tools, ToolsHub365, FHA loan limit">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://toolshub365.com/fha-loan-calculator">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="FHA Loan Calculator - Accurate Payment Estimator">
+    <meta property="og:description" content="Estimate your FHA mortgage payments including Upfront MIP and monthly insurance costs accurately.">
+    <meta property="og:url" content="https://toolshub365.com/fha-loan-calculator">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MortgageLoan",
+      "name": "FHA Loan Calculator",
+      "description": "Calculates monthly payments for FHA loans including Principal, Interest, Taxes, Insurance, and MIP.",
+      "amount": {
+        "@type": "MonetaryAmount",
+        "currency": "USD"
+      },
+      "brand": {
+        "@type": "Brand",
+        "name": "ToolsHub365"
+      },
+      "category": "Real Estate Tools"
+    }
+    </script>
+
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --primary: #2563eb;       /* Royal Blue */
+            --primary-dark: #1e40af;
+            --header-bg: #0f172a;     /* Dark Slate */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --c-principal: #2563eb;   /* Blue */
+            --c-tax: #10b981;         /* Green */
+            --c-ins: #f59e0b;         /* Orange */
+            --c-mip: #ef4444;         /* Red */
+            --c-hoa: #8b5cf6;         /* Purple */
+        }
+
+        /* --- Reset & Layout --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-top: 50px; /* Space for fixed header */
+        }
+
+        /* --- Fixed Header (50px) --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--header-bg);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* --- Layout Grid --- */
+        .tool-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            padding: 25px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        /* --- Form Elements --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+        
+        .sub-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .prefix, .suffix {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .prefix { left: 10px; }
+        .suffix { right: 10px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 10px 10px 25px; /* space for prefix */
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .input-wrap.has-suffix input {
+            padding-right: 30px;
+        }
+
+        /* --- Buttons --- */
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-calc { background: var(--primary); color: white; }
+        .btn-calc:hover { background: var(--primary-dark); }
+        
+        .btn-clear { background: #e2e8f0; color: var(--text-main); }
+        .btn-clear:hover { background: #cbd5e1; }
+
+        /* --- Results Section --- */
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .big-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .donut-chart {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--c-principal) 0deg 0deg, 
+                var(--border) 0deg 360deg
+            );
+            position: relative;
+        }
+
+        .donut-hole {
+            width: 70%;
+            height: 70%;
+            background: var(--bg-card);
+            border-radius: 50%;
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .breakdown-list {
+            list-style: none;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+        .breakdown-item:last-child { border-bottom: none; }
+
+        .legend-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .loan-summary {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        .loan-summary p {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        /* --- Mobile Specifics (Strict Requirements) --- */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0; /* Remove blank space */
+                max-width: 100%;
+                margin-top: 10px;
+            }
+
+            .tool-wrapper {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .card {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            /* Visual separation between stacked cards */
+            .card:first-child {
+                border-bottom: 10px solid #f1f5f9;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>FHA Loan Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Input Section -->
+            <div class="card">
+                <h2>Loan Details</h2>
+                <form id="fhaForm" onsubmit="event.preventDefault(); calculateFHA();">
+                    
+                    <div class="form-group">
+                        <label for="homePrice">Home Price</label>
+                        <div class="input-wrap">
+                            <span class="prefix">$</span>
+                            <input type="number" id="homePrice" placeholder="300000" oninput="saveData()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="downPayment">Down Payment <span class="sub-label">(Min 3.5%)</span></label>
+                        <div class="input-row">
+                            <div class="input-wrap has-suffix" style="flex:1">
+                                <input type="number" id="downPercent" placeholder="3.5" step="0.1" oninput="updateDownAmount(); saveData()">
+                                <span class="suffix">%</span>
+                            </div>
+                            <div class="input-wrap" style="flex:2">
+                                <span class="prefix">$</span>
+                                <input type="number" id="downAmount" oninput="updateDownPercent(); saveData()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-row">
+                            <div style="flex:1">
+                                <label for="interestRate">Interest Rate</label>
+                                <div class="input-wrap has-suffix">
+                                    <input type="number" id="interestRate" placeholder="6.5" step="0.01" oninput="saveData()">
+                                    <span class="suffix">%</span>
+                                </div>
+                            </div>
+                            <div style="flex:1">
+                                <label for="loanTerm">Loan Term</label>
+                                <div class="input-wrap has-suffix">
+                                    <input type="number" id="loanTerm" placeholder="30" oninput="saveData()">
+                                    <span class="suffix">Yrs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Taxes & Insurance (Annual)</label>
+                        <div class="input-row">
+                            <div class="input-wrap" style="flex:1">
+                                <span class="prefix" style="font-size:0.7em; left:5px;">Tax $</span>
+                                <input type="number" id="propertyTax" placeholder="3000" oninput="saveData()" style="padding-left:45px">
+                            </div>
+                            <div class="input-wrap" style="flex:1">
+                                <span class="prefix" style="font-size:0.7em; left:5px;">Ins $</span>
+                                <input type="number" id="homeInsurance" placeholder="1200" oninput="saveData()" style="padding-left:45px">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hoa">HOA Fees <span class="sub-label">(Monthly, Optional)</span></label>
+                        <div class="input-wrap">
+                            <span class="prefix">$</span>
+                            <input type="number" id="hoa" placeholder="0" oninput="saveData()">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                         <label for="mipRate">Annual MIP Rate <span class="sub-label">(Default 0.55%)</span></label>
+                         <div class="input-wrap has-suffix">
+                            <input type="number" id="mipRate" placeholder="0.55" step="0.01" oninput="saveData()">
+                            <span class="suffix">%</span>
+                        </div>
+                    </div>
+
+                    <div class="btn-container">
+                        <button class="btn btn-calc" onclick="calculateFHA()">Calculate Payment</button>
+                        <button class="btn btn-clear" onclick="clearData()">Clear Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Result Section -->
+            <div class="card">
+                <h2>Monthly Breakdown</h2>
+                
+                <div class="result-header">
+                    <div style="font-size:0.9rem; color:var(--text-muted)">Estimated Monthly Payment</div>
+                    <div class="big-price" id="totalMonthly">$0.00</div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="donut-chart" id="donutChart"></div>
+                    <div class="donut-hole">FHA</div>
+                </div>
+
+                <ul class="breakdown-list">
+                    <li class="breakdown-item">
+                        <span><span class="legend-color" style="background:var(--c-principal)"></span>Principal & Interest</span>
+                        <strong id="valPrincipal">$0.00</strong>
+                    </li>
+                    <li class="breakdown-item">
+                        <span><span class="legend-color" style="background:var(--c-mip)"></span>Mortgage Insurance (MIP)</span>
+                        <strong id="valMip">$0.00</strong>
+                    </li>
+                    <li class="breakdown-item">
+                        <span><span class="legend-color" style="background:var(--c-tax)"></span>Property Tax</span>
+                        <strong id="valTax">$0.00</strong>
+                    </li>
+                    <li class="breakdown-item">
+                        <span><span class="legend-color" style="background:var(--c-ins)"></span>Home Insurance</span>
+                        <strong id="valIns">$0.00</strong>
+                    </li>
+                    <li class="breakdown-item">
+                        <span><span class="legend-color" style="background:var(--c-hoa)"></span>HOA Fees</span>
+                        <strong id="valHoa">$0.00</strong>
+                    </li>
+                </ul>
+
+                <div class="loan-summary">
+                    <p><strong>Base Loan Amount:</strong> <span id="valBaseLoan">$0</span></p>
+                    <p><strong>Upfront MIP (1.75%):</strong> <span id="valUfmip">$0</span></p>
+                    <p style="border-top:1px solid #cbd5e1; padding-top:5px; margin-top:5px;"><strong>Total Financed Loan:</strong> <span id="valTotalLoan">$0</span></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Constants for FHA Logic
+        const UFMIP_RATE = 0.0175; // 1.75% Upfront Mortgage Insurance Premium
+
+        // DOM Elements
+        const els = {
+            price: document.getElementById('homePrice'),
+            downPct: document.getElementById('downPercent'),
+            downAmt: document.getElementById('downAmount'),
+            rate: document.getElementById('interestRate'),
+            term: document.getElementById('loanTerm'),
+            tax: document.getElementById('propertyTax'),
+            ins: document.getElementById('homeInsurance'),
+            hoa: document.getElementById('hoa'),
+            mipRate: document.getElementById('mipRate'),
+            // Outputs
+            totalMonthly: document.getElementById('totalMonthly'),
+            valPrincipal: document.getElementById('valPrincipal'),
+            valMip: document.getElementById('valMip'),
+            valTax: document.getElementById('valTax'),
+            valIns: document.getElementById('valIns'),
+            valHoa: document.getElementById('valHoa'),
+            valBaseLoan: document.getElementById('valBaseLoan'),
+            valUfmip: document.getElementById('valUfmip'),
+            valTotalLoan: document.getElementById('valTotalLoan'),
+            donut: document.getElementById('donutChart')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // Optional: Run calculation on load if data exists
+            if (els.price.value) calculateFHA();
+        });
+
+        // Sync Down Payment Fields
+        function updateDownAmount() {
+            const price = parseFloat(els.price.value) || 0;
+            const pct = parseFloat(els.downPct.value) || 0;
+            els.downAmt.value = ((price * pct) / 100).toFixed(0);
+        }
+
+        function updateDownPercent() {
+            const price = parseFloat(els.price.value) || 0;
+            const amt = parseFloat(els.downAmt.value) || 0;
+            if (price > 0) els.downPct.value = ((amt / price) * 100).toFixed(2);
+        }
+
+        // Calculation Logic
+        function calculateFHA() {
+            // Get Values
+            const price = parseFloat(els.price.value) || 0;
+            const downAmt = parseFloat(els.downAmt.value) || 0;
+            const rate = parseFloat(els.rate.value) || 0;
+            const term = parseFloat(els.term.value) || 30;
+            const tax = parseFloat(els.tax.value) || 0;
+            const ins = parseFloat(els.ins.value) || 0;
+            const hoa = parseFloat(els.hoa.value) || 0;
+            let mipRatePct = parseFloat(els.mipRate.value);
+
+            // Default MIP if empty
+            if (isNaN(mipRatePct)) {
+                mipRatePct = 0.55; 
+                els.mipRate.value = 0.55;
+            }
+
+            if (price === 0) return;
+
+            // 1. Calculate Loans
+            const baseLoan = price - downAmt;
+            const ufmipAmt = baseLoan * UFMIP_RATE;
+            const totalLoan = baseLoan + ufmipAmt;
+
+            // 2. Monthly P&I (Principal & Interest)
+            // Formula: M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1 ]
+            const monthlyRate = rate / 100 / 12;
+            const numberOfPayments = term * 12;
+            
+            let monthlyPI = 0;
+            if (rate === 0) {
+                monthlyPI = totalLoan / numberOfPayments;
+            } else {
+                monthlyPI = totalLoan * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+            }
+
+            // 3. Components
+            const monthlyTax = tax / 12;
+            const monthlyIns = ins / 12;
+            const monthlyMip = (baseLoan * (mipRatePct / 100)) / 12; // MIP calculated on base loan average usually, but simplified here to base loan * rate / 12 which is standard estimate
+            
+            const totalMonthlyPayment = monthlyPI + monthlyTax + monthlyIns + monthlyMip + hoa;
+
+            // 4. Update UI
+            els.totalMonthly.innerText = formatMoney(totalMonthlyPayment);
+            els.valPrincipal.innerText = formatMoney(monthlyPI);
+            els.valMip.innerText = formatMoney(monthlyMip);
+            els.valTax.innerText = formatMoney(monthlyTax);
+            els.valIns.innerText = formatMoney(monthlyIns);
+            els.valHoa.innerText = formatMoney(hoa);
+
+            els.valBaseLoan.innerText = formatMoney(baseLoan);
+            els.valUfmip.innerText = formatMoney(ufmipAmt);
+            els.valTotalLoan.innerText = formatMoney(totalLoan);
+
+            // 5. Update Donut Chart
+            updateChart(monthlyPI, monthlyMip, monthlyTax, monthlyIns, hoa, totalMonthlyPayment);
+        }
+
+        // Helper: Chart Rendering
+        function updateChart(pi, mip, tax, ins, hoa, total) {
+            if (total === 0) return;
+
+            // Calculate degrees
+            const degPI = (pi / total) * 360;
+            const degMIP = (mip / total) * 360;
+            const degTax = (tax / total) * 360;
+            const degIns = (ins / total) * 360;
+            const degHoa = (hoa / total) * 360;
+
+            const cPI = 'var(--c-principal)';
+            const cMIP = 'var(--c-mip)';
+            const cTax = 'var(--c-tax)';
+            const cIns = 'var(--c-ins)';
+            const cHoa = 'var(--c-hoa)';
+
+            // Build Conic Gradient
+            // Start at 0, PI ends at degPI
+            // MIP starts at degPI, ends at degPI + degMIP, etc.
+            let currentDeg = 0;
+            let grad = `conic-gradient(`;
+            
+            grad += `${cPI} 0deg ${degPI}deg, `;
+            currentDeg += degPI;
+            
+            grad += `${cMIP} ${currentDeg}deg ${currentDeg + degMIP}deg, `;
+            currentDeg += degMIP;
+            
+            grad += `${cTax} ${currentDeg}deg ${currentDeg + degTax}deg, `;
+            currentDeg += degTax;
+            
+            grad += `${cIns} ${currentDeg}deg ${currentDeg + degIns}deg, `;
+            currentDeg += degIns;
+            
+            grad += `${cHoa} ${currentDeg}deg 360deg)`;
+
+            els.donut.style.background = grad;
+        }
+
+        // Helper: Format Money
+        function formatMoney(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+
+        // Local Storage
+        function saveData() {
+            const data = {
+                price: els.price.value,
+                downPct: els.downPct.value,
+                downAmt: els.downAmt.value,
+                rate: els.rate.value,
+                term: els.term.value,
+                tax: els.tax.value,
+                ins: els.ins.value,
+                hoa: els.hoa.value,
+                mip: els.mipRate.value
+            };
+            localStorage.setItem('fha_calc_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('fha_calc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                els.price.value = data.price || '';
+                els.downPct.value = data.downPct || '';
+                els.downAmt.value = data.downAmt || '';
+                els.rate.value = data.rate || '';
+                els.term.value = data.term || '';
+                els.tax.value = data.tax || '';
+                els.ins.value = data.ins || '';
+                els.hoa.value = data.hoa || '';
+                els.mipRate.value = data.mip || '';
+            }
+        }
+
+        function clearData() {
+            localStorage.removeItem('fha_calc_data');
+            document.getElementById('fhaForm').reset();
+            // Reset text results
+            els.totalMonthly.innerText = '$0.00';
+            els.valPrincipal.innerText = '$0.00';
+            els.valMip.innerText = '$0.00';
+            els.valTax.innerText = '$0.00';
+            els.valIns.innerText = '$0.00';
+            els.valHoa.innerText = '$0.00';
+            els.valBaseLoan.innerText = '$0.00';
+            els.valUfmip.innerText = '$0.00';
+            els.valTotalLoan.innerText = '$0.00';
+            els.donut.style.background = '#e2e8f0'; // Reset chart color
+        }
+    </script>
+</body>
+</html>

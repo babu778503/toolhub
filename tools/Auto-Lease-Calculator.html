@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Lease Calculator</title>
+    
+    <!-- SEO & Metadata for Toolshub365.com -->
+    <meta name="description" content="Free Auto Lease Calculator to estimate monthly car lease payments. Calculate based on MSRP, negotiated price, residual value, and money factor.">
+    <meta name="keywords" content="Auto Lease Calculator, Car Lease Calculator, Lease Payment Estimator, Residual Value, Money Factor, Auto Finance, Toolshub365">
+    <meta name="author" content="Toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/auto-lease-calculator">
+    
+    <!-- Technical SEO for AI Crawlers (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Auto Lease Calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A comprehensive Auto Lease Calculator to compute monthly payments including depreciation, finance charges, and taxes.",
+      "featureList": "APR to Money Factor conversion, Residual value calculation, Auto-save data",
+      "author": {
+        "@type": "Organization",
+        "name": "Toolshub365"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #2563eb;       /* Blue */
+            --secondary-color: #1e40af;     /* Dark Blue */
+            --bg-color: #f3f4f6;            /* Light Gray Background */
+            --card-bg: #ffffff;             /* White Card */
+            --text-main: #1f2937;           /* Dark Text */
+            --text-secondary: #6b7280;      /* Gray Text */
+            --border-color: #e5e7eb;        /* Border Gray */
+            --highlight-color: #10b981;     /* Green for Money */
+            --header-height: 50px;
+        }
+
+        /* Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Main Layout */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Column Styles */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            flex: 1;
+            min-width: 320px;
+        }
+
+        /* Input Forms */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 15px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .prefix span { left: 10px; }
+        .suffix span { right: 10px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .prefix input { padding-left: 25px; }
+        .suffix input { padding-right: 30px; }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Result Styles */
+        .result-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-main);
+        }
+
+        .monthly-payment-box {
+            background-color: #f0fdf4; /* Light Green bg */
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .monthly-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .monthly-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--highlight-color);
+            margin-top: 5px;
+        }
+
+        .breakdown-list {
+            list-style: none;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .val {
+            font-weight: 600;
+        }
+
+        /* Visual Bar Graph */
+        .bar-container {
+            display: flex;
+            height: 12px;
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .bar-depreciation { background-color: var(--primary-color); height: 100%; }
+        .bar-finance { background-color: #f59e0b; height: 100%; } /* Orange */
+        .bar-tax { background-color: #ef4444; height: 100%; } /* Red */
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Buttons */
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                padding: 0; /* Edge to Edge */
+                gap: 0;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                width: 100%;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .input-section {
+                padding-bottom: 10px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Auto Lease Calculator</h1>
+    </header>
+
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            <h3 style="margin-bottom: 20px; color: var(--text-main);">Lease Details</h3>
+            
+            <div class="form-group">
+                <label for="msrp">MSRP (Sticker Price)</label>
+                <div class="input-wrapper prefix">
+                    <span>$</span>
+                    <input type="number" id="msrp" placeholder="35000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="negotiatedPrice">Negotiated Price</label>
+                <div class="input-wrapper prefix">
+                    <span>$</span>
+                    <input type="number" id="negotiatedPrice" placeholder="32000">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="downPayment">Down Payment</label>
+                    <div class="input-wrapper prefix">
+                        <span>$</span>
+                        <input type="number" id="downPayment" placeholder="2000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="taxRate">Sales Tax</label>
+                    <div class="input-wrapper suffix">
+                        <span>%</span>
+                        <input type="number" id="taxRate" placeholder="7.5" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="term">Lease Term</label>
+                    <div class="input-wrapper suffix">
+                        <span>Mo</span>
+                        <input type="number" id="term" placeholder="36">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="interestRate">Interest Rate (APR)</label>
+                    <div class="input-wrapper suffix">
+                        <span>%</span>
+                        <input type="number" id="interestRate" placeholder="4.5" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="residual">Residual Value</label>
+                <div class="input-wrapper suffix">
+                    <span>%</span>
+                    <input type="number" id="residual" placeholder="55" step="1">
+                </div>
+                <small style="color: #9ca3af; font-size: 0.8rem;">Typical range: 45% - 65%</small>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <div class="result-header">
+                <h2>Payment Breakdown</h2>
+            </div>
+
+            <div class="monthly-payment-box">
+                <div class="monthly-label">Estimated Monthly Payment</div>
+                <div class="monthly-value" id="totalMonthly">$0.00</div>
+                <div style="margin-top:5px; font-size: 0.85rem; color: var(--text-secondary);">
+                    (Including Tax)
+                </div>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-depreciation" id="barDep" style="width: 0%"></div>
+                <div class="bar-finance" id="barFin" style="width: 0%"></div>
+                <div class="bar-tax" id="barTax" style="width: 0%"></div>
+            </div>
+            <div class="legend">
+                <div class="legend-item"><div class="dot" style="background: var(--primary-color)"></div> Depreciation</div>
+                <div class="legend-item"><div class="dot" style="background: #f59e0b"></div> Interest</div>
+                <div class="legend-item"><div class="dot" style="background: #ef4444"></div> Tax</div>
+            </div>
+
+            <ul class="breakdown-list">
+                <li class="breakdown-item">
+                    <span>Base Monthly (Pre-Tax)</span>
+                    <span class="val" id="baseMonthly">$0.00</span>
+                </li>
+                <li class="breakdown-item">
+                    <span>Monthly Depreciation</span>
+                    <span class="val" id="monthlyDepreciation">$0.00</span>
+                </li>
+                <li class="breakdown-item">
+                    <span>Monthly Finance (Rent)</span>
+                    <span class="val" id="monthlyFinance">$0.00</span>
+                </li>
+                <li class="breakdown-item">
+                    <span>Monthly Tax</span>
+                    <span class="val" id="monthlyTax">$0.00</span>
+                </li>
+                <li class="breakdown-item" style="border-top: 1px solid var(--border-color); margin-top: 10px; padding-top: 10px; border-bottom: none;">
+                    <span>Total Lease Cost</span>
+                    <span class="val" id="totalLeaseCost">$0.00</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const els = {
+            msrp: document.getElementById('msrp'),
+            negotiatedPrice: document.getElementById('negotiatedPrice'),
+            downPayment: document.getElementById('downPayment'),
+            taxRate: document.getElementById('taxRate'),
+            term: document.getElementById('term'),
+            interestRate: document.getElementById('interestRate'),
+            residual: document.getElementById('residual'),
+            
+            // Outputs
+            totalMonthly: document.getElementById('totalMonthly'),
+            baseMonthly: document.getElementById('baseMonthly'),
+            monthlyDepreciation: document.getElementById('monthlyDepreciation'),
+            monthlyFinance: document.getElementById('monthlyFinance'),
+            monthlyTax: document.getElementById('monthlyTax'),
+            totalLeaseCost: document.getElementById('totalLeaseCost'),
+            
+            // Bars
+            barDep: document.getElementById('barDep'),
+            barFin: document.getElementById('barFin'),
+            barTax: document.getElementById('barTax')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            calculateLease();
+        });
+
+        // Add Listeners
+        const inputs = [els.msrp, els.negotiatedPrice, els.downPayment, els.taxRate, els.term, els.interestRate, els.residual];
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                calculateLease();
+                saveData();
+            });
+        });
+
+        // Main Logic
+        function calculateLease() {
+            // Get Values
+            const msrp = parseFloat(els.msrp.value) || 0;
+            const sellingPrice = parseFloat(els.negotiatedPrice.value) || 0;
+            const down = parseFloat(els.downPayment.value) || 0;
+            const tax = (parseFloat(els.taxRate.value) || 0) / 100;
+            const months = parseFloat(els.term.value) || 0;
+            const apr = parseFloat(els.interestRate.value) || 0;
+            const residPct = (parseFloat(els.residual.value) || 0) / 100;
+
+            if (months === 0 || msrp === 0) {
+                resetResults();
+                return;
+            }
+
+            // Calculations
+            // 1. Residual Value Amount
+            const residualValue = msrp * residPct;
+
+            // 2. Net Capitalized Cost (Adjusted Cost)
+            // Price - Down Payment
+            const netCapCost = Math.max(0, sellingPrice - down);
+
+            // 3. Depreciation Fee
+            const depreciationFee = (netCapCost - residualValue) / months;
+
+            // 4. Finance Fee (Money Factor)
+            // APR to Money Factor = APR / 2400
+            const moneyFactor = apr / 2400;
+            const financeFee = (netCapCost + residualValue) * moneyFactor;
+
+            // 5. Base Monthly Payment
+            const basePayment = depreciationFee + financeFee;
+
+            // 6. Taxes (Monthly Sales Tax)
+            // Most states tax the monthly payment
+            const monthlyTaxAmt = basePayment * tax;
+
+            // 7. Total Monthly
+            const totalMonthlyPayment = basePayment + monthlyTaxAmt;
+
+            // 8. Total Cost
+            const totalCost = (totalMonthlyPayment * months) + down;
+
+            // Update UI
+            if (basePayment < 0) {
+                // Edge case where down payment covers everything
+                resetResults();
+                return;
+            }
+
+            const format = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+
+            els.totalMonthly.textContent = format(totalMonthlyPayment);
+            els.baseMonthly.textContent = format(basePayment);
+            els.monthlyDepreciation.textContent = format(depreciationFee);
+            els.monthlyFinance.textContent = format(financeFee);
+            els.monthlyTax.textContent = format(monthlyTaxAmt);
+            els.totalLeaseCost.textContent = format(totalCost);
+
+            // Update Graph
+            if (totalMonthlyPayment > 0) {
+                const depPct = (depreciationFee / totalMonthlyPayment) * 100;
+                const finPct = (financeFee / totalMonthlyPayment) * 100;
+                const taxPct = (monthlyTaxAmt / totalMonthlyPayment) * 100;
+
+                els.barDep.style.width = `${depPct}%`;
+                els.barFin.style.width = `${finPct}%`;
+                els.barTax.style.width = `${taxPct}%`;
+            }
+        }
+
+        function resetResults() {
+            els.totalMonthly.textContent = "$0.00";
+            els.baseMonthly.textContent = "$0.00";
+            els.monthlyDepreciation.textContent = "$0.00";
+            els.monthlyFinance.textContent = "$0.00";
+            els.monthlyTax.textContent = "$0.00";
+            els.totalLeaseCost.textContent = "$0.00";
+            els.barDep.style.width = "0%";
+            els.barFin.style.width = "0%";
+            els.barTax.style.width = "0%";
+        }
+
+        // Storage
+        function saveData() {
+            const data = {
+                msrp: els.msrp.value,
+                negotiatedPrice: els.negotiatedPrice.value,
+                downPayment: els.downPayment.value,
+                taxRate: els.taxRate.value,
+                term: els.term.value,
+                interestRate: els.interestRate.value,
+                residual: els.residual.value
+            };
+            localStorage.setItem('toolshub365_lease_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('toolshub365_lease_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                els.msrp.value = data.msrp || '';
+                els.negotiatedPrice.value = data.negotiatedPrice || '';
+                els.downPayment.value = data.downPayment || '';
+                els.taxRate.value = data.taxRate || '';
+                els.term.value = data.term || '';
+                els.interestRate.value = data.interestRate || '';
+                els.residual.value = data.residual || '';
+            } else {
+                // Set reasonable defaults
+                els.msrp.value = 35000;
+                els.negotiatedPrice.value = 33000;
+                els.downPayment.value = 2000;
+                els.taxRate.value = 7;
+                els.term.value = 36;
+                els.interestRate.value = 5;
+                els.residual.value = 55;
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear all data?")) {
+                localStorage.removeItem('toolshub365_lease_data');
+                // Reset inputs to reasonable defaults
+                els.msrp.value = 35000;
+                els.negotiatedPrice.value = 33000;
+                els.downPayment.value = 2000;
+                els.taxRate.value = 7;
+                els.term.value = 36;
+                els.interestRate.value = 5;
+                els.residual.value = 55;
+                calculateLease();
+            }
+        }
+    </script>
+</body>
+</html>

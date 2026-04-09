@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pension Calculator</title>
+    <meta name="description" content="Free Pension Calculator by ToolsHub365. Estimate your retirement pot and future annual income based on your contributions and investment growth.">
+    <meta name="keywords" content="pension calculator, retirement planner, pension pot calculator, 401k calculator, retirement income, finance tool, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/pension-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/pension-calculator">
+    <meta property="og:title" content="Pension Calculator">
+    <meta property="og:description" content="Plan your retirement securely with our Pension Calculator. Visualize your pension pot growth and estimated income.">
+
+    <!-- Schema.org for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Pension Calculator",
+      "url": "https://toolshub365.com/pension-calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "description": "A tool to calculate the estimated value of a pension pot at retirement and the potential annual income it could generate.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ToolsHub365"
+      }
+    }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #6366f1; /* Indigo */
+            --secondary-color: #4f46e5;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --header-height: 50px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Inputs left, Results right */
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* Sections */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group input.has-icon {
+            padding-left: 28px;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Input Row for Ages */
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        .input-row .form-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-clear {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .card sub {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin-top: 0;
+                gap: 5px;
+                width: 100%;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px 15px;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            /* Remove side spaces */
+            .main-wrapper {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Pension Calculator</h1>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Input Section -->
+            <div class="input-section">
+                <form id="calcForm" onsubmit="event.preventDefault(); calculatePension();">
+                    
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label for="currentAge">Current Age</label>
+                            <input type="number" id="currentAge" placeholder="30" min="18" max="99" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="retireAge">Retirement Age</label>
+                            <input type="number" id="retireAge" placeholder="65" min="19" max="100" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currentPot">Current Pension Pot</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="currentPot" class="has-icon" placeholder="15000" min="0" step="1">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label for="monthlyContrib">Your Monthly Contribution</label>
+                            <div class="input-wrapper">
+                                <span>$</span>
+                                <input type="number" id="monthlyContrib" class="has-icon" placeholder="300" min="0" step="1" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="employerContrib">Employer Contribution</label>
+                            <div class="input-wrapper">
+                                <span>$</span>
+                                <input type="number" id="employerContrib" class="has-icon" placeholder="150" min="0" step="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="growthRate">Annual Investment Growth (%)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="growthRate" placeholder="5" min="0" max="20" step="0.1" required>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-calc">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearData()">Clear Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section">
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>Total Pension Pot</h3>
+                        <p id="res-pot">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Est. Annual Income</h3>
+                        <p id="res-income">-</p>
+                        <sub>(Based on 4% withdrawal)</sub>
+                    </div>
+                    <div class="card">
+                        <h3>Est. Monthly Income</h3>
+                        <p id="res-monthly">-</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="pensionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('calcForm');
+        const inputs = ['currentAge', 'retireAge', 'currentPot', 'monthlyContrib', 'employerContrib', 'growthRate'];
+        let myChart = null;
+
+        // On Load: Retrieve Data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // Trigger calculation if minimal data exists
+            if(document.getElementById('monthlyContrib').value && document.getElementById('currentAge').value) {
+                calculatePension();
+            }
+        });
+
+        // Add Autosave Listeners
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', saveData);
+            el.addEventListener('change', saveData);
+        });
+
+        // Save Data to LocalStorage
+        function saveData() {
+            const data = {};
+            inputs.forEach(id => {
+                data[id] = document.getElementById(id).value;
+            });
+            localStorage.setItem('pension_calc_data', JSON.stringify(data));
+        }
+
+        // Load Data from LocalStorage
+        function loadData() {
+            const saved = localStorage.getItem('pension_calc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                inputs.forEach(id => {
+                    if(data[id]) document.getElementById(id).value = data[id];
+                });
+            }
+        }
+
+        // Clear Data
+        function clearData() {
+            if(confirm('Are you sure you want to clear all data?')) {
+                localStorage.removeItem('pension_calc_data');
+                form.reset();
+                document.getElementById('res-pot').innerText = '-';
+                document.getElementById('res-income').innerText = '-';
+                document.getElementById('res-monthly').innerText = '-';
+                
+                if (myChart) {
+                    myChart.destroy();
+                    myChart = null;
+                }
+            }
+        }
+
+        // Calculation Logic
+        function calculatePension() {
+            // Get Values
+            const currentAge = parseInt(document.getElementById('currentAge').value) || 0;
+            const retireAge = parseInt(document.getElementById('retireAge').value) || 0;
+            const startPot = parseFloat(document.getElementById('currentPot').value) || 0;
+            const userMonthly = parseFloat(document.getElementById('monthlyContrib').value) || 0;
+            const employerMonthly = parseFloat(document.getElementById('employerContrib').value) || 0;
+            const rate = parseFloat(document.getElementById('growthRate').value) || 0;
+
+            if (currentAge === 0 || retireAge <= currentAge) return;
+
+            const yearsToGrow = retireAge - currentAge;
+            let currentBalance = startPot;
+            let totalContrib = startPot;
+
+            // Arrays for Chart
+            const labels = [];
+            const balanceData = [];
+            const contribData = [];
+            const growthData = [];
+
+            // Initial Point
+            labels.push(currentAge);
+            balanceData.push(currentBalance);
+            contribData.push(totalContrib);
+            growthData.push(0);
+
+            // Total Monthly Contribution
+            const totalMonthlyContrib = userMonthly + employerMonthly;
+
+            for (let i = 1; i <= yearsToGrow; i++) {
+                // Annualize Contribution
+                let annualContrib = totalMonthlyContrib * 12;
+
+                // Add Contributions
+                currentBalance += annualContrib;
+                totalContrib += annualContrib;
+
+                // Apply Growth (Annual Compounding approximated)
+                // Note: Standard Pension calculators often apply half-year growth to new contributions 
+                // and full year to existing pot.
+                let interest = (currentBalance - annualContrib/2) * (rate / 100);
+                
+                // For simplicity in visualizer: Apply interest to total balance at end of year
+                // currentBalance = currentBalance * (1 + rate/100); 
+                // Refining logic: Add contributions, then apply growth is standard simple model
+                
+                // Better approach:
+                // Start Bal * (1+r) + Contrib * (1+r/2) (Approx for monthly deposits)
+                let interestOnPot = (currentBalance - annualContrib) * (rate/100);
+                let interestOnContrib = annualContrib * (rate/100) / 2; // Average money is in for half year
+                
+                currentBalance += (interestOnPot + interestOnContrib); // Update balance with Interest
+
+                labels.push(currentAge + i);
+                balanceData.push(currentBalance);
+                contribData.push(totalContrib);
+                growthData.push(currentBalance - totalContrib);
+            }
+
+            // Estimate Income (4% Rule)
+            const safeWithdrawalRate = 0.04;
+            const annualIncome = currentBalance * safeWithdrawalRate;
+            const monthlyIncome = annualIncome / 12;
+
+            // Update UI
+            const currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('res-pot').innerText = currencyFormatter.format(currentBalance);
+            document.getElementById('res-income').innerText = currencyFormatter.format(annualIncome);
+            document.getElementById('res-monthly').innerText = currencyFormatter.format(monthlyIncome);
+
+            updateChart(labels, contribData, growthData);
+            saveData();
+        }
+
+        function updateChart(labels, contribArr, growthArr) {
+            const ctx = document.getElementById('pensionChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total Contributions',
+                            data: contribArr,
+                            backgroundColor: '#818cf8', /* Soft Indigo */
+                            stack: 'Stack 0'
+                        },
+                        {
+                            label: 'Investment Growth',
+                            data: growthArr,
+                            backgroundColor: '#4338ca', /* Dark Indigo */
+                            stack: 'Stack 0'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if(value >= 1000000) return '$' + (value/1000000).toFixed(1) + 'M';
+                                    if(value >= 1000) return '$' + (value/1000).toFixed(0) + 'k';
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

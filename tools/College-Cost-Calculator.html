@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>College Cost Calculator</title>
+    <meta name="description" content="Free College Cost Calculator by ToolsHub365. Estimate future tuition costs, inflation, and how much you need to save for your child's education.">
+    <meta name="keywords" content="college cost calculator, tuition calculator, 529 calculator, education savings planner, university cost estimator, finance tool, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/college-cost-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/college-cost-calculator">
+    <meta property="og:title" content="College Cost Calculator">
+    <meta property="og:description" content="Plan for your child's future education. Calculate projected college costs and savings shortfalls.">
+
+    <!-- Schema.org for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "College Cost Calculator",
+      "url": "https://toolshub365.com/college-cost-calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "description": "A tool to estimate the future cost of college education and calculate required savings based on inflation and investment returns.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ToolsHub365"
+      }
+    }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1e40af; /* Academic Blue */
+            --secondary-color: #1e3a8a;
+            --accent-color: #fbbf24; /* Gold/Diploma color */
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --header-height: 50px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Inputs left, Results right */
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* Sections */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group input.has-icon {
+            padding-left: 30px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+        }
+
+        /* Input Row */
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        .input-row .form-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-clear {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Area */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 0.8rem;
+            color: #1e3a8a;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card.highlight {
+            background-color: #fef3c7;
+            border-left-color: #d97706;
+        }
+        .card.highlight h3 { color: #b45309; }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin-top: 0;
+                gap: 5px;
+                width: 100%;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px 15px;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            /* Remove side spaces for mobile */
+            .main-wrapper {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>College Cost Calculator</h1>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Input Section -->
+            <div class="input-section">
+                <form id="calcForm" onsubmit="event.preventDefault(); calculateCollege();">
+                    
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label for="childAge">Current Age of Child</label>
+                            <input type="number" id="childAge" placeholder="5" min="0" max="17" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="collegeAge">College Start Age</label>
+                            <input type="number" id="collegeAge" placeholder="18" min="16" max="25" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currentCost">Current Annual Cost (Tuition + Room)</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="currentCost" class="has-icon" placeholder="25000" min="0" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label for="inflation">Tuition Inflation (%)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="inflation" placeholder="5" min="0" max="20" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Duration (Years)</label>
+                            <input type="number" id="duration" placeholder="4" min="1" max="8" step="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="savings">Current Savings (529/Other)</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="savings" class="has-icon" placeholder="10000" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="monthlyContrib">Monthly Contribution</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="monthlyContrib" class="has-icon" placeholder="200" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="returnRate">Investment Return (%)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="returnRate" placeholder="6" min="0" max="20" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-calc">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearData()">Clear Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section">
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>Projected Total Cost</h3>
+                        <p id="res-totalCost">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Projected Savings</h3>
+                        <p id="res-totalSaved">-</p>
+                    </div>
+                    <div class="card highlight">
+                        <h3>Shortfall / Surplus</h3>
+                        <p id="res-gap">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Est. Monthly to Cover</h3>
+                        <p id="res-needed">-</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="collegeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('calcForm');
+        const inputs = ['childAge', 'collegeAge', 'currentCost', 'inflation', 'duration', 'savings', 'monthlyContrib', 'returnRate'];
+        let myChart = null;
+
+        // On Load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            if(document.getElementById('currentCost').value && document.getElementById('childAge').value) {
+                calculateCollege();
+            }
+        });
+
+        // Autosave
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', saveData);
+            el.addEventListener('change', saveData);
+        });
+
+        function saveData() {
+            const data = {};
+            inputs.forEach(id => {
+                data[id] = document.getElementById(id).value;
+            });
+            localStorage.setItem('college_calc_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('college_calc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                inputs.forEach(id => {
+                    if(data[id]) document.getElementById(id).value = data[id];
+                });
+            }
+        }
+
+        function clearData() {
+            if(confirm('Are you sure you want to clear all data?')) {
+                localStorage.removeItem('college_calc_data');
+                form.reset();
+                resetResults();
+            }
+        }
+
+        function resetResults() {
+            document.getElementById('res-totalCost').innerText = '-';
+            document.getElementById('res-totalSaved').innerText = '-';
+            document.getElementById('res-gap').innerText = '-';
+            document.getElementById('res-needed').innerText = '-';
+            if (myChart) {
+                myChart.destroy();
+                myChart = null;
+            }
+        }
+
+        // Calculation Logic
+        function calculateCollege() {
+            // Get Values
+            const childAge = parseInt(document.getElementById('childAge').value) || 0;
+            const collegeAge = parseInt(document.getElementById('collegeAge').value) || 18;
+            const currentAnnualCost = parseFloat(document.getElementById('currentCost').value) || 0;
+            const inflationRate = parseFloat(document.getElementById('inflation').value) || 0;
+            const duration = parseInt(document.getElementById('duration').value) || 4;
+            
+            const currentSavings = parseFloat(document.getElementById('savings').value) || 0;
+            const monthlyContrib = parseFloat(document.getElementById('monthlyContrib').value) || 0;
+            const returnRate = parseFloat(document.getElementById('returnRate').value) || 0;
+
+            if (collegeAge <= childAge) {
+                alert("College Start Age must be greater than Child Age");
+                return;
+            }
+
+            const yearsUntilStart = collegeAge - childAge;
+            const monthsUntilStart = yearsUntilStart * 12;
+
+            // 1. Calculate Future Cost of College
+            // The cost increases every year until college starts, AND increases during the 4 years of college.
+            let totalFutureCost = 0;
+            let firstYearCost = currentAnnualCost * Math.pow(1 + inflationRate/100, yearsUntilStart);
+            
+            // Loop through college duration to get total cost (accounting for annual inflation)
+            for (let i = 0; i < duration; i++) {
+                totalFutureCost += firstYearCost * Math.pow(1 + inflationRate/100, i);
+            }
+
+            // 2. Calculate Future Value of Savings (at start of college)
+            // FV of Lump Sum
+            const fvLumpSum = currentSavings * Math.pow(1 + returnRate/100, yearsUntilStart);
+            
+            // FV of Monthly Contributions (Series)
+            // Formula: PMT * (((1 + r/n)^(nt) - 1) / (r/n))
+            // n = 12, t = yearsUntilStart
+            const r_monthly = (returnRate / 100) / 12;
+            let fvSeries = 0;
+            if (returnRate === 0) {
+                fvSeries = monthlyContrib * monthsUntilStart;
+            } else {
+                fvSeries = monthlyContrib * ((Math.pow(1 + r_monthly, monthsUntilStart) - 1) / r_monthly);
+            }
+
+            const totalProjectedSavings = fvLumpSum + fvSeries;
+            const gap = totalProjectedSavings - totalFutureCost;
+
+            // 3. Calculate "Monthly Needed" to close gap
+            // If gap is negative (shortfall), calculate PMT needed to reach the positive gap amount
+            let monthlyNeeded = 0;
+            if (gap < 0) {
+                const shortfall = Math.abs(gap);
+                // We need to generate 'shortfall' amount over 'monthsUntilStart' period
+                // We assume existing savings are already accounted for, so this is EXTRA monthly or TOTAL monthly?
+                // Usually "Monthly contribution needed" means Total needed.
+                // Target Future Value = TotalFutureCost
+                // FV_Existing + FV_NewContribs = TotalFutureCost
+                // FV_NewContribs = TotalFutureCost - FV_Existing (Lump sum growth)
+                
+                const targetFromSeries = totalFutureCost - fvLumpSum;
+                
+                if (targetFromSeries > 0) {
+                     if (returnRate === 0) {
+                        monthlyNeeded = targetFromSeries / monthsUntilStart;
+                    } else {
+                        monthlyNeeded = targetFromSeries * (r_monthly / (Math.pow(1 + r_monthly, monthsUntilStart) - 1));
+                    }
+                }
+            }
+
+            // Update UI
+            const currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('res-totalCost').innerText = currencyFormatter.format(totalFutureCost);
+            document.getElementById('res-totalSaved').innerText = currencyFormatter.format(totalProjectedSavings);
+            
+            const gapEl = document.getElementById('res-gap');
+            gapEl.innerText = currencyFormatter.format(gap);
+            gapEl.style.color = gap < 0 ? '#ef4444' : '#10b981'; // Red if shortfall, Green if surplus
+
+            document.getElementById('res-needed').innerText = gap < 0 
+                ? currencyFormatter.format(monthlyNeeded) 
+                : "Fully Funded!";
+
+            generateChart(yearsUntilStart, currentSavings, monthlyContrib, returnRate, totalFutureCost);
+            saveData();
+        }
+
+        function generateChart(years, startBal, monthly, rate, totalCostGoal) {
+            const labels = [];
+            const savingsData = [];
+            const goalData = [];
+            
+            let currentBal = startBal;
+            const r_monthly = (rate / 100) / 12;
+
+            labels.push('Now');
+            savingsData.push(currentBal);
+            
+            // Just a straight line for goal visualization is simple, 
+            // or we could show the "Required Path". 
+            // Let's just show savings growth vs a static line of the goal at the end.
+            
+            // For chart aesthetics, we create a flat line for the goal or a step up?
+            // Let's make the goal line simply the Total Cost Value appearing at the end.
+            
+            // Loop years
+            for (let i = 1; i <= years; i++) {
+                // Compound 12 months
+                for (let m = 0; m < 12; m++) {
+                    currentBal = (currentBal + monthly) * (1 + r_monthly);
+                }
+                labels.push(`Year ${i}`);
+                savingsData.push(currentBal);
+            }
+
+            // Create a target line dataset (all values = totalCostGoal)
+            for(let i=0; i<labels.length; i++) {
+                goalData.push(totalCostGoal);
+            }
+
+            updateChart(labels, savingsData, goalData);
+        }
+
+        function updateChart(labels, savings, goal) {
+            const ctx = document.getElementById('collegeChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Projected Savings',
+                            data: savings,
+                            borderColor: '#1e40af',
+                            backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Total College Cost Goal',
+                            data: goal,
+                            borderColor: '#ef4444',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    if(value >= 1000) return '$' + (value/1000).toFixed(0) + 'k';
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + 
+                                        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                }
+                            }
+                        },
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

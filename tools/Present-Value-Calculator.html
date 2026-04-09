@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Present Value Calculator</title>
+    
+    <!-- Technical SEO & AI Optimization -->
+    <meta name="description" content="Calculate the Present Value (PV) of a future lump sum or a stream of payments (annuity). Features auto-save, compounding frequency options, and instant financial analysis.">
+    <meta name="keywords" content="Present Value Calculator, PV Calculator, Discounted Cash Flow, Time Value of Money, Annuity Calculator, toolshub365.com, Financial Analysis Tool">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/present-value-calculator">
+    
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": "Present Value Calculator",
+      "description": "A professional tool to determine the current value of a future sum of money or stream of cash flows given a specific rate of return.",
+      "brand": {
+        "@type": "Brand",
+        "name": "toolshub365.com"
+      },
+      "category": "Financial Calculator",
+      "audience": "Investors, Students, Financial Analysts"
+    }
+    </script>
+
+    <style>
+        /* --- CUSTOMIZABLE SETTINGS (CSS Variables) --- */
+        :root {
+            /* Layout Dimensions */
+            --container-max-width: 1200px;
+            --header-height: 50px;
+            
+            /* Color Palette */
+            --primary-color: #2c3e50;      /* Dark Blue/Grey - Header & Text */
+            --accent-color: #27ae60;       /* Green - Money/Success */
+            --secondary-accent: #2980b9;   /* Blue - Info/Charts */
+            --bg-body: #ecf0f1;            /* Light Grey Background */
+            --bg-card: #ffffff;            /* White Container */
+            --border-color: #bdc3c7;       
+            
+            /* Text */
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+        }
+
+        /* --- RESET & BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            padding-top: var(--header-height);
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            width: 100%;
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            display: flex;
+            flex-wrap: wrap;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Desktop Layout Rules */
+        @media (min-width: 768px) {
+            .container {
+                margin-top: 30px;
+                margin-bottom: 30px;
+                border-radius: 8px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+                overflow: hidden;
+                min-height: auto; /* Allow auto height on desktop */
+            }
+            .input-section {
+                width: 45%;
+                border-right: 1px solid #f0f0f0;
+            }
+            .result-section {
+                width: 55%;
+            }
+        }
+
+        /* Mobile Layout Rules (Edge to Edge) */
+        @media (max-width: 767px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .input-section, .result-section {
+                width: 100%;
+                padding: 20px;
+            }
+            .result-section {
+                border-top: 5px solid var(--bg-body); /* Separator */
+            }
+        }
+
+        /* --- SECTIONS --- */
+        .input-section, .result-section {
+            padding: 30px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .prefix, .suffix {
+            position: absolute;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .prefix { left: 12px; }
+        .suffix { right: 12px; }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        input.has-prefix { padding-left: 25px; }
+        input.has-suffix { padding-right: 30px; }
+
+        input:focus, select:focus {
+            border-color: var(--secondary-accent);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1);
+        }
+
+        /* --- RADIO TOGGLES --- */
+        .mode-toggle {
+            display: flex;
+            background: #f1f3f4;
+            padding: 4px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .mode-toggle label {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .mode-toggle input { display: none; }
+
+        .mode-toggle input:checked + label {
+            background: #fff;
+            color: var(--primary-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-weight: 700;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #ecf0f1;
+            color: var(--text-dark);
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: #dfe6e9;
+        }
+
+        /* --- RESULTS --- */
+        .result-card {
+            background: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .main-value-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin: 10px 0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .summary-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--secondary-accent);
+        }
+
+        .summary-item small {
+            display: block;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        /* --- CHART (CSS Bar) --- */
+        .chart-container {
+            margin-top: 40px;
+        }
+        
+        .chart-bar-bg {
+            height: 30px;
+            width: 100%;
+            background-color: #eee;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+        }
+
+        .chart-bar-pv {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%; /* JS will animate */
+            transition: width 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .chart-bar-diff {
+            height: 100%;
+            background-color: #bdc3c7; /* Represents the discount/interest difference */
+            flex-grow: 1;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Present Value Calculator</h1>
+    </header>
+
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            
+            <div class="mode-toggle">
+                <input type="radio" name="calcMode" id="modeLumpSum" value="lumpsum" checked>
+                <label for="modeLumpSum">Lump Sum</label>
+                
+                <input type="radio" name="calcMode" id="modeAnnuity" value="annuity">
+                <label for="modeAnnuity">Periodic Deposit</label>
+            </div>
+
+            <h2>Input Parameters</h2>
+
+            <div class="form-group">
+                <label id="amountLabel" for="futureValue">Future Value Amount</label>
+                <div class="input-wrapper">
+                    <span class="prefix">$</span>
+                    <input type="number" id="futureValue" class="has-prefix" placeholder="0.00" value="10000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="interestRate">Discount Rate (Annual %)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="interestRate" class="has-suffix" placeholder="5.0" value="5" step="0.1">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="years">Time Period (Years)</label>
+                <input type="number" id="years" placeholder="10" value="10" step="1">
+            </div>
+
+            <div class="form-group">
+                <label for="compounding">Compounding Frequency</label>
+                <select id="compounding">
+                    <option value="1">Annually (1/yr)</option>
+                    <option value="2">Semi-Annually (2/yr)</option>
+                    <option value="4">Quarterly (4/yr)</option>
+                    <option value="12">Monthly (12/yr)</option>
+                    <option value="365">Daily (365/yr)</option>
+                </select>
+            </div>
+
+            <button class="btn-action" onclick="resetCalculator()">Clear Data</button>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <h2>Calculated Results</h2>
+
+            <div class="result-card">
+                <div class="main-value-label">Present Value</div>
+                <div class="main-value" id="displayPV">$0.00</div>
+                <div style="font-size: 0.9rem; color: #7f8c8d;">
+                    What this money is worth today
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-bar-bg">
+                    <div class="chart-bar-pv" id="barPV"></div>
+                    <div class="chart-bar-diff"></div>
+                </div>
+                <div class="chart-legend">
+                    <span>Present Value</span>
+                    <span id="displayTotalFuture">Future Amount</span>
+                </div>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <small>Total Future Value</small>
+                    <strong id="displayFV">$0.00</strong>
+                </div>
+                <div class="summary-item" style="border-left-color: #95a5a6;">
+                    <small>Discount / Interest Effect</small>
+                    <strong id="displayDiff">$0.00</strong>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; font-size: 0.85rem; color: #7f8c8d; line-height: 1.5; background: #fafafa; padding: 15px; border-radius: 4px;">
+                <strong>Concept:</strong> "A dollar today is worth more than a dollar tomorrow." This calculation shows how much you would need to invest today at the specified rate to achieve the target future amount.
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS & STATE ---
+        const STORAGE_KEY = 'toolshub_pv_calc_data';
+        
+        // DOM Elements
+        const inputs = {
+            modeLump: document.getElementById('modeLumpSum'),
+            modeAnnuity: document.getElementById('modeAnnuity'),
+            amount: document.getElementById('futureValue'),
+            amountLabel: document.getElementById('amountLabel'),
+            rate: document.getElementById('interestRate'),
+            years: document.getElementById('years'),
+            compounding: document.getElementById('compounding')
+        };
+
+        const outputs = {
+            pv: document.getElementById('displayPV'),
+            fv: document.getElementById('displayFV'),
+            diff: document.getElementById('displayDiff'),
+            totalFutureLabel: document.getElementById('displayTotalFuture'),
+            barPV: document.getElementById('barPV')
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            updateLabel(); // Set correct label based on mode
+            calculate();
+
+            // Event Listeners
+            document.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', () => {
+                    handleInput();
+                });
+                el.addEventListener('change', () => {
+                    handleInput();
+                });
+            });
+
+            // Specific listener for radio buttons to update label immediately
+            inputs.modeLump.addEventListener('change', updateLabel);
+            inputs.modeAnnuity.addEventListener('change', updateLabel);
+        });
+
+        function handleInput() {
+            updateLabel();
+            calculate();
+            saveData();
+        }
+
+        function updateLabel() {
+            if (inputs.modeAnnuity.checked) {
+                inputs.amountLabel.textContent = "Periodic Payment Amount";
+                inputs.amount.placeholder = "Payment Amount";
+            } else {
+                inputs.amountLabel.textContent = "Future Value Amount";
+                inputs.amount.placeholder = "Target Sum";
+            }
+        }
+
+        // --- CALCULATION LOGIC ---
+        function calculate() {
+            // Get raw values
+            const valAmount = parseFloat(inputs.amount.value) || 0;
+            const valRate = parseFloat(inputs.rate.value) || 0;
+            const valYears = parseFloat(inputs.years.value) || 0;
+            const valComp = parseInt(inputs.compounding.value) || 1;
+
+            const r = (valRate / 100) / valComp; // Rate per period
+            const n = valYears * valComp;        // Total number of periods
+
+            let pv = 0;
+            let totalFutureNominal = 0; // The raw sum of cashflows without discounting
+
+            if (inputs.modeLump.checked) {
+                // LUMP SUM FORMULA: PV = FV / (1 + r)^n
+                if (valRate === 0) {
+                    pv = valAmount;
+                } else {
+                    pv = valAmount / Math.pow(1 + r, n);
+                }
+                totalFutureNominal = valAmount;
+
+            } else {
+                // ANNUITY (ORDINARY) FORMULA: PV = PMT * [ (1 - (1+r)^-n) / r ]
+                // Calculating PV of a stream of payments
+                if (valRate === 0) {
+                    pv = valAmount * n;
+                } else {
+                    pv = valAmount * ( (1 - Math.pow(1 + r, -n)) / r );
+                }
+                totalFutureNominal = valAmount * n; // Total cash paid/received over time
+            }
+
+            const difference = totalFutureNominal - pv;
+
+            // --- UPDATE UI ---
+            outputs.pv.textContent = formatMoney(pv);
+            outputs.fv.textContent = formatMoney(totalFutureNominal);
+            outputs.diff.textContent = formatMoney(difference);
+
+            // Chart Logic
+            // To prevent division by zero or negative bars
+            let percentPV = 0;
+            if (totalFutureNominal > 0) {
+                percentPV = (pv / totalFutureNominal) * 100;
+            }
+            if (percentPV > 100) percentPV = 100;
+            if (percentPV < 0) percentPV = 0;
+
+            outputs.barPV.style.width = percentPV + '%';
+            outputs.barPV.textContent = Math.round(percentPV) + '%';
+            
+            // If the bar is too small, remove text
+            if(percentPV < 15) outputs.barPV.textContent = '';
+
+            outputs.totalFutureLabel.textContent = inputs.modeLump.checked ? "Future Value" : "Total Payments";
+        }
+
+        function formatMoney(amount) {
+            return '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- STORAGE ---
+        function saveData() {
+            const data = {
+                mode: inputs.modeLump.checked ? 'lumpsum' : 'annuity',
+                amount: inputs.amount.value,
+                rate: inputs.rate.value,
+                years: inputs.years.value,
+                compounding: inputs.compounding.value
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.mode === 'annuity') inputs.modeAnnuity.checked = true;
+                    else inputs.modeLump.checked = true;
+                    
+                    if (data.amount) inputs.amount.value = data.amount;
+                    if (data.rate) inputs.rate.value = data.rate;
+                    if (data.years) inputs.years.value = data.years;
+                    if (data.compounding) inputs.compounding.value = data.compounding;
+                } catch (e) {
+                    console.error("Error loading data", e);
+                }
+            }
+        }
+
+        function resetCalculator() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Defaults
+                inputs.modeLump.checked = true;
+                inputs.amount.value = 10000;
+                inputs.rate.value = 5;
+                inputs.years.value = 10;
+                inputs.compounding.value = 1;
+                updateLabel();
+                calculate();
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Property Calculator</title>
+    
+    <!-- SEO & Metadata for Toolshub365.com -->
+    <meta name="description" content="Free Rental Property Calculator. Analyze cash flow, Cap Rate, and Cash on Cash Return for real estate investments. Auto-saves your analysis.">
+    <meta name="keywords" content="Rental Property Calculator, Real Estate Calculator, Cash Flow Calculator, Cap Rate Calculator, Investment Property Analysis, ROI Calculator, Toolshub365">
+    <meta name="author" content="Toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/rental-property-calculator">
+    
+    <!-- Technical SEO for AI Crawlers (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Rental Property Calculator",
+      "applicationCategory": "RealEstateApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A comprehensive tool for real estate investors to calculate rental income, expenses, mortgage costs, and return on investment (ROI).",
+      "featureList": "Cash Flow Analysis, Cap Rate Calculation, Expense Breakdown, Auto-save functionality",
+      "author": {
+        "@type": "Organization",
+        "name": "Toolshub365"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #059669;       /* Emerald Green */
+            --secondary-color: #047857;     /* Darker Green */
+            --bg-color: #f3f4f6;            /* Light Gray */
+            --card-bg: #ffffff;             /* White */
+            --text-main: #1f2937;           /* Dark Gray */
+            --text-secondary: #6b7280;      /* Muted Gray */
+            --border-color: #e5e7eb;        /* Border */
+            --positive-color: #10b981;      /* Success */
+            --negative-color: #ef4444;      /* Danger/Expense */
+            --header-height: 50px;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* Columns */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            flex: 1;
+            min-width: 340px;
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 0.95rem;
+            color: var(--primary-color);
+            margin: 15px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .prefix span { left: 12px; }
+        .suffix span { right: 12px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+
+        .prefix input { padding-left: 25px; }
+        .suffix input { padding-right: 30px; }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        /* Result Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .kpi-card.highlight {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            grid-column: span 2;
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .kpi-card.highlight .kpi-value { font-size: 2.5rem; }
+
+        /* Breakdown Table */
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        .breakdown-table td {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .breakdown-table .amount {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .expense-text { color: var(--negative-color); }
+        .income-text { color: var(--positive-color); }
+
+        /* Buttons */
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Simple donut chart using CSS */
+        .chart-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .donut-chart {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--negative-color) 0% 70%, 
+                var(--primary-color) 70% 100%
+            );
+            position: relative;
+        }
+        
+        .donut-hole {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex-direction: column;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                gap: 0;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                width: 100%;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .kpi-card.highlight .kpi-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Rental Property Calculator</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- Input Section -->
+        <div class="input-section">
+            <h2>Property Details</h2>
+            
+            <h3>Purchase Info</h3>
+            <div class="form-group">
+                <label for="purchasePrice">Purchase Price</label>
+                <div class="input-wrapper prefix">
+                    <span>$</span>
+                    <input type="number" id="purchasePrice" placeholder="250000">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="downPayment">Down Payment (%)</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="downPayment" placeholder="20" step="1">
+                        <span>%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="closingCosts">Closing Costs</label>
+                    <div class="input-wrapper prefix">
+                        <span>$</span>
+                        <input type="number" id="closingCosts" placeholder="5000">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="interestRate">Interest Rate</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="interestRate" placeholder="6.5" step="0.1">
+                        <span>%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="loanTerm">Loan Term</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="loanTerm" placeholder="30">
+                        <span>Yrs</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Income & Expenses (Monthly)</h3>
+            <div class="form-group">
+                <label for="monthlyRent">Rental Income</label>
+                <div class="input-wrapper prefix">
+                    <span>$</span>
+                    <input type="number" id="monthlyRent" placeholder="2000">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="propertyTax">Property Tax</label>
+                    <div class="input-wrapper prefix">
+                        <span>$</span>
+                        <input type="number" id="propertyTax" placeholder="250">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="insurance">Insurance</label>
+                    <div class="input-wrapper prefix">
+                        <span>$</span>
+                        <input type="number" id="insurance" placeholder="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="hoa">HOA Fees</label>
+                    <div class="input-wrapper prefix">
+                        <span>$</span>
+                        <input type="number" id="hoa" placeholder="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="maintenance">Maint. / Vacancy</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="maintenance" placeholder="10" step="1">
+                        <span>%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <h2>Investment Analysis</h2>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card highlight">
+                    <div class="kpi-label">Monthly Cash Flow</div>
+                    <div class="kpi-value" id="resCashFlow">$0.00</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Cash on Cash Return</div>
+                    <div class="kpi-value" style="color:var(--primary-color);" id="resCOC">0.00%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Cap Rate</div>
+                    <div class="kpi-value" style="color:var(--primary-color);" id="resCapRate">0.00%</div>
+                </div>
+            </div>
+
+            <!-- Visualization -->
+            <div class="chart-wrapper">
+                <div class="donut-chart" id="expenseChart">
+                    <div class="donut-hole">
+                        <span style="font-weight:700; color:var(--text-main)" id="chartLabel">Expense<br>Ratio</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Monthly Breakdown</h3>
+            <table class="breakdown-table">
+                <tbody>
+                    <tr>
+                        <td>Gross Income</td>
+                        <td class="amount income-text" id="outIncome">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Mortgage Payment (P&I)</td>
+                        <td class="amount expense-text" id="outMortgage">-$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Property Taxes</td>
+                        <td class="amount expense-text" id="outTax">-$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Insurance</td>
+                        <td class="amount expense-text" id="outIns">-$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>HOA / Misc</td>
+                        <td class="amount expense-text" id="outHoa">-$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Maintenance & Vacancy</td>
+                        <td class="amount expense-text" id="outMaint">-$0.00</td>
+                    </tr>
+                    <tr style="border-top: 2px solid var(--border-color);">
+                        <td style="font-weight:600;">Net Operating Income (NOI)</td>
+                        <td class="amount" id="outNOI">$0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top:20px; font-size:0.85rem; color:var(--text-secondary);">
+                *NOI = Income minus Operating Expenses (excluding mortgage).
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const els = {
+            price: document.getElementById('purchasePrice'),
+            downPct: document.getElementById('downPayment'),
+            closing: document.getElementById('closingCosts'),
+            rate: document.getElementById('interestRate'),
+            term: document.getElementById('loanTerm'),
+            rent: document.getElementById('monthlyRent'),
+            tax: document.getElementById('propertyTax'),
+            ins: document.getElementById('insurance'),
+            hoa: document.getElementById('hoa'),
+            maintPct: document.getElementById('maintenance'),
+            
+            // Outputs
+            resCashFlow: document.getElementById('resCashFlow'),
+            resCOC: document.getElementById('resCOC'),
+            resCapRate: document.getElementById('resCapRate'),
+            
+            outIncome: document.getElementById('outIncome'),
+            outMortgage: document.getElementById('outMortgage'),
+            outTax: document.getElementById('outTax'),
+            outIns: document.getElementById('outIns'),
+            outHoa: document.getElementById('outHoa'),
+            outMaint: document.getElementById('outMaint'),
+            outNOI: document.getElementById('outNOI'),
+            
+            chart: document.getElementById('expenseChart')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            calculate();
+        });
+
+        // Event Listeners
+        const inputs = [
+            els.price, els.downPct, els.closing, els.rate, els.term,
+            els.rent, els.tax, els.ins, els.hoa, els.maintPct
+        ];
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                calculate();
+                saveData();
+            });
+        });
+
+        // Calculation Logic
+        function calculate() {
+            // Get Values
+            const price = parseFloat(els.price.value) || 0;
+            const downPct = parseFloat(els.downPct.value) || 0;
+            const closing = parseFloat(els.closing.value) || 0;
+            const rate = parseFloat(els.rate.value) || 0;
+            const term = parseFloat(els.term.value) || 0;
+            const rent = parseFloat(els.rent.value) || 0;
+            
+            const tax = parseFloat(els.tax.value) || 0;
+            const ins = parseFloat(els.ins.value) || 0;
+            const hoa = parseFloat(els.hoa.value) || 0;
+            const maintPct = parseFloat(els.maintPct.value) || 0;
+
+            if (price === 0) {
+                resetUI();
+                return;
+            }
+
+            // 1. Initial Cash Invested
+            const downAmount = price * (downPct / 100);
+            const totalCashInvested = downAmount + closing;
+            const loanAmount = price - downAmount;
+
+            // 2. Mortgage Payment (Principal + Interest)
+            let mortgage = 0;
+            if (loanAmount > 0 && rate > 0 && term > 0) {
+                const r = (rate / 100) / 12;
+                const n = term * 12;
+                mortgage = loanAmount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            }
+
+            // 3. Operating Expenses
+            const maintAmount = rent * (maintPct / 100);
+            const operatingExpenses = tax + ins + hoa + maintAmount;
+            
+            // 4. Net Operating Income (NOI) = Income - Operating Expenses (Excl Mortgage)
+            // Note: NOI is usually annual, but we calc monthly first
+            const monthlyNOI = rent - operatingExpenses;
+            
+            // 5. Cash Flow = NOI - Mortgage
+            const monthlyCashFlow = monthlyNOI - mortgage;
+
+            // 6. Ratios
+            const annualCashFlow = monthlyCashFlow * 12;
+            const annualNOI = monthlyNOI * 12;
+
+            let cocReturn = 0;
+            if (totalCashInvested > 0) {
+                cocReturn = (annualCashFlow / totalCashInvested) * 100;
+            }
+
+            let capRate = 0;
+            if (price > 0) {
+                capRate = (annualNOI / price) * 100;
+            }
+
+            // Update UI
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+            const formatPct = (num) => num.toFixed(2) + "%";
+
+            els.resCashFlow.textContent = formatMoney(monthlyCashFlow);
+            els.resCOC.textContent = formatPct(cocReturn);
+            els.resCapRate.textContent = formatPct(capRate);
+
+            els.outIncome.textContent = formatMoney(rent);
+            els.outMortgage.textContent = "-" + formatMoney(mortgage);
+            els.outTax.textContent = "-" + formatMoney(tax);
+            els.outIns.textContent = "-" + formatMoney(ins);
+            els.outHoa.textContent = "-" + formatMoney(hoa);
+            els.outMaint.textContent = "-" + formatMoney(maintAmount);
+            els.outNOI.textContent = formatMoney(monthlyNOI);
+
+            // Styling positive/negative cash flow
+            if (monthlyCashFlow < 0) {
+                els.resCashFlow.style.color = 'var(--negative-color)';
+            } else {
+                els.resCashFlow.style.color = 'var(--primary-color)'; // White text on Green BG actually handled by CSS class, but this is fallback
+            }
+
+            // Update Chart
+            // Ratio of Expenses (Mortgage + Ops) vs Income
+            const totalExpenses = operatingExpenses + mortgage;
+            let expenseRatio = 0;
+            if (rent > 0) {
+                expenseRatio = (totalExpenses / rent) * 100;
+                if (expenseRatio > 100) expenseRatio = 100;
+            }
+            
+            // Set conic gradient: Red (Expenses) then Green (Profit)
+            // Example: 70% expense means 0% to 70% is Red, 70% to 100% is Green
+            els.chart.style.background = `conic-gradient(var(--negative-color) 0% ${expenseRatio}%, var(--primary-color) ${expenseRatio}% 100%)`;
+        }
+
+        function resetUI() {
+            els.resCashFlow.textContent = "$0.00";
+            els.resCOC.textContent = "0.00%";
+            els.resCapRate.textContent = "0.00%";
+            // Reset table to 0s...
+            document.querySelectorAll('.amount').forEach(el => el.textContent = "$0.00");
+            els.chart.style.background = `conic-gradient(#e5e7eb 0% 100%, #e5e7eb 100% 100%)`;
+        }
+
+        // Data Persistence
+        function saveData() {
+            const data = {
+                price: els.price.value,
+                downPct: els.downPct.value,
+                closing: els.closing.value,
+                rate: els.rate.value,
+                term: els.term.value,
+                rent: els.rent.value,
+                tax: els.tax.value,
+                ins: els.ins.value,
+                hoa: els.hoa.value,
+                maintPct: els.maintPct.value
+            };
+            localStorage.setItem('toolshub365_rental_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('toolshub365_rental_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    els.price.value = data.price || '';
+                    els.downPct.value = data.downPct || '';
+                    els.closing.value = data.closing || '';
+                    els.rate.value = data.rate || '';
+                    els.term.value = data.term || '';
+                    els.rent.value = data.rent || '';
+                    els.tax.value = data.tax || '';
+                    els.ins.value = data.ins || '';
+                    els.hoa.value = data.hoa || '';
+                    els.maintPct.value = data.maintPct || '';
+                } catch (e) {
+                    console.error("Error loading data");
+                }
+            } else {
+                // Set reasonable defaults if no data
+                els.downPct.value = 20;
+                els.term.value = 30;
+                els.maintPct.value = 10;
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem('toolshub365_rental_data');
+                els.price.value = '';
+                els.downPct.value = '20';
+                els.closing.value = '';
+                els.rate.value = '';
+                els.term.value = '30';
+                els.rent.value = '';
+                els.tax.value = '';
+                els.ins.value = '';
+                els.hoa.value = '';
+                els.maintPct.value = '10';
+                calculate();
+            }
+        }
+    </script>
+</body>
+</html>

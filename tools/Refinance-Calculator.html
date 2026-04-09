@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refinance Calculator</title>
+    
+    <!-- SEO & Metadata for Toolshub365.com -->
+    <meta name="description" content="Free Refinance Calculator to compare your current mortgage with a new loan. Calculate monthly savings, break-even point, and lifetime interest savings.">
+    <meta name="keywords" content="Refinance Calculator, Mortgage Refinance Tool, Break-even Calculator, Refi Calculator, Loan Comparison, Mortgage Savings, Toolshub365">
+    <meta name="author" content="Toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/refinance-calculator">
+    
+    <!-- Technical SEO for AI Crawlers (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Refinance Calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A professional Refinance Calculator to analyze mortgage savings, break-even periods, and closing cost recovery.",
+      "featureList": "Current vs New Loan comparison, Break-even analysis, Auto-save data",
+      "author": {
+        "@type": "Organization",
+        "name": "Toolshub365"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #4f46e5;       /* Indigo */
+            --secondary-color: #4338ca;     /* Darker Indigo */
+            --bg-color: #f3f4f6;            /* Light Gray */
+            --card-bg: #ffffff;             /* White */
+            --text-main: #1f2937;           /* Dark Gray */
+            --text-light: #6b7280;          /* Muted Gray */
+            --border-color: #e5e7eb;        /* Border */
+            --success-color: #10b981;       /* Green */
+            --danger-color: #ef4444;        /* Red */
+            --header-height: 50px;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* Layout Columns */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            flex: 1;
+            min-width: 340px;
+        }
+
+        /* Titles */
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .sub-header {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .prefix span { left: 12px; }
+        .suffix span { right: 12px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+
+        .prefix input { padding-left: 25px; }
+        .suffix input { padding-right: 30px; }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Result Cards */
+        .savings-card {
+            background-color: #ecfdf5; /* Light Green */
+            border: 1px solid #d1fae5;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .savings-card.negative {
+            background-color: #fef2f2;
+            border-color: #fee2e2;
+        }
+
+        .savings-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin: 5px 0;
+        }
+
+        .savings-card.negative .savings-amount {
+            color: var(--danger-color);
+        }
+
+        .savings-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        .comparison-table th {
+            text-align: left;
+            padding: 10px 5px;
+            color: var(--text-light);
+            font-weight: 500;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .comparison-table td {
+            padding: 12px 5px;
+            border-bottom: 1px dashed var(--border-color);
+            color: var(--text-main);
+        }
+
+        .comparison-table .val-col {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .new-loan-col { color: var(--primary-color); }
+        .old-loan-col { color: var(--text-light); }
+
+        /* Break Even Box */
+        .break-even-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #eff6ff;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            border-left: 4px solid var(--primary-color);
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                gap: 0;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                width: 100%;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .savings-amount {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Refinance Calculator</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="sub-header">Current Loan</div>
+            <div class="form-group">
+                <label for="currentBalance">Remaining Principal Balance</label>
+                <div class="input-wrapper prefix">
+                    <span>$</span>
+                    <input type="number" id="currentBalance" placeholder="200000" min="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="currentRate">Interest Rate</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="currentRate" placeholder="6.5" step="0.01" min="0">
+                        <span>%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="currentTerm">Years Remaining</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="currentTerm" placeholder="25" min="1">
+                        <span>Yrs</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-header" style="margin-top: 20px;">New Refinance Loan</div>
+            
+            <div class="form-group">
+                <label for="newRate">New Interest Rate</label>
+                <div class="input-wrapper suffix">
+                    <input type="number" id="newRate" placeholder="5.0" step="0.01" min="0">
+                    <span>%</span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="newTerm">New Term</label>
+                    <div class="input-wrapper suffix">
+                        <input type="number" id="newTerm" placeholder="30" min="1">
+                        <span>Yrs</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="closingCosts">Closing Costs</label>
+                    <div class="input-wrapper prefix">
+                        <span>$</span>
+                        <input type="number" id="closingCosts" placeholder="4000" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                <input type="checkbox" id="rollCosts" style="width:auto;">
+                <label for="rollCosts" style="margin:0; cursor:pointer;">Roll closing costs into loan amount?</label>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <h2>Savings Analysis</h2>
+            
+            <div class="savings-card" id="savingsCard">
+                <div class="savings-label">Monthly Savings</div>
+                <div class="savings-amount" id="resMonthlySavings">$0.00</div>
+                <div style="font-size:0.85rem; color: var(--text-light);">Difference in payment</div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Details</th>
+                        <th class="val-col old-loan-col">Current</th>
+                        <th class="val-col new-loan-col">New</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Loan Amount</td>
+                        <td class="val-col old-loan-col" id="tblOldAmount">$0</td>
+                        <td class="val-col new-loan-col" id="tblNewAmount">$0</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly P&I</td>
+                        <td class="val-col old-loan-col" id="tblOldPayment">$0</td>
+                        <td class="val-col new-loan-col" id="tblNewPayment">$0</td>
+                    </tr>
+                    <tr>
+                        <td>Total Interest</td>
+                        <td class="val-col old-loan-col" id="tblOldInterest">$0</td>
+                        <td class="val-col new-loan-col" id="tblNewInterest">$0</td>
+                    </tr>
+                    <tr>
+                        <td>Total Cost</td>
+                        <td class="val-col old-loan-col" id="tblOldTotal">$0</td>
+                        <td class="val-col new-loan-col" id="tblNewTotal">$0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="break-even-box" id="breakEvenBox">
+                Enter details to see your break-even point.
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <span class="savings-label">Net Lifetime Savings:</span>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);" id="resLifetimeSavings">$0.00</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const els = {
+            currentBalance: document.getElementById('currentBalance'),
+            currentRate: document.getElementById('currentRate'),
+            currentTerm: document.getElementById('currentTerm'),
+            newRate: document.getElementById('newRate'),
+            newTerm: document.getElementById('newTerm'),
+            closingCosts: document.getElementById('closingCosts'),
+            rollCosts: document.getElementById('rollCosts'),
+            
+            // Outputs
+            resMonthlySavings: document.getElementById('resMonthlySavings'),
+            resLifetimeSavings: document.getElementById('resLifetimeSavings'),
+            savingsCard: document.getElementById('savingsCard'),
+            breakEvenBox: document.getElementById('breakEvenBox'),
+            
+            // Table
+            tblOldAmount: document.getElementById('tblOldAmount'),
+            tblNewAmount: document.getElementById('tblNewAmount'),
+            tblOldPayment: document.getElementById('tblOldPayment'),
+            tblNewPayment: document.getElementById('tblNewPayment'),
+            tblOldInterest: document.getElementById('tblOldInterest'),
+            tblNewInterest: document.getElementById('tblNewInterest'),
+            tblOldTotal: document.getElementById('tblOldTotal'),
+            tblNewTotal: document.getElementById('tblNewTotal'),
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            calculateRefinance();
+        });
+
+        // Event Listeners
+        const inputs = [
+            els.currentBalance, els.currentRate, els.currentTerm,
+            els.newRate, els.newTerm, els.closingCosts, els.rollCosts
+        ];
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                calculateRefinance();
+                saveData();
+            });
+        });
+
+        // Main Calculation Logic
+        function calculateRefinance() {
+            // Get inputs
+            const currentBal = parseFloat(els.currentBalance.value) || 0;
+            const currentRate = parseFloat(els.currentRate.value) || 0;
+            const currentYears = parseFloat(els.currentTerm.value) || 0;
+            
+            const newRate = parseFloat(els.newRate.value) || 0;
+            const newYears = parseFloat(els.newTerm.value) || 0;
+            const costs = parseFloat(els.closingCosts.value) || 0;
+            const isRolled = els.rollCosts.checked;
+
+            if (currentBal === 0 || currentYears === 0 || newYears === 0) {
+                resetUI();
+                return;
+            }
+
+            // Calculate Old Loan
+            const oldMonthly = calculatePMT(currentBal, currentRate, currentYears);
+            const oldTotalPayment = oldMonthly * currentYears * 12;
+            const oldTotalInterest = oldTotalPayment - currentBal;
+
+            // Calculate New Loan
+            let newLoanAmount = currentBal;
+            if (isRolled) {
+                newLoanAmount += costs;
+            }
+            
+            const newMonthly = calculatePMT(newLoanAmount, newRate, newYears);
+            const newTotalPayment = newMonthly * newYears * 12;
+            const newTotalInterest = newTotalPayment - newLoanAmount;
+
+            // Analysis
+            const monthlySavings = oldMonthly - newMonthly;
+            // Lifetime Savings = (Old Total Cost) - (New Total Cost) - (Costs if paid upfront)
+            // If costs are rolled, they are inside New Total Cost. If upfront, subtract them.
+            let lifetimeSavings = oldTotalPayment - newTotalPayment;
+            if (!isRolled) {
+                lifetimeSavings -= costs;
+            }
+
+            // Update UI
+            const format = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+
+            els.resMonthlySavings.textContent = format(monthlySavings);
+            els.resLifetimeSavings.textContent = format(lifetimeSavings);
+
+            // Styling for savings (Positive vs Negative)
+            if (monthlySavings < 0) {
+                els.savingsCard.classList.add('negative');
+                els.resMonthlySavings.textContent = "-" + format(Math.abs(monthlySavings));
+            } else {
+                els.savingsCard.classList.remove('negative');
+            }
+
+            if (lifetimeSavings < 0) {
+                els.resLifetimeSavings.style.color = 'var(--danger-color)';
+            } else {
+                els.resLifetimeSavings.style.color = 'var(--primary-color)';
+            }
+
+            // Table Updates
+            els.tblOldAmount.textContent = format(currentBal);
+            els.tblNewAmount.textContent = format(newLoanAmount);
+            els.tblOldPayment.textContent = format(oldMonthly);
+            els.tblNewPayment.textContent = format(newMonthly);
+            els.tblOldInterest.textContent = format(oldTotalInterest);
+            els.tblNewInterest.textContent = format(newTotalInterest);
+            els.tblOldTotal.textContent = format(oldTotalPayment);
+            els.tblNewTotal.textContent = format(newTotalPayment);
+
+            // Break Even Calculation
+            updateBreakEven(monthlySavings, costs, isRolled);
+        }
+
+        function calculatePMT(principal, rate, years) {
+            if (rate === 0) return principal / (years * 12);
+            const r = (rate / 100) / 12;
+            const n = years * 12;
+            return principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        }
+
+        function updateBreakEven(monthlySavings, costs, isRolled) {
+            if (monthlySavings <= 0) {
+                els.breakEvenBox.innerHTML = "<strong>No Break-Even:</strong> The new monthly payment is higher than your current payment.";
+                return;
+            }
+
+            // If costs are rolled in, "Break Even" is less relevant in terms of cash out of pocket, 
+            // but usually defined as when the savings cover the costs.
+            // If costs are rolled, the "Cost" is technically interest on the extra amount, but simplified:
+            // Standard def: Months to recoup closing costs.
+            
+            if (costs === 0) {
+                 els.breakEvenBox.innerHTML = "<strong>Instant Savings:</strong> With no closing costs, you save money starting immediately.";
+                 return;
+            }
+
+            const monthsToBreakEven = costs / monthlySavings;
+            const years = Math.floor(monthsToBreakEven / 12);
+            const months = Math.ceil(monthsToBreakEven % 12);
+
+            let timeStr = "";
+            if (years > 0) timeStr += `${years} year${years > 1 ? 's' : ''} `;
+            if (months > 0) timeStr += `${months} month${months > 1 ? 's' : ''}`;
+
+            els.breakEvenBox.innerHTML = `<strong>Break-Even Point:</strong> It will take approximately <strong>${timeStr}</strong> of monthly savings to recover your closing costs of $${costs}.`;
+        }
+
+        function resetUI() {
+            els.resMonthlySavings.textContent = "$0.00";
+            els.resLifetimeSavings.textContent = "$0.00";
+            els.breakEvenBox.textContent = "Enter details to see your break-even point.";
+            
+            const zeros = document.querySelectorAll('[id^="tbl"]');
+            zeros.forEach(el => el.textContent = "$0");
+        }
+
+        // Data Persistence
+        function saveData() {
+            const data = {
+                currentBalance: els.currentBalance.value,
+                currentRate: els.currentRate.value,
+                currentTerm: els.currentTerm.value,
+                newRate: els.newRate.value,
+                newTerm: els.newTerm.value,
+                closingCosts: els.closingCosts.value,
+                rollCosts: els.rollCosts.checked
+            };
+            localStorage.setItem('toolshub365_refi_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('toolshub365_refi_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    els.currentBalance.value = data.currentBalance || '';
+                    els.currentRate.value = data.currentRate || '';
+                    els.currentTerm.value = data.currentTerm || '';
+                    els.newRate.value = data.newRate || '';
+                    els.newTerm.value = data.newTerm || '';
+                    els.closingCosts.value = data.closingCosts || '';
+                    els.rollCosts.checked = data.rollCosts || false;
+                } catch (e) {
+                    console.error("Error loading data");
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem('toolshub365_refi_data');
+                els.currentBalance.value = '';
+                els.currentRate.value = '';
+                els.currentTerm.value = '';
+                els.newRate.value = '';
+                els.newTerm.value = '';
+                els.closingCosts.value = '';
+                els.rollCosts.checked = false;
+                calculateRefinance();
+            }
+        }
+    </script>
+</body>
+</html>

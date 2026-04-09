@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>401K Calculator</title>
+    <meta name="description" content="Free 401K Calculator by ToolsHub365. Estimate your retirement savings balance based on your salary, contributions, employer match, and investment growth.">
+    <meta name="keywords" content="401k calculator, retirement calculator, pension calculator, investment growth, finance tool, toolshub365, retirement planning">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/401k-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/401k-calculator">
+    <meta property="og:title" content="401K Calculator">
+    <meta property="og:description" content="Plan your retirement accurately with our user-friendly 401K Calculator. Analyze contributions, employer matches, and future growth.">
+
+    <!-- Schema.org for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "401K Calculator",
+      "url": "https://toolshub365.com/401k-calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "description": "A tool to estimate the future value of a 401k retirement plan including employer matching and compound interest.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ToolsHub365"
+      }
+    }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #059669; /* Emerald Green for Money/Retirement */
+            --secondary-color: #047857;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --header-height: 50px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Inputs left, Results right */
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* Input & Result Sections */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input.has-icon {
+            padding-left: 25px;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        /* Two column input row */
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+        .input-row .form-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-clear {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Display */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin-top: 0;
+                gap: 5px;
+                width: 100%;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px 15px;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            /* Remove side spaces for mobile */
+            .main-wrapper {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>401K Calculator</h1>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Input Section -->
+            <div class="input-section">
+                <form id="calcForm" onsubmit="event.preventDefault(); calculate401k();">
+                    
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label for="currentAge">Current Age</label>
+                            <input type="number" id="currentAge" placeholder="30" min="18" max="99" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="retireAge">Retirement Age</label>
+                            <input type="number" id="retireAge" placeholder="65" min="19" max="100" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currentBalance">Current 401k Balance</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="currentBalance" class="has-icon" placeholder="10000" min="0" step="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salary">Annual Salary</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="salary" class="has-icon" placeholder="60000" min="0" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label for="contribution">Your Contribution (%)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="contribution" placeholder="6" min="0" max="100" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="salaryIncrease">Annual Salary Increase (%)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="salaryIncrease" placeholder="2" min="0" max="20" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="employerMatch">Employer Match (% of Salary)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="employerMatch" placeholder="3" min="0" max="100" step="0.1">
+                        </div>
+                        <small style="color: #6b7280; font-size: 0.8rem;">Amount employer adds based on your salary</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="returnRate">Expected Annual Return (%)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="returnRate" placeholder="7" min="0" max="30" step="0.1" required>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-calc">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearData()">Clear Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section">
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>At Retirement</h3>
+                        <p id="res-balance">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Contributions</h3>
+                        <p id="res-contributions">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Growth</h3>
+                        <p id="res-interest">-</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('calcForm');
+        const inputs = ['currentAge', 'retireAge', 'currentBalance', 'salary', 'contribution', 'salaryIncrease', 'employerMatch', 'returnRate'];
+        let myChart = null;
+
+        // Auto-Load Data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // Optional: Auto calculate if critical data is present
+            if(document.getElementById('salary').value && document.getElementById('currentAge').value) {
+                calculate401k();
+            }
+        });
+
+        // Add Autosave Listeners
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', saveData);
+            el.addEventListener('change', saveData);
+        });
+
+        // Save Data Logic
+        function saveData() {
+            const data = {};
+            inputs.forEach(id => {
+                data[id] = document.getElementById(id).value;
+            });
+            localStorage.setItem('401k_data', JSON.stringify(data));
+        }
+
+        // Load Data Logic
+        function loadData() {
+            const saved = localStorage.getItem('401k_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                inputs.forEach(id => {
+                    if(data[id]) document.getElementById(id).value = data[id];
+                });
+            }
+        }
+
+        // Clear Data Logic
+        function clearData() {
+            if(confirm('Clear all input data?')) {
+                localStorage.removeItem('401k_data');
+                form.reset();
+                resetResults();
+            }
+        }
+
+        function resetResults() {
+            document.getElementById('res-balance').innerText = '-';
+            document.getElementById('res-contributions').innerText = '-';
+            document.getElementById('res-interest').innerText = '-';
+            if (myChart) {
+                myChart.destroy();
+                myChart = null;
+            }
+        }
+
+        // Calculation Logic
+        function calculate401k() {
+            // Get Inputs
+            let currentAge = parseInt(document.getElementById('currentAge').value);
+            let retireAge = parseInt(document.getElementById('retireAge').value);
+            let balance = parseFloat(document.getElementById('currentBalance').value) || 0;
+            let salary = parseFloat(document.getElementById('salary').value) || 0;
+            let userContribPct = parseFloat(document.getElementById('contribution').value) || 0;
+            let salaryIncrease = parseFloat(document.getElementById('salaryIncrease').value) || 0;
+            let employerMatchPct = parseFloat(document.getElementById('employerMatch').value) || 0;
+            let returnRate = parseFloat(document.getElementById('returnRate').value) || 0;
+
+            // Validation
+            if (!currentAge || !retireAge || !salary || retireAge <= currentAge) {
+                // If basics missing, do nothing (or show error visually if strictly required, but HTML5 validation handles required)
+                return;
+            }
+
+            let yearsToGrow = retireAge - currentAge;
+            let totalPrincipal = balance; // Includes initial balance
+            
+            // Chart Data Arrays
+            const labels = [];
+            const balanceData = [];
+            const principalData = [];
+            const interestData = [];
+
+            // Initial Point
+            labels.push(currentAge);
+            balanceData.push(balance);
+            principalData.push(balance);
+            interestData.push(0);
+
+            // Calculation Loop (Year by Year)
+            for (let i = 1; i <= yearsToGrow; i++) {
+                // Calculate contributions for this year
+                let userContribAmt = salary * (userContribPct / 100);
+                let employerContribAmt = salary * (employerMatchPct / 100);
+                let annualContribution = userContribAmt + employerContribAmt;
+
+                // Add Growth (Interest)
+                // Assumption: Contributions are made throughout the year, so they earn approx half-year interest
+                // Opening Balance grows for full year
+                let interestEarned = (balance * (returnRate / 100)) + (annualContribution * (returnRate / 100) / 2);
+                
+                // Update Balance
+                balance += annualContribution + interestEarned;
+                totalPrincipal += annualContribution;
+
+                // Increase Salary for next year
+                salary = salary * (1 + (salaryIncrease / 100));
+
+                // Store Data for Chart
+                labels.push(currentAge + i);
+                balanceData.push(balance);
+                principalData.push(totalPrincipal);
+                interestData.push(balance - totalPrincipal);
+            }
+
+            // Update UI
+            const currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('res-balance').innerText = currencyFormatter.format(balance);
+            document.getElementById('res-contributions').innerText = currencyFormatter.format(totalPrincipal);
+            document.getElementById('res-interest').innerText = currencyFormatter.format(balance - totalPrincipal);
+
+            updateChart(labels, principalData, interestData);
+            
+            // Save immediately after calc
+            saveData();
+        }
+
+        // Chart Rendering
+        function updateChart(labels, principalArr, interestArr) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total Contributions',
+                            data: principalArr,
+                            backgroundColor: '#059669',
+                            stack: 'Stack 0'
+                        },
+                        {
+                            label: 'Total Growth',
+                            data: interestArr,
+                            backgroundColor: '#6ee7b7',
+                            stack: 'Stack 0'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 10 // Prevent overcrowding on mobile
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if(value >= 1000000) return '$' + (value/1000000).toFixed(1) + 'M';
+                                    if(value >= 1000) return '$' + (value/1000).toFixed(0) + 'k';
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

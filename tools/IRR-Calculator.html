@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    
+    <!-- SEO & Metadata -->
+    <title>IRR Calculator</title>
+    <meta name="description" content="Free Internal Rate of Return (IRR) Calculator. Calculate the profitability of investments with dynamic cash flows. Features auto-save and mobile-friendly design.">
+    <meta name="keywords" content="IRR Calculator, Internal Rate of Return, Investment Calculator, NPV Calculator, Financial Return Tool, Cash Flow Analysis, Toolshub365">
+    <meta name="author" content="Toolshub365">
+    <meta name="robots" content="index, follow">
+    
+    <!-- AI Crawler Optimization -->
+    <meta name="gpt-bot" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://toolshub365.com/irr-calculator">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "IRR Calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "url": "https://toolshub365.com/irr-calculator",
+      "description": "Calculates the Internal Rate of Return (IRR) for a series of cash flows.",
+      "offer": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #27ae60;
+            --danger-color: #e74c3c;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --header-height: 50px;
+            --container-width: 1200px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Calculator Layout */
+        .calculator-wrapper {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Input Section */
+        .input-panel {
+            flex: 1;
+            min-width: 320px;
+            padding: 30px;
+            border-right: 1px solid #eee;
+        }
+
+        /* Result Section */
+        .result-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            background-color: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Cash Flow List */
+        .cash-flow-list {
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .cf-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        .cf-label {
+            width: 80px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 10px 10px 25px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        /* Buttons */
+        .btn-icon {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .btn-icon:hover {
+            color: var(--danger-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-add {
+            background-color: #fff;
+            border: 2px dashed #bdc3c7;
+            color: #7f8c8d;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            background-color: #f0f8ff;
+        }
+
+        .main-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button.control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-calc {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-calc:hover { background-color: #2980b9; }
+
+        .btn-clear {
+            background-color: #ecf0f1;
+            color: var(--text-color);
+            border: 1px solid #bdc3c7;
+        }
+
+        .btn-clear:hover { background-color: #bdc3c7; }
+
+        /* Results */
+        .result-box {
+            margin-bottom: 20px;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7f8c8d;
+        }
+
+        .result-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .result-msg {
+            font-size: 0.9rem;
+            color: #777;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        /* Error state */
+        .error { color: var(--danger-color); }
+        .success { color: var(--accent-color); }
+
+        /* Mobile Responsive Design */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .calculator-wrapper {
+                border-radius: 0;
+                box-shadow: none;
+                flex-direction: column;
+            }
+
+            .input-panel {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                padding: 20px;
+            }
+
+            .result-panel {
+                padding: 30px 20px;
+                border-top: 5px solid #f4f6f7;
+                min-height: auto;
+            }
+            
+            /* Prevent iOS zoom */
+            input[type="number"] {
+                font-size: 16px;
+            }
+
+            .cf-row {
+                gap: 5px;
+            }
+
+            .cf-label {
+                width: 55px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IRR Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calculator-wrapper">
+            
+            <!-- Input Section -->
+            <div class="input-panel">
+                <h3 style="margin-bottom: 15px; color: var(--primary-color);">Cash Flows</h3>
+                <div class="cash-flow-list" id="cfList">
+                    <!-- Dynamic Rows go here -->
+                </div>
+
+                <button type="button" class="btn-add" id="addBtn">+ Add Year</button>
+
+                <div class="main-controls">
+                    <button type="button" class="btn-clear" id="clearBtn">Clear</button>
+                    <button type="button" class="btn-calc" id="calcBtn">Calculate IRR</button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-panel">
+                <div class="result-box">
+                    <div class="result-label">Internal Rate of Return</div>
+                    <div class="result-value" id="irrResult">--%</div>
+                </div>
+                <div class="result-msg" id="resultMsg">
+                    Enter your initial investment (negative) and subsequent cash flows (positive) to calculate.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const cfList = document.getElementById('cfList');
+        const addBtn = document.getElementById('addBtn');
+        const calcBtn = document.getElementById('calcBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const irrResult = document.getElementById('irrResult');
+        const resultMsg = document.getElementById('resultMsg');
+
+        const STORAGE_KEY = 'toolshub365_irr_data';
+
+        // Default Data
+        let cashFlows = [
+            { id: 0, value: -10000 },
+            { id: 1, value: 2000 },
+            { id: 2, value: 3000 },
+            { id: 3, value: 4000 },
+            { id: 4, value: 5000 }
+        ];
+
+        // Initialization
+        window.addEventListener('load', () => {
+            loadData();
+            renderRows();
+        });
+
+        // Event Listeners
+        addBtn.addEventListener('click', addRow);
+        calcBtn.addEventListener('click', performCalculation);
+        clearBtn.addEventListener('click', clearData);
+
+        // Core Functions
+
+        function renderRows() {
+            cfList.innerHTML = '';
+            
+            cashFlows.forEach((cf, index) => {
+                const row = document.createElement('div');
+                row.className = 'cf-row';
+                
+                // Label
+                const label = document.createElement('div');
+                label.className = 'cf-label';
+                label.textContent = index === 0 ? 'Initial' : `Year ${index}`;
+                
+                // Input Wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'input-wrapper';
+                const symbol = document.createElement('span');
+                symbol.textContent = '$';
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = cf.value;
+                input.placeholder = '0.00';
+                input.step = '0.01';
+                input.dataset.index = index;
+                
+                // Auto-save on input
+                input.addEventListener('input', (e) => {
+                    updateValue(index, e.target.value);
+                });
+
+                wrapper.appendChild(symbol);
+                wrapper.appendChild(input);
+
+                // Delete Button (only for Year 1+)
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-icon';
+                delBtn.innerHTML = '&times;';
+                if (index > 0) {
+                    delBtn.onclick = () => removeRow(index);
+                } else {
+                    delBtn.style.visibility = 'hidden';
+                }
+
+                row.appendChild(label);
+                row.appendChild(wrapper);
+                row.appendChild(delBtn);
+                
+                cfList.appendChild(row);
+            });
+        }
+
+        function addRow() {
+            cashFlows.push({ id: cashFlows.length, value: 0 });
+            renderRows();
+            saveData();
+            // Scroll to bottom
+            cfList.scrollTop = cfList.scrollHeight;
+        }
+
+        function removeRow(index) {
+            if (index === 0) return; // Cannot delete initial
+            cashFlows.splice(index, 1);
+            renderRows();
+            saveData();
+        }
+
+        function updateValue(index, val) {
+            cashFlows[index].value = val; // Keep as string for input, convert for math
+            saveData();
+        }
+
+        // Calculation Logic (Newton-Raphson Method)
+        function performCalculation() {
+            // Convert to numbers and validate
+            const flows = cashFlows.map(cf => parseFloat(cf.value) || 0);
+            
+            // Validation: Must have at least one negative and one positive
+            const hasPositive = flows.some(v => v > 0);
+            const hasNegative = flows.some(v => v < 0);
+
+            if (!hasPositive || !hasNegative) {
+                irrResult.textContent = "Error";
+                irrResult.classList.add('error');
+                resultMsg.textContent = "IRR requires at least one negative value (outflow) and one positive value (inflow).";
+                return;
+            }
+
+            try {
+                const irr = calculateIRR(flows);
+                if (isNaN(irr) || !isFinite(irr)) {
+                    throw new Error("Calculation Failed");
+                }
+                const percentage = (irr * 100).toFixed(2);
+                irrResult.textContent = `${percentage}%`;
+                irrResult.className = 'result-value success';
+                
+                if (irr > 0) {
+                    resultMsg.textContent = "Positive return. The project is estimated to generate profit.";
+                } else {
+                    resultMsg.textContent = "Negative return. The project may result in a loss.";
+                }
+            } catch (e) {
+                irrResult.textContent = "Error";
+                irrResult.className = 'result-value error';
+                resultMsg.textContent = "Could not find a valid result. Cash flows may be too irregular.";
+            }
+        }
+
+        function calculateIRR(values, guess = 0.1) {
+            const maxIterations = 1000;
+            const precision = 1e-6;
+            let x0 = guess;
+
+            for (let i = 0; i < maxIterations; i++) {
+                let npv = 0;
+                let derivative = 0;
+
+                for (let j = 0; j < values.length; j++) {
+                    const val = values[j];
+                    const denominator = Math.pow(1 + x0, j);
+                    
+                    npv += val / denominator;
+                    
+                    // Derivative of (val * (1+r)^-j) is -j * val * (1+r)^(-j-1)
+                    derivative += -j * val * Math.pow(1 + x0, -j - 1);
+                }
+
+                const x1 = x0 - (npv / derivative);
+
+                if (Math.abs(x1 - x0) < precision) {
+                    return x1;
+                }
+
+                x0 = x1;
+            }
+            return NaN; // Did not converge
+        }
+
+        // Local Storage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cashFlows));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    cashFlows = JSON.parse(saved);
+                } catch (e) {
+                    console.error("Error loading data", e);
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Clear all data?")) {
+                cashFlows = [
+                    { id: 0, value: '' },
+                    { id: 1, value: '' }
+                ];
+                renderRows();
+                irrResult.textContent = "--%";
+                irrResult.className = 'result-value';
+                resultMsg.textContent = "Data cleared.";
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+
+    </script>
+</body>
+</html>

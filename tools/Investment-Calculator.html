@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO Optimization -->
+    <title>Investment Calculator - Toolshub365</title>
+    <meta name="description" content="Free Investment Calculator by Toolshub365. Calculate compound interest, total returns, and growth over time. Mobile-friendly and saves your data automatically.">
+    <meta name="keywords" content="Investment Calculator, Compound Interest Calculator, ROI Calculator, Financial Tool, toolshub365.com, Investment Growth, Savings Calculator">
+    <meta name="author" content="Toolshub365">
+    <link rel="canonical" href="https://toolshub365.com/investment-calculator">
+    
+    <!-- Open Graph / Social SEO -->
+    <meta property="og:title" content="Investment Calculator">
+    <meta property="og:description" content="Calculate your investment growth with compound interest. Fast, free, and saves your progress.">
+    <meta property="og:url" content="https://toolshub365.com/investment-calculator">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Schema for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Investment Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "FinanceApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Toolshub365",
+        "url": "https://toolshub365.com"
+      }
+    }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #f3f4f6;
+            --text-color: #1f2937;
+            --bg-color: #f9fafb;
+            --header-bg: #1e40af;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --danger-color: #dc2626;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 50px; /* Space for fixed header */
+            overflow-x: hidden;
+        }
+
+        /* Header Styling */
+        header {
+            width: 100%;
+            height: 50px;
+            background-color: var(--header-bg);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Desktop default */
+            gap: 20px;
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #4b5563;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-symbol {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 10px 10px 25px; /* Space for symbol */
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Range Slider Styling */
+        input[type="range"] {
+            width: 100%;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex: 1;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-calc:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-clear {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            color: var(--danger-color);
+            flex: 0.5;
+        }
+
+        .btn-clear:hover {
+            background-color: #fee2e2;
+        }
+
+        /* Results Section */
+        .results-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-box.total {
+            grid-column: span 2;
+            background-color: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .result-box.total .result-value {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Desktop Layout Specifics */
+        @media (min-width: 769px) {
+            .container {
+                max-width: 1200px;
+            }
+        }
+
+        /* Mobile Layout Specifics */
+        @media (max-width: 768px) {
+            .container {
+                display: block; /* Stack elements */
+                width: 100%;
+                padding: 15px 0; /* No side padding per request? Actually request says "remove side blank space" so 100% width, but content needs slight padding or it touches edge */
+                margin: 0;
+            }
+
+            .card {
+                border-radius: 0; /* Full width look */
+                box-shadow: none;
+                border-left: none;
+                border-right: none;
+                margin-bottom: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.1rem;
+            }
+
+            .results-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .result-box.total {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Investment Calculator</h1>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- Input Section -->
+        <div class="card">
+            <div class="form-group">
+                <label for="initialInvest">Initial Investment</label>
+                <div class="input-wrapper">
+                    <span class="input-symbol">$</span>
+                    <input type="number" id="initialInvest" placeholder="5000" oninput="updateRange('initialInvestRange', this.value)">
+                </div>
+                <input type="range" id="initialInvestRange" min="0" max="100000" step="100" oninput="updateInput('initialInvest', this.value)">
+            </div>
+
+            <div class="form-group">
+                <label for="monthlyContrib">Monthly Contribution</label>
+                <div class="input-wrapper">
+                    <span class="input-symbol">$</span>
+                    <input type="number" id="monthlyContrib" placeholder="500" oninput="updateRange('monthlyContribRange', this.value)">
+                </div>
+                <input type="range" id="monthlyContribRange" min="0" max="10000" step="50" oninput="updateInput('monthlyContrib', this.value)">
+            </div>
+
+            <div class="form-group">
+                <label for="interestRate">Estimated Interest Rate (%)</label>
+                <div class="input-wrapper">
+                    <span class="input-symbol">%</span>
+                    <input type="number" id="interestRate" placeholder="7" step="0.1" oninput="updateRange('interestRateRange', this.value)">
+                </div>
+                <input type="range" id="interestRateRange" min="1" max="20" step="0.1" oninput="updateInput('interestRate', this.value)">
+            </div>
+
+            <div class="form-group">
+                <label for="years">Investment Duration (Years)</label>
+                <div class="input-wrapper">
+                    <span class="input-symbol">#</span>
+                    <input type="number" id="years" placeholder="10" oninput="updateRange('yearsRange', this.value)">
+                </div>
+                <input type="range" id="yearsRange" min="1" max="50" step="1" oninput="updateInput('years', this.value)">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+                <button class="btn-calc" onclick="calculateInvestment()">Calculate</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="card">
+            <div class="results-summary">
+                <div class="result-box total">
+                    <div class="result-label">End Balance</div>
+                    <div class="result-value" id="totalBalance">$0.00</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Total Principal</div>
+                    <div class="result-value" id="totalPrincipal">$0.00</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Total Interest</div>
+                    <div class="result-value" id="totalInterest" style="color: var(--success-color);">$0.00</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="investmentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Global Chart Instance
+        let myChart = null;
+
+        // On Load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            calculateInvestment(); // Auto calculate on load
+        });
+
+        // Sync Range and Number Inputs
+        function updateInput(id, val) {
+            document.getElementById(id).value = val;
+            calculateInvestment();
+        }
+
+        function updateRange(id, val) {
+            document.getElementById(id).value = val;
+            calculateInvestment();
+        }
+
+        // Main Calculation Logic
+        function calculateInvestment() {
+            // Get Values
+            const initial = parseFloat(document.getElementById('initialInvest').value) || 0;
+            const monthly = parseFloat(document.getElementById('monthlyContrib').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const years = parseFloat(document.getElementById('years').value) || 0;
+
+            // Save to LocalStorage
+            saveData(initial, monthly, rate, years);
+
+            // Calculation (Compounded Monthly)
+            const r = rate / 100 / 12; // Monthly rate
+            const n = years * 12; // Total months
+
+            let futureValue = 0;
+            let totalInvested = initial + (monthly * n);
+
+            if (rate === 0) {
+                futureValue = totalInvested;
+            } else {
+                // Compound Interest Formula for Initial Investment + Monthly Contributions
+                futureValue = initial * Math.pow(1 + r, n) + 
+                              (monthly * (Math.pow(1 + r, n) - 1)) / r;
+            }
+
+            const totalInterest = futureValue - totalInvested;
+
+            // Update DOM
+            document.getElementById('totalBalance').innerText = formatCurrency(futureValue);
+            document.getElementById('totalPrincipal').innerText = formatCurrency(totalInvested);
+            document.getElementById('totalInterest').innerText = formatCurrency(totalInterest);
+
+            // Update Chart
+            updateChart(totalInvested, totalInterest);
+        }
+
+        // Currency Formatter
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+
+        // Chart.js Update
+        function updateChart(invested, interest) {
+            const ctx = document.getElementById('investmentChart').getContext('2d');
+            
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Total Invested', 'Total Interest'],
+                    datasets: [{
+                        data: [invested, interest],
+                        backgroundColor: [
+                            '#2563eb', // Blue
+                            '#10b981'  // Green
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Local Storage Functions
+        function saveData(initial, monthly, rate, years) {
+            const data = {
+                initial: initial,
+                monthly: monthly,
+                rate: rate,
+                years: years
+            };
+            localStorage.setItem('investmentData_toolshub365', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('investmentData_toolshub365');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('initialInvest').value = data.initial;
+                document.getElementById('initialInvestRange').value = data.initial;
+                
+                document.getElementById('monthlyContrib').value = data.monthly;
+                document.getElementById('monthlyContribRange').value = data.monthly;
+                
+                document.getElementById('interestRate').value = data.rate;
+                document.getElementById('interestRateRange').value = data.rate;
+                
+                document.getElementById('years').value = data.years;
+                document.getElementById('yearsRange').value = data.years;
+            } else {
+                // Defaults if no data
+                document.getElementById('initialInvest').value = 5000;
+                document.getElementById('initialInvestRange').value = 5000;
+                document.getElementById('monthlyContrib').value = 200;
+                document.getElementById('monthlyContribRange').value = 200;
+                document.getElementById('interestRate').value = 7;
+                document.getElementById('interestRateRange').value = 7;
+                document.getElementById('years').value = 10;
+                document.getElementById('yearsRange').value = 10;
+            }
+        }
+
+        function clearData() {
+            localStorage.removeItem('investmentData_toolshub365');
+            // Reset to 0
+            document.getElementById('initialInvest').value = 0;
+            document.getElementById('initialInvestRange').value = 0;
+            document.getElementById('monthlyContrib').value = 0;
+            document.getElementById('monthlyContribRange').value = 0;
+            document.getElementById('interestRate').value = 0;
+            document.getElementById('interestRateRange').value = 0;
+            document.getElementById('years').value = 1;
+            document.getElementById('yearsRange').value = 1;
+            
+            calculateInvestment();
+        }
+    </script>
+</body>
+</html>

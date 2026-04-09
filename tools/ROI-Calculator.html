@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROI Calculator</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Advanced Free Online ROI Calculator. Calculate annualized return, net profit, and visualize investment growth instantly. Auto-save supported.">
+    <meta name="keywords" content="ROI Calculator, Return on Investment, Investment Analyzer, Profit Calculator, Financial Tools, ToolsHub365">
+    <meta name="author" content="ToolsHub365">
+    <link rel="canonical" href="https://toolshub365.com/roi-calculator">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ROI Calculator - Advanced Financial Tool">
+    <meta property="og:description" content="Calculate and visualize your Return on Investment with our advanced, mobile-friendly tool.">
+    <meta property="og:url" content="https://toolshub365.com/roi-calculator">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": "ROI Calculator",
+      "description": "Advanced tool to calculate Return on Investment with visual analytics.",
+      "brand": {
+        "@type": "Brand",
+        "name": "ToolsHub365"
+      },
+      "category": "Financial Tools"
+    }
+    </script>
+
+    <style>
+        /* --- CSS Variables & Theme --- */
+        :root {
+            --brand-color: #2563eb;       /* Royal Blue */
+            --brand-dark: #1e40af;
+            --accent-color: #0f172a;      /* Dark Slate */
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --header-h: 50px;
+        }
+
+        /* --- Reset & Layout --- */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            padding-top: var(--header-h);
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-h);
+            background: var(--accent-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* --- Card Styles --- */
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Split View: Inputs | Visuals */
+            gap: 0;
+        }
+
+        /* Left Side: Form */
+        .form-section {
+            padding: 30px;
+            border-right: 1px solid var(--border);
+        }
+
+        /* Right Side: Visuals */
+        .visual-section {
+            padding: 30px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 350px;
+        }
+
+        /* --- Inputs --- */
+        .input-wrapper {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .input-wrapper label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            border-color: var(--brand-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* --- Buttons --- */
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-calc { background: var(--brand-color); color: #fff; }
+        .btn-calc:hover { background: var(--brand-dark); }
+        .btn-clear { background: #e2e8f0; color: var(--text-primary); }
+        .btn-clear:hover { background: #cbd5e1; }
+
+        /* --- Results & Chart --- */
+        .empty-state {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* Advanced Donut Chart */
+        .chart-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 25px;
+            display: none; /* Hidden initially */
+        }
+        .donut-chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--brand-color) 0deg 0deg, #e2e8f0 0deg 360deg);
+            position: relative;
+            transition: background 0.5s ease-out;
+        }
+        .donut-hole {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75%; height: 75%;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        .chart-label { font-size: 0.8rem; color: var(--text-secondary); }
+        .chart-value { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            display: none; /* Hidden initially */
+        }
+        .stat-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .stat-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
+        .stat-num { font-size: 1.1rem; font-weight: 700; margin-top: 5px; color: var(--text-primary); }
+        
+        .val-pos { color: var(--success); }
+        .val-neg { color: var(--danger); }
+
+        /* --- Mobile Responsive (Strict) --- */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0; /* Remove side padding */
+                margin-top: 15px;
+            }
+            .tool-card {
+                display: flex;
+                flex-direction: column;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                box-shadow: none;
+            }
+            .form-section { border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
+            .visual-section { padding: 25px 20px; min-height: auto; }
+            .action-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>ROI Calculator</h1>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="tool-card">
+            
+            <!-- Input Section -->
+            <div class="form-section">
+                <form id="roiForm" onsubmit="event.preventDefault();">
+                    <div class="input-wrapper">
+                        <label for="invested">Amount Invested ($)</label>
+                        <input type="number" id="invested" class="input-field" placeholder="0.00" step="0.01" oninput="handleInput()">
+                    </div>
+
+                    <div class="input-wrapper">
+                        <label for="returned">Amount Returned ($)</label>
+                        <input type="number" id="returned" class="input-field" placeholder="0.00" step="0.01" oninput="handleInput()">
+                    </div>
+
+                    <div class="input-wrapper">
+                        <label for="duration">Duration (Years) <small style="color:var(--text-secondary); font-weight:400">(Optional)</small></label>
+                        <input type="number" id="duration" class="input-field" placeholder="1.0" step="0.1" oninput="handleInput()">
+                    </div>
+
+                    <div class="action-bar">
+                        <button type="button" class="btn btn-calc" onclick="calculateROI()">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearData()">Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Result Visualization Section -->
+            <div class="visual-section">
+                
+                <div id="emptyState" class="empty-state">
+                    <p>Enter your investment details<br>to see analytics.</p>
+                </div>
+
+                <!-- Donut Chart -->
+                <div id="chartContainer" class="chart-container">
+                    <div class="donut-chart" id="donutChart"></div>
+                    <div class="donut-hole">
+                        <span class="chart-label">ROI</span>
+                        <span class="chart-value" id="mainRoiDisplay">0%</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Stats -->
+                <div id="statsGrid" class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-title">Net Profit</div>
+                        <div class="stat-num" id="displayProfit">$0.00</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-title">Total Value</div>
+                        <div class="stat-num" id="displayTotal">$0.00</div>
+                    </div>
+                    <div class="stat-box" style="grid-column: span 2;">
+                        <div class="stat-title">Annualized ROI</div>
+                        <div class="stat-num" id="displayAnnual">-</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ROI Calculator Logic with LocalStorage and Visuals
+         * Domain: toolshub365.com
+         */
+
+        const els = {
+            invested: document.getElementById('invested'),
+            returned: document.getElementById('returned'),
+            duration: document.getElementById('duration'),
+            emptyState: document.getElementById('emptyState'),
+            chartContainer: document.getElementById('chartContainer'),
+            statsGrid: document.getElementById('statsGrid'),
+            donutChart: document.getElementById('donutChart'),
+            mainRoi: document.getElementById('mainRoiDisplay'),
+            dProfit: document.getElementById('displayProfit'),
+            dTotal: document.getElementById('displayTotal'),
+            dAnnual: document.getElementById('displayAnnual')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // If data exists, trigger calc automatically
+            if(els.invested.value && els.returned.value) {
+                calculateROI();
+            }
+        });
+
+        function handleInput() {
+            saveData();
+            // Optional: Real-time calculation if you prefer, 
+            // but let's stick to button for explicit action or auto-update if valid
+            if(els.invested.value && els.returned.value) {
+                calculateROI();
+            }
+        }
+
+        function calculateROI() {
+            const invested = parseFloat(els.invested.value);
+            const returned = parseFloat(els.returned.value);
+            const duration = parseFloat(els.duration.value);
+
+            if (isNaN(invested) || isNaN(returned) || invested <= 0) {
+                // Keep empty state if invalid
+                return; 
+            }
+
+            // Core Math
+            const netProfit = returned - invested;
+            const roiPercent = (netProfit / invested) * 100;
+            
+            // Annualized Math
+            let annualRoi = 0;
+            let hasAnnual = false;
+            if (!isNaN(duration) && duration > 0) {
+                // CAGR Formula: (End/Start)^(1/n) - 1
+                const totalGrowth = returned / invested;
+                if(totalGrowth > 0) {
+                    annualRoi = (Math.pow(totalGrowth, 1 / duration) - 1) * 100;
+                    hasAnnual = true;
+                }
+            }
+
+            // Update UI
+            updateUI(invested, returned, netProfit, roiPercent, annualRoi, hasAnnual);
+        }
+
+        function updateUI(invested, total, profit, roi, annual, hasAnnual) {
+            // Hide Empty, Show Results
+            els.emptyState.style.display = 'none';
+            els.chartContainer.style.display = 'block';
+            els.statsGrid.style.display = 'grid';
+
+            // Text Updates
+            els.mainRoi.textContent = roi.toFixed(2) + '%';
+            els.mainRoi.className = 'chart-value ' + (roi >= 0 ? 'val-pos' : 'val-neg');
+            
+            els.dProfit.textContent = formatMoney(profit);
+            els.dProfit.className = 'stat-num ' + (profit >= 0 ? 'val-pos' : 'val-neg');
+            
+            els.dTotal.textContent = formatMoney(total);
+            
+            if(hasAnnual) {
+                els.dAnnual.textContent = annual.toFixed(2) + '%';
+                els.dAnnual.className = 'stat-num ' + (annual >= 0 ? 'val-pos' : 'val-neg');
+            } else {
+                els.dAnnual.textContent = '-';
+                els.dAnnual.className = 'stat-num';
+            }
+
+            // Chart Visualization (Conic Gradient)
+            // Logic: Calculate angle for Investment vs Profit
+            // To make it look good: 
+            // If Profit > 0: Investment is Grey, Profit is Green.
+            // If Loss: Investment is Grey, Loss eats into it (Red).
+            
+            let color = roi >= 0 ? '#10b981' : '#ef4444'; // Green or Red
+            
+            // For visual simplicity in the donut, we map ROI percentage to degrees.
+            // Valid range for visual: 0 to 360 degrees.
+            // If ROI is +50%, we show 50% fill. If +200%, full fill.
+            
+            // Normalize for display (capped at 100% visual fill for simplicity or modulo)
+            // Let's visualize the ratio of Net Profit to Total Return
+            let degrees = 0;
+            
+            if (roi >= 0) {
+                // Positive ROI: Show Profit slice
+                // Percentage of circle = Profit / Total Return
+                // (e.g., Invest 100, Return 150. Profit 50. 50/150 = 33% of circle is profit)
+                let percentage = (profit / total) * 100;
+                degrees = (percentage / 100) * 360;
+                els.donutChart.style.background = `conic-gradient(${color} 0deg ${degrees}deg, #e2e8f0 ${degrees}deg 360deg)`;
+            } else {
+                // Negative ROI: Show Remaining Value vs Loss
+                // Loss % = (Loss / Invested)
+                // e.g. Invest 100, Return 80. Loss 20. 20% red.
+                let lossPercent = Math.abs(roi); // e.g., 20%
+                degrees = (lossPercent / 100) * 360;
+                els.donutChart.style.background = `conic-gradient(#e2e8f0 0deg ${360 - degrees}deg, ${color} ${360 - degrees}deg 360deg)`;
+            }
+        }
+
+        function formatMoney(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+
+        // --- Data Persistence ---
+        function saveData() {
+            localStorage.setItem('roi_invested', els.invested.value);
+            localStorage.setItem('roi_returned', els.returned.value);
+            localStorage.setItem('roi_duration', els.duration.value);
+        }
+
+        function loadData() {
+            if(localStorage.getItem('roi_invested')) els.invested.value = localStorage.getItem('roi_invested');
+            if(localStorage.getItem('roi_returned')) els.returned.value = localStorage.getItem('roi_returned');
+            if(localStorage.getItem('roi_duration')) els.duration.value = localStorage.getItem('roi_duration');
+        }
+
+        function clearData() {
+            els.invested.value = '';
+            els.returned.value = '';
+            els.duration.value = '';
+            
+            localStorage.removeItem('roi_invested');
+            localStorage.removeItem('roi_returned');
+            localStorage.removeItem('roi_duration');
+            
+            // Reset UI
+            els.emptyState.style.display = 'block';
+            els.chartContainer.style.display = 'none';
+            els.statsGrid.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

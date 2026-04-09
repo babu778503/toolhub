@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Calculator</title>
+    
+    <!-- SEO Optimization -->
+    <meta name="description" content="Free Bond Calculator. Calculate bond price, current yield, and determine if a bond is trading at a premium or discount. Auto-saves your data.">
+    <meta name="keywords" content="Bond Calculator, Bond Valuation, Yield to Maturity, YTM Calculator, Fixed Income Tool, Investment Calculator, Coupon Rate, toolshub365">
+    <meta name="author" content="toolshub365.com">
+    <link rel="canonical" href="https://toolshub365.com/bond-calculator">
+    
+    <!-- Schema.org for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": "Bond Calculator",
+      "description": "A tool to calculate the fair market value (price) of a bond based on yield to maturity and coupon rate.",
+      "brand": {
+        "@type": "Brand",
+        "name": "ToolsHub365"
+      },
+      "category": "Investment Tools",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any"
+    }
+    </script>
+
+    <style>
+        /* CSS Variables & Reset */
+        :root {
+            --primary-color: #d4af37; /* Gold for Wealth/Bonds */
+            --primary-dark: #b5921f;
+            --secondary-color: #2c3e50; /* Dark Blue/Grey */
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #e9ecef;
+            --header-height: 50px;
+            --container-max: 1200px;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+            line-height: 1.6;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: var(--container-max);
+            margin: 30px auto;
+            background: white;
+            display: flex;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Layout Columns */
+        .input-section, .result-section {
+            padding: 35px;
+            width: 50%;
+        }
+
+        .result-section {
+            background-color: #fcfcfc;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Typography & Form */
+        h2 {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .symbol {
+            position: absolute;
+            color: #777;
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+        
+        .prefix { left: 12px; }
+        .suffix { right: 12px; }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .has-prefix { padding-left: 30px; }
+        .has-suffix { padding-right: 35px; }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-calc {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: 1px solid var(--secondary-color);
+        }
+
+        .btn-calc:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-clear {
+            background-color: #fff;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+
+        .btn-clear:hover {
+            background-color: #f1f1f1;
+            color: #d9534f;
+        }
+
+        /* Results Display */
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            line-height: 1.2;
+        }
+        
+        .result-tag {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag-premium { background: #d4edda; color: #155724; }
+        .tag-discount { background: #f8d7da; color: #721c24; }
+        .tag-par { background: #e2e3e5; color: #383d41; }
+
+        /* Breakdown Table */
+        .breakdown {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .breakdown td {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .breakdown td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsive */
+        @media screen and (max-width: 768px) {
+            body {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .container {
+                width: 100%;
+                margin: 0; /* Remove vertical margin */
+                border-radius: 0; /* Edge to edge */
+                box-shadow: none;
+                flex-direction: column;
+            }
+
+            .input-section, .result-section {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .result-section {
+                border-top: 5px solid #f0f0f0;
+                border-left: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Bond Calculator</h1>
+    </header>
+
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            <h2>Bond Details</h2>
+            <form id="bondForm" onsubmit="event.preventDefault(); calculateBond();">
+                
+                <div class="form-group">
+                    <label for="faceValue">Face Value (Par Value)</label>
+                    <div class="input-wrapper">
+                        <span class="symbol prefix">$</span>
+                        <input type="number" id="faceValue" class="has-prefix" placeholder="1000" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="couponRate">Annual Coupon Rate</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="couponRate" class="has-suffix" placeholder="5.0" min="0" step="0.01" required>
+                        <span class="symbol suffix">%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ytm">Yield to Maturity (Market Rate)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="ytm" class="has-suffix" placeholder="6.0" min="0" step="0.01" required>
+                        <span class="symbol suffix">%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="years">Years to Maturity</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="years" class="has-suffix" placeholder="10" min="0.1" step="0.1" required>
+                        <span class="symbol suffix">Yrs</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">Coupon Frequency</label>
+                    <select id="frequency">
+                        <option value="1">Annual (1x / Year)</option>
+                        <option value="2" selected>Semi-Annual (2x / Year)</option>
+                        <option value="4">Quarterly (4x / Year)</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn-calc">Calculate Price</button>
+                    <button type="button" class="btn-clear" onclick="clearData()">Clear Data</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <h2>Valuation Result</h2>
+            
+            <div id="resultsContent" style="opacity: 0.5;">
+                <div class="result-card">
+                    <div class="result-label">Estimated Bond Price</div>
+                    <div class="result-value" id="res-price">$0.00</div>
+                    <div id="res-status" class="result-tag tag-par">PAR</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-label">Current Yield</div>
+                    <div class="result-value" style="font-size: 1.8rem; color: #555;" id="res-current-yield">0.00%</div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <h3 style="font-size: 0.95rem; text-transform:uppercase; color:#777; border-bottom: 1px solid #eee; padding-bottom:5px;">Value Breakdown</h3>
+                    <table class="breakdown">
+                        <tr>
+                            <td>PV of Coupons (Annuity)</td>
+                            <td id="res-pv-coupons">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>PV of Face Value (Lump Sum)</td>
+                            <td id="res-pv-face">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Total Coupon Payout</td>
+                            <td id="res-total-payout">$0.00</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('bondForm');
+        const faceInput = document.getElementById('faceValue');
+        const couponInput = document.getElementById('couponRate');
+        const ytmInput = document.getElementById('ytm');
+        const yearsInput = document.getElementById('years');
+        const freqInput = document.getElementById('frequency');
+        
+        const resPrice = document.getElementById('res-price');
+        const resCurrentYield = document.getElementById('res-current-yield');
+        const resStatus = document.getElementById('res-status');
+        const resPvCoupons = document.getElementById('res-pv-coupons');
+        const resPvFace = document.getElementById('res-pv-face');
+        const resTotalPayout = document.getElementById('res-total-payout');
+        const resultContent = document.getElementById('resultsContent');
+
+        // Formatter
+        const moneyFormatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+
+        // Calculation Logic
+        function calculateBond() {
+            const F = parseFloat(faceInput.value); // Face Value
+            const cr = parseFloat(couponInput.value) / 100; // Coupon Rate
+            const ytm = parseFloat(ytmInput.value) / 100; // Market Rate
+            const years = parseFloat(yearsInput.value);
+            const freq = parseInt(freqInput.value);
+
+            if (isNaN(F) || isNaN(cr) || isNaN(ytm) || isNaN(years)) return;
+
+            // Calculations for Periods
+            const n = years * freq; // Total number of periods
+            const r = ytm / freq; // Rate per period
+            const C = (F * cr) / freq; // Coupon payment per period
+
+            let pvCoupons = 0;
+            let pvFace = 0;
+
+            // 1. PV of Coupons (Annuity Formula)
+            // PV = C * [ (1 - (1+r)^-n) / r ]
+            if (r === 0) {
+                pvCoupons = C * n;
+            } else {
+                pvCoupons = C * ((1 - Math.pow(1 + r, -n)) / r);
+            }
+
+            // 2. PV of Face Value (Lump Sum)
+            // PV = F / (1+r)^n
+            pvFace = F / Math.pow(1 + r, n);
+
+            const bondPrice = pvCoupons + pvFace;
+
+            // 3. Current Yield = Annual Coupon / Price
+            const annualCoupon = F * cr;
+            const currentYield = (annualCoupon / bondPrice) * 100;
+
+            // Update UI
+            resPrice.innerText = moneyFormatter.format(bondPrice);
+            resCurrentYield.innerText = currentYield.toFixed(2) + '%';
+            resPvCoupons.innerText = moneyFormatter.format(pvCoupons);
+            resPvFace.innerText = moneyFormatter.format(pvFace);
+            resTotalPayout.innerText = moneyFormatter.format(annualCoupon * years);
+
+            // Determine Status
+            resStatus.className = 'result-tag';
+            if (bondPrice > F) {
+                resStatus.innerText = "PREMIUM BOND";
+                resStatus.classList.add('tag-premium');
+            } else if (bondPrice < F) {
+                resStatus.innerText = "DISCOUNT BOND";
+                resStatus.classList.add('tag-discount');
+            } else {
+                resStatus.innerText = "PAR VALUE BOND";
+                resStatus.classList.add('tag-par');
+            }
+
+            resultContent.style.opacity = '1';
+            saveData();
+        }
+
+        // Local Storage
+        function saveData() {
+            const data = {
+                face: faceInput.value,
+                coupon: couponInput.value,
+                ytm: ytmInput.value,
+                years: yearsInput.value,
+                freq: freqInput.value
+            };
+            localStorage.setItem('toolsHub_bondCalc_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('toolsHub_bondCalc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                faceInput.value = data.face || '';
+                couponInput.value = data.coupon || '';
+                ytmInput.value = data.ytm || '';
+                yearsInput.value = data.years || '';
+                freqInput.value = data.freq || '2';
+
+                if (data.face && data.coupon && data.ytm && data.years) {
+                    calculateBond();
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem('toolsHub_bondCalc_data');
+                form.reset();
+                freqInput.value = "2";
+                
+                // Reset Results
+                resultContent.style.opacity = '0.5';
+                resPrice.innerText = "$0.00";
+                resCurrentYield.innerText = "0.00%";
+                resPvCoupons.innerText = "$0.00";
+                resPvFace.innerText = "$0.00";
+                resTotalPayout.innerText = "$0.00";
+                resStatus.innerText = "PAR";
+                resStatus.className = 'result-tag tag-par';
+            }
+        }
+
+        // Listeners for auto-save/calc
+        const inputs = [faceInput, couponInput, ytmInput, yearsInput, freqInput];
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                saveData();
+                if(faceInput.value && couponInput.value && ytmInput.value && yearsInput.value) {
+                    calculateBond();
+                }
+            });
+        });
+
+        // Initialize
+        window.onload = loadData;
+
+    </script>
+</body>
+</html>

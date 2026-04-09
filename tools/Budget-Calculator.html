@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#27ae60">
+    
+    <!-- SEO & Metadata -->
+    <title>Budget Calculator</title>
+    <meta name="description" content="Free Budget Calculator. Plan your monthly budget by tracking income and expenses. Features auto-save, instant balance updates, and visual breakdown.">
+    <meta name="keywords" content="Budget Calculator, Monthly Budget Planner, Expense Tracker, Income vs Expense, Personal Finance Tool, Toolshub365, Free Budget Tool">
+    <meta name="author" content="Toolshub365">
+    <meta name="robots" content="index, follow">
+    
+    <!-- AI Crawler Optimization -->
+    <meta name="gpt-bot" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://toolshub365.com/budget-calculator">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Budget Calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "url": "https://toolshub365.com/budget-calculator",
+      "description": "A user-friendly tool to calculate monthly budget, track expenses, and view remaining balance.",
+      "offer": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #2c3e50;
+            --income-color: #27ae60;
+            --expense-color: #e74c3c;
+            --balance-color: #3498db;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --header-height: 50px;
+            --container-width: 1200px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Grid Layout */
+        .budget-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-total {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .income-total { color: var(--income-color); }
+        .expense-total { color: var(--expense-color); }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        label {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            flex: 0 0 140px;
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 10px 10px 25px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: right;
+            transition: border 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--balance-color);
+        }
+
+        /* Summary Section */
+        .summary-card {
+            grid-column: span 2;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            align-items: center;
+        }
+
+        .summary-item {
+            flex: 1;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* Visual Chart (Pure CSS) */
+        .chart-container {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .pie-chart {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--expense-color) 0% 0%, 
+                var(--income-color) 0% 100%
+            );
+            position: relative;
+            transition: background 0.5s ease;
+        }
+        
+        .pie-chart::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .chart-legend {
+            font-size: 0.9rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        /* Controls */
+        .controls {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-clear {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            border: 1px solid #bdc3c7;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        /* Mobile Responsive Design */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .card {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                box-shadow: none;
+            }
+
+            .summary-card {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px 0;
+                grid-column: span 1;
+            }
+            
+            .chart-container, .controls {
+                grid-column: span 1;
+            }
+
+            .summary-value {
+                font-size: 1.5rem;
+            }
+
+            /* Prevent iOS zoom */
+            input[type="number"] {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Budget Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="budget-grid">
+
+            <!-- Summary Section (Top for visibility) -->
+            <div class="card summary-card">
+                <div class="summary-item">
+                    <div class="summary-label">Total Income</div>
+                    <div class="summary-value" id="totalIncomeDisplay" style="color: #2ecc71;">$0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Expenses</div>
+                    <div class="summary-value" id="totalExpenseDisplay" style="color: #e74c3c;">$0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Remaining Balance</div>
+                    <div class="summary-value" id="balanceDisplay">$0.00</div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="card chart-container">
+                <div class="pie-chart" id="budgetChart"></div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="dot" style="background: var(--income-color);"></div>
+                        <span>Income (Remaining)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot" style="background: var(--expense-color);"></div>
+                        <span>Expenses (Used)</span>
+                    </div>
+                    <div style="margin-top:5px; font-size: 0.8rem; color: #888;">*Chart shows expense ratio</div>
+                </div>
+            </div>
+
+            <!-- Income Section -->
+            <div class="card">
+                <h2>
+                    Income 
+                    <span class="section-total income-total" id="incomeSum">$0.00</span>
+                </h2>
+                <form id="incomeForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="salary">Monthly Salary</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="salary" class="income-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bonus">Bonus / Tips</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="bonus" class="income-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sideHustle">Side Hustle</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="sideHustle" class="income-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="otherIncome">Other Income</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="otherIncome" class="income-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Expenses Section -->
+            <div class="card">
+                <h2>
+                    Expenses 
+                    <span class="section-total expense-total" id="expenseSum">$0.00</span>
+                </h2>
+                <form id="expenseForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="housing">Housing (Rent/Mortgage)</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="housing" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="food">Groceries & Dining</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="food" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="transport">Transportation</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="transport" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="utilities">Utilities (Elec/Water/Net)</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="utilities" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="entertainment">Entertainment</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="entertainment" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="health">Health & Medical</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="health" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="debt">Debt Repayment</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="debt" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="savings">Savings / Investing</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="savings" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="otherExpense">Other Expenses</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="otherExpense" class="expense-input" placeholder="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button type="button" class="btn-clear" id="clearBtn">Clear All Data</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const incomeInputs = document.querySelectorAll('.income-input');
+        const expenseInputs = document.querySelectorAll('.expense-input');
+        const totalIncomeDisplay = document.getElementById('totalIncomeDisplay');
+        const totalExpenseDisplay = document.getElementById('totalExpenseDisplay');
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const incomeSum = document.getElementById('incomeSum');
+        const expenseSum = document.getElementById('expenseSum');
+        const budgetChart = document.getElementById('budgetChart');
+        const clearBtn = document.getElementById('clearBtn');
+
+        const STORAGE_KEY = 'toolshub365_budget_data';
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadData();
+            calculateBudget();
+            
+            // Add listeners to all inputs for real-time calculation and saving
+            [...incomeInputs, ...expenseInputs].forEach(input => {
+                input.addEventListener('input', () => {
+                    calculateBudget();
+                    saveData();
+                });
+            });
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if(confirm('Are you sure you want to clear all budget data?')) {
+                clearData();
+            }
+        });
+
+        // Main Calculation Logic
+        function calculateBudget() {
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            // Sum Income
+            incomeInputs.forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                totalIncome += val;
+            });
+
+            // Sum Expenses
+            expenseInputs.forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                totalExpense += val;
+            });
+
+            const balance = totalIncome - totalExpense;
+
+            // Update Text Displays
+            totalIncomeDisplay.textContent = formatMoney(totalIncome);
+            totalExpenseDisplay.textContent = formatMoney(totalExpense);
+            balanceDisplay.textContent = formatMoney(balance);
+            
+            incomeSum.textContent = formatMoney(totalIncome);
+            expenseSum.textContent = formatMoney(totalExpense);
+
+            // Update Balance Color
+            if(balance >= 0) {
+                balanceDisplay.style.color = "#3498db"; // Blue/White default
+            } else {
+                balanceDisplay.style.color = "#e74c3c"; // Red warning
+            }
+
+            // Update Chart
+            updateChart(totalIncome, totalExpense);
+        }
+
+        // Visual Chart Logic
+        function updateChart(income, expense) {
+            if (income === 0 && expense === 0) {
+                budgetChart.style.background = '#e0e0e0'; // Grey if empty
+                return;
+            }
+
+            let percentage = 0;
+            if (income > 0) {
+                percentage = (expense / income) * 100;
+            } else {
+                // If no income but has expenses, show full red
+                percentage = 100; 
+            }
+            
+            // Cap at 100% for visual sanity in pie chart
+            const visualPercent = Math.min(percentage, 100);
+
+            // Conic gradient: Red part represents expense %
+            budgetChart.style.background = `conic-gradient(
+                var(--expense-color) 0% ${visualPercent}%, 
+                var(--income-color) ${visualPercent}% 100%
+            )`;
+        }
+
+        function formatMoney(num) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2
+            }).format(num);
+        }
+
+        // Local Storage Functions
+        function saveData() {
+            const data = {};
+            
+            // Save inputs by ID
+            [...incomeInputs, ...expenseInputs].forEach(input => {
+                data[input.id] = input.value;
+            });
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                for (const id in data) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = data[id];
+                }
+            }
+        }
+
+        function clearData() {
+            [...incomeInputs, ...expenseInputs].forEach(input => {
+                input.value = '';
+            });
+            localStorage.removeItem(STORAGE_KEY);
+            calculateBudget();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Calculator</title>
+    
+    <!-- Technical SEO & AI Optimization -->
+    <meta name="description" content="Free Commission Calculator for sales professionals and real estate agents. Calculate gross commission, splits, deductions, and net pay instantly. Auto-saves data.">
+    <meta name="keywords" content="Commission Calculator, Sales Commission Estimator, Real Estate Commission Calculator, Broker Split Calculator, Net Pay Tool, toolshub365.com">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/commission-calculator">
+    
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": "Commission Calculator",
+      "description": "A tool to calculate sales commissions, including splits between agents/brokers and deduction of expenses.",
+      "brand": {
+        "@type": "Brand",
+        "name": "toolshub365.com"
+      },
+      "category": "Business Tool"
+    }
+    </script>
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-color: #10893E; /* Money Green */
+            --primary-dark: #0b6b2f;
+            --accent-color: #2D3E50;  /* Corporate Blue/Grey */
+            --bg-body: #f4f6f8;
+            --bg-white: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --header-height: 50px;
+            --container-width: 1200px;
+            --danger-color: #d32f2f;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            padding-top: var(--header-height);
+        }
+
+        /* --- FIXED HEADER --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            width: 100%;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            background-color: var(--bg-white);
+            display: flex;
+            flex-wrap: wrap;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Desktop Layout */
+        @media (min-width: 768px) {
+            .container {
+                margin-top: 30px;
+                margin-bottom: 30px;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+                overflow: hidden;
+                min-height: auto;
+            }
+            
+            .input-section {
+                width: 50%;
+                border-right: 1px solid var(--border-color);
+            }
+            
+            .result-section {
+                width: 50%;
+                background-color: #fafafa;
+            }
+        }
+
+        /* Mobile Layout (Edge to Edge) */
+        @media (max-width: 767px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .input-section, .result-section {
+                width: 100%;
+                padding: 20px 15px;
+            }
+            .result-section {
+                border-top: 5px solid var(--bg-body);
+            }
+        }
+
+        /* --- SECTIONS --- */
+        .input-section, .result-section {
+            padding: 30px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .prefix, .suffix {
+            position: absolute;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .prefix { left: 12px; }
+        .suffix { right: 12px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 12px 12px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            -moz-appearance: textfield;
+            background: #fff;
+            color: var(--text-dark);
+        }
+        
+        input.has-prefix { padding-left: 25px; }
+        input.has-suffix { padding-right: 30px; }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 137, 62, 0.15);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-reset {
+            background-color: #f1f3f4;
+            color: var(--text-dark);
+            border: 1px solid #dcdcdc;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* --- RESULTS DISPLAY --- */
+        .big-result-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(16, 137, 62, 0.2);
+            margin-bottom: 25px;
+        }
+
+        .big-result-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .big-result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .breakdown-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.95rem;
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-item strong {
+            color: var(--text-dark);
+        }
+        
+        .breakdown-item.deduction {
+            color: var(--danger-color);
+        }
+
+        /* --- VISUAL BAR --- */
+        .split-bar-container {
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        .split-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .split-bar-bg {
+            height: 20px;
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .bar-agent { background-color: var(--primary-color); height: 100%; }
+        .bar-broker { background-color: var(--accent-color); height: 100%; }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            justify-content: center;
+        }
+        
+        .legend-item { display: flex; align-items: center; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Commission Calculator</h1>
+    </header>
+
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            <h2>Sale Details</h2>
+            
+            <div class="form-group">
+                <label for="salePrice">Sale Price / Revenue</label>
+                <div class="input-wrapper">
+                    <span class="prefix">$</span>
+                    <input type="number" id="salePrice" class="has-prefix" value="10000" min="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="commissionRate">Commission Rate</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="commissionRate" class="has-suffix" value="3" step="0.01">
+                        <span class="suffix">%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="deductions">Expenses/Deductions</label>
+                    <div class="input-wrapper">
+                        <span class="prefix">$</span>
+                        <input type="number" id="deductions" class="has-prefix" value="0" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <h2>Split & Bonus (Optional)</h2>
+            
+            <div class="form-group">
+                <label for="splitType">Commission Split (You / House)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="yourSplit" class="has-suffix" value="100" max="100" min="0">
+                    <span class="suffix">% (Your Share)</span>
+                </div>
+                <small style="color: #666; font-size: 0.8rem; display:block; margin-top:5px;">Remaining % goes to Broker/House/Team</small>
+            </div>
+
+            <div class="form-group">
+                <label for="baseSalary">Base Pay / Bonus (Add-on)</label>
+                <div class="input-wrapper">
+                    <span class="prefix">$</span>
+                    <input type="number" id="baseSalary" class="has-prefix" value="0" min="0">
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn-reset" onclick="resetData()">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <h2>Your Earnings</h2>
+
+            <div class="big-result-card">
+                <div class="big-result-label">Net Pay</div>
+                <div class="big-result-value" id="totalPay">$0.00</div>
+            </div>
+
+            <div class="breakdown-list">
+                <div class="breakdown-item">
+                    <span>Total Gross Commission</span>
+                    <strong id="grossCommission">$0.00</strong>
+                </div>
+                <div class="breakdown-item deduction">
+                    <span>Expenses Deducted</span>
+                    <strong id="displayDeductions">-$0.00</strong>
+                </div>
+                <div class="breakdown-item">
+                    <span>Commission After Expenses</span>
+                    <strong id="netCommissionBase">$0.00</strong>
+                </div>
+                <div class="breakdown-item">
+                    <span>Your Split Share (<span id="splitPctDisplay">100</span>%)</span>
+                    <strong id="yourCommission">$0.00</strong>
+                </div>
+                <div class="breakdown-item">
+                    <span>Base Pay / Bonus</span>
+                    <strong id="displayBase">$0.00</strong>
+                </div>
+            </div>
+
+            <!-- Visual Split -->
+            <div class="split-bar-container">
+                <div class="split-label">
+                    <span>You</span>
+                    <span>Broker/House</span>
+                </div>
+                <div class="split-bar-bg" id="splitBar">
+                    <div class="bar-agent" style="width: 100%"></div>
+                    <div class="bar-broker" style="width: 0%"></div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="dot" style="background: var(--primary-color)"></div> You (<span id="txtYouPct">100%</span>)</div>
+                    <div class="legend-item"><div class="dot" style="background: var(--accent-color)"></div> House (<span id="txtHousePct">0%</span>)</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: right; font-size: 0.9rem; color: var(--text-light);">
+                <strong>House/Broker Share:</strong> <span id="houseAmount">$0.00</span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const inputs = {
+            salePrice: document.getElementById('salePrice'),
+            commissionRate: document.getElementById('commissionRate'),
+            deductions: document.getElementById('deductions'),
+            yourSplit: document.getElementById('yourSplit'),
+            baseSalary: document.getElementById('baseSalary')
+        };
+
+        const outputs = {
+            totalPay: document.getElementById('totalPay'),
+            grossCommission: document.getElementById('grossCommission'),
+            displayDeductions: document.getElementById('displayDeductions'),
+            netCommissionBase: document.getElementById('netCommissionBase'),
+            yourCommission: document.getElementById('yourCommission'),
+            displayBase: document.getElementById('displayBase'),
+            houseAmount: document.getElementById('houseAmount'),
+            splitPctDisplay: document.getElementById('splitPctDisplay'),
+            txtYouPct: document.getElementById('txtYouPct'),
+            txtHousePct: document.getElementById('txtHousePct'),
+            splitBar: document.getElementById('splitBar')
+        };
+
+        const STORAGE_KEY = 'toolshub_comm_calc';
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            calculate();
+            
+            // Attach listeners
+            Object.values(inputs).forEach(input => {
+                input.addEventListener('input', () => {
+                    validateSplit(input);
+                    calculate();
+                    saveData();
+                });
+            });
+        });
+
+        function validateSplit(input) {
+            if (input.id === 'yourSplit') {
+                let val = parseFloat(input.value);
+                if (val > 100) input.value = 100;
+                if (val < 0) input.value = 0;
+            }
+        }
+
+        function calculate() {
+            // Get Values
+            const price = parseFloat(inputs.salePrice.value) || 0;
+            const rate = parseFloat(inputs.commissionRate.value) || 0;
+            const expenses = parseFloat(inputs.deductions.value) || 0;
+            const mySplitPct = parseFloat(inputs.yourSplit.value) || 0;
+            const base = parseFloat(inputs.baseSalary.value) || 0;
+
+            // 1. Calculate Gross Commission
+            const gross = price * (rate / 100);
+
+            // 2. Subtract Deductions (from gross) - Common model. 
+            // *Some models deduct from price first, but standard sales calc deducts from commission pool.*
+            let netPool = gross - expenses;
+            if (netPool < 0) netPool = 0;
+
+            // 3. Apply Split
+            const myShareAmount = netPool * (mySplitPct / 100);
+            const houseShareAmount = netPool - myShareAmount;
+
+            // 4. Add Base Pay
+            const totalEarnings = myShareAmount + base;
+
+            // Update UI
+            outputs.grossCommission.textContent = formatMoney(gross);
+            outputs.displayDeductions.textContent = '-' + formatMoney(expenses);
+            outputs.netCommissionBase.textContent = formatMoney(netPool);
+            outputs.splitPctDisplay.textContent = mySplitPct;
+            
+            outputs.yourCommission.textContent = formatMoney(myShareAmount);
+            outputs.displayBase.textContent = formatMoney(base);
+            outputs.houseAmount.textContent = formatMoney(houseShareAmount);
+            
+            outputs.totalPay.textContent = formatMoney(totalEarnings);
+
+            // Update Bars
+            const bars = outputs.splitBar.children;
+            bars[0].style.width = mySplitPct + '%';
+            bars[1].style.width = (100 - mySplitPct) + '%';
+            
+            outputs.txtYouPct.textContent = mySplitPct + '%';
+            outputs.txtHousePct.textContent = (100 - mySplitPct) + '%';
+        }
+
+        function formatMoney(num) {
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- Local Storage ---
+        function saveData() {
+            const data = {};
+            for (const [key, element] of Object.entries(inputs)) {
+                data[key] = element.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    for (const [key, value] of Object.entries(data)) {
+                        if (inputs[key]) {
+                            inputs[key].value = value;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading data", e);
+                }
+            }
+        }
+
+        function resetData() {
+            if(confirm("Clear all values?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Defaults
+                inputs.salePrice.value = 10000;
+                inputs.commissionRate.value = 3;
+                inputs.deductions.value = 0;
+                inputs.yourSplit.value = 100;
+                inputs.baseSalary.value = 0;
+                calculate();
+            }
+        }
+    </script>
+</body>
+</html>

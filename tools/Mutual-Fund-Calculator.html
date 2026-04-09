@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mutual Fund Calculator</title>
+    <meta name="description" content="Free Mutual Fund Calculator by ToolsHub365. Calculate returns on SIP (Systematic Investment Plan) and Lumpsum mutual fund investments accurately.">
+    <meta name="keywords" content="mutual fund calculator, SIP calculator, lumpsum calculator, investment return calculator, mutual fund returns, finance tool, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/mutual-fund-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/mutual-fund-calculator">
+    <meta property="og:title" content="Mutual Fund Calculator">
+    <meta property="og:description" content="Calculate your SIP and Lumpsum investment returns with our easy-to-use Mutual Fund Calculator.">
+
+    <!-- Schema.org for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Mutual Fund Calculator",
+      "url": "https://toolshub365.com/mutual-fund-calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "description": "A tool to estimate the future value of mutual fund investments via SIP or Lumpsum modes.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ToolsHub365"
+      }
+    }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #0d9488; /* Teal/Green for Growth */
+            --secondary-color: #115e59;
+            --accent-color: #f0fdfa;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --header-height: 50px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Inputs left, Results right */
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* Sections */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Mode Switcher (SIP vs Lumpsum) */
+        .mode-switch {
+            display: flex;
+            background: #e2e8f0;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 25px;
+        }
+
+        .mode-switch button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .mode-switch button.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group input.has-icon {
+            padding-left: 30px;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            width: 100%;
+            margin-top: 5px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-clear {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Area */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: var(--accent-color);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 0.8rem;
+            color: #0f766e;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin-top: 0;
+                gap: 5px;
+                width: 100%;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px 15px;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            /* Remove side spaces for mobile */
+            .main-wrapper {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mutual Fund Calculator</h1>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Input Section -->
+            <div class="input-section">
+                
+                <div class="mode-switch">
+                    <button id="btn-sip" class="active" onclick="switchMode('sip')">SIP (Monthly)</button>
+                    <button id="btn-lumpsum" onclick="switchMode('lumpsum')">Lumpsum (One-Time)</button>
+                </div>
+
+                <form id="calcForm" onsubmit="event.preventDefault(); calculateMutualFund();">
+                    <input type="hidden" id="investType" value="sip">
+
+                    <div class="form-group">
+                        <label id="amountLabel" for="amount">Monthly Investment</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="amount" class="has-icon" placeholder="500" min="1" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rate">Expected Return Rate (p.a) %</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="rate" placeholder="12" min="1" max="30" step="0.1" required>
+                        </div>
+                        <input type="range" min="1" max="30" step="0.5" id="rateRange" oninput="syncRange('rate', 'rateRange')">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="years">Time Period (Years)</label>
+                        <input type="number" id="years" placeholder="10" min="1" max="50" step="1" required>
+                        <input type="range" min="1" max="50" step="1" id="yearsRange" oninput="syncRange('years', 'yearsRange')">
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-calc">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearData()">Clear Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section">
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>Invested Amount</h3>
+                        <p id="res-invested">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Est. Returns</h3>
+                        <p id="res-returns">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Value</h3>
+                        <p id="res-total">-</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="mfChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('calcForm');
+        const amountInput = document.getElementById('amount');
+        const rateInput = document.getElementById('rate');
+        const yearsInput = document.getElementById('years');
+        const typeInput = document.getElementById('investType');
+        const amountLabel = document.getElementById('amountLabel');
+        const btnSip = document.getElementById('btn-sip');
+        const btnLump = document.getElementById('btn-lumpsum');
+
+        let myChart = null;
+
+        // Sync Range Sliders with Inputs
+        function syncRange(inputId, rangeId) {
+            document.getElementById(inputId).value = document.getElementById(rangeId).value;
+            saveData();
+        }
+
+        // Add listeners to text inputs to update sliders
+        rateInput.addEventListener('input', () => document.getElementById('rateRange').value = rateInput.value);
+        yearsInput.addEventListener('input', () => document.getElementById('yearsRange').value = yearsInput.value);
+
+        // On Load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // Sync initial slider positions
+            document.getElementById('rateRange').value = rateInput.value || 12;
+            document.getElementById('yearsRange').value = yearsInput.value || 10;
+            
+            // Trigger calculation if data exists
+            if(amountInput.value && rateInput.value) {
+                calculateMutualFund();
+            }
+        });
+
+        // Autosave
+        const inputs = ['amount', 'rate', 'years', 'investType'];
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('input', saveData);
+                el.addEventListener('change', saveData);
+            }
+        });
+
+        function saveData() {
+            const data = {};
+            inputs.forEach(id => {
+                data[id] = document.getElementById(id).value;
+            });
+            localStorage.setItem('mf_calc_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('mf_calc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if(data.investType) {
+                    switchMode(data.investType);
+                }
+                if(data.amount) amountInput.value = data.amount;
+                if(data.rate) rateInput.value = data.rate;
+                if(data.years) yearsInput.value = data.years;
+            }
+        }
+
+        function clearData() {
+            if(confirm('Are you sure you want to clear all data?')) {
+                localStorage.removeItem('mf_calc_data');
+                form.reset();
+                switchMode('sip'); // Default back to SIP
+                document.getElementById('res-invested').innerText = '-';
+                document.getElementById('res-returns').innerText = '-';
+                document.getElementById('res-total').innerText = '-';
+                
+                // Reset Sliders
+                document.getElementById('rateRange').value = 12;
+                document.getElementById('yearsRange').value = 10;
+                
+                if (myChart) {
+                    myChart.destroy();
+                    myChart = null;
+                }
+            }
+        }
+
+        // Mode Switching
+        function switchMode(mode) {
+            typeInput.value = mode;
+            if(mode === 'sip') {
+                btnSip.classList.add('active');
+                btnLump.classList.remove('active');
+                amountLabel.innerText = "Monthly Investment";
+            } else {
+                btnSip.classList.remove('active');
+                btnLump.classList.add('active');
+                amountLabel.innerText = "Total Investment Amount";
+            }
+            saveData();
+        }
+
+        // Calculation Logic
+        function calculateMutualFund() {
+            const P = parseFloat(amountInput.value) || 0;
+            const r = parseFloat(rateInput.value) || 0;
+            const n = parseFloat(yearsInput.value) || 0;
+            const type = typeInput.value;
+
+            if (P === 0 || n === 0) return;
+
+            let investedAmount = 0;
+            let totalValue = 0;
+
+            if (type === 'sip') {
+                // SIP Formula
+                // M = P * ({[1 + i]^n - 1} / i) * (1 + i)
+                // i = monthly rate, n = months
+                const i = (r / 100) / 12;
+                const months = n * 12;
+                
+                if (r === 0) {
+                    investedAmount = P * months;
+                    totalValue = investedAmount;
+                } else {
+                    investedAmount = P * months;
+                    totalValue = P * ((Math.pow(1 + i, months) - 1) / i) * (1 + i);
+                }
+
+            } else {
+                // Lumpsum Formula
+                // A = P(1 + r/100)^n
+                investedAmount = P;
+                if (r === 0) {
+                    totalValue = P;
+                } else {
+                    totalValue = P * Math.pow(1 + r/100, n);
+                }
+            }
+
+            const estReturns = totalValue - investedAmount;
+
+            // Update UI
+            const currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('res-invested').innerText = currencyFormatter.format(investedAmount);
+            document.getElementById('res-returns').innerText = currencyFormatter.format(estReturns);
+            document.getElementById('res-total').innerText = currencyFormatter.format(totalValue);
+
+            updateChart(investedAmount, estReturns);
+        }
+
+        function updateChart(invested, returns) {
+            const ctx = document.getElementById('mfChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            // Using a Donut chart for breakdown
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Invested Amount', 'Est. Returns'],
+                    datasets: [{
+                        data: [invested, returns],
+                        backgroundColor: [
+                            '#e2e8f0', // Light Grey for Invested
+                            '#0d9488'  // Teal for Returns
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(context.raw);
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%', // Thinner donut
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELOC Calculator</title>
+    
+    <!-- Technical SEO & AI Optimization -->
+    <meta name="description" content="Calculate your Home Equity Line of Credit (HELOC) limit, interest-only payments, and repayment phase costs. Features auto-save and accurate LTV logic.">
+    <meta name="keywords" content="HELOC Calculator, Home Equity Line of Credit, Equity Loan Calculator, LTV Calculator, HELOC Payment Estimator, toolshub365.com">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/heloc-calculator">
+    
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": "HELOC Calculator",
+      "description": "A tool to estimate available home equity line of credit and monthly payments for both draw and repayment periods.",
+      "brand": {
+        "@type": "Brand",
+        "name": "toolshub365.com"
+      },
+      "category": "Mortgage Calculator"
+    }
+    </script>
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-color: #0056b3; /* Professional Blue */
+            --accent-color: #00a86b;  /* Finance Green */
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-light: #666666;
+            --border-color: #ddd;
+            --header-height: 50px;
+            --container-width: 1200px;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            padding-top: var(--header-height);
+        }
+
+        /* --- FIXED HEADER --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- LAYOUT CONTAINER --- */
+        .container {
+            width: 100%;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            background-color: var(--bg-white);
+            display: flex;
+            flex-wrap: wrap;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Desktop Layout (min-width 768px) */
+        @media (min-width: 768px) {
+            .container {
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                overflow: hidden;
+                min-height: auto;
+            }
+            
+            .input-section {
+                width: 45%;
+                border-right: 1px solid var(--border-color);
+            }
+            
+            .result-section {
+                width: 55%;
+            }
+        }
+
+        /* Mobile Layout (Edge to Edge) */
+        @media (max-width: 767px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .input-section, .result-section {
+                width: 100%;
+                padding: 15px;
+            }
+        }
+
+        /* --- SECTIONS --- */
+        .input-section, .result-section {
+            padding: 25px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        /* --- FORMS --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .prefix, .suffix {
+            position: absolute;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .prefix { left: 10px; }
+        .suffix { right: 10px; }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+        }
+        
+        input.has-prefix { padding-left: 25px; }
+        input.has-suffix { padding-right: 30px; }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-reset {
+            background-color: #f1f1f1;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .btn-reset:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* --- RESULTS DISPLAY --- */
+        .result-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, var(--primary-color), #004494);
+            color: white;
+            border: none;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .payment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .payment-box {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .payment-box h3 {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin: 0 0 5px 0;
+        }
+        
+        .payment-box p {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .note {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* --- EQUITY BAR CHART --- */
+        .bar-chart-container {
+            margin-top: 30px;
+        }
+        
+        .bar-wrapper {
+            width: 100%;
+            height: 25px;
+            background-color: #eee;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .bar-mortgage { background-color: #dc3545; height: 100%; }
+        .bar-heloc { background-color: var(--accent-color); height: 100%; }
+        .bar-equity { background-color: #ddd; height: 100%; } /* Remaining equity */
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HELOC Calculator</h1>
+    </header>
+
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            <h2>Property & Loan Details</h2>
+            
+            <div class="form-group">
+                <label for="homeValue">Current Home Value</label>
+                <div class="input-wrapper">
+                    <span class="prefix">$</span>
+                    <input type="number" id="homeValue" class="has-prefix" value="450000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mortgageBalance">Current Mortgage Balance</label>
+                <div class="input-wrapper">
+                    <span class="prefix">$</span>
+                    <input type="number" id="mortgageBalance" class="has-prefix" value="250000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ltvLimit">Max LTV Limit (Typically 80% - 90%)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="ltvLimit" class="has-suffix" value="85" max="100">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="interestRate">HELOC Interest Rate</label>
+                <div class="input-wrapper">
+                    <input type="number" id="interestRate" class="has-suffix" value="8.5" step="0.1">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="drawPeriod">Draw Period (Interest Only)</label>
+                <select id="drawPeriod">
+                    <option value="10">10 Years (Standard)</option>
+                    <option value="5">5 Years</option>
+                    <option value="15">15 Years</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="repayPeriod">Repayment Period</label>
+                <select id="repayPeriod">
+                    <option value="20">20 Years (Standard)</option>
+                    <option value="10">10 Years</option>
+                    <option value="15">15 Years</option>
+                </select>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn-reset" onclick="resetCalculator()">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+            <h2>Calculation Results</h2>
+
+            <div class="result-card highlight">
+                <div class="result-label">Maximum HELOC Available</div>
+                <div class="result-value" id="maxHeloc">$0.00</div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">Based on <span id="displayLtv">85</span>% LTV</div>
+            </div>
+
+            <div class="payment-grid">
+                <div class="payment-box">
+                    <h3>Interest Only Payment</h3>
+                    <p id="interestPayment">$0.00</p>
+                    <div class="note">During Draw Period</div>
+                </div>
+                <div class="payment-box">
+                    <h3>P&I Payment</h3>
+                    <p id="repaymentPayment">$0.00</p>
+                    <div class="note">During Repayment Period</div>
+                </div>
+            </div>
+
+            <div class="bar-chart-container">
+                <h3 style="font-size: 0.95rem; margin-bottom: 10px;">Equity Breakdown</h3>
+                <div class="bar-wrapper" id="barChart">
+                    <div class="bar-mortgage" style="width: 0%"></div>
+                    <div class="bar-heloc" style="width: 0%"></div>
+                    <div class="bar-equity" style="width: 0%"></div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="dot" style="background:#dc3545;"></div> Mortgage</div>
+                    <div class="legend-item"><div class="dot" style="background:var(--accent-color);"></div> Available HELOC</div>
+                    <div class="legend-item"><div class="dot" style="background:#ddd;"></div> Untouchable Equity</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const inputs = {
+            homeValue: document.getElementById('homeValue'),
+            mortgageBalance: document.getElementById('mortgageBalance'),
+            ltvLimit: document.getElementById('ltvLimit'),
+            interestRate: document.getElementById('interestRate'),
+            drawPeriod: document.getElementById('drawPeriod'),
+            repayPeriod: document.getElementById('repayPeriod')
+        };
+
+        const outputs = {
+            maxHeloc: document.getElementById('maxHeloc'),
+            displayLtv: document.getElementById('displayLtv'),
+            interestPayment: document.getElementById('interestPayment'),
+            repaymentPayment: document.getElementById('repaymentPayment'),
+            barChart: document.getElementById('barChart')
+        };
+
+        // Storage Key
+        const STORAGE_KEY = 'toolshub_heloc_data';
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            calculate();
+            
+            // Add listeners
+            Object.values(inputs).forEach(input => {
+                input.addEventListener('input', () => {
+                    calculate();
+                    saveData();
+                });
+            });
+        });
+
+        function calculate() {
+            // Get values
+            const homeVal = parseFloat(inputs.homeValue.value) || 0;
+            const mortBal = parseFloat(inputs.mortgageBalance.value) || 0;
+            const ltv = parseFloat(inputs.ltvLimit.value) || 0;
+            const rate = parseFloat(inputs.interestRate.value) || 0;
+            const repayYears = parseFloat(inputs.repayPeriod.value);
+
+            // 1. Calculate Max Loan Amount (Home Value * LTV%)
+            const maxLoanable = homeVal * (ltv / 100);
+
+            // 2. Calculate Available HELOC (Max Loanable - Existing Mortgage)
+            let availableHeloc = maxLoanable - mortBal;
+            if (availableHeloc < 0) availableHeloc = 0;
+
+            // 3. Calculate Interest Only Payment (Monthly)
+            // (Loan Amount * Rate) / 12
+            const monthlyRate = (rate / 100) / 12;
+            const interestOnlyPmt = availableHeloc * monthlyRate;
+
+            // 4. Calculate Repayment Period Payment (Principal + Interest)
+            // Standard Amortization Formula
+            const numPayments = repayYears * 12;
+            let amortizedPmt = 0;
+            
+            if (availableHeloc > 0 && rate > 0) {
+                amortizedPmt = availableHeloc * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else if (availableHeloc > 0 && rate === 0) {
+                amortizedPmt = availableHeloc / numPayments;
+            }
+
+            // Update UI Text
+            outputs.maxHeloc.textContent = formatCurrency(availableHeloc);
+            outputs.displayLtv.textContent = ltv;
+            outputs.interestPayment.textContent = formatCurrency(interestOnlyPmt);
+            outputs.repaymentPayment.textContent = formatCurrency(amortizedPmt);
+
+            // Update Chart
+            updateChart(homeVal, mortBal, availableHeloc);
+        }
+
+        function updateChart(homeVal, mortBal, helocAmt) {
+            if (homeVal <= 0) return;
+
+            // Calculate percentages
+            let pctMortgage = (mortBal / homeVal) * 100;
+            let pctHeloc = (helocAmt / homeVal) * 100;
+            
+            // Caps to prevent overflow if inputs are unrealistic
+            if(pctMortgage > 100) pctMortgage = 100;
+            if(pctMortgage + pctHeloc > 100) pctHeloc = 100 - pctMortgage;
+
+            const bars = outputs.barChart.children;
+            bars[0].style.width = `${pctMortgage}%`;
+            bars[1].style.width = `${pctHeloc}%`;
+            // The rest is auto-filled by flex layout or background color, but explicit width helps animation
+            bars[2].style.width = `${100 - pctMortgage - pctHeloc}%`;
+        }
+
+        function formatCurrency(num) {
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- Local Storage Functions ---
+
+        function saveData() {
+            const data = {};
+            for (const [key, element] of Object.entries(inputs)) {
+                data[key] = element.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    for (const [key, value] of Object.entries(data)) {
+                        if (inputs[key]) {
+                            inputs[key].value = value;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading saved data", e);
+                }
+            }
+        }
+
+        function resetCalculator() {
+            if(confirm("Are you sure you want to clear all data?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Defaults
+                inputs.homeValue.value = 450000;
+                inputs.mortgageBalance.value = 250000;
+                inputs.ltvLimit.value = 85;
+                inputs.interestRate.value = 8.5;
+                inputs.drawPeriod.value = 10;
+                inputs.repayPeriod.value = 20;
+                calculate();
+            }
+        }
+    </script>
+</body>
+</html>

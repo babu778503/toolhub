@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT Calculator</title>
+    
+    <!-- SEO & Metadata for Toolshub365.com -->
+    <meta name="description" content="Free VAT Calculator to add or remove Value Added Tax from amounts. Calculate Net to Gross and Gross to Net instantly with automatic data saving.">
+    <meta name="keywords" content="VAT Calculator, Value Added Tax, Sales Tax Calculator, Net to Gross, Gross to Net, GST Calculator, Tax Tool, Toolshub365">
+    <meta name="author" content="Toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/vat-calculator">
+    
+    <!-- Technical SEO for AI Crawlers (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "VAT Calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A precise VAT Calculator to compute tax amounts, excluding or including VAT.",
+      "featureList": "Add/Remove VAT modes, Custom Tax Rate, Auto-save data, Mobile responsive",
+      "author": {
+        "@type": "Organization",
+        "name": "Toolshub365"
+      }
+    }
+    </script>
+
+    <style>
+        /* CSS Variables for Theme */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --accent-color: #f59e0b; /* Amber for tax highlights */
+            --header-height: 50px;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height); /* Space for fixed header */
+        }
+
+        /* Header Design (Fixed, 50px) */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Calculator Card */
+        .calculator-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px; /* Optimal width for this specific tool */
+            overflow: hidden;
+        }
+
+        .calc-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f9fafb;
+        }
+
+        .calc-body {
+            padding: 25px;
+        }
+
+        /* Operation Toggle */
+        .operation-toggle {
+            display: flex;
+            background-color: #e5e7eb;
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background-color: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix, .input-suffix {
+            position: absolute;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .input-prefix { left: 12px; }
+        .input-suffix { right: 12px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            transition: border-color 0.2s;
+        }
+
+        .has-prefix input { padding-left: 30px; }
+        .has-suffix input { padding-right: 35px; }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Standard Preset Buttons */
+        .preset-rates {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .rate-btn {
+            padding: 6px 12px;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: var(--primary-color);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .rate-btn:hover {
+            background-color: #dbeafe;
+        }
+
+        /* Results Section */
+        .results-container {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .result-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .highlight {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .tax-highlight {
+            color: var(--accent-color);
+        }
+
+        /* Action Buttons */
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-clear {
+            background-color: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 768px) {
+            .container {
+                margin: 0;
+                width: 100%;
+                padding: 0; /* Edge to edge */
+            }
+            
+            .calculator-card {
+                border-radius: 0;
+                box-shadow: none;
+                max-width: 100%;
+                min-height: calc(100vh - var(--header-height));
+            }
+
+            .calc-body {
+                padding: 20px;
+            }
+
+            input[type="number"] {
+                font-size: 16px; /* Prevents zoom on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>VAT Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calculator-card">
+            
+            <div class="calc-body">
+                <!-- Toggle Mode -->
+                <div class="operation-toggle">
+                    <button class="toggle-btn active" id="btn-add" onclick="setMode('add')">Add VAT (Net &rarr; Gross)</button>
+                    <button class="toggle-btn" id="btn-remove" onclick="setMode('remove')">Remove VAT (Gross &rarr; Net)</button>
+                </div>
+
+                <!-- Input Section -->
+                <div class="form-group">
+                    <label id="amountLabel" for="amount">Net Amount</label>
+                    <div class="input-group has-prefix">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="amount" placeholder="1000" inputmode="decimal" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="vatRate">VAT Rate (%)</label>
+                    <div class="input-group has-suffix">
+                        <input type="number" id="vatRate" placeholder="20" inputmode="decimal" step="0.1">
+                        <span class="input-suffix">%</span>
+                    </div>
+                    <div class="preset-rates">
+                        <button class="rate-btn" onclick="setRate(5)">5%</button>
+                        <button class="rate-btn" onclick="setRate(10)">10%</button>
+                        <button class="rate-btn" onclick="setRate(15)">15%</button>
+                        <button class="rate-btn" onclick="setRate(20)">20%</button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-container">
+                    <div class="result-row">
+                        <span class="result-label" id="resLabelNet">Net Amount</span>
+                        <span class="result-value" id="resNet">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">VAT Amount</span>
+                        <span class="result-value tax-highlight" id="resTax">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label" id="resLabelGross">Gross Amount</span>
+                        <span class="result-value highlight" id="resGross">-</span>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-clear" onclick="clearData()">Clear Data</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // State
+        let mode = 'add'; // 'add' or 'remove'
+
+        // DOM Elements
+        const els = {
+            amount: document.getElementById('amount'),
+            vatRate: document.getElementById('vatRate'),
+            amountLabel: document.getElementById('amountLabel'),
+            btnAdd: document.getElementById('btn-add'),
+            btnRemove: document.getElementById('btn-remove'),
+            resNet: document.getElementById('resNet'),
+            resTax: document.getElementById('resTax'),
+            resGross: document.getElementById('resGross'),
+            resLabelNet: document.getElementById('resLabelNet'),
+            resLabelGross: document.getElementById('resLabelGross')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            updateLabels();
+            calculateVAT();
+        });
+
+        // Event Listeners
+        els.amount.addEventListener('input', () => { calculateVAT(); saveData(); });
+        els.vatRate.addEventListener('input', () => { calculateVAT(); saveData(); });
+
+        // Functions
+        function setMode(newMode) {
+            mode = newMode;
+            
+            // Toggle Visuals
+            if (mode === 'add') {
+                els.btnAdd.classList.add('active');
+                els.btnRemove.classList.remove('active');
+            } else {
+                els.btnAdd.classList.remove('active');
+                els.btnRemove.classList.add('active');
+            }
+
+            updateLabels();
+            calculateVAT();
+            saveData();
+        }
+
+        function setRate(rate) {
+            els.vatRate.value = rate;
+            calculateVAT();
+            saveData();
+        }
+
+        function updateLabels() {
+            if (mode === 'add') {
+                els.amountLabel.textContent = "Net Amount (Exclusive of VAT)";
+                els.resLabelGross.style.fontWeight = "700";
+                els.resLabelNet.style.fontWeight = "400";
+            } else {
+                els.amountLabel.textContent = "Gross Amount (Inclusive of VAT)";
+                els.resLabelGross.style.fontWeight = "400";
+                els.resLabelNet.style.fontWeight = "700";
+            }
+        }
+
+        function calculateVAT() {
+            const amount = parseFloat(els.amount.value);
+            const rate = parseFloat(els.vatRate.value);
+
+            if (isNaN(amount) || isNaN(rate)) {
+                els.resNet.textContent = "-";
+                els.resTax.textContent = "-";
+                els.resGross.textContent = "-";
+                return;
+            }
+
+            let net, tax, gross;
+
+            if (mode === 'add') {
+                // Net to Gross
+                net = amount;
+                tax = amount * (rate / 100);
+                gross = net + tax;
+            } else {
+                // Gross to Net
+                gross = amount;
+                net = amount / (1 + (rate / 100));
+                tax = gross - net;
+            }
+
+            // Formatting currency
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            els.resNet.textContent = formatter.format(net);
+            els.resTax.textContent = formatter.format(tax);
+            els.resGross.textContent = formatter.format(gross);
+        }
+
+        // Data Persistence
+        function saveData() {
+            const data = {
+                mode: mode,
+                amount: els.amount.value,
+                rate: els.vatRate.value
+            };
+            localStorage.setItem('toolshub365_vat_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('toolshub365_vat_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.mode) setMode(data.mode); // This handles the visual toggle update too
+                if (data.amount) els.amount.value = data.amount;
+                if (data.rate) els.vatRate.value = data.rate;
+            } else {
+                // Defaults
+                els.vatRate.value = 20;
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem('toolshub365_vat_data');
+                els.amount.value = '';
+                els.vatRate.value = 20;
+                setMode('add');
+                calculateVAT();
+            }
+        }
+    </script>
+</body>
+</html>

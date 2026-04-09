@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<!-- Category: Financial Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Repayment Calculator</title>
+    <meta name="description" content="Free Repayment Calculator by ToolsHub365. Calculate your monthly loan or mortgage repayments, total interest, and payoff timeline.">
+    <meta name="keywords" content="repayment calculator, loan calculator, mortgage repayment, amortization calculator, debt payoff, finance tool, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/repayment-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/repayment-calculator">
+    <meta property="og:title" content="Repayment Calculator">
+    <meta property="og:description" content="Calculate monthly repayments and total interest for loans and mortgages with our easy-to-use Repayment Calculator.">
+
+    <!-- Schema.org for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Repayment Calculator",
+      "url": "https://toolshub365.com/repayment-calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "description": "A tool to calculate monthly repayments, total interest payable, and the amortization schedule of a loan.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ToolsHub365"
+      }
+    }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Blue */
+            --secondary-color: #2563eb;
+            --accent-color: #1d4ed8;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --header-height: 50px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Inputs left, Results right */
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* Sections */
+        .input-section, .result-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group input.has-icon {
+            padding-left: 30px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-clear {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Area */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #eff6ff; /* Light Blue */
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 0.8rem;
+            color: #3b82f6;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin-top: 0;
+                gap: 5px;
+                width: 100%;
+            }
+
+            .input-section, .result-section {
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px 15px;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            /* Remove side spaces for mobile */
+            .main-wrapper {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Repayment Calculator</h1>
+    </header>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- Input Section -->
+            <div class="input-section">
+                <form id="calcForm" onsubmit="event.preventDefault(); calculateRepayment();">
+                    
+                    <div class="form-group">
+                        <label for="amount">Loan Amount</label>
+                        <div class="input-wrapper">
+                            <span>$</span>
+                            <input type="number" id="amount" class="has-icon" placeholder="20000" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rate">Interest Rate (%)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="rate" placeholder="5.5" min="0" max="100" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="term">Loan Term (Years)</label>
+                        <input type="number" id="term" placeholder="5" min="0.1" max="100" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frequency">Repayment Frequency</label>
+                        <select id="frequency">
+                            <option value="12">Monthly</option>
+                            <option value="26">Bi-Weekly</option>
+                            <option value="52">Weekly</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-calc">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearData()">Clear Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section">
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>Repayment Amount</h3>
+                        <p id="res-monthly">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Interest</h3>
+                        <p id="res-interest">-</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Payback</h3>
+                        <p id="res-total">-</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="repaymentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('calcForm');
+        const inputs = ['amount', 'rate', 'term', 'frequency'];
+        let myChart = null;
+
+        // On Load: Retrieve Data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // Trigger calculation if data exists
+            if(document.getElementById('amount').value && document.getElementById('term').value) {
+                calculateRepayment();
+            }
+        });
+
+        // Add Autosave Listeners
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', saveData);
+            el.addEventListener('change', saveData);
+        });
+
+        // Save Data to LocalStorage
+        function saveData() {
+            const data = {};
+            inputs.forEach(id => {
+                data[id] = document.getElementById(id).value;
+            });
+            localStorage.setItem('repayment_calc_data', JSON.stringify(data));
+        }
+
+        // Load Data from LocalStorage
+        function loadData() {
+            const saved = localStorage.getItem('repayment_calc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                inputs.forEach(id => {
+                    if(data[id]) document.getElementById(id).value = data[id];
+                });
+            }
+        }
+
+        // Clear Data
+        function clearData() {
+            if(confirm('Are you sure you want to clear all data?')) {
+                localStorage.removeItem('repayment_calc_data');
+                form.reset();
+                document.getElementById('res-monthly').innerText = '-';
+                document.getElementById('res-interest').innerText = '-';
+                document.getElementById('res-total').innerText = '-';
+                
+                if (myChart) {
+                    myChart.destroy();
+                    myChart = null;
+                }
+            }
+        }
+
+        // Calculation Logic
+        function calculateRepayment() {
+            const principal = parseFloat(document.getElementById('amount').value) || 0;
+            const rateAnnual = parseFloat(document.getElementById('rate').value) || 0;
+            const years = parseFloat(document.getElementById('term').value) || 0;
+            const freq = parseInt(document.getElementById('frequency').value);
+
+            if (principal === 0 || years === 0) return;
+
+            // Standard Amortization Formula
+            // A = P * (r(1+r)^n) / ((1+r)^n - 1)
+            
+            const n = years * freq; // Total number of payments
+            const r = (rateAnnual / 100) / freq; // Rate per period
+            
+            let payment = 0;
+            
+            if (rateAnnual === 0) {
+                payment = principal / n;
+            } else {
+                payment = principal * ( (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1) );
+            }
+
+            const totalPayback = payment * n;
+            const totalInterest = totalPayback - principal;
+
+            // Update UI Text
+            const currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2
+            });
+
+            document.getElementById('res-monthly').innerText = currencyFormatter.format(payment);
+            document.getElementById('res-interest').innerText = currencyFormatter.format(totalInterest);
+            document.getElementById('res-total').innerText = currencyFormatter.format(totalPayback);
+
+            // Generate Chart Data (Balance over time)
+            generateChart(principal, payment, r, n, freq);
+            saveData();
+        }
+
+        function generateChart(principal, payment, r, n, freq) {
+            const labels = [];
+            const balanceData = [];
+            
+            let currentBalance = principal;
+            
+            // Limit points on chart for performance if N is huge (e.g. weekly for 30 years)
+            // We aim for roughly 10-20 points on the x-axis (Years)
+            
+            labels.push('Start');
+            balanceData.push(principal);
+
+            // We calculate month by month (or period by period) but only push to chart annually
+            // unless term is short (< 2 years), then show all periods.
+            
+            const step = (n > 24) ? freq : 1; // If long term, step by year (freq), else step by period
+            
+            for (let i = 1; i <= n; i++) {
+                // Apply Interest
+                let interest = currentBalance * r;
+                let principalPaid = payment - interest;
+                currentBalance -= principalPaid;
+                
+                if (currentBalance < 0) currentBalance = 0;
+
+                // Push data based on step
+                if (i % step === 0 || i === n) {
+                    let timeLabel = (step === freq) ? `Year ${i/freq}` : `Period ${i}`;
+                    labels.push(timeLabel);
+                    balanceData.push(currentBalance);
+                }
+            }
+
+            updateChart(labels, balanceData);
+        }
+
+        function updateChart(labels, balanceData) {
+            const ctx = document.getElementById('repaymentChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Remaining Balance',
+                            data: balanceData,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 8
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    if(value >= 1000) return '$' + (value/1000).toFixed(0) + 'k';
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
