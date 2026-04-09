@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organize PDF</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Organize PDF pages online. Reorder, rotate, delete, and rearrange PDF pages securely. Free client-side tool on toolshub365.com.">
+    <meta name="keywords" content="Organize PDF, reorder PDF pages, rotate PDF pages, delete PDF pages, rearrange PDF, PDF organizer, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/organize-pdf">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Organize PDF - Toolshub365">
+    <meta property="og:description" content="Rearrange, rotate, and organize PDF pages effortlessly.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/organize-pdf">
+
+    <!-- Libraries -->
+    <!-- PDF-Lib for manipulation -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- PDF.js for rendering thumbnails -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <!-- SortableJS for Drag & Drop -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <script>
+        // Set PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Organize PDF",
+      "applicationCategory": "Productivity",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Browser-based tool to reorder, rotate, and organize PDF pages visually.",
+      "url": "https://toolshub365.com/organize-pdf"
+    }
+    </script>
+
+    <style>
+        /* --- CSS Variables & Design System --- */
+        :root {
+            --primary: #2563eb;       /* Blue 600 */
+            --primary-hover: #1d4ed8; /* Blue 700 */
+            --bg-body: #f3f4f6;       /* Gray 100 */
+            --surface: #ffffff;
+            --text-main: #1f2937;     /* Gray 800 */
+            --text-sub: #6b7280;      /* Gray 500 */
+            --border: #e5e7eb;
+            
+            --header-h: 50px;
+            --max-w: 1200px;
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-top: var(--header-h);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Fixed Header --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: var(--header-h);
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 30px auto;
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Upload Section --- */
+        .upload-wrapper {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 20px;
+            cursor: pointer;
+            background: #f8fafc;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .icon-upload {
+            width: 50px;
+            height: 50px;
+            fill: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        /* --- Organizer Workspace --- */
+        .workspace {
+            display: none; /* Hidden until file loaded */
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .file-info {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Grid */
+        .page-grid {
+            flex: 1;
+            padding: 30px;
+            background: #f3f4f6;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        /* Page Card */
+        .page-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+        .page-card:active {
+            cursor: grabbing;
+        }
+
+        .page-card.sortable-ghost {
+            opacity: 0.4;
+            background: #bfdbfe;
+        }
+
+        .thumb-container {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e5e7eb;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .thumb-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            /* Shadow for the paper look */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+        }
+
+        .card-footer {
+            padding: 8px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-num {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .card-controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .card-controls button:hover {
+            background: #f3f4f6;
+            color: var(--primary);
+        }
+        
+        .card-controls button.btn-delete:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        /* --- Loader Overlay --- */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .upload-wrapper, .workspace {
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .workspace {
+                min-height: calc(100vh - var(--header-h));
+            }
+
+            .page-grid {
+                padding: 15px;
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+                gap: 10px;
+            }
+
+            .thumb-container {
+                height: 150px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Organize PDF</h1>
+    </header>
+
+    <div class="container">
+        
+        <input type="file" id="fileInput" accept=".pdf" hidden>
+
+        <!-- Upload View -->
+        <div class="upload-wrapper" id="uploadView">
+            <div class="drop-zone" id="dropZone">
+                <svg class="icon-upload" viewBox="0 0 24 24">
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                </svg>
+                <h3>Select PDF File</h3>
+                <p style="color:var(--text-sub); margin-top:8px;">Drag and drop or click to browse</p>
+            </div>
+        </div>
+
+        <!-- Organizer View -->
+        <div class="workspace" id="workspace">
+            <div class="toolbar">
+                <div class="file-info" id="fileName">document.pdf</div>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="clearBtn">Clear Data</button>
+                    <button class="btn btn-primary" id="saveBtn">Save & Download</button>
+                </div>
+            </div>
+            
+            <div class="page-grid" id="pageGrid">
+                <!-- Pages generated here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Processing Overlay -->
+    <div class="overlay" id="loader">
+        <div class="spinner"></div>
+        <h3 id="loaderText">Processing...</h3>
+        <p style="color:#6b7280; font-size:0.9rem;">Rendering thumbnails...</p>
+    </div>
+
+    <script>
+        const { PDFDocument, degrees } = PDFLib;
+
+        // --- DOM Elements ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadView = document.getElementById('uploadView');
+        const workspace = document.getElementById('workspace');
+        const pageGrid = document.getElementById('pageGrid');
+        const saveBtn = document.getElementById('saveBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileNameEl = document.getElementById('fileName');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loaderText');
+
+        // --- State ---
+        let originalFile = null;
+        let originalPdfBytes = null;
+        let pdfDoc = null; // The loaded PDFLib document
+        
+        // --- Initialization ---
+        // Check for saved state on load
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('organizePdf_name');
+            if (savedName) {
+                // We show the "Clear Data" button prompts or just handle a fresh start logic
+                // Since we can't save the actual file binary in localStorage easily (quota limits),
+                // we reset for a clean experience but acknowledge the user returned.
+                clearData(false);
+            }
+        });
+
+        // --- Event Listeners ---
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(e => dropZone.classList.add('drag-over'));
+        ['dragleave', 'drop'].forEach(e => dropZone.classList.remove('drag-over'));
+        
+        dropZone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+
+        clearBtn.addEventListener('click', () => clearData(true));
+        saveBtn.addEventListener('click', savePdf);
+
+        // --- Functions ---
+
+        function clearData(fullReset = true) {
+            originalFile = null;
+            originalPdfBytes = null;
+            pdfDoc = null;
+            fileInput.value = '';
+            pageGrid.innerHTML = '';
+            
+            if (fullReset) {
+                localStorage.removeItem('organizePdf_name');
+            }
+
+            workspace.style.display = 'none';
+            uploadView.style.display = 'block';
+        }
+
+        async function handleFile(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please select a valid PDF file.');
+                return;
+            }
+
+            showLoader(true, 'Loading & Rendering...');
+            originalFile = file;
+            fileNameEl.textContent = file.name;
+            localStorage.setItem('organizePdf_name', file.name);
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                originalPdfBytes = arrayBuffer;
+                
+                // Load into PDFLib (for later saving)
+                pdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                // Render Thumbnails using PDF.js
+                await renderThumbnails(arrayBuffer);
+
+                // Initialize SortableJS
+                new Sortable(pageGrid, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    // Save order to localstorage (simple version: just knowing user is working)
+                    onEnd: function (evt) {
+                        // console.log('Reordered');
+                    }
+                });
+
+                showLoader(false);
+                uploadView.style.display = 'none';
+                workspace.style.display = 'flex';
+
+            } catch (err) {
+                console.error(err);
+                alert('Error processing PDF. It might be encrypted.');
+                clearData();
+                showLoader(false);
+            }
+        }
+
+        async function renderThumbnails(data) {
+            const loadingTask = pdfjsLib.getDocument({ data: data });
+            const pdf = await loadingTask.promise;
+            const numPages = pdf.numPages;
+
+            pageGrid.innerHTML = '';
+
+            for (let i = 1; i <= numPages; i++) {
+                const page = await pdf.getPage(i);
+                
+                // Desired scale for thumbnails (approx 200px width)
+                const viewport = page.getViewport({ scale: 0.5 });
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+
+                createPageCard(i, canvas.toDataURL(), i - 1); // i-1 is the 0-based index
+            }
+        }
+
+        function createPageCard(pageNum, imgSrc, originalIndex) {
+            const card = document.createElement('div');
+            card.className = 'page-card';
+            card.dataset.originalIndex = originalIndex;
+            card.dataset.rotation = 0; // Current rotation
+
+            // Image Container
+            const thumbContainer = document.createElement('div');
+            thumbContainer.className = 'thumb-container';
+            
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            img.className = 'thumb-img';
+            thumbContainer.appendChild(img);
+
+            // Footer (Controls)
+            const footer = document.createElement('div');
+            footer.className = 'card-footer';
+
+            const pgLabel = document.createElement('span');
+            pgLabel.className = 'page-num';
+            pgLabel.textContent = `Page ${pageNum}`;
+
+            const controls = document.createElement('div');
+            controls.className = 'card-controls';
+
+            // Rotate Button
+            const rotateBtn = document.createElement('button');
+            rotateBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72 1.02-2.47zM6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47zm1.01 5.32c1.16.9 2.51 1.44 3.9 1.61V17.9c-.87-.15-1.71-.49-2.46-1.03L7.1 18.32zM13 4.07V1L8.45 5.55 13 10V6.09c2.84.48 5 2.94 5 5.91s-2.16 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93s-3.05-7.44-7-7.93z"/></svg>';
+            rotateBtn.title = "Rotate Clockwise";
+            rotateBtn.onclick = () => {
+                let currentRot = parseInt(card.dataset.rotation);
+                currentRot = (currentRot + 90) % 360;
+                card.dataset.rotation = currentRot;
+                img.style.transform = `rotate(${currentRot}deg)`;
+            };
+
+            // Delete Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-delete';
+            deleteBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+            deleteBtn.title = "Delete Page";
+            deleteBtn.onclick = () => {
+                card.remove(); // Remove from DOM
+            };
+
+            controls.appendChild(rotateBtn);
+            controls.appendChild(deleteBtn);
+
+            footer.appendChild(pgLabel);
+            footer.appendChild(controls);
+
+            card.appendChild(thumbContainer);
+            card.appendChild(footer);
+            
+            pageGrid.appendChild(card);
+        }
+
+        async function savePdf() {
+            const cards = Array.from(pageGrid.children);
+            
+            if (cards.length === 0) {
+                alert("No pages to save!");
+                return;
+            }
+
+            showLoader(true, 'Building PDF...');
+
+            try {
+                // Create a new PDF
+                const newPdf = await PDFDocument.create();
+                
+                // We need to reload the original doc to copy pages from
+                // We use the already loaded `pdfDoc` variable
+                
+                // Iterate through current DOM order
+                for (const card of cards) {
+                    const originalIndex = parseInt(card.dataset.originalIndex);
+                    const rotation = parseInt(card.dataset.rotation);
+
+                    // Copy page from original
+                    const [copiedPage] = await newPdf.copyPages(pdfDoc, [originalIndex]);
+                    
+                    // Apply rotation logic
+                    // Existing rotation + added rotation
+                    const existingRotation = copiedPage.getRotation().angle;
+                    copiedPage.setRotation(degrees(existingRotation + rotation));
+
+                    newPdf.addPage(copiedPage);
+                }
+
+                const pdfBytes = await newPdf.save();
+                downloadFile(pdfBytes, `organized_${originalFile.name}`);
+
+                showLoader(false);
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to save PDF.");
+                showLoader(false);
+            }
+        }
+
+        function downloadFile(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showLoader(show, text = 'Processing...') {
+            loader.style.display = show ? 'flex' : 'none';
+            loaderText.textContent = text;
+        }
+
+    </script>
+</body>
+</html>

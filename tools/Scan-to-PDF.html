@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scan to PDF</title>
+
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Turn your device into a document scanner. Scan paper documents, receipts, and photos to PDF instantly. Free online scanner tool on toolshub365.com.">
+    <meta name="keywords" content="Scan to PDF, online scanner, document scanner, jpg to pdf, camera to pdf, photo to pdf, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/scan-to-pdf">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Scan to PDF - Toolshub365">
+    <meta property="og:description" content="Scan documents using your camera and convert them to PDF instantly.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/scan-to-pdf">
+
+    <!-- JSPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Scan to PDF",
+      "applicationCategory": "Productivity",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A browser-based tool to scan images via camera and convert them to PDF.",
+      "url": "https://toolshub365.com/scan-to-pdf"
+    }
+    </script>
+
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --primary: #0ea5e9; /* Sky Blue */
+            --primary-dark: #0284c7;
+            --secondary: #64748b;
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --header-bg: #0f172a;
+            --header-text: #ffffff;
+            --danger: #ef4444;
+            
+            --header-h: 50px;
+            --max-w: 1200px;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: #1e293b;
+            padding-top: var(--header-h);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: var(--header-h);
+            background: var(--header-bg);
+            color: var(--header-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Tool Interface --- */
+        .scanner-interface {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 15px;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Scanned Image Grid */
+        .scan-grid {
+            flex: 1;
+            background: #f8fafc;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            align-content: start;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .icon-camera-lg {
+            width: 64px; height: 64px;
+            fill: #cbd5e1;
+            margin-bottom: 15px;
+        }
+
+        /* Image Card */
+        .scan-card {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1 / 1.414; /* A4 aspect ratio approximation */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .scan-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000; /* Dark background for contrast */
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 5px; left: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            pointer-events: none;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .delete-btn:hover { background: #dc2626; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 50px; /* Pill shape */
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(14, 165, 233, 0.25);
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .btn-secondary {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid #cbd5e1;
+        }
+        .btn-secondary:hover { background: #f1f5f9; color: #334155; }
+
+        .btn-action {
+            background: #10b981; /* Emerald */
+            color: white;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
+            min-width: 150px;
+        }
+        .btn-action:hover { background: #059669; transform: translateY(-1px); }
+        .btn-action:disabled { background: #cbd5e1; box-shadow: none; transform: none; cursor: not-allowed; }
+
+        /* Icon SVG styling */
+        .icon { width: 20px; height: 20px; fill: currentColor; }
+
+        /* --- Footer/Status Bar --- */
+        .status-bar {
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        /* --- Loader --- */
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .scanner-interface {
+                border-radius: 0;
+                box-shadow: none;
+                height: calc(100vh - var(--header-h));
+            }
+
+            .scan-grid {
+                padding: 10px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .toolbar {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .btn {
+                flex: 1; /* Buttons span width */
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+            
+            .btn span { display: none; } /* Hide text on small screens if needed, or keep for clarity */
+            .btn span.mobile-show { display: inline; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Scan to PDF</h1>
+    </header>
+
+    <div class="container">
+        <div class="scanner-interface">
+            
+            <!-- Hidden Inputs -->
+            <!-- 1. Camera Input (Mobile) -->
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+            <!-- 2. Gallery Input (Desktop/Mobile) -->
+            <input type="file" id="galleryInput" accept="image/*" multiple hidden>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="btn btn-primary" id="btnCamera">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <svg class="icon" style="margin-left:-5px;" viewBox="0 0 24 24"><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                    <span class="mobile-show">Scan / Camera</span>
+                </button>
+                
+                <button class="btn btn-secondary" id="btnUpload">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    <span class="mobile-show">Upload Image</span>
+                </button>
+
+                <button class="btn btn-secondary" id="btnClear" style="color:var(--danger); border-color: #fca5a5;">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+
+            <!-- Workspace -->
+            <div class="scan-grid" id="scanGrid">
+                <div class="empty-state" id="emptyState">
+                    <svg class="icon-camera-lg" viewBox="0 0 24 24">
+                        <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                    </svg>
+                    <h3>No Scans Yet</h3>
+                    <p>Tap "Scan / Camera" to take a photo of a document.</p>
+                </div>
+                <!-- Images injected here -->
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="status-bar">
+                <span id="pageCount">0 Pages</span>
+                <button class="btn btn-action" id="btnDownload" disabled>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download PDF
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; font-weight:600; color:#334155;" id="loaderText">Processing...</p>
+    </div>
+
+    <script>
+        // --- Setup ---
+        const { jsPDF } = window.jspdf;
+
+        // Elements
+        const cameraInput = document.getElementById('cameraInput');
+        const galleryInput = document.getElementById('galleryInput');
+        const btnCamera = document.getElementById('btnCamera');
+        const btnUpload = document.getElementById('btnUpload');
+        const btnClear = document.getElementById('btnClear');
+        const btnDownload = document.getElementById('btnDownload');
+        const scanGrid = document.getElementById('scanGrid');
+        const emptyState = document.getElementById('emptyState');
+        const pageCountEl = document.getElementById('pageCount');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loaderText');
+
+        // State
+        let scannedImages = []; // Array of Base64 strings
+
+        // --- Initialization ---
+        window.addEventListener('load', () => {
+            const savedData = localStorage.getItem('scanToPdf_images');
+            if (savedData) {
+                try {
+                    scannedImages = JSON.parse(savedData);
+                    renderGrid();
+                } catch (e) {
+                    console.error("Data load error", e);
+                    localStorage.removeItem('scanToPdf_images');
+                }
+            }
+        });
+
+        // --- Event Listeners ---
+
+        // Trigger Inputs
+        btnCamera.addEventListener('click', () => cameraInput.click());
+        btnUpload.addEventListener('click', () => galleryInput.click());
+
+        // Handle File Changes
+        cameraInput.addEventListener('change', (e) => processFiles(e.target.files));
+        galleryInput.addEventListener('change', (e) => processFiles(e.target.files));
+
+        // Clear Data
+        btnClear.addEventListener('click', () => {
+            if(confirm("Delete all scanned pages?")) {
+                scannedImages = [];
+                updateStorage();
+                renderGrid();
+            }
+        });
+
+        // Download PDF
+        btnDownload.addEventListener('click', generatePDF);
+
+        // --- Core Functions ---
+
+        async function processFiles(fileList) {
+            if (!fileList || fileList.length === 0) return;
+
+            showLoader(true, "Optimizing images...");
+
+            try {
+                const newImages = [];
+                for (let i = 0; i < fileList.length; i++) {
+                    const file = fileList[i];
+                    if (!file.type.startsWith('image/')) continue;
+
+                    // Compress image before saving to avoid LocalStorage quota limits
+                    const compressedBase64 = await compressImage(file);
+                    newImages.push(compressedBase64);
+                }
+
+                scannedImages = [...scannedImages, ...newImages];
+                updateStorage();
+                renderGrid();
+                
+                // Reset inputs
+                cameraInput.value = '';
+                galleryInput.value = '';
+
+            } catch (err) {
+                console.error(err);
+                alert("Error processing images. Try smaller files.");
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Image Compression Helper (Canvas)
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        // Max dimension 1200px (good for A4 PDF, keeps size low)
+                        const MAX_SIZE = 1200; 
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_SIZE) {
+                                height *= MAX_SIZE / width;
+                                width = MAX_SIZE;
+                            }
+                        } else {
+                            if (height > MAX_SIZE) {
+                                width *= MAX_SIZE / height;
+                                height = MAX_SIZE;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Output quality 0.7 JPEG
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateStorage() {
+            try {
+                localStorage.setItem('scanToPdf_images', JSON.stringify(scannedImages));
+            } catch (e) {
+                alert("Storage full! Please delete some pages or clear data.");
+            }
+        }
+
+        function renderGrid() {
+            scanGrid.innerHTML = '';
+            
+            if (scannedImages.length === 0) {
+                scanGrid.appendChild(emptyState);
+                btnDownload.disabled = true;
+                pageCountEl.textContent = "0 Pages";
+                return;
+            }
+
+            btnDownload.disabled = false;
+            pageCountEl.textContent = `${scannedImages.length} Page${scannedImages.length !== 1 ? 's' : ''}`;
+
+            scannedImages.forEach((imgSrc, index) => {
+                const card = document.createElement('div');
+                card.className = 'scan-card';
+                card.innerHTML = `
+                    <div class="card-badge">#${index + 1}</div>
+                    <img src="${imgSrc}" class="scan-img" alt="Scan ${index + 1}">
+                    <button class="delete-btn" onclick="removeImage(${index})">
+                        <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                `;
+                scanGrid.appendChild(card);
+            });
+        }
+
+        // Global function for onclick attribute
+        window.removeImage = function(index) {
+            scannedImages.splice(index, 1);
+            updateStorage();
+            renderGrid();
+        };
+
+        async function generatePDF() {
+            if (scannedImages.length === 0) return;
+            
+            showLoader(true, "Generating PDF...");
+            
+            // Allow UI to update
+            await new Promise(r => setTimeout(r, 100));
+
+            try {
+                // Initialize jsPDF (A4 default)
+                const pdf = new jsPDF();
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+
+                for (let i = 0; i < scannedImages.length; i++) {
+                    if (i > 0) pdf.addPage();
+
+                    const imgData = scannedImages[i];
+                    
+                    // Get image dimensions to fit to page
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const imgRatio = imgProps.width / imgProps.height;
+                    const pageRatio = pageWidth / pageHeight;
+
+                    let finalW, finalH;
+
+                    // Fit image to A4 page (contain)
+                    if (imgRatio > pageRatio) {
+                        // Image is wider than page ratio -> Fit to Width
+                        finalW = pageWidth;
+                        finalH = pageWidth / imgRatio;
+                    } else {
+                        // Image is taller than page ratio -> Fit to Height
+                        finalH = pageHeight;
+                        finalW = pageHeight * imgRatio;
+                    }
+
+                    // Center image
+                    const x = (pageWidth - finalW) / 2;
+                    const y = (pageHeight - finalH) / 2;
+
+                    pdf.addImage(imgData, 'JPEG', x, y, finalW, finalH);
+                }
+
+                pdf.save(`scanned-document-${Date.now()}.pdf`);
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to generate PDF.");
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function showLoader(show, text) {
+            loader.style.display = show ? 'flex' : 'none';
+            if (text) loaderText.textContent = text;
+        }
+
+    </script>
+</body>
+</html>

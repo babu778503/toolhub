@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add watermark into a PDF</title>
+    
+    <!-- SEO & Metadata for toolshub365.com -->
+    <meta name="description" content="Free online tool to Add watermark into a PDF. Insert text watermarks with custom opacity, rotation, color, and position. Secure, client-side, and mobile-friendly.">
+    <meta name="keywords" content="Add watermark into a PDF, watermark pdf, protect pdf, stamp pdf, pdf copyright tool, toolshub365, pdf editor, technical SEO tools">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/add-watermark-into-a-pdf">
+
+    <!-- External Libraries -->
+    <!-- PDF-Lib for manipulating PDFs -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- FileSaver for downloading files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --primary-hover: #4338ca;
+            --bg-body: #f1f5f9;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --border: #cbd5e1;
+            --header-h: 50px;
+            --max-w: 1200px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+
+        /* --- Reset & Base --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-top: var(--header-h);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--header-h);
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Upload Section --- */
+        .upload-zone {
+            background: var(--white);
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background-color: #eef2ff;
+        }
+
+        .icon-watermark {
+            width: 50px; height: 50px; fill: var(--primary); margin-bottom: 15px;
+        }
+
+        .upload-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 5px; }
+        .upload-desc { font-size: 0.9rem; color: var(--text-light); }
+
+        input[type="file"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+        }
+
+        /* --- Workspace --- */
+        .workspace {
+            display: none; /* Hidden initially */
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        /* --- Controls Panel --- */
+        .controls-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            border-right: 1px solid var(--border);
+        }
+
+        .panel-header {
+            font-size: 1rem; font-weight: 700; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        
+        .form-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; background: #fff;
+        }
+        .form-control:focus { border-color: var(--primary); }
+
+        /* Sliders */
+        input[type=range] {
+            width: 100%; cursor: pointer; accent-color: var(--primary);
+        }
+
+        /* Color Picker Wrapper */
+        .color-wrapper {
+            display: flex; gap: 10px; align-items: center;
+        }
+        input[type=color] {
+            border: none; width: 40px; height: 40px; cursor: pointer; background: none; padding: 0;
+        }
+
+        /* --- Preview Panel --- */
+        .preview-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-badge {
+            background: #e2e8f0; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--text-light); margin-bottom: 20px;
+        }
+
+        /* Mockup PDF Page */
+        .pdf-mockup {
+            width: 240px; height: 340px; /* A4 aspectish */
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            position: relative;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mockup-text {
+            position: absolute;
+            white-space: nowrap;
+            pointer-events: none;
+            transform-origin: center center;
+            /* Dynamic styles applied via JS */
+        }
+
+        /* --- Buttons --- */
+        .action-bar {
+            width: 100%; padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 15px; justify-content: flex-end; background: var(--white);
+        }
+
+        .btn {
+            padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.7; cursor: wait; }
+
+        .btn-danger { background: white; color: #ef4444; border: 1px solid #fecaca; }
+        .btn-danger:hover { background: #fef2f2; }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                padding: 0; width: 100%; max-width: 100%; gap: 0;
+            }
+            .upload-zone {
+                border-radius: 0; border: none; border-bottom: 1px solid var(--border); margin: 0; padding: 40px 20px;
+            }
+            .workspace {
+                border-radius: 0; box-shadow: none; flex-direction: column;
+            }
+            .controls-panel { border-right: none; border-bottom: 1px solid var(--border); }
+            .action-bar { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .pdf-mockup { width: 200px; height: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Add watermark into a PDF</h1>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="dropZone">
+            <svg class="icon-watermark" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+            <div class="upload-title">Choose PDF File</div>
+            <div class="upload-desc">Drag & Drop or click to upload</div>
+            <input type="file" id="fileInput" accept="application/pdf">
+        </div>
+
+        <!-- Processing Workspace -->
+        <div class="workspace" id="workspace">
+            
+            <!-- Left: Controls -->
+            <div class="controls-panel">
+                <div class="panel-header">Watermark Settings</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Watermark Text</label>
+                    <input type="text" id="wmText" class="form-control" value="CONFIDENTIAL">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>Font Size</span>
+                        <span id="valSize">50px</span>
+                    </label>
+                    <input type="range" id="wmSize" min="10" max="150" value="50">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>Rotation</span>
+                        <span id="valRotate">-45°</span>
+                    </label>
+                    <input type="range" id="wmRotate" min="-90" max="90" value="-45">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>Opacity</span>
+                        <span id="valOpacity">0.5</span>
+                    </label>
+                    <input type="range" id="wmOpacity" min="0.1" max="1" step="0.1" value="0.5">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <div class="color-wrapper">
+                        <input type="color" id="wmColor" value="#ff0000">
+                        <span style="font-size:0.9rem; color:var(--text-light);">Click to change color</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="preview-panel">
+                <div class="file-badge" id="fileNameDisplay">document.pdf</div>
+                
+                <!-- Mockup -->
+                <div class="pdf-mockup">
+                    <div style="width:80%; height:10px; background:#f1f5f9; margin-bottom:10px; position:absolute; top:40px;"></div>
+                    <div style="width:80%; height:10px; background:#f1f5f9; margin-bottom:10px; position:absolute; top:60px;"></div>
+                    <div style="width:60%; height:10px; background:#f1f5f9; margin-bottom:10px; position:absolute; top:80px;"></div>
+                    
+                    <div style="width:80%; height:10px; background:#f1f5f9; margin-bottom:10px; position:absolute; bottom:60px;"></div>
+                    <div style="width:80%; height:10px; background:#f1f5f9; margin-bottom:10px; position:absolute; bottom:40px;"></div>
+
+                    <!-- The Watermark Element -->
+                    <div id="mockupText" class="mockup-text">CONFIDENTIAL</div>
+                </div>
+                <div style="margin-top:15px; font-size:0.85rem; color:#64748b;">Live Preview</div>
+            </div>
+
+            <!-- Bottom: Actions -->
+            <div class="action-bar">
+                <button class="btn btn-danger" onclick="clearData()">Clear Data</button>
+                <button class="btn btn-primary" id="processBtn" onclick="addWatermark()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Apply & Download PDF
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const workspace = document.getElementById('workspace');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const processBtn = document.getElementById('processBtn');
+        const mockupText = document.getElementById('mockupText');
+
+        // Inputs
+        const inputs = {
+            text: document.getElementById('wmText'),
+            size: document.getElementById('wmSize'),
+            rotate: document.getElementById('wmRotate'),
+            opacity: document.getElementById('wmOpacity'),
+            color: document.getElementById('wmColor')
+        };
+
+        // Value Displays
+        const displays = {
+            size: document.getElementById('valSize'),
+            rotate: document.getElementById('valRotate'),
+            opacity: document.getElementById('valOpacity')
+        };
+
+        // State & Config
+        let currentFile = null;
+        let config = {
+            text: "CONFIDENTIAL",
+            size: 50,
+            rotate: -45,
+            opacity: 0.5,
+            color: "#ff0000"
+        };
+        const STORAGE_KEY = 'toolshub365_watermark_cfg';
+
+        // --- Initialization ---
+        window.onload = () => {
+            loadConfig();
+            updateMockup();
+        };
+
+        // --- Event Listeners ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        // Input Change Listeners (Real-time update & Save)
+        Object.keys(inputs).forEach(key => {
+            inputs[key].addEventListener('input', (e) => {
+                config[key] = key === 'text' || key === 'color' ? e.target.value : parseFloat(e.target.value);
+                
+                // Update Value Labels
+                if(key === 'size') displays.size.innerText = config.size + 'px';
+                if(key === 'rotate') displays.rotate.innerText = config.rotate + '°';
+                if(key === 'opacity') displays.opacity.innerText = config.opacity;
+
+                updateMockup();
+                saveConfig();
+            });
+        });
+
+        // --- Core Functions ---
+
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            currentFile = file;
+            fileNameDisplay.textContent = file.name;
+            dropZone.style.display = 'none';
+            workspace.style.display = 'flex';
+        }
+
+        function updateMockup() {
+            mockupText.innerText = config.text;
+            mockupText.style.fontSize = Math.min(config.size, 100) + 'px'; // Cap visual size for mockup
+            mockupText.style.transform = `rotate(${config.rotate}deg)`;
+            mockupText.style.opacity = config.opacity;
+            mockupText.style.color = config.color;
+        }
+
+        async function addWatermark() {
+            if (!currentFile) return;
+
+            processBtn.disabled = true;
+            processBtn.innerHTML = "Processing...";
+
+            try {
+                // 1. Load PDF
+                const arrayBuffer = await currentFile.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+                const pages = pdfDoc.getPages();
+                
+                // 2. Parse Color (Hex to RGB 0-1)
+                const r = parseInt(config.color.substr(1,2), 16) / 255;
+                const g = parseInt(config.color.substr(3,2), 16) / 255;
+                const b = parseInt(config.color.substr(5,2), 16) / 255;
+                const color = PDFLib.rgb(r, g, b);
+
+                // 3. Apply to All Pages
+                pages.forEach(page => {
+                    const { width, height } = page.getSize();
+                    
+                    // Simple center logic
+                    const textWidth = helveticaFont.widthOfTextAtSize(config.text, config.size);
+                    const textHeight = helveticaFont.heightAtSize(config.size);
+                    
+                    page.drawText(config.text, {
+                        x: (width / 2) - (textWidth / 2 * Math.cos(config.rotate * Math.PI / 180)), // approx adjustment
+                        y: (height / 2),
+                        size: config.size,
+                        font: helveticaFont,
+                        color: color,
+                        opacity: config.opacity,
+                        rotate: PDFLib.degrees(config.rotate),
+                        // Anchor center to make rotation cleaner
+                        x: width / 2 - textWidth / 2, // Centering logic is complex with rotation, simplifing to center of page
+                        y: height / 2,
+                        // Using built-in centering helper if available, otherwise manual calc
+                    });
+                    
+                    // Re-draw with correct center anchor logic for rotation
+                    // pdf-lib draws from bottom-left of text. To center-rotate:
+                    // It's easier to just draw it.
+                     page.drawText(config.text, {
+                        x: width / 2 - (textWidth / 2),
+                        y: height / 2,
+                        size: config.size,
+                        font: helveticaFont,
+                        color: color,
+                        opacity: config.opacity,
+                        rotate: PDFLib.degrees(config.rotate),
+                    });
+                });
+
+                // 4. Save & Download
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const newName = currentFile.name.replace('.pdf', '_watermarked.pdf');
+                
+                saveAs(blob, newName);
+
+                processBtn.disabled = false;
+                processBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Apply & Download PDF`;
+
+            } catch (err) {
+                console.error(err);
+                alert("Error adding watermark.");
+                processBtn.disabled = false;
+                processBtn.innerText = "Try Again";
+            }
+        }
+
+        // --- Storage Logic ---
+
+        function saveConfig() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        }
+
+        function loadConfig() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                config = JSON.parse(saved);
+                
+                // Update Inputs
+                inputs.text.value = config.text;
+                inputs.size.value = config.size;
+                inputs.rotate.value = config.rotate;
+                inputs.opacity.value = config.opacity;
+                inputs.color.value = config.color;
+
+                // Update Labels
+                displays.size.innerText = config.size + 'px';
+                displays.rotate.innerText = config.rotate + '°';
+                displays.opacity.innerText = config.opacity;
+            }
+        }
+
+        function clearData() {
+            if(confirm("Clear all settings and current file?")) {
+                currentFile = null;
+                fileInput.value = '';
+                workspace.style.display = 'none';
+                dropZone.style.display = 'block';
+                
+                // Reset Config
+                config = { text: "CONFIDENTIAL", size: 50, rotate: -45, opacity: 0.5, color: "#ff0000" };
+                saveConfig();
+                loadConfig();
+                updateMockup();
+            }
+        }
+    </script>
+</body>
+</html>

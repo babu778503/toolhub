@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to WORD</title>
+    
+    <!-- SEO & Metadata for toolshub365.com -->
+    <meta name="description" content="Free online PDF to Word converter. Convert PDF documents to editable DOCX files instantly. Secure, mobile-friendly, and no installation required.">
+    <meta name="keywords" content="PDF to WORD, pdf to docx, convert pdf to word, editable pdf, document converter, toolshub365, office tools, technical SEO">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/pdf-to-word">
+
+    <!-- External Libraries -->
+    <!-- PDF.js for reading files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Docx.js for generating Word files -->
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <!-- FileSaver for downloading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        // Initialize PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --primary-color: #2b579a; /* Microsoft Word Blue */
+            --primary-hover: #1e3f72;
+            --accent-color: #ffffff;
+            --bg-body: #f3f4f6;
+            --text-main: #333333;
+            --text-light: #6b7280;
+            --border-color: #e5e7eb;
+            --header-h: 50px;
+            --max-w: 1200px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+
+        /* --- Reset & Base Styles --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-top: var(--header-h);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Fixed Header (50px) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--header-h);
+            background-color: var(--primary-color);
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        /* --- Upload Section --- */
+        .upload-box {
+            background: white;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-box:hover, .upload-box.dragover {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            fill: #94a3b8;
+        }
+
+        .upload-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* --- Workspace / Process Section --- */
+        .workspace {
+            display: none; /* Hidden by default */
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .workspace-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .workspace-body {
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        /* --- Buttons --- */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(43, 87, 154, 0.3);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: #dc2626;
+            border: 1px solid #fee2e2;
+        }
+        .btn-danger:hover {
+            background-color: #fef2f2;
+            border-color: #dc2626;
+        }
+
+        /* --- History Section --- */
+        .history-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .history-item:last-child { border-bottom: none; }
+
+        .history-name { font-size: 0.9rem; color: #333; }
+        .history-date { font-size: 0.75rem; color: #999; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                padding: 0; /* Remove blank space */
+                width: 100%;
+                max-width: 100%;
+                gap: 5px;
+                background: white; /* Unified background for mobile */
+            }
+
+            .upload-box {
+                border-radius: 0;
+                border: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 40px 20px;
+            }
+
+            .workspace, .history-section {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>PDF to WORD</h1>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Upload Zone -->
+        <div class="upload-box" id="dropZone">
+            <svg class="upload-icon" viewBox="0 0 24 24">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+            <div class="upload-title">Select PDF File</div>
+            <div class="upload-subtitle">Drag & Drop or Click to Upload</div>
+            <input type="file" id="fileInput" accept="application/pdf">
+        </div>
+
+        <!-- Processing Workspace -->
+        <div class="workspace" id="workspace">
+            <div class="workspace-header">
+                <div class="file-details">
+                    <svg style="width:20px;height:20px;fill:#2b579a;" viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
+                    <span id="fileName">document.pdf</span>
+                </div>
+                <button class="btn btn-danger" onclick="clearData()" style="padding:5px 10px; font-size:0.8rem;">Close</button>
+            </div>
+
+            <div class="workspace-body">
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span id="statusText">Ready to convert</span>
+                        <span id="percentText">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="convertBtn" onclick="processPDF()">
+                        Convert to Word
+                    </button>
+                    <!-- Download button appears after conversion -->
+                    <button class="btn btn-secondary" id="downloadBtn" onclick="downloadFile()" style="display:none; background:#ecfdf5; color:#047857; border-color:#10b981;">
+                        <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+                        Download DOCX
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section (Auto Save Data) -->
+        <div class="history-section" id="historySection" style="display:none;">
+            <div class="history-header">
+                <h3>Recent Conversions</h3>
+                <button class="btn btn-danger" onclick="clearHistory()" style="padding:4px 8px; font-size:0.75rem;">Clear History</button>
+            </div>
+            <ul class="history-list" id="historyList">
+                <!-- Items added dynamically -->
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const workspace = document.getElementById('workspace');
+        const fileNameDisplay = document.getElementById('fileName');
+        const convertBtn = document.getElementById('convertBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const percentText = document.getElementById('percentText');
+        const historySection = document.getElementById('historySection');
+        const historyList = document.getElementById('historyList');
+
+        // State Variables
+        let currentFile = null;
+        let generatedDocBlob = null;
+        
+        // --- Initialization ---
+        window.onload = function() {
+            loadHistory();
+        };
+
+        // --- Event Listeners ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        // --- Core Functions ---
+
+        function handleFile(file) {
+            if(file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            currentFile = file;
+            fileNameDisplay.textContent = file.name;
+            workspace.style.display = 'block';
+            
+            // Reset UI
+            convertBtn.style.display = 'inline-flex';
+            convertBtn.disabled = false;
+            convertBtn.textContent = 'Convert to Word';
+            downloadBtn.style.display = 'none';
+            progressBar.style.width = '0%';
+            percentText.textContent = '0%';
+            statusText.textContent = 'Ready to convert';
+        }
+
+        async function processPDF() {
+            if(!currentFile) return;
+
+            convertBtn.disabled = true;
+            convertBtn.textContent = 'Processing...';
+            statusText.textContent = 'Reading PDF...';
+
+            try {
+                const arrayBuffer = await currentFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                const totalPages = pdf.numPages;
+                
+                let docBody = []; // To store docx paragraphs
+
+                // Extract text from pages
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    
+                    // Simple extraction logic: Join strings in the same line/block
+                    // Note: Client-side PDF to Word is structure-limited. 
+                    // This creates a document preserving paragraphs but not complex layout (tables/images).
+                    
+                    let pageTextItems = textContent.items.map(item => item.str);
+                    
+                    // Create paragraphs for Docx
+                    // We group items to form basic paragraphs
+                    const paragraphText = pageTextItems.join(' ');
+                    
+                    // Add to doc structure (using 'docx' library syntax)
+                    docBody.push(
+                        new docx.Paragraph({
+                            children: [new docx.TextRun(paragraphText)],
+                            spacing: { after: 200 } // Add space between blocks
+                        })
+                    );
+
+                    // Add Page Break if not last page
+                    if(i < totalPages) {
+                        docBody.push(new docx.Paragraph({ children: [new docx.PageBreak()] }));
+                    }
+
+                    // Update Progress
+                    const percent = Math.round((i / totalPages) * 100);
+                    progressBar.style.width = `${percent}%`;
+                    percentText.textContent = `${percent}%`;
+                    statusText.textContent = `Processing Page ${i} of ${totalPages}...`;
+                }
+
+                statusText.textContent = 'Generating DOCX file...';
+
+                // Create Document
+                const doc = new docx.Document({
+                    sections: [{
+                        properties: {},
+                        children: docBody,
+                    }],
+                });
+
+                // Generate Blob
+                generatedDocBlob = await docx.Packer.toBlob(doc);
+                
+                // Update UI
+                statusText.textContent = 'Conversion Complete!';
+                convertBtn.style.display = 'none';
+                downloadBtn.style.display = 'inline-flex';
+                
+                // Auto Save History
+                addToHistory(currentFile.name);
+
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = 'Error: ' + error.message;
+                alert('An error occurred during conversion.');
+                convertBtn.disabled = false;
+                convertBtn.textContent = 'Try Again';
+            }
+        }
+
+        function downloadFile() {
+            if(generatedDocBlob && currentFile) {
+                const newName = currentFile.name.replace('.pdf', '.docx');
+                saveAs(generatedDocBlob, newName);
+            }
+        }
+
+        function clearData() {
+            currentFile = null;
+            generatedDocBlob = null;
+            fileInput.value = '';
+            workspace.style.display = 'none';
+        }
+
+        // --- History / Storage Functions ---
+
+        function addToHistory(filename) {
+            const history = JSON.parse(localStorage.getItem('toolshub365_pdf_word_history') || '[]');
+            const newItem = {
+                name: filename,
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
+            };
+            
+            // Add to beginning, keep max 5
+            history.unshift(newItem);
+            if(history.length > 5) history.pop();
+
+            localStorage.setItem('toolshub365_pdf_word_history', JSON.stringify(history));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('toolshub365_pdf_word_history') || '[]');
+            historyList.innerHTML = '';
+            
+            if(history.length > 0) {
+                historySection.style.display = 'block';
+                history.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.innerHTML = `
+                        <span class="history-name">${item.name.replace('.pdf', '.docx')}</span>
+                        <span class="history-date">${item.date}</span>
+                    `;
+                    historyList.appendChild(li);
+                });
+            } else {
+                historySection.style.display = 'none';
+            }
+        }
+
+        function clearHistory() {
+            if(confirm('Clear conversion history?')) {
+                localStorage.removeItem('toolshub365_pdf_word_history');
+                loadHistory();
+            }
+        }
+
+    </script>
+</body>
+</html>

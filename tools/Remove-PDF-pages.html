@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove PDF pages</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Remove specific pages from your PDF documents online. Free, secure, and fast tool to delete unwanted PDF pages. Optimized for toolshub365.com.">
+    <meta name="keywords" content="Remove PDF pages, delete PDF pages, cut PDF pages, edit PDF, remove pages from pdf online, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/remove-pdf-pages">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Remove PDF pages - Toolshub365">
+    <meta property="og:description" content="Delete unwanted pages from PDF files instantly in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/remove-pdf-pages">
+
+    <!-- PDF Library -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Remove PDF pages",
+      "applicationCategory": "Productivity",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A browser-based tool to visually select and delete pages from PDF documents.",
+      "url": "https://toolshub365.com/remove-pdf-pages"
+    }
+    </script>
+
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --primary: #e11d48; /* Rose-600 for delete actions */
+            --primary-hover: #be123c;
+            --secondary: #64748b;
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --header-bg: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+            --header-h: 50px;
+            --max-w: 1200px;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: #1e293b;
+            padding-top: var(--header-h);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: var(--header-h);
+            background: var(--header-bg);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 30px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .tool-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Upload View --- */
+        .upload-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: radial-gradient(circle, #f1f5f9 0%, #fff 100%);
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: #fff1f2; /* Light red tint */
+            transform: translateY(-2px);
+        }
+
+        .icon-upload {
+            width: 60px;
+            height: 60px;
+            fill: var(--primary);
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .drop-zone h3 { margin-bottom: 8px; font-size: 1.25rem; }
+        .drop-zone p { color: var(--secondary); font-size: 0.95rem; }
+
+        /* --- Editor View --- */
+        .editor-area {
+            display: none; /* Hidden initially */
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .editor-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .file-info h4 { font-size: 1rem; color: #334155; }
+        .file-info span { font-size: 0.85rem; color: var(--secondary); }
+
+        .editor-controls {
+            padding: 10px 30px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .instruction {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        /* Page Grid */
+        .pages-grid {
+            flex: 1;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            background: #f1f5f9;
+            max-height: 600px; /* Scrollable area */
+        }
+
+        .page-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            cursor: pointer;
+            aspect-ratio: 1/1.4; /* A4 Ratio approx */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .page-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Styles for "Marked for Deletion" */
+        .page-card.deleted {
+            background: #fecdd3; /* Red tint */
+            border-color: var(--primary);
+            opacity: 0.7;
+        }
+
+        .page-card.deleted::after {
+            content: 'REMOVED';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1rem;
+            border: 2px solid var(--primary);
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .page-icon {
+            width: 50px;
+            height: 50px;
+            fill: #cbd5e1;
+            transition: fill 0.2s;
+        }
+
+        .page-card.deleted .page-icon {
+            fill: var(--primary);
+        }
+
+        /* --- Footer Actions --- */
+        .action-bar {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-clear {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--secondary);
+        }
+
+        .btn-clear:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(225, 29, 72, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* --- Overlay --- */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #fecdd3;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .tool-card {
+                border-radius: 0;
+                box-shadow: none;
+                min-height: calc(100vh - var(--header-h));
+            }
+
+            .editor-header, .action-bar {
+                padding: 15px;
+            }
+
+            .action-bar {
+                flex-direction: column-reverse;
+            }
+
+            .btn { width: 100%; justify-content: center; }
+
+            .pages-grid {
+                grid-template-columns: repeat(3, 1fr); /* More dense on mobile */
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .page-card { aspect-ratio: 1/1.3; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Remove PDF pages</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-card">
+            
+            <!-- Hidden Input -->
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+
+            <!-- 1. Upload View -->
+            <div class="upload-area" id="uploadView">
+                <div class="drop-zone" id="dropZone">
+                    <svg class="icon-upload" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    <h3>Upload PDF Document</h3>
+                    <p>Drag & drop or click to select file</p>
+                </div>
+            </div>
+
+            <!-- 2. Editor View -->
+            <div class="editor-area" id="editorView">
+                <div class="editor-header">
+                    <div class="file-info">
+                        <h4 id="fileName">document.pdf</h4>
+                        <span id="fileMeta">3 Pages</span>
+                    </div>
+                </div>
+
+                <div class="editor-controls">
+                    <p class="instruction">Click on pages to mark them for removal (Red = Deleted)</p>
+                </div>
+
+                <!-- Page Grid -->
+                <div class="pages-grid" id="pagesGrid">
+                    <!-- Javascript populates this -->
+                </div>
+
+                <!-- Footer -->
+                <div class="action-bar">
+                    <button class="btn btn-clear" id="clearBtn">Clear Data</button>
+                    <button class="btn btn-primary" id="removeBtn">
+                        Remove Selected Pages
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div class="loading-overlay" id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; font-weight:600; color:#334155;">Processing...</p>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+
+        // --- Elements ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadView = document.getElementById('uploadView');
+        const editorView = document.getElementById('editorView');
+        const pagesGrid = document.getElementById('pagesGrid');
+        const removeBtn = document.getElementById('removeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileNameEl = document.getElementById('fileName');
+        const fileMetaEl = document.getElementById('fileMeta');
+        const loader = document.getElementById('loader');
+
+        // --- State ---
+        let currentFile = null;
+        let pdfDoc = null;
+        let totalPages = 0;
+        let pagesToDelete = new Set(); // Stores 0-based indices
+
+        // --- Initialization ---
+        
+        // Auto-load if data exists in localStorage
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('removePdf_fileName');
+            if (savedName) {
+                // We cannot reload the actual File object due to browser security,
+                // but we can clear the stale data to avoid confusion.
+                clearData(); 
+            }
+        });
+
+        // --- Event Listeners ---
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, preventDefaults, false);
+        });
+
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+        ['dragenter', 'dragover'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.remove('drag-over'), false);
+        });
+
+        dropZone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+
+        clearBtn.addEventListener('click', clearData);
+        removeBtn.addEventListener('click', processPdf);
+
+        // --- Core Functions ---
+
+        async function handleFile(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+
+            loader.style.display = 'flex';
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdfDoc = await PDFDocument.load(arrayBuffer);
+                totalPages = pdfDoc.getPageCount();
+                currentFile = file;
+
+                // Update UI
+                fileNameEl.textContent = file.name;
+                fileMetaEl.textContent = `${totalPages} Pages`;
+                
+                renderGrid();
+                
+                // Save basic state (metadata only)
+                localStorage.setItem('removePdf_fileName', file.name);
+
+                // Switch views
+                uploadView.style.display = 'none';
+                editorView.style.display = 'flex';
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error reading PDF. It may be encrypted.');
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function renderGrid() {
+            pagesGrid.innerHTML = '';
+            pagesToDelete.clear();
+            updateButton();
+
+            // Create Visual "Cards" for each page
+            // Note: Generating real thumbnails client-side requires heavy PDF.js worker setup.
+            // For a single file tool, we use a sleek CSS representation.
+            
+            for (let i = 0; i < totalPages; i++) {
+                const card = document.createElement('div');
+                card.className = 'page-card';
+                card.dataset.index = i;
+                
+                // Inner Content
+                card.innerHTML = `
+                    <svg class="page-icon" viewBox="0 0 24 24">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    </svg>
+                    <span class="page-number">Page ${i + 1}</span>
+                `;
+
+                // Interaction
+                card.addEventListener('click', () => togglePage(i, card));
+                
+                pagesGrid.appendChild(card);
+            }
+        }
+
+        function togglePage(index, cardElement) {
+            if (pagesToDelete.has(index)) {
+                pagesToDelete.delete(index);
+                cardElement.classList.remove('deleted');
+            } else {
+                pagesToDelete.add(index);
+                cardElement.classList.add('deleted');
+            }
+            updateButton();
+        }
+
+        function updateButton() {
+            const count = pagesToDelete.size;
+            if (count > 0) {
+                removeBtn.textContent = `Remove ${count} Page${count > 1 ? 's' : ''}`;
+                removeBtn.disabled = false;
+            } else {
+                removeBtn.textContent = 'Select Pages to Remove';
+                removeBtn.disabled = true;
+            }
+        }
+
+        function clearData() {
+            currentFile = null;
+            pdfDoc = null;
+            pagesToDelete.clear();
+            fileInput.value = '';
+            localStorage.removeItem('removePdf_fileName');
+            
+            editorView.style.display = 'none';
+            uploadView.style.display = 'flex';
+        }
+
+        async function processPdf() {
+            if (pagesToDelete.size === 0) return;
+            if (pagesToDelete.size === totalPages) {
+                alert("You cannot remove all pages from a PDF.");
+                return;
+            }
+
+            loader.style.display = 'flex';
+
+            try {
+                // Create a NEW PDF
+                const newPdf = await PDFDocument.create();
+                
+                // Calculate which pages to KEEP
+                const pagesToKeep = [];
+                for (let i = 0; i < totalPages; i++) {
+                    if (!pagesToDelete.has(i)) {
+                        pagesToKeep.push(i);
+                    }
+                }
+
+                // Copy pages from original to new
+                const copiedPages = await newPdf.copyPages(pdfDoc, pagesToKeep);
+                copiedPages.forEach(page => newPdf.addPage(page));
+
+                // Serialize and Download
+                const pdfBytes = await newPdf.save();
+                downloadFile(pdfBytes, `edited_${currentFile.name}`);
+
+            } catch (err) {
+                console.error(err);
+                alert("An error occurred while processing the PDF.");
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function downloadFile(data, filename) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>

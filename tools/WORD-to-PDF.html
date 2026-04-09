@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORD to PDF</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Advanced online WORD to PDF converter. Convert DOCX documents to professional PDF files instantly. 100% Free, Secure, and Mobile-Friendly.">
+    <meta name="keywords" content="word to pdf, docx to pdf, convert word to pdf, word document converter, toolshub365.com, pdf tools, online converter">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/word-to-pdf">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="WORD to PDF - Professional Converter">
+    <meta property="og:description" content="Convert Word documents to PDF files instantly in your browser with high accuracy.">
+    <meta property="og:url" content="https://toolshub365.com/word-to-pdf">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "WORD to PDF",
+      "operatingSystem": "Any",
+      "applicationCategory": "ProductivityApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "High-quality browser-based tool to convert Microsoft Word (DOCX) files into PDF format."
+    }
+    </script>
+
+    <!-- External Libraries -->
+    <!-- Mammoth.js: Best for extracting content from DOCX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- html2pdf.js: Converts the rendered HTML to PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* --- CSS Reset & Core Variables --- */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2B579A 0%, #1E3F72 100%);
+            --primary-solid: #2B579A;
+            --accent-color: #4F46E5;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --border-color: #E2E8F0;
+            --header-bg: #0F172A;
+            --header-text: #FFFFFF;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding-top: 50px; /* Space for fixed header */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Tool Interface Card --- */
+        .tool-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Upload Zone --- */
+        .upload-area {
+            width: 100%;
+            border: 2px dashed #CBD5E1;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #F8FAFC, #EFF6FF);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-solid);
+            background-color: #E0E7FF;
+            transform: translateY(-2px);
+        }
+
+        .icon-wrapper {
+            width: 64px;
+            height: 64px;
+            background: #DBEAFE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--primary-solid);
+            font-size: 32px;
+        }
+
+        .upload-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+        }
+
+        #fileInput { display: none; }
+
+        /* --- Controls & Preview --- */
+        .controls-area {
+            width: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .file-badge {
+            background: #F1F5F9;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .file-badge i { color: var(--primary-solid); }
+
+        /* Document Preview Styling (Simulates Paper) */
+        .preview-container {
+            width: 100%;
+            background: #525659; /* PDF Viewer Background Color */
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        #document-content {
+            background: white;
+            width: 100%;
+            max-width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            padding: 20mm; /* Standard Margins */
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            color: black;
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* Styling the internal content of the DOCX to look good */
+        #document-content h1, #document-content h2, #document-content h3 { margin-top: 1em; margin-bottom: 0.5em; }
+        #document-content p { margin-bottom: 1em; }
+        #document-content table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+        #document-content td, #document-content th { border: 1px solid #000; padding: 5px; }
+        #document-content img { max-width: 100%; height: auto; }
+
+        /* --- Buttons --- */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        button {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-convert {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(43, 87, 154, 0.3);
+        }
+
+        .btn-convert:hover {
+            box-shadow: 0 6px 20px rgba(43, 87, 154, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-convert:disabled {
+            background: #94A3B8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-clear {
+            background: white;
+            color: #EF4444;
+            border: 1px solid #EF4444;
+        }
+
+        .btn-clear:hover {
+            background: #FEF2F2;
+        }
+
+        /* --- Loading / Status --- */
+        .status-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 16px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #E2E8F0;
+            border-top: 4px solid var(--primary-solid);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .status-text {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Responsive Design --- */
+        @media screen and (max-width: 1200px) {
+            .container { padding-left: 15px; padding-right: 15px; }
+        }
+
+        /* Mobile Optimization */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+                margin-top: 0;
+            }
+
+            .tool-card {
+                border-radius: 0;
+                box-shadow: none;
+                min-height: calc(100vh - 50px);
+                padding: 25px 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            button { width: 100%; justify-content: center; }
+
+            .preview-container { padding: 10px; }
+            #document-content { padding: 10mm; } /* Smaller margins for mobile view */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>WORD to PDF</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-card">
+            
+            <!-- Upload Section -->
+            <div class="upload-area" id="dropZone">
+                <div class="icon-wrapper">
+                    <span>📄</span>
+                </div>
+                <div class="upload-text">Select WORD File</div>
+                <div class="upload-subtext">Supports .docx files. Drag & Drop or Click.</div>
+                <input type="file" id="fileInput" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            </div>
+
+            <!-- Controls & Preview Section -->
+            <div class="controls-area" id="controlsArea">
+                <div class="file-badge">
+                    <span>📝</span>
+                    <span id="fileNameDisplay">document.docx</span>
+                </div>
+
+                <div class="preview-container">
+                    <!-- The content of the word doc will be injected here -->
+                    <div id="document-content"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="convertBtn" class="btn-convert">Download as PDF</button>
+                    <button id="clearBtn" class="btn-clear">Clear Data</button>
+                </div>
+            </div>
+
+            <!-- Loading/Status Overlay -->
+            <div class="status-overlay" id="statusOverlay">
+                <div class="spinner"></div>
+                <div class="status-text" id="statusText">Processing...</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const controlsArea = document.getElementById('controlsArea');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const docContent = document.getElementById('document-content');
+        const convertBtn = document.getElementById('convertBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusOverlay = document.getElementById('statusOverlay');
+        const statusText = document.getElementById('statusText');
+
+        let currentFile = null;
+
+        // --- Event Listeners ---
+
+        // Drag & Drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFiles);
+
+        convertBtn.addEventListener('click', generatePDF);
+        clearBtn.addEventListener('click', resetTool);
+
+        // --- Logic ---
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            processFiles(files);
+        }
+
+        function handleFiles(e) {
+            const files = e.target.files;
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                
+                // Simple validation
+                if (!file.name.toLowerCase().endsWith('.docx')) {
+                    alert("Please select a valid .docx file.");
+                    return;
+                }
+
+                currentFile = file;
+                fileNameDisplay.textContent = file.name;
+                
+                // Show Loading
+                showLoading(true, "Parsing Word Document...");
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const arrayBuffer = event.target.result;
+                    
+                    // Convert DOCX to HTML
+                    mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                        .then(displayResult)
+                        .catch(handleError);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function displayResult(result) {
+            // Update UI
+            showLoading(false);
+            dropZone.style.display = 'none';
+            controlsArea.style.display = 'flex';
+            
+            // Inject content
+            docContent.innerHTML = result.value;
+            
+            // Console warning if any structure was lost
+            if(result.messages.length > 0) {
+                console.log("Mammoth Messages:", result.messages);
+            }
+        }
+
+        function handleError(err) {
+            console.error(err);
+            showLoading(false);
+            alert("Error parsing document. The file might be corrupted or password protected.");
+            resetTool();
+        }
+
+        function generatePDF() {
+            if (!docContent.innerHTML) return;
+
+            showLoading(true, "Generating PDF...");
+
+            // Configuration for html2pdf
+            // We capture the #document-content div which has A4 styling
+            const opt = {
+                margin:       10, // mm
+                filename:     currentFile.name.replace('.docx', '.pdf'),
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, 
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // Execute Conversion
+            html2pdf().set(opt).from(docContent).save().then(() => {
+                showLoading(false);
+                // Optional: Auto-clear or keep open
+            }).catch(err => {
+                console.error(err);
+                showLoading(false);
+                alert("Error generating PDF.");
+            });
+        }
+
+        function resetTool() {
+            currentFile = null;
+            fileInput.value = '';
+            docContent.innerHTML = '';
+            controlsArea.style.display = 'none';
+            dropZone.style.display = 'block';
+            showLoading(false);
+        }
+
+        function showLoading(isLoading, text = "Processing...") {
+            statusText.textContent = text;
+            statusOverlay.style.display = isLoading ? 'flex' : 'none';
+        }
+
+    </script>
+</body>
+</html>

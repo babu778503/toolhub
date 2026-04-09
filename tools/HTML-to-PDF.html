@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to PDF</title>
+    
+    <!-- SEO & Metadata for toolshub365.com -->
+    <meta name="description" content="Advanced HTML to PDF converter. Convert raw HTML/CSS code into professional PDF documents. Features dark mode editor, live preview, auto-save, and mobile optimization.">
+    <meta name="keywords" content="HTML to PDF, advanced html converter, code to pdf, developer tools, responsive pdf generator, toolshub365, save html as pdf">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/html-to-pdf">
+    
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* --- CSS Variables & Modern Palette --- */
+        :root {
+            --primary-grad: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            
+            --bg-body: #f1f5f9;
+            --bg-editor: #1e293b; /* Dark Slate for Code Look */
+            --text-editor: #f8fafc;
+            
+            --header-h: 50px;
+            --max-w: 1200px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        /* --- Reset & Base --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding-top: var(--header-h);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* prevent body scroll, handle inside containers */
+        }
+
+        /* --- Header (Fixed) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--header-h);
+            background: var(--primary-grad);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Space for hidden elements if needed */
+            padding: 0 20px;
+            z-index: 2000;
+            box-shadow: var(--shadow-md);
+        }
+        
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto; /* Center title */
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            flex: 1;
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: calc(100vh - var(--header-h));
+        }
+
+        /* --- Toolbar --- */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .status-indicator {
+            font-size: 0.85rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+        
+        .status-dot {
+            width: 8px; height: 8px;
+            background-color: #cbd5e1;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        .status-dot.active { background-color: var(--success-color); }
+
+        .actions { display: flex; gap: 10px; }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-ghost:hover { background: #fef2f2; border-color: var(--danger-color); }
+
+        /* --- Workspace (Split View) --- */
+        .workspace {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            overflow: hidden; /* Contain inner scrolls */
+        }
+
+        /* --- Editor Side --- */
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-editor);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .pane-header {
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+            padding: 8px 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        textarea#htmlInput {
+            flex: 1;
+            width: 100%;
+            background: var(--bg-editor);
+            color: var(--text-editor);
+            border: none;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+        }
+        
+        textarea#htmlInput::placeholder { color: rgba(255,255,255,0.3); }
+
+        /* --- Preview Side --- */
+        .preview-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #e2e8f0; /* Contrast against paper */
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+        }
+
+        .preview-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center the paper */
+        }
+
+        #previewArea {
+            background: white;
+            width: 100%;
+            min-height: 100%;
+            box-shadow: var(--shadow-lg);
+            padding: 40px; /* Internal Paper Padding */
+            color: #333;
+            font-family: serif; /* Default PDF look */
+        }
+
+        /* --- Toast Notification --- */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 12px;
+            position: fixed;
+            z-index: 3000;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                padding: 0; /* Constraints: Remove blank space */
+                width: 100%;
+                max-width: 100%;
+                gap: 0;
+            }
+
+            .toolbar {
+                border-radius: 0;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: #fff;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 8px 12px;
+            }
+            
+            .status-indicator { display: none; /* Save space on mobile */ }
+            
+            .actions { width: 100%; justify-content: space-between; }
+            .btn { font-size: 0.8rem; padding: 6px 12px; }
+
+            .workspace {
+                flex-direction: column;
+                gap: 0;
+                overflow-y: auto; /* Allow full page scroll on mobile */
+                height: auto;
+                padding-bottom: 50px; /* Space for scrolling */
+            }
+
+            .editor-pane {
+                border-radius: 0;
+                min-height: 40vh;
+                flex: none;
+            }
+
+            .preview-pane {
+                border-radius: 0;
+                min-height: 60vh;
+                border: none;
+                border-top: 4px solid #cbd5e1;
+            }
+
+            .preview-scroll-area { padding: 15px; }
+            #previewArea { padding: 20px; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>
+            <!-- Simple SVG Icon -->
+            <svg style="width:20px;height:20px;fill:white;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            HTML to PDF
+        </h1>
+    </header>
+
+    <div class="main-container">
+        
+        <!-- Controls & Status -->
+        <div class="toolbar">
+            <div class="status-indicator">
+                <div id="statusDot" class="status-dot"></div>
+                <span id="statusText">Ready</span>
+            </div>
+            <div class="actions">
+                <button class="btn btn-ghost" onclick="clearData()">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    Clear
+                </button>
+                <button class="btn btn-primary" onclick="generatePDF()">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="workspace">
+            <!-- Code Editor Side -->
+            <div class="editor-pane">
+                <div class="pane-header">
+                    <span>HTML / CSS Source</span>
+                    <span>Editor</span>
+                </div>
+                <textarea id="htmlInput" spellcheck="false" placeholder="<!-- Paste your HTML Code here -->&#10;<h1>Hello World</h1>&#10;<p>Start typing to see the magic...</p>"></textarea>
+            </div>
+
+            <!-- Preview Side -->
+            <div class="preview-pane">
+                <div class="pane-header" style="background:#f1f5f9; color:#64748b; border-bottom:1px solid #cbd5e1;">
+                    <span>Live Preview (A4)</span>
+                </div>
+                <div class="preview-scroll-area">
+                    <div id="previewArea"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast">Message here</div>
+
+    <script>
+        // --- Configuration ---
+        const DOM = {
+            input: document.getElementById('htmlInput'),
+            preview: document.getElementById('previewArea'),
+            statusDot: document.getElementById('statusDot'),
+            statusText: document.getElementById('statusText'),
+            toast: document.getElementById('toast')
+        };
+        const STORAGE_KEY = 'toolshub365_pdf_advanced_data';
+
+        // --- Default Template ---
+        const DEFAULT_HTML = `
+<div style="font-family: Helvetica, Arial, sans-serif; color: #333;">
+    <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 20px;">
+        <h1 style="color: #4f46e5; margin: 0;">Invoice / Report</h1>
+        <span style="color: #666;">Generated via Toolshub365</span>
+    </div>
+    
+    <p>This is a <strong>live preview</strong>. Edit the HTML code on the left (or top on mobile) to see changes instantly.</p>
+    
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <tr style="background: #f3f4f6;">
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Item</th>
+            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">Cost</th>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">HTML Conversion</td>
+            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$0.00</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Advanced Design</td>
+            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$0.00</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Total</strong></td>
+            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;"><strong>FREE</strong></td>
+        </tr>
+    </table>
+    
+    <div style="margin-top: 30px; padding: 15px; background: #eef2ff; border-radius: 4px; border-left: 4px solid #4f46e5;">
+        <strong>Note:</strong> This tool supports inline CSS and basic HTML5 tags.
+    </div>
+</div>`;
+
+        // --- Initialization ---
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                DOM.input.value = saved;
+                updateStatus('Restored from save');
+            } else {
+                DOM.input.value = DEFAULT_HTML.trim();
+            }
+            updatePreview();
+        });
+
+        // --- Core Logic ---
+        let timeout;
+        DOM.input.addEventListener('input', () => {
+            // Debounce the save/preview slightly for performance
+            clearTimeout(timeout);
+            updateStatus('Typing...', false);
+            
+            timeout = setTimeout(() => {
+                updatePreview();
+                saveData();
+                updateStatus('Saved to device', true);
+            }, 500);
+        });
+
+        function updatePreview() {
+            DOM.preview.innerHTML = DOM.input.value;
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, DOM.input.value);
+        }
+
+        function clearData() {
+            if (confirm('Are you sure you want to clear all code? This cannot be undone.')) {
+                DOM.input.value = '';
+                DOM.preview.innerHTML = '';
+                localStorage.removeItem(STORAGE_KEY);
+                showToast('Workspace cleared');
+                updateStatus('Cleared');
+            }
+        }
+
+        function generatePDF() {
+            const element = DOM.preview;
+            const originalShadow = element.style.boxShadow;
+            
+            // UI Feedback
+            updateStatus('Generating PDF...', true);
+            showToast('Preparing PDF download...');
+            
+            // Remove shadow for print cleanly
+            element.style.boxShadow = 'none';
+
+            // Filename with timestamp
+            const now = new Date();
+            const timeString = now.toISOString().slice(0,19).replace(/[:T]/g, '-');
+            
+            const opt = {
+                margin:       [10, 10, 10, 10], // mm
+                filename:     `ToolsHub365-Document-${timeString}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore UI
+                element.style.boxShadow = originalShadow;
+                updateStatus('Download Complete', true);
+                showToast('PDF Downloaded successfully!');
+            }).catch(err => {
+                console.error(err);
+                element.style.boxShadow = originalShadow;
+                showToast('Error generating PDF');
+                updateStatus('Error', false);
+            });
+        }
+
+        // --- UI Helpers ---
+        function updateStatus(text, active = false) {
+            DOM.statusText.textContent = text;
+            if (active) DOM.statusDot.classList.add('active');
+            else DOM.statusDot.classList.remove('active');
+        }
+
+        function showToast(message) {
+            DOM.toast.textContent = message;
+            DOM.toast.className = 'show';
+            setTimeout(() => { DOM.toast.className = DOM.toast.className.replace('show', ''); }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop PDF</title>
+    
+    <!-- SEO & Metadata for toolshub365.com -->
+    <meta name="description" content="Free online PDF Cropper. Crop PDF margins, adjust page size, and remove white space visually. Mobile-friendly, secure, and auto-saves your preferences.">
+    <meta name="keywords" content="Crop PDF, trim pdf, pdf cropper, resize pdf pages, cut pdf, toolshub365, online pdf tools, technical SEO">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/crop-pdf">
+
+    <!-- External Libraries -->
+    <!-- PDF.js for rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- PDF-Lib for saving -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- Cropper.js for UI -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <!-- FileSaver -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        // Set PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --primary: #8b5cf6; /* Violet */
+            --primary-hover: #7c3aed;
+            --bg-body: #f8fafc;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --border: #e2e8f0;
+            --header-h: 50px;
+            --max-w: 1200px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        /* --- Reset --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-top: var(--header-h);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--header-h);
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Upload Section --- */
+        .upload-zone {
+            background: var(--white);
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background-color: #f5f3ff;
+        }
+
+        .icon-crop {
+            width: 50px; height: 50px; fill: var(--primary); margin-bottom: 15px;
+        }
+
+        .upload-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+        .upload-desc { font-size: 0.9rem; color: #64748b; }
+        
+        input[type="file"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+        }
+
+        /* --- Workspace --- */
+        .workspace {
+            display: none; /* Hidden initially */
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 10px 20px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tool-group { display: flex; gap: 10px; align-items: center; }
+        .file-info { font-weight: 600; color: var(--primary); max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+        /* Crop Area */
+        .crop-container {
+            position: relative;
+            background: #333; /* Dark background for better crop visibility */
+            flex: 1;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Ensure image fits */
+        #cropImage {
+            max-width: 100%;
+            display: block; /* Required for Cropper.js */
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 8px 16px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-secondary { background: white; border: 1px solid #cbd5e1; color: var(--text-main); }
+        .btn-secondary:hover { background: #f1f5f9; }
+
+        .btn-danger { background: white; border: 1px solid #fecaca; color: #ef4444; }
+        .btn-danger:hover { background: #fef2f2; }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                padding: 0; width: 100%; max-width: 100%; gap: 0;
+            }
+            .upload-zone {
+                border-radius: 0; border: none; border-bottom: 1px solid var(--border); margin: 0; padding: 40px 20px;
+            }
+            .workspace {
+                border-radius: 0; box-shadow: none; height: calc(100vh - 50px);
+            }
+            .toolbar {
+                flex-direction: column; align-items: stretch; gap: 10px;
+            }
+            .tool-group { justify-content: space-between; }
+            .crop-container { height: auto; flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Crop PDF</h1>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="dropZone">
+            <svg class="icon-crop" viewBox="0 0 24 24">
+                <path d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/>
+            </svg>
+            <div class="upload-title">Select PDF to Crop</div>
+            <div class="upload-desc">Drag & Drop or click to upload</div>
+            <input type="file" id="fileInput" accept="application/pdf">
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace" id="workspace">
+            
+            <div class="toolbar">
+                <div class="tool-group">
+                    <span class="file-info" id="fileName">file.pdf</span>
+                    <div style="font-size:0.85rem; color:#64748b;">
+                        Page <span id="pageNum">1</span> / <span id="pageCount">--</span>
+                    </div>
+                </div>
+
+                <div class="tool-group">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="changePage(-1)">
+                        &#9664; Prev
+                    </button>
+                    <button class="btn btn-secondary" id="nextBtn" onclick="changePage(1)">
+                        Next &#9654;
+                    </button>
+                </div>
+
+                <div class="tool-group">
+                    <button class="btn btn-danger" onclick="clearData()">Clear</button>
+                    <button class="btn btn-primary" id="cropDownloadBtn" onclick="applyCropAndDownload()">
+                        Crop & Download
+                    </button>
+                </div>
+            </div>
+
+            <div class="crop-container">
+                <div>
+                    <img id="cropImage" src="" alt="PDF Page">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const workspace = document.getElementById('workspace');
+        const cropImage = document.getElementById('cropImage');
+        const fileNameDisplay = document.getElementById('fileName');
+        const pageNumDisplay = document.getElementById('pageNum');
+        const pageCountDisplay = document.getElementById('pageCount');
+        const cropDownloadBtn = document.getElementById('cropDownloadBtn');
+
+        // State
+        let currentFile = null;
+        let pdfDoc = null; // PDF.js doc
+        let cropper = null;
+        let currentPageIndex = 1;
+        let totalPages = 0;
+        let pdfScale = 1.5; // Quality for rendering
+
+        const STORAGE_KEY = 'toolshub365_crop_config';
+
+        // --- Init ---
+        window.onload = function() {
+            // Auto Save logic: Check if user was working on a file
+            // We can't restore the file binary easily, but we can restore crop box data if needed.
+            // For now, we clean up if page reloads.
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if(savedData) {
+                console.log("Previous session detected.");
+                // Optional: Hint user to re-upload
+            }
+        };
+
+        // --- Event Listeners ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        // --- Core Functions ---
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            
+            // Reset UI
+            clearData(false);
+
+            currentFile = file;
+            fileNameDisplay.textContent = file.name;
+            dropZone.style.display = 'none';
+            workspace.style.display = 'flex';
+            
+            // Auto Save Name
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ filename: file.name }));
+
+            try {
+                // Load PDF
+                const arrayBuffer = await file.arrayBuffer();
+                pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+                totalPages = pdfDoc.numPages;
+                pageCountDisplay.textContent = totalPages;
+                currentPageIndex = 1;
+
+                await renderPage(currentPageIndex);
+
+            } catch (err) {
+                console.error(err);
+                alert("Error opening PDF.");
+                clearData();
+            }
+        }
+
+        async function renderPage(num) {
+            // Cleanup existing cropper
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: pdfScale });
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+            // Set image source
+            cropImage.src = canvas.toDataURL('image/png');
+            pageNumDisplay.textContent = num;
+
+            // Init Cropper
+            // Wrap in slight timeout to ensure DOM update
+            setTimeout(() => {
+                cropper = new Cropper(cropImage, {
+                    viewMode: 1, // Restrict crop box to canvas
+                    autoCropArea: 0.8,
+                    responsive: true,
+                    background: false, // Cleaner look
+                });
+            }, 50);
+        }
+
+        function changePage(delta) {
+            const newPage = currentPageIndex + delta;
+            if (newPage > 0 && newPage <= totalPages) {
+                currentPageIndex = newPage;
+                renderPage(currentPageIndex);
+            }
+        }
+
+        async function applyCropAndDownload() {
+            if (!cropper || !currentFile) return;
+
+            cropDownloadBtn.disabled = true;
+            cropDownloadBtn.textContent = "Processing...";
+
+            try {
+                // 1. Get Crop Data (relative to the rendered image)
+                const cropData = cropper.getData();
+                
+                // 2. Load PDF via PDF-Lib for modification
+                const arrayBuffer = await currentFile.arrayBuffer();
+                const pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const pages = pdfLibDoc.getPages();
+
+                // 3. Calculate Scaling Factors
+                // Note: PDF pages are defined in 'points'. PDF.js rendered in pixels based on 'pdfScale'.
+                // We must map Pixel Coordinates -> PDF Point Coordinates.
+                
+                // Get the dimensions of the current page from PDF-Lib to get the 'points' size
+                const currentPage = pages[currentPageIndex - 1];
+                const { width: pageWidth, height: pageHeight } = currentPage.getSize();
+
+                // Calculate the rendered image dimensions (natural dimensions of the image in the cropper)
+                const imageNaturalWidth = cropImage.naturalWidth;
+                const imageNaturalHeight = cropImage.naturalHeight;
+
+                // Scale Ratio (Points per Pixel)
+                const scaleX = pageWidth / imageNaturalWidth;
+                const scaleY = pageHeight / imageNaturalHeight;
+
+                // 4. Map Cropper Coordinates to PDF Coordinates
+                // PDF coordinates start at Bottom-Left. Cropper starts Top-Left.
+                // We need to invert the Y axis.
+                const cropX = cropData.x * scaleX;
+                const cropW = cropData.width * scaleX;
+                const cropH = cropData.height * scaleY;
+                
+                // Invert Y: PageHeight - (CropTopY + CropHeight)
+                const cropY = pageHeight - ((cropData.y * scaleY) + cropH);
+
+                // 5. Apply Crop to ALL pages (Standard simple cropper behavior)
+                // If you want single page crop, loop only once or use index.
+                // Here we apply the visual crop defined on Page N to ALL pages.
+                pages.forEach(page => {
+                    page.setCropBox(cropX, cropY, cropW, cropH);
+                });
+
+                // 6. Save & Download
+                const pdfBytes = await pdfLibDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const newName = currentFile.name.replace('.pdf', '_cropped.pdf');
+                
+                saveAs(blob, newName);
+
+                cropDownloadBtn.disabled = false;
+                cropDownloadBtn.textContent = "Crop & Download";
+
+            } catch (err) {
+                console.error(err);
+                alert("Error processing crop.");
+                cropDownloadBtn.disabled = false;
+                cropDownloadBtn.textContent = "Try Again";
+            }
+        }
+
+        function clearData(fullReset = true) {
+            if (fullReset && !confirm("Clear all data?")) return;
+
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            
+            currentFile = null;
+            pdfDoc = null;
+            fileInput.value = '';
+            cropImage.src = '';
+            
+            workspace.style.display = 'none';
+            dropZone.style.display = 'block';
+
+            if(fullReset) {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+    </script>
+</body>
+</html>

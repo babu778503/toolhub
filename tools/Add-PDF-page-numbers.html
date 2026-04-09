@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add PDF page numbers</title>
+    
+    <!-- SEO & Metadata for toolshub365.com -->
+    <meta name="description" content="Free online tool to Add PDF page numbers. Insert numbering into PDF documents with custom positioning, font size, and starting numbers. Secure and mobile-friendly.">
+    <meta name="keywords" content="Add PDF page numbers, number pdf pages, insert page numbers pdf, pdf pagination tool, toolshub365, pdf editor, technical SEO tools">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/add-pdf-page-numbers">
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --primary: #0891b2; /* Cyan/Teal shade */
+            --primary-dark: #0e7490;
+            --bg-body: #f8fafc;
+            --white: #ffffff;
+            --text-main: #0f172a;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --header-h: 50px;
+            --max-w: 1200px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        /* --- Reset --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-top: var(--header-h);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Header (Fixed 50px) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: var(--header-h);
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            width: 100%;
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Upload Section --- */
+        .upload-zone {
+            background: var(--white);
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background-color: #ecfeff;
+        }
+
+        .icon-number {
+            width: 48px; height: 48px; fill: var(--primary); margin-bottom: 10px;
+        }
+
+        .upload-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; }
+        .upload-desc { font-size: 0.9rem; color: var(--text-light); }
+        
+        input[type="file"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+        }
+
+        /* --- Workspace --- */
+        .workspace {
+            display: none; /* Hidden initially */
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        /* --- Settings Panel --- */
+        .settings-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            border-right: 1px solid var(--border);
+        }
+
+        .settings-header {
+            font-size: 1rem; font-weight: 700; margin-bottom: 20px; color: var(--primary-dark); border-bottom: 1px solid var(--border); padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        
+        .form-label {
+            display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; background: #fff;
+        }
+        .form-control:focus { border-color: var(--primary); }
+
+        .position-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;
+        }
+
+        .pos-btn {
+            padding: 10px; border: 1px solid var(--border); background: #f1f5f9; cursor: pointer; border-radius: 4px; text-align: center; font-size: 0.8rem;
+        }
+        .pos-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* --- Preview Panel --- */
+        .preview-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-name-tag {
+            background: #e2e8f0; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--text-light); margin-bottom: 15px; max-width: 90%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+
+        /* CSS-based PDF Mockup */
+        .pdf-mockup {
+            width: 210px; height: 297px; /* A4 Ratio */
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            border: 1px solid #ddd;
+            display: flex;
+            transition: all 0.2s;
+        }
+
+        .mockup-content {
+            flex: 1; margin: 20px; background: #f8fafc; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #cbd5e1;
+        }
+
+        .page-number-indicator {
+            position: absolute;
+            color: var(--text-main);
+            font-weight: bold;
+            padding: 5px;
+            border: 1px solid transparent;
+            /* Positioning handled by JS */
+        }
+        .page-number-indicator.highlight { border-color: var(--primary); background: rgba(8, 145, 178, 0.1); }
+
+        /* --- Buttons --- */
+        .action-bar {
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            background: var(--white);
+        }
+
+        .btn {
+            padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .btn-danger { background: white; color: #ef4444; border: 1px solid #fecaca; }
+        .btn-danger:hover { background: #fef2f2; }
+
+        /* --- Mobile Optimization --- */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                padding: 0; width: 100%; max-width: 100%;
+            }
+            .upload-zone {
+                border-radius: 0; border: none; border-bottom: 1px solid var(--border); margin: 0;
+            }
+            .workspace {
+                border-radius: 0; box-shadow: none; flex-direction: column;
+            }
+            .settings-panel { border-right: none; border-bottom: 1px solid var(--border); }
+            .action-bar { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Add PDF page numbers</h1>
+    </header>
+
+    <div class="main-container">
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="dropZone">
+            <svg class="icon-number" viewBox="0 0 24 24">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                <text x="10" y="16" font-size="6" fill="currentColor" font-weight="bold">#</text>
+            </svg>
+            <div class="upload-title">Select PDF File</div>
+            <div class="upload-desc">Drag & Drop or click to upload</div>
+            <input type="file" id="fileInput" accept="application/pdf">
+        </div>
+
+        <!-- Processing Workspace -->
+        <div class="workspace" id="workspace">
+            
+            <!-- Left: Settings -->
+            <div class="settings-panel">
+                <div class="settings-header">Configuration</div>
+                
+                <!-- Position Grid -->
+                <div class="form-group">
+                    <label class="form-label">Position</label>
+                    <div class="position-grid" id="posGrid">
+                        <div class="pos-btn" data-pos="tl">Top Left</div>
+                        <div class="pos-btn" data-pos="tc">Top Center</div>
+                        <div class="pos-btn" data-pos="tr">Top Right</div>
+                        <div class="pos-btn" data-pos="bl">Btm Left</div>
+                        <div class="pos-btn active" data-pos="bc">Btm Center</div>
+                        <div class="pos-btn" data-pos="br">Btm Right</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Start Number</label>
+                    <input type="number" id="startNumber" class="form-control" value="1" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Font Size</label>
+                    <input type="number" id="fontSize" class="form-control" value="12" min="8" max="72">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Text Format</label>
+                    <select id="textFormat" class="form-control">
+                        <option value="n">1</option>
+                        <option value="p_n">Page 1</option>
+                        <option value="p_n_of_t">Page 1 of n</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="preview-panel">
+                <div class="file-name-tag" id="fileNameDisplay">document.pdf</div>
+                
+                <!-- Visual Mockup -->
+                <div class="pdf-mockup">
+                    <div class="mockup-content">CONTENT</div>
+                    <div id="numberPreview" class="page-number-indicator highlight">1</div>
+                </div>
+                <div style="margin-top:10px; font-size:0.8rem; color:#64748b;">Preview Layout</div>
+            </div>
+
+            <!-- Bottom: Actions -->
+            <div class="action-bar">
+                <button class="btn btn-danger" onclick="clearData()">Clear Data</button>
+                <button class="btn btn-primary" id="processBtn" onclick="addPageNumbers()">Add Numbers & Download</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const workspace = document.getElementById('workspace');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const processBtn = document.getElementById('processBtn');
+        const numberPreview = document.getElementById('numberPreview');
+        const posBtns = document.querySelectorAll('.pos-btn');
+        
+        // Inputs
+        const startNumberInput = document.getElementById('startNumber');
+        const fontSizeInput = document.getElementById('fontSize');
+        const textFormatInput = document.getElementById('textFormat');
+
+        // State
+        let currentFile = null;
+        let config = {
+            position: 'bc', // bc = bottom center
+            start: 1,
+            size: 12,
+            format: 'n'
+        };
+
+        const STORAGE_KEY = 'toolshub365_pagenum_config';
+
+        // --- Initialization ---
+        window.onload = function() {
+            // Restore Settings
+            const savedConfig = localStorage.getItem(STORAGE_KEY);
+            if (savedConfig) {
+                config = JSON.parse(savedConfig);
+                applyConfigToUI();
+            }
+            updatePreview();
+        };
+
+        // --- Event Listeners ---
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        // Settings Change Listeners (Auto Save)
+        posBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                posBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                config.position = btn.getAttribute('data-pos');
+                saveConfig();
+                updatePreview();
+            });
+        });
+
+        [startNumberInput, fontSizeInput, textFormatInput].forEach(input => {
+            input.addEventListener('input', () => {
+                config.start = parseInt(startNumberInput.value) || 1;
+                config.size = parseInt(fontSizeInput.value) || 12;
+                config.format = textFormatInput.value;
+                saveConfig();
+                updatePreview();
+            });
+        });
+
+        // --- Core Functions ---
+
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            currentFile = file;
+            fileNameDisplay.textContent = file.name;
+            dropZone.style.display = 'none';
+            workspace.style.display = 'flex';
+        }
+
+        function saveConfig() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        }
+
+        function applyConfigToUI() {
+            // Position
+            posBtns.forEach(b => {
+                b.classList.remove('active');
+                if(b.getAttribute('data-pos') === config.position) b.classList.add('active');
+            });
+            // Inputs
+            startNumberInput.value = config.start;
+            fontSizeInput.value = config.size;
+            textFormatInput.value = config.format;
+        }
+
+        function updatePreview() {
+            const el = numberPreview;
+            
+            // 1. Text Content
+            let text = config.start.toString();
+            if (config.format === 'p_n') text = `Page ${config.start}`;
+            if (config.format === 'p_n_of_t') text = `Page ${config.start} of 10`;
+            el.textContent = text;
+            
+            // 2. Font Size (scaled down for mockup)
+            // Mockup is approx 1/3 scale visually? Let's just set relative
+            el.style.fontSize = Math.max(8, config.size) + 'px'; 
+
+            // 3. Position Logic
+            const margin = '15px';
+            el.style.top = 'auto'; el.style.bottom = 'auto'; 
+            el.style.left = 'auto'; el.style.right = 'auto'; el.style.transform = 'none';
+
+            switch(config.position) {
+                case 'tl': el.style.top = margin; el.style.left = margin; break;
+                case 'tc': el.style.top = margin; el.style.left = '50%'; el.style.transform = 'translateX(-50%)'; break;
+                case 'tr': el.style.top = margin; el.style.right = margin; break;
+                case 'bl': el.style.bottom = margin; el.style.left = margin; break;
+                case 'bc': el.style.bottom = margin; el.style.left = '50%'; el.style.transform = 'translateX(-50%)'; break;
+                case 'br': el.style.bottom = margin; el.style.right = margin; break;
+            }
+        }
+
+        async function addPageNumbers() {
+            if (!currentFile) return;
+
+            processBtn.disabled = true;
+            processBtn.textContent = "Processing...";
+
+            try {
+                const arrayBuffer = await currentFile.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                
+                // Embed Font
+                const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+                const pages = pdfDoc.getPages();
+                const totalPages = pages.length;
+
+                // Loop Pages
+                pages.forEach((page, idx) => {
+                    const { width, height } = page.getSize();
+                    const num = config.start + idx;
+                    
+                    // Format Text
+                    let text = num.toString();
+                    if (config.format === 'p_n') text = `Page ${num}`;
+                    if (config.format === 'p_n_of_t') text = `Page ${num} of ${config.start + totalPages - 1}`;
+
+                    const textWidth = helveticaFont.widthOfTextAtSize(text, config.size);
+                    const textHeight = helveticaFont.heightAtSize(config.size);
+
+                    // Calculate Coordinates (PDF coords start bottom-left = 0,0)
+                    const margin = 20;
+                    let x, y;
+
+                    // Y Coord
+                    if (config.position.startsWith('t')) {
+                        y = height - margin - textHeight;
+                    } else {
+                        y = margin;
+                    }
+
+                    // X Coord
+                    if (config.position.endsWith('l')) {
+                        x = margin;
+                    } else if (config.position.endsWith('c')) {
+                        x = (width / 2) - (textWidth / 2);
+                    } else { // Right
+                        x = width - margin - textWidth;
+                    }
+
+                    page.drawText(text, {
+                        x: x,
+                        y: y,
+                        size: config.size,
+                        font: helveticaFont,
+                        color: PDFLib.rgb(0, 0, 0),
+                    });
+                });
+
+                // Save
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const newName = currentFile.name.replace('.pdf', '_numbered.pdf');
+                
+                saveAs(blob, newName);
+
+                processBtn.disabled = false;
+                processBtn.textContent = "Add Numbers & Download";
+
+            } catch (err) {
+                console.error(err);
+                alert("An error occurred processing the PDF.");
+                processBtn.disabled = false;
+                processBtn.textContent = "Try Again";
+            }
+        }
+
+        function clearData() {
+            if(confirm('Reset all data?')) {
+                currentFile = null;
+                fileInput.value = '';
+                workspace.style.display = 'none';
+                dropZone.style.display = 'block';
+                
+                // Optional: clear localstorage config too?
+                // localStorage.removeItem(STORAGE_KEY); 
+                // Usually "Clear Data" implies clearing the workspace file, but keeping preferences is usually better UX.
+                // If you strictly want to clear everything:
+                config = { position: 'bc', start: 1, size: 12, format: 'n' };
+                saveConfig();
+                applyConfigToUI();
+                updatePreview();
+            }
+        }
+    </script>
+</body>
+</html>

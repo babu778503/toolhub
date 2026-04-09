@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<!-- Category: PDF -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Redact PDF</title>
+    
+    <!-- SEO Optimization -->
+    <meta name="description" content="Free online Redact PDF tool. Permanently hide sensitive information from PDF documents. Secure, client-side processing for mobile and desktop.">
+    <meta name="keywords" content="Redact PDF, hide pdf text, blackout pdf, sanitise pdf, remove sensitive info, toolshub365, free pdf tool">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/redact-pdf">
+    
+    <!-- Libraries (Stable Versions) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <script>
+        // Initialize PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+
+    <style>
+        /* --- Reset & Variables --- */
+        :root {
+            --primary: #111827; /* Deep Black for Redaction theme */
+            --primary-hover: #374151;
+            --accent: #2563eb;
+            --danger: #ef4444;
+            --bg-body: #f3f4f6;
+            --header-h: 50px;
+            --container-w: 1200px;
+            --border-col: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            padding-top: var(--header-h);
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-h);
+            background: #fff; border-bottom: 1px solid var(--border-col);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        h1 { font-size: 1.2rem; font-weight: 700; color: #111; letter-spacing: -0.5px; margin: 0; }
+
+        /* --- Layout --- */
+        .app-container {
+            max-width: var(--container-w);
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            min-height: calc(100vh - var(--header-h));
+        }
+
+        /* Sidebar Controls */
+        .controls-panel {
+            width: 300px;
+            flex-shrink: 0;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* PDF Workspace */
+        .pdf-viewer {
+            flex-grow: 1;
+            background: #525659;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            min-height: 600px;
+            position: relative;
+            user-select: none;
+        }
+
+        /* PDF Canvas Wrapper */
+        #render-target {
+            position: relative;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            line-height: 0;
+            cursor: crosshair;
+        }
+
+        canvas#the-canvas {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* --- Components --- */
+        
+        /* Upload Area */
+        .drop-zone {
+            border: 2px dashed #9ca3af;
+            background: #f9fafb;
+            padding: 30px 15px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .drop-zone:hover { border-color: var(--primary); background: #f3f4f6; }
+        .icon { font-size: 24px; display: block; margin-bottom: 8px; }
+        .text-label { font-size: 0.9rem; font-weight: 500; color: #4b5563; }
+
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 10px 15px; border: none; border-radius: 6px;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: white; border: 1px solid #d1d5db; color: #374151; }
+        .btn-outline:hover { background: #f3f4f6; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
+
+        /* Redaction Element */
+        .blackout-box {
+            position: absolute;
+            background-color: #000;
+            opacity: 0.7; /* Semi-transparent to verify position */
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .blackout-box:hover {
+            opacity: 0.5;
+            cursor: pointer;
+            outline: 2px solid var(--danger);
+        }
+        /* Close Button on Hover */
+        .blackout-box::after {
+            content: '×';
+            position: absolute;
+            top: -12px; right: -12px;
+            background: var(--danger); color: white;
+            border-radius: 50%; width: 20px; height: 20px;
+            text-align: center; line-height: 20px; font-weight: bold;
+            font-size: 14px; display: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .blackout-box:hover::after { display: block; }
+
+        /* Info & Helpers */
+        .section-header { font-size: 0.75rem; font-weight: 700; color: #6b7280; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hidden { display: none !important; }
+        .info-box { font-size: 0.85rem; color: #4b5563; background: #fffbeb; padding: 10px; border-radius: 4px; border-left: 3px solid #f59e0b; margin-bottom: 15px; }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; padding: 0; width: 100%; gap: 0; }
+            .controls-panel { width: 100%; border-radius: 0; position: relative; top: 0; box-shadow: none; border-bottom: 1px solid #e5e7eb; z-index: 50; }
+            .pdf-viewer { padding: 10px; border-radius: 0; min-height: 60vh; }
+            body { margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Redact PDF</h1>
+    </header>
+
+    <div class="app-container">
+        
+        <!-- Left Panel -->
+        <div class="controls-panel">
+            
+            <!-- Step 1: Upload -->
+            <div id="panel-upload">
+                <input type="file" id="file-input" accept="application/pdf" class="hidden">
+                <div class="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <span class="icon">⬛</span>
+                    <span class="text-label">Select PDF to Redact</span>
+                </div>
+            </div>
+
+            <!-- Step 2: Tools -->
+            <div id="panel-tools" class="hidden">
+                
+                <div class="info-box">
+                    <strong>Instructions:</strong> Drag over text to create black redaction boxes. Click a box to remove it.
+                </div>
+
+                <div class="section-header">Navigation</div>
+                <div class="btn-row" style="align-items: center; justify-content: space-between;">
+                    <button class="btn-outline" style="width: auto;" onclick="changePage(-1)">❮ Prev</button>
+                    <span style="font-size: 0.9rem; font-weight: 600;">Page <span id="page-curr">1</span> / <span id="page-total">--</span></span>
+                    <button class="btn-outline" style="width: auto;" onclick="changePage(1)">Next ❯</button>
+                </div>
+
+                <div class="section-header">Actions</div>
+                <button class="btn btn-outline" onclick="clearCurrentPage()" style="margin-bottom: 15px;">Clear Page Redactions</button>
+                
+                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+
+                <button class="btn btn-primary" id="save-btn" onclick="savePdf()">
+                    <span>💾</span> Apply & Download PDF
+                </button>
+                
+                <button class="btn btn-danger" style="margin-top: 10px;" onclick="resetApp()">
+                    <span>↺</span> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Panel: PDF -->
+        <div class="pdf-viewer">
+            <div id="render-target" class="hidden">
+                <canvas id="the-canvas"></canvas>
+                <!-- Redaction elements injected here -->
+            </div>
+            <div id="empty-msg" style="color: #ccc; margin-top: 80px; text-align: center;">
+                <p>No Document Loaded</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Global State ---
+        let pdfDoc = null;
+        let pdfBytesForSaving = null; // Separate copy for PDF-Lib
+        let pageNum = 1;
+        let scale = 1.0;
+        let isRendering = false;
+
+        // Store redactions: { "1": [{x,y,w,h}], "2": [...] }
+        // Coordinates are Normalized (0.0 to 1.0) relative to page size
+        let redactionMap = {};
+
+        // Drawing Vars
+        let isDrawing = false;
+        let startX, startY;
+        let activeDiv = null;
+
+        // References
+        const canvas = document.getElementById('the-canvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('render-target');
+
+        // --- File Handling ---
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || file.type !== 'application/pdf') return;
+
+            try {
+                // 1. Read the file
+                const buffer = await file.arrayBuffer();
+
+                // 2. CLONE the buffer for saving later. 
+                // PDF.js can detach the buffer, so we slice it to create a deep copy.
+                pdfBytesForSaving = buffer.slice(0);
+
+                // 3. Load PDF for viewing
+                pdfDoc = await pdfjsLib.getDocument(buffer).promise;
+                
+                // 4. Update UI
+                document.getElementById('page-total').textContent = pdfDoc.numPages;
+                document.getElementById('panel-upload').classList.add('hidden');
+                document.getElementById('panel-tools').classList.remove('hidden');
+                document.getElementById('empty-msg').classList.add('hidden');
+                wrapper.classList.remove('hidden');
+
+                // 5. Reset State
+                redactionMap = {};
+                pageNum = 1;
+                renderPage(pageNum);
+
+            } catch (err) {
+                console.error(err);
+                alert("Error loading PDF: " + err.message);
+            }
+        });
+
+        // --- Rendering ---
+        async function renderPage(num) {
+            isRendering = true;
+            
+            // Clear current DOM redactions
+            document.querySelectorAll('.blackout-box').forEach(el => el.remove());
+
+            try {
+                const page = await pdfDoc.getPage(num);
+                
+                // Scale Logic: Fit Width
+                const containerW = document.querySelector('.pdf-viewer').clientWidth - 40;
+                const viewportRaw = page.getViewport({ scale: 1 });
+                scale = containerW / viewportRaw.width;
+                if (scale > 1.5) scale = 1.5;
+
+                const viewport = page.getViewport({ scale: scale });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                wrapper.style.width = viewport.width + 'px';
+                wrapper.style.height = viewport.height + 'px';
+
+                await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                // Restore redactions from memory
+                loadRedactionsForPage(num);
+
+                document.getElementById('page-curr').textContent = num;
+                isRendering = false;
+
+            } catch (err) {
+                console.error(err);
+                isRendering = false;
+            }
+        }
+
+        function changePage(delta) {
+            const next = pageNum + delta;
+            if (next >= 1 && next <= pdfDoc.numPages) {
+                pageNum = next;
+                renderPage(pageNum);
+            }
+        }
+
+        // --- Interaction (Draw Redaction) ---
+        
+        // Helper: Get coords relative to wrapper
+        function getLocalPos(e) {
+            const rect = wrapper.getBoundingClientRect();
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: cx - rect.left, y: cy - rect.top };
+        }
+
+        wrapper.addEventListener('mousedown', startDraw);
+        wrapper.addEventListener('touchstart', startDraw, {passive: false});
+
+        wrapper.addEventListener('mousemove', moveDraw);
+        wrapper.addEventListener('touchmove', moveDraw, {passive: false});
+
+        wrapper.addEventListener('mouseup', endDraw);
+        wrapper.addEventListener('touchend', endDraw);
+
+        function startDraw(e) {
+            if (e.target.classList.contains('blackout-box')) {
+                deleteRedaction(e.target);
+                return;
+            }
+            if (e.type === 'touchstart') e.preventDefault();
+            
+            isDrawing = true;
+            const pos = getLocalPos(e);
+            startX = pos.x;
+            startY = pos.y;
+
+            activeDiv = document.createElement('div');
+            activeDiv.className = 'blackout-box';
+            activeDiv.style.left = startX + 'px';
+            activeDiv.style.top = startY + 'px';
+            activeDiv.style.width = '0px';
+            activeDiv.style.height = '0px';
+            wrapper.appendChild(activeDiv);
+        }
+
+        function moveDraw(e) {
+            if (!isDrawing) return;
+            if (e.type === 'touchmove') e.preventDefault();
+            
+            const pos = getLocalPos(e);
+            const w = pos.x - startX;
+            const h = pos.y - startY;
+
+            // Handle negative drag directions
+            if (w < 0) {
+                activeDiv.style.left = pos.x + 'px';
+                activeDiv.style.width = Math.abs(w) + 'px';
+            } else {
+                activeDiv.style.width = w + 'px';
+            }
+
+            if (h < 0) {
+                activeDiv.style.top = pos.y + 'px';
+                activeDiv.style.height = Math.abs(h) + 'px';
+            } else {
+                activeDiv.style.height = h + 'px';
+            }
+        }
+
+        function endDraw() {
+            if (!isDrawing) return;
+            isDrawing = false;
+
+            // Validate size
+            const w = parseFloat(activeDiv.style.width);
+            const h = parseFloat(activeDiv.style.height);
+
+            if (w > 5 && h > 5) {
+                saveToMemory(activeDiv);
+            } else {
+                activeDiv.remove();
+            }
+            activeDiv = null;
+        }
+
+        // --- Data Management ---
+        
+        function saveToMemory(div) {
+            const domRect = {
+                x: parseFloat(div.style.left),
+                y: parseFloat(div.style.top),
+                w: parseFloat(div.style.width),
+                h: parseFloat(div.style.height)
+            };
+
+            // Normalize (0-1) to survive resize
+            const normRect = {
+                x: domRect.x / wrapper.offsetWidth,
+                y: domRect.y / wrapper.offsetHeight,
+                w: domRect.w / wrapper.offsetWidth,
+                h: domRect.h / wrapper.offsetHeight
+            };
+
+            if (!redactionMap[pageNum]) redactionMap[pageNum] = [];
+            
+            // Add to array
+            redactionMap[pageNum].push(normRect);
+            
+            // Tag element with index
+            div.dataset.idx = redactionMap[pageNum].length - 1;
+        }
+
+        function loadRedactionsForPage(pNum) {
+            const list = redactionMap[pNum];
+            if (!list) return;
+
+            list.forEach((rect, i) => {
+                if (!rect) return; // Deleted items
+                const div = document.createElement('div');
+                div.className = 'blackout-box';
+                div.style.left = (rect.x * wrapper.offsetWidth) + 'px';
+                div.style.top = (rect.y * wrapper.offsetHeight) + 'px';
+                div.style.width = (rect.w * wrapper.offsetWidth) + 'px';
+                div.style.height = (rect.h * wrapper.offsetHeight) + 'px';
+                div.dataset.idx = i;
+                wrapper.appendChild(div);
+            });
+        }
+
+        function deleteRedaction(div) {
+            const idx = div.dataset.idx;
+            // Mark as null in array (preserve indices)
+            if (redactionMap[pageNum][idx]) {
+                redactionMap[pageNum][idx] = null;
+                div.remove();
+            }
+        }
+
+        function clearCurrentPage() {
+            if(confirm("Clear all redactions on this page?")) {
+                redactionMap[pageNum] = [];
+                document.querySelectorAll('.blackout-box').forEach(e => e.remove());
+            }
+        }
+
+        // --- Saving (PDF-Lib) ---
+        async function savePdf() {
+            if (!pdfBytesForSaving) {
+                alert("Original PDF data lost. Please re-upload.");
+                return;
+            }
+
+            const btn = document.getElementById('save-btn');
+            btn.innerHTML = "Processing...";
+            btn.disabled = true;
+
+            try {
+                // Load clean buffer
+                const pdfDocLib = await PDFLib.PDFDocument.load(pdfBytesForSaving);
+                const pages = pdfDocLib.getPages();
+
+                // Apply redactions
+                for (const [pNumStr, rects] of Object.entries(redactionMap)) {
+                    const pIdx = parseInt(pNumStr) - 1;
+                    const page = pages[pIdx];
+                    if (!page) continue;
+
+                    const { width, height } = page.getSize();
+
+                    for (const r of rects) {
+                        if (!r) continue; // Skip deleted
+
+                        // Convert Normalized -> PDF Points
+                        const pdfX = r.x * width;
+                        const pdfW = r.w * width;
+                        const pdfH = r.h * height;
+                        
+                        // Y Flip (PDF 0 is bottom)
+                        // PDF_Y = PDF_Height - (Top_Ratio * PDF_Height) - (Height_Ratio * PDF_Height)
+                        const pdfY = height - (r.y * height) - pdfH;
+
+                        page.drawRectangle({
+                            x: pdfX,
+                            y: pdfY,
+                            width: pdfW,
+                            height: pdfH,
+                            color: PDFLib.rgb(0, 0, 0), // Black
+                        });
+                    }
+                }
+
+                const modifiedBytes = await pdfDocLib.save();
+                const blob = new Blob([modifiedBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Redacted_Document_${Date.now()}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (err) {
+                console.error(err);
+                alert("Save Failed: " + err.message);
+            } finally {
+                btn.innerHTML = "<span>💾</span> Apply & Download PDF";
+                btn.disabled = false;
+            }
+        }
+
+        function resetApp() {
+            if(confirm("Start over?")) location.reload();
+        }
+    </script>
+</body>
+</html>
