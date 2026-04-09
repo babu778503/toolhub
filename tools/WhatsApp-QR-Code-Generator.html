@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<!-- Category: WhatsApp -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WhatsApp QR Code Generator</title>
+    
+    <!-- SEO & Technical AI Crawler Optimization -->
+    <meta name="description" content="Free WhatsApp QR Code Generator. Create, scan, and download custom WhatsApp Click-to-Chat QR codes instantly. Auto-saves data locally. Powered by toolshub365.com">
+    <meta name="keywords" content="WhatsApp QR Code Generator, WhatsApp QR maker, generate wa.me QR code, scan to chat WhatsApp, direct WhatsApp message QR, toolshub365.com, AI optimized SEO tools">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://toolshub365.com/whatsapp-qr-code-generator" />
+
+    <!-- Structured Data for Search Engines and AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "WhatsApp QR Code Generator",
+      "url": "https://toolshub365.com/whatsapp-qr-code-generator",
+      "description": "Generate custom WhatsApp Click-to-Chat QR codes instantly. The tool automatically saves user input locally for ease of use.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- QRCode.js Library for QR Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            padding-top: 50px; /* Exact offset for the 50px fixed header */
+            overflow-x: hidden;
+        }
+
+        /* Fixed Header - Exactly 50px Height */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #25D366; /* WhatsApp Green */
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Desktop Design Measurements */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 25px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #fff;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #65676B;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        /* QR Code Display Area */
+        .qr-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            background-color: #f8f9fa;
+            border: 2px dashed #ccd0d5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .qr-wrapper.active {
+            border-color: #25D366;
+            background-color: #e9fbf0;
+        }
+
+        #qr-code-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none; /* Hidden until generated */
+        }
+
+        .placeholder-text {
+            color: #65676B;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            text-decoration: none;
+            color: #ffffff;
+            flex: 1;
+            min-width: 140px;
+            user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary { background-color: #25D366; }
+        .btn-primary:hover { background-color: #128C7E; }
+        .btn-primary:disabled { background-color: #93e4af; cursor: not-allowed; transform: none; }
+        
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #c82333; }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #1c1e21;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 14px 20px;
+            position: fixed;
+            z-index: 1001;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+
+        #toast.show {
+            visibility: visible;
+            bottom: 50px;
+            opacity: 1;
+        }
+
+        /* Mobile Specific Adjustments - removing side spaces strictly */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr; /* Stack cards vertically */
+                padding-left: 0;
+                padding-right: 0;
+                padding-top: 15px;
+                padding-bottom: 0;
+                width: 100%;
+                max-width: 100%;
+                gap: 15px;
+            }
+            
+            .card {
+                border-radius: 0;
+                box-shadow: none;
+                border-top: 1px solid #e1e4e8;
+                border-bottom: 1px solid #e1e4e8;
+                padding: 20px 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>WhatsApp QR Code Generator</h1>
+    </header>
+
+    <main class="container">
+        <!-- Input Section -->
+        <div class="card">
+            <div class="form-group">
+                <label for="wa-phone">WhatsApp Phone Number</label>
+                <input type="text" id="wa-phone" placeholder="e.g., 1234567890" inputmode="tel" autocomplete="tel">
+                <div class="help-text">Enter your full number with country code. Do not include '+', dashes, or brackets. (Example: 1 for US, 44 for UK, 91 for India).</div>
+            </div>
+
+            <div class="form-group">
+                <label for="wa-message">Pre-filled Message (Optional)</label>
+                <textarea id="wa-message" placeholder="Hello, I'd like to know more about your services..."></textarea>
+                <div class="help-text">This exact text will automatically appear in the user's chat box when they scan the QR code.</div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="btn btn-danger" id="clear-btn">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="card">
+            <div class="form-group">
+                <label>Generated QR Code</label>
+                <div class="qr-wrapper" id="qr-wrapper">
+                    <span class="placeholder-text" id="qr-placeholder">Enter a phone number to generate your QR Code automatically.</span>
+                    <div id="qr-code-box"></div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" id="download-btn" disabled>Download QR Code</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast">Action completed!</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // DOM Elements
+            const phoneInput = document.getElementById('wa-phone');
+            const messageInput = document.getElementById('wa-message');
+            const qrWrapper = document.getElementById('qr-wrapper');
+            const qrCodeBox = document.getElementById('qr-code-box');
+            const qrPlaceholder = document.getElementById('qr-placeholder');
+            const downloadBtn = document.getElementById('download-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const toast = document.getElementById('toast');
+
+            // LocalStorage Keys
+            const STORAGE_KEY_PHONE = 'toolshub365_wa_qr_phone';
+            const STORAGE_KEY_MSG = 'toolshub365_wa_qr_msg';
+
+            // QRCode Instance variable
+            let qrCodeInstance = null;
+
+            // Toast Notification UI Logic
+            let toastTimeout;
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add("show");
+                
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(function() { 
+                    toast.classList.remove("show"); 
+                }, 2500);
+            }
+
+            // Function to generate the WhatsApp QR Code
+            function generateQR() {
+                // Remove non-numeric characters from the phone number
+                let phone = phoneInput.value.replace(/\D/g, '');
+                let message = messageInput.value.trim();
+                
+                // Auto-save user data seamlessly to the device
+                localStorage.setItem(STORAGE_KEY_PHONE, phoneInput.value);
+                localStorage.setItem(STORAGE_KEY_MSG, messageInput.value);
+
+                if (!phone) {
+                    // Reset UI if phone is empty
+                    qrPlaceholder.style.display = 'block';
+                    qrCodeBox.style.display = 'none';
+                    qrWrapper.classList.remove('active');
+                    downloadBtn.disabled = true;
+                    if(qrCodeInstance) {
+                        qrCodeInstance.clear();
+                        qrCodeBox.innerHTML = '';
+                        qrCodeInstance = null;
+                    }
+                    return;
+                }
+
+                // Construct WhatsApp Link
+                let waLink = `https://wa.me/${phone}`;
+                if (message) {
+                    waLink += `?text=${encodeURIComponent(message)}`;
+                }
+
+                // Update UI
+                qrPlaceholder.style.display = 'none';
+                qrCodeBox.style.display = 'block';
+                qrWrapper.classList.add('active');
+                downloadBtn.disabled = false;
+
+                // Render QR Code
+                if (qrCodeInstance) {
+                    qrCodeInstance.clear();
+                    qrCodeInstance.makeCode(waLink);
+                } else {
+                    qrCodeBox.innerHTML = ''; // clear any leftover elements
+                    qrCodeInstance = new QRCode(qrCodeBox, {
+                        text: waLink,
+                        width: 200,
+                        height: 200,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                }
+            }
+
+            // Function to load saved data securely from device memory
+            function loadSavedData() {
+                const savedPhone = localStorage.getItem(STORAGE_KEY_PHONE);
+                const savedMsg = localStorage.getItem(STORAGE_KEY_MSG);
+
+                if (savedPhone !== null) phoneInput.value = savedPhone;
+                if (savedMsg !== null) messageInput.value = savedMsg;
+
+                generateQR();
+            }
+
+            // Attach Real-time Event Listeners
+            phoneInput.addEventListener('input', generateQR);
+            messageInput.addEventListener('input', generateQR);
+
+            // Download QR Code Functionality
+            downloadBtn.addEventListener('click', function() {
+                if(downloadBtn.disabled) return;
+                
+                // qrcode.js generates a canvas and an img tag. We extract the image.
+                const qrImage = qrCodeBox.querySelector('img');
+                const qrCanvas = qrCodeBox.querySelector('canvas');
+                
+                let imageUrl = '';
+                
+                if (qrImage && qrImage.getAttribute('src')) {
+                    imageUrl = qrImage.getAttribute('src');
+                } else if (qrCanvas) {
+                    imageUrl = qrCanvas.toDataURL("image/png");
+                }
+
+                if (imageUrl) {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = imageUrl;
+                    downloadLink.download = 'WhatsApp-QR-Code.png';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    showToast("QR Code downloaded successfully!");
+                } else {
+                    showToast("Error downloading QR Code. Please try again.");
+                }
+            });
+
+            // Clear Data Workable Implementation
+            clearBtn.addEventListener('click', function() {
+                if (confirm("Are you sure you want to clear your saved data and reset the QR code?")) {
+                    localStorage.removeItem(STORAGE_KEY_PHONE);
+                    localStorage.removeItem(STORAGE_KEY_MSG);
+                    
+                    phoneInput.value = '';
+                    messageInput.value = '';
+                    
+                    generateQR();
+                    showToast("Device data cleared successfully!");
+                }
+            });
+
+            // Initialize the tool with saved data
+            loadSavedData();
+        });
+    </script>
+</body>
+</html>
