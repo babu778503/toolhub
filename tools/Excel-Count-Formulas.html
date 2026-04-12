@@ -10,7 +10,7 @@
     <meta name="description" content="Master Excel Count Formulas. Comprehensive reference for COUNT, COUNTA, COUNTIFS, SUMPRODUCT logic, and advanced dynamic array counting techniques.">
     <meta name="keywords" content="Excel Count Formulas, Excel COUNTIF, COUNTA, SUMPRODUCT count, dynamic array counting, Excel count distinct, toolshub365.com">
     <meta name="author" content="toolshub365.com">
-    <link rel="canonical" href="https://toolshub365.com/excel-formulas-count">
+    <link rel="canonical" href="https://toolshub365.com/excel-count-formulas">
     
     <!-- Technical SEO AI Crawler Schema -->
     <script type="application/ld+json">
@@ -20,7 +20,7 @@
       "name": "Excel Count Formulas",
       "operatingSystem": "Web",
       "applicationCategory": "BusinessApplication",
-      "url": "https://toolshub365.com/excel-formulas-count",
+      "url": "https://toolshub365.com/excel-count-formulas",
       "description": "Interactive guide and reference for Excel Counting Formulas, including conditional counting, arrays, and text combinations with local data saving.",
       "publisher": {
         "@type": "Organization",
@@ -89,47 +89,74 @@
             padding: 20px;
         }
 
-        /* Search Bar & Controls */
+        /* Dynamic Search Bar */
         .controls-wrapper {
             margin-bottom: 20px;
             position: sticky;
             top: 60px;
             z-index: 999;
-            display: flex;
-            gap: 10px;
             background: var(--bg-color);
             padding-bottom: 10px;
         }
         
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 16px;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
         .search-input {
-            flex: 1;
-            padding: 14px 20px;
+            width: 100%;
+            padding: 14px 45px 14px 42px; /* Padded to make room for icons */
             font-size: 16px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             outline: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: border 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+            color: var(--text-main);
         }
 
         .search-input:focus {
             border-color: var(--excel-green);
+            box-shadow: 0 4px 12px rgba(16, 124, 65, 0.15);
         }
 
-        .btn-clear {
-            padding: 0 20px;
-            background-color: #d13438;
-            color: white;
+        .search-input:focus + .search-icon {
+            color: var(--excel-green);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            background: #edebe9;
             border: none;
-            border-radius: 6px;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            color: var(--text-muted);
             cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: none; /* Hidden until typing starts */
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
         }
 
-        .btn-clear:hover {
-            background-color: #a80000;
+        .clear-btn:hover {
+            background: #d13438;
+            color: white;
         }
 
         /* Accordion Categories */
@@ -140,6 +167,11 @@
             margin-bottom: 12px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: box-shadow 0.3s;
+        }
+
+        .category-block:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
         }
 
         .category-header {
@@ -194,6 +226,7 @@
             justify-content: space-between;
             align-items: center;
             user-select: none;
+            transition: background 0.2s;
         }
 
         .func-header:hover {
@@ -209,10 +242,18 @@
         .fav-btn {
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             color: #ccc;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color 0.2s, transform 0.2s;
+            line-height: 1;
+            padding: 0;
+            margin-top: -2px;
+            outline: none;
+        }
+
+        .fav-btn:active {
+            transform: scale(1.2);
         }
 
         .fav-btn.active {
@@ -235,6 +276,12 @@
             display: none;
             padding: 20px;
             background: var(--card-bg);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .func-item.active .func-details {
@@ -273,6 +320,7 @@
             font-size: 0.9rem;
             border-left: 3px solid var(--excel-green);
             word-wrap: break-word;
+            white-space: pre-wrap;
         }
 
         /* Mobile Adjustments: Remove both side blank space */
@@ -283,6 +331,10 @@
             }
             .controls-wrapper {
                 padding: 0 10px 10px 10px;
+            }
+            .search-input {
+                padding: 12px 40px 12px 38px;
+                font-size: 15px;
             }
             .category-block {
                 border-radius: 0;
@@ -300,9 +352,13 @@
     </header>
 
     <div class="container">
+        <!-- Dynamic Search Box -->
         <div class="controls-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search counting functions (e.g. COUNTIF, SUMPRODUCT, UNIQUE)...">
-            <button id="clearDataBtn" class="btn-clear" title="Clear saved favorites and local settings">Clear Data</button>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search counting functions (e.g. COUNTIF, SUMPRODUCT, UNIQUE)...">
+                <span class="search-icon">🔍</span>
+                <button id="clearBtn" class="clear-btn" title="Clear Search">✖</button>
+            </div>
         </div>
         <div id="dataContainer"></div>
     </div>
@@ -365,7 +421,7 @@
 
         const container = document.getElementById('dataContainer');
         const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearDataBtn');
+        const clearBtn = document.getElementById('clearBtn');
 
         // LocalStorage Management
         const STORAGE_KEY = 'excelCountFavs';
@@ -436,7 +492,7 @@
                     favBtn.innerHTML = isFav ? '★' : '☆';
                     favBtn.title = "Save to favorites";
                     favBtn.onclick = (e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent opening accordion when clicking star
                         toggleFavorite(funcId, favBtn);
                     };
 
@@ -499,10 +555,13 @@
             });
         }
 
-        // Live Search/Filter functionality
+        // Live Search/Filter & Dynamic Button UI
         function filterUI() {
             const query = searchInput.value.toLowerCase().trim();
             const categories = document.querySelectorAll('.category-block');
+
+            // Show/Hide Clear Button Dynamically
+            clearBtn.style.display = query.length > 0 ? 'flex' : 'none';
 
             categories.forEach(cat => {
                 let hasVisibleItems = false;
@@ -534,14 +593,15 @@
             });
         }
 
-        // Clear Local Data
+        // Dynamic Clear Functionality
         clearBtn.addEventListener('click', () => {
-            if(confirm("Are you sure you want to clear your saved favorites?")) {
-                localStorage.removeItem(STORAGE_KEY);
-                favorites = [];
-                renderUI();
-                alert("Saved data cleared successfully.");
-            }
+            searchInput.value = '';
+            filterUI();
+            searchInput.focus(); // Brings user directly back to searching
+            
+            // Re-collapse items visually for a clean reset
+            const items = document.querySelectorAll('.func-item');
+            items.forEach(item => item.classList.remove('active'));
         });
 
         searchInput.addEventListener('input', filterUI);
