@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<!-- Category: Math Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P-value Calculator</title>
+    <meta name="description" content="Free online P-value Calculator. Calculate P-values from Z-score, T-score, and Chi-Square scores with Left, Right, and Two-tailed options.">
+    <meta name="keywords" content="P-value Calculator, Probability Value, Z-score to P-value, T-score Calculator, Statistical Significance, Hypothesis Testing, ToolsHub365">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/p-value-calculator">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "P-value Calculator",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate P-values instantly for Z-tests, T-tests, and Chi-Square tests."
+    }
+    </script>
+
+    <style>
+        /* --- CSS Reset & Variables --- */
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #27ae60;
+            --accent-hover: #219150;
+            --bg-color: #f7f9fc;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dcdde1;
+            --header-height: 50px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Input Sections --- */
+        .form-section {
+            display: grid;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+
+        /* Conditional Inputs */
+        .df-input {
+            display: none; /* Hidden by default (for Z-test) */
+        }
+
+        /* --- Buttons --- */
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn-calc {
+            background-color: var(--accent-color);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-clear {
+            background-color: #e74c3c;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-clear:hover {
+            background-color: #c0392b;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+        }
+
+        /* --- Results Area --- */
+        .result-area {
+            display: none;
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-left: 5px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 4px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+
+        .significance-text {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Layout Logic --- */
+        /* Desktop */
+        @media (min-width: 769px) {
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px;
+                min-height: calc(100vh - var(--header-height));
+            }
+
+            .btn-row {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>P-value Calculator</h1>
+    </header>
+
+    <div class="container">
+        
+        <form id="pCalcForm" onsubmit="return false;">
+            <div class="form-grid">
+                
+                <!-- Distribution Selection -->
+                <div class="input-group full-width">
+                    <label for="distType">Distribution Type</label>
+                    <select id="distType" onchange="toggleFields(); autoSave();">
+                        <option value="z">Normal Distribution (Z-score)</option>
+                        <option value="t">T-Distribution (t-score)</option>
+                        <option value="chi">Chi-Square (χ²)</option>
+                    </select>
+                </div>
+
+                <!-- Test Statistic -->
+                <div class="input-group">
+                    <label id="statLabel" for="testStat">Z-score</label>
+                    <input type="number" id="testStat" step="any" placeholder="e.g. 1.96" oninput="autoSave()">
+                </div>
+
+                <!-- Degrees of Freedom (Hidden for Z) -->
+                <div class="input-group df-input" id="dfGroup">
+                    <label for="df">Degrees of Freedom (df)</label>
+                    <input type="number" id="df" step="1" min="1" placeholder="e.g. 10" oninput="autoSave()">
+                </div>
+
+                <!-- Tail Selection -->
+                <div class="input-group">
+                    <label for="tailType">Hypothesis Tail</label>
+                    <select id="tailType" onchange="autoSave()">
+                        <option value="two">Two-tailed (≠)</option>
+                        <option value="left">Left-tailed (&lt;)</option>
+                        <option value="right">Right-tailed (&gt;)</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <label for="sigLevel">Significance Level (α) - Optional</label>
+                <select id="sigLevel" onchange="autoSave()">
+                    <option value="0.01">0.01 (1%)</option>
+                    <option value="0.05" selected>0.05 (5%)</option>
+                    <option value="0.10">0.10 (10%)</option>
+                </select>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-calc" onclick="calculateP()">Calculate P-value</button>
+                <button class="btn btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+        </form>
+
+        <div id="resultBox" class="result-area">
+            <div class="result-title">P-value Result</div>
+            <div class="result-value" id="pResult">0.00000</div>
+            <div class="significance-text" id="sigText"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Statistical Functions ---
+
+        // Error Function (Approximation for Normal CDF)
+        function erf(x) {
+            // constants
+            var a1 =  0.254829592;
+            var a2 = -0.284496736;
+            var a3 =  1.421413741;
+            var a4 = -1.453152027;
+            var a5 =  1.061405429;
+            var p  =  0.3275911;
+
+            // Save the sign of x
+            var sign = 1;
+            if (x < 0) {
+                sign = -1;
+            }
+            x = Math.abs(x);
+
+            // A&S formula 7.1.26
+            var t = 1.0 / (1.0 + p * x);
+            var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return sign * y;
+        }
+
+        // Standard Normal CDF
+        function normalCDF(z) {
+            return 0.5 * (1 + erf(z / Math.sqrt(2)));
+        }
+
+        // T-Distribution PDF (for integration)
+        function tPDF(x, df) {
+            var num = Math.exp(logGamma((df + 1) / 2));
+            var den = Math.sqrt(df * Math.PI) * Math.exp(logGamma(df / 2));
+            var base = 1 + (x * x) / df;
+            var expo = -(df + 1) / 2;
+            return (num / den) * Math.pow(base, expo);
+        }
+
+        // Simpson's Rule Integration for T-Dist CDF
+        function tCDF(t, df) {
+            if (df <= 0) return 0;
+            
+            // Integrate from -infinity to t. 
+            // T-dist is symmetric. If t < 0, calculate 1 - P(t > |x|).
+            // Actually, simplest is calculating area from 0 to |t| and adding/subtracting 0.5.
+            
+            var upper = Math.abs(t);
+            var n = 1000; // Intervals
+            var h = upper / n;
+            var sum = tPDF(0, df) + tPDF(upper, df);
+            
+            for (var i = 1; i < n; i++) {
+                var x = i * h;
+                sum += (i % 2 === 0 ? 2 : 4) * tPDF(x, df);
+            }
+            
+            var area0toT = (h / 3) * sum;
+            
+            if (t >= 0) {
+                return 0.5 + area0toT;
+            } else {
+                return 0.5 - area0toT;
+            }
+        }
+
+        // Chi-Square CDF (Approximation using Wilson-Hilferty or Gamma)
+        // Using a lower regularized gamma approximation logic simplified
+        function chiCDF(x, k) {
+            if (x <= 0) return 0;
+            // For even k, exact formula exists, but for general k, numerical integration of PDF is best in vanilla JS
+            // Integrate from 0 to x
+            
+            // PDF: (1 / (2^(k/2) * Gamma(k/2))) * x^(k/2 - 1) * e^(-x/2)
+            
+            var n = 1000;
+            var h = x / n;
+            var sum = chiPDF(0.0001, k) + chiPDF(x, k); // Start slightly above 0 to avoid div by zero if k < 2
+            
+            for (var i = 1; i < n; i++) {
+                var val = i * h;
+                sum += (i % 2 === 0 ? 2 : 4) * chiPDF(val, k);
+            }
+            
+            return (h / 3) * sum;
+        }
+
+        function chiPDF(x, k) {
+            if (x <= 0) return 0;
+            var num = Math.pow(x, (k/2) - 1) * Math.exp(-x/2);
+            var den = Math.pow(2, k/2) * Math.exp(logGamma(k/2));
+            return num / den;
+        }
+
+        // Log Gamma Function (Lanczos approximation)
+        function logGamma(z) {
+            var c = [
+                76.18009172947146, -86.50532032941677, 24.01409824083091,
+                -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+            ];
+            var x = z;
+            var y = z;
+            var tmp = x + 5.5;
+            tmp -= (x + 0.5) * Math.log(tmp);
+            var ser = 1.000000000190015;
+            for (var i = 0; i < 6; i++) ser += c[i] / ++y;
+            return -tmp + Math.log(2.5066282746310005 * ser / x);
+        }
+
+
+        // --- UI Logic ---
+
+        function toggleFields() {
+            var type = document.getElementById('distType').value;
+            var dfGroup = document.getElementById('dfGroup');
+            var statLabel = document.getElementById('statLabel');
+
+            if (type === 'z') {
+                dfGroup.style.display = 'none';
+                statLabel.innerText = "Z-score";
+            } else if (type === 't') {
+                dfGroup.style.display = 'flex';
+                statLabel.innerText = "t-score";
+            } else if (type === 'chi') {
+                dfGroup.style.display = 'flex';
+                statLabel.innerText = "Chi-Square Score (χ²)";
+            }
+        }
+
+        function calculateP() {
+            var type = document.getElementById('distType').value;
+            var stat = parseFloat(document.getElementById('testStat').value);
+            var df = parseFloat(document.getElementById('df').value);
+            var tail = document.getElementById('tailType').value;
+            var alpha = parseFloat(document.getElementById('sigLevel').value);
+
+            if (isNaN(stat)) {
+                alert("Please enter a valid Test Statistic.");
+                return;
+            }
+
+            if ((type === 't' || type === 'chi') && (isNaN(df) || df <= 0)) {
+                alert("Please enter valid Degrees of Freedom (must be > 0).");
+                return;
+            }
+
+            var pValue = 0;
+            var cdf = 0;
+
+            if (type === 'z') {
+                cdf = normalCDF(stat);
+            } else if (type === 't') {
+                cdf = tCDF(stat, df);
+            } else if (type === 'chi') {
+                if (stat < 0) {
+                    alert("Chi-Square statistic cannot be negative.");
+                    return;
+                }
+                cdf = chiCDF(stat, df);
+            }
+
+            // Tail Logic
+            if (type === 'chi') {
+                // Chi square is usually right tailed or testing variance
+                // CDF gives area to left.
+                if (tail === 'right') {
+                    pValue = 1 - cdf;
+                } else if (tail === 'left') {
+                    pValue = cdf;
+                } else {
+                    // Two tailed for Chi is complex, usually simply 2 * min(p_left, p_right)
+                    // but often strictly positive.
+                     pValue = 2 * Math.min(cdf, 1 - cdf);
+                }
+            } else {
+                // Symmetric distributions (Z and T)
+                if (tail === 'left') {
+                    pValue = cdf;
+                } else if (tail === 'right') {
+                    pValue = 1 - cdf;
+                } else {
+                    // Two tailed
+                    // P = 2 * (1 - CDF(|x|))
+                    pValue = 2 * (1 - (type === 'z' ? normalCDF(Math.abs(stat)) : tCDF(Math.abs(stat), df)));
+                }
+            }
+
+            // Clamp results
+            if (pValue < 0) pValue = 0;
+            if (pValue > 1) pValue = 1;
+
+            // Display
+            var pText = pValue < 0.00001 ? "< 0.00001" : pValue.toFixed(5);
+            document.getElementById('pResult').innerText = pText;
+
+            var isSig = pValue < alpha;
+            var sigText = isSig 
+                ? `Result is <strong>Significant</strong> at p < ${alpha}.` 
+                : `Result is <strong>Not Significant</strong> at p < ${alpha}.`;
+            
+            document.getElementById('sigText').innerHTML = sigText;
+
+            var resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'block';
+
+            // Scroll on mobile
+            if(window.innerWidth <= 768) {
+                resultBox.scrollIntoView({behavior: "smooth"});
+            }
+
+            autoSave();
+        }
+
+        // --- Local Storage ---
+
+        function autoSave() {
+            var data = {
+                type: document.getElementById('distType').value,
+                stat: document.getElementById('testStat').value,
+                df: document.getElementById('df').value,
+                tail: document.getElementById('tailType').value,
+                sig: document.getElementById('sigLevel').value
+            };
+            localStorage.setItem('pValueCalcData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            var saved = localStorage.getItem('pValueCalcData');
+            if (saved) {
+                var data = JSON.parse(saved);
+                document.getElementById('distType').value = data.type || 'z';
+                document.getElementById('testStat').value = data.stat || '';
+                document.getElementById('df').value = data.df || '';
+                document.getElementById('tailType').value = data.tail || 'two';
+                document.getElementById('sigLevel').value = data.sig || '0.05';
+                
+                toggleFields();
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear all data?")) {
+                localStorage.removeItem('pValueCalcData');
+                document.getElementById('pCalcForm').reset();
+                document.getElementById('distType').value = 'z'; // Reset specific defaults
+                toggleFields();
+                document.getElementById('resultBox').style.display = 'none';
+            }
+        }
+
+        // Init
+        window.addEventListener('DOMContentLoaded', loadData);
+
+    </script>
+</body>
+</html>

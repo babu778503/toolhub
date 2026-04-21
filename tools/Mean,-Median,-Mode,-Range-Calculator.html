@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<!-- Category: Math Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO & Technical Metadata -->
+    <title>Mean, Median, Mode, Range Calculator</title>
+    <meta name="description" content="Free online Mean, Median, Mode, Range Calculator by toolshub365.com. Instantly calculate statistics from your dataset with automatic saving.">
+    <meta name="keywords" content="Mean Median Mode Range Calculator, Statistics Calculator, Average Calculator, Math Tool, toolshub365, Central Tendency, Data Analysis">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/mean-median-mode-range-calculator">
+    
+    <!-- JSON-LD for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Mean, Median, Mode, Range Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "MathApplication",
+      "offer": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A responsive statistics tool to calculate Mean, Median, Mode, and Range from a data set."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2c3e50;
+            --header-bg: #1e272e;
+            --header-text: #ffffff;
+            --bg-color: #f0f3f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dfe6e9;
+            --input-bg: #f8f9fa;
+            --success-color: #00b894;
+            --highlight-color: #e67e22;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 50px; /* Space for fixed header */
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Calculator Card */
+        .calculator-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            background-color: var(--input-bg);
+            resize: vertical;
+            transition: border-color 0.3s;
+            color: #2d3436;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex: 1;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            background-color: #fab1a0;
+            color: #d63031;
+            flex: 1;
+        }
+
+        .btn-clear:hover {
+            background-color: #ff7675;
+            color: white;
+        }
+
+        /* Results Grid */
+        .results-wrapper {
+            display: none; /* Hidden initially */
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .main-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-card:nth-child(2) { border-color: var(--success-color); }
+        .stat-card:nth-child(3) { border-color: var(--highlight-color); }
+        .stat-card:nth-child(4) { border-color: #9b59b6; }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #636e72;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            word-wrap: break-word;
+        }
+
+        /* Detailed Stats & Sorting */
+        .details-section {
+            background-color: #f1f8ff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d1e8ff;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dcdcdc;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-item span {
+            display: block;
+        }
+
+        .sorted-set {
+            font-family: monospace;
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            word-break: break-all;
+            color: #555;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0; /* Remove blank space on sides */
+                margin: 0;
+            }
+
+            .calculator-card {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+                min-height: calc(100vh - 50px);
+                padding: 20px;
+            }
+
+            .main-stats-grid {
+                grid-template-columns: 1fr; /* Stack cards */
+                gap: 15px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr 1fr; /* 2x2 grid for details */
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-calc, .btn-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Mean, Median, Mode, Range Calculator
+    </header>
+
+    <div class="container">
+        <div class="calculator-card">
+            
+            <div class="input-section">
+                <label for="dataSet">Enter Data Set</label>
+                <div class="helper-text">Separate numbers with commas, spaces, or new lines (e.g., 10, 25, 40, 10).</div>
+                <textarea id="dataSet" placeholder="Enter your numbers here..." oninput="autoSave()"></textarea>
+                <div id="errorMsg" class="error-msg">Please enter valid numbers.</div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-calc" onclick="calculateStats()">Calculate</button>
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <div class="results-wrapper" id="resultsBox">
+                <!-- Main Cards -->
+                <div class="main-stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Mean</span>
+                        <span class="stat-value" id="valMean">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Median</span>
+                        <span class="stat-value" id="valMedian">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Mode</span>
+                        <span class="stat-value" id="valMode" style="font-size: 1.2rem; padding-top:5px;">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Range</span>
+                        <span class="stat-value" id="valRange">-</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Stats -->
+                <div class="details-section">
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="stat-label" style="font-size: 0.75rem;">Sum</span>
+                            <span class="stat-value" id="valSum" style="font-size: 1.2rem;">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="stat-label" style="font-size: 0.75rem;">Count</span>
+                            <span class="stat-value" id="valCount" style="font-size: 1.2rem;">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="stat-label" style="font-size: 0.75rem;">Minimum</span>
+                            <span class="stat-value" id="valMin" style="font-size: 1.2rem;">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="stat-label" style="font-size: 0.75rem;">Maximum</span>
+                            <span class="stat-value" id="valMax" style="font-size: 1.2rem;">-</span>
+                        </div>
+                    </div>
+                    
+                    <label style="font-size: 0.9rem;">Ascending Order:</label>
+                    <div class="sorted-set" id="valSorted"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'toolshub365_stats_calc';
+        const inputArea = document.getElementById('dataSet');
+        const resultsBox = document.getElementById('resultsBox');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        function calculateStats() {
+            // 1. Parse Input
+            const rawText = inputArea.value;
+            // Split by comma, space, newline, or tab
+            const tokens = rawText.split(/[,\s\n\t]+/);
+            
+            // Filter valid numbers
+            const numbers = tokens
+                .filter(token => token.trim() !== '' && !isNaN(Number(token)))
+                .map(Number);
+
+            // Validation
+            if (numbers.length === 0) {
+                errorMsg.style.display = 'block';
+                resultsBox.style.display = 'none';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+            resultsBox.style.display = 'block';
+
+            // 2. Perform Calculations
+            
+            // Sort (Ascending)
+            numbers.sort((a, b) => a - b);
+            const count = numbers.length;
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const min = numbers[0];
+            const max = numbers[count - 1];
+
+            // Mean
+            const mean = sum / count;
+
+            // Median
+            let median;
+            const mid = Math.floor(count / 2);
+            if (count % 2 !== 0) {
+                median = numbers[mid];
+            } else {
+                median = (numbers[mid - 1] + numbers[mid]) / 2;
+            }
+
+            // Mode
+            const frequency = {};
+            let maxFreq = 0;
+            let modes = [];
+
+            numbers.forEach(num => {
+                frequency[num] = (frequency[num] || 0) + 1;
+                if (frequency[num] > maxFreq) maxFreq = frequency[num];
+            });
+
+            if (maxFreq === 1) {
+                modes = ["No Mode"]; // All numbers distinct
+            } else {
+                for (const num in frequency) {
+                    if (frequency[num] === maxFreq) {
+                        modes.push(Number(num));
+                    }
+                }
+                modes.sort((a, b) => a - b);
+            }
+
+            // Range
+            const range = max - min;
+
+            // 3. Update UI
+            document.getElementById('valMean').innerText = formatNum(mean);
+            document.getElementById('valMedian').innerText = formatNum(median);
+            document.getElementById('valRange').innerText = formatNum(range);
+            document.getElementById('valMode').innerText = modes.join(', ');
+
+            // Details
+            document.getElementById('valSum').innerText = formatNum(sum);
+            document.getElementById('valCount').innerText = count;
+            document.getElementById('valMin').innerText = min;
+            document.getElementById('valMax').innerText = max;
+            document.getElementById('valSorted').innerText = numbers.join(', ');
+
+            // Save state
+            saveData(true);
+        }
+
+        // Helper: Format large decimals
+        function formatNum(num) {
+            if (typeof num === 'string') return num;
+            if (Number.isInteger(num)) return num;
+            return parseFloat(num.toFixed(4));
+        }
+
+        // --- Local Storage Logic ---
+
+        function autoSave() {
+            // Only save input while typing, don't trigger calculation display yet
+            saveData(false);
+            errorMsg.style.display = 'none';
+        }
+
+        function saveData(calculated) {
+            const data = {
+                input: inputArea.value,
+                isCalculated: calculated || (resultsBox.style.display === 'block')
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.input) {
+                        inputArea.value = data.input;
+                        // If it was in a calculated state, run calculation immediately
+                        if (data.isCalculated) {
+                            calculateStats();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading saved data");
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear all data?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                inputArea.value = '';
+                resultsBox.style.display = 'none';
+                errorMsg.style.display = 'none';
+                
+                // Reset text
+                ['valMean', 'valMedian', 'valMode', 'valRange'].forEach(id => {
+                    document.getElementById(id).innerText = '-';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

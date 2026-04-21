@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<!-- Category: Math Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO & Technical Metadata -->
+    <title>Binary Calculator</title>
+    <meta name="description" content="Free online Binary Calculator by toolshub365.com. Perform addition, subtraction, multiplication, and division on binary numbers with automatic data saving.">
+    <meta name="keywords" content="Binary Calculator, Binary Math, Binary Addition, Binary Subtraction, Binary Converter, toolshub365, Programmer Calculator">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/binary-calculator">
+    
+    <!-- JSON-LD for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Binary Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "UtilitiesApplication",
+      "offer": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A responsive binary calculator tool for performing arithmetic operations on binary numbers."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #007bff;
+            --header-bg: #222;
+            --header-text: #fff;
+            --bg-color: #f4f6f9;
+            --calc-bg: #ffffff;
+            --btn-bg: #e0e0e0;
+            --btn-text: #333;
+            --accent-color: #ff9800;
+            --display-bg: #333;
+            --display-text: #00ff00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            padding-top: 50px; /* Space for fixed header */
+        }
+
+        /* Fixed Header Configuration */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: calc(100vh - 50px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Calculator Body */
+        .calculator-wrapper {
+            width: 100%;
+            max-width: 400px;
+            background: var(--calc-bg);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        /* Display Screen */
+        .display-screen {
+            background-color: var(--display-bg);
+            padding: 20px;
+            text-align: right;
+        }
+
+        #history-line {
+            color: #aaa;
+            font-size: 0.9rem;
+            min-height: 1.2rem;
+            margin-bottom: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        #result-line {
+            color: var(--display-text);
+            font-size: 2rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            overflow-x: auto;
+        }
+
+        /* Conversions Panel */
+        .conversions {
+            background: #444;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            border-top: 1px solid #555;
+        }
+        
+        .conversions span {
+            opacity: 0.9;
+        }
+
+        /* Keypad Grid */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background-color: #ccc; /* Gap color */
+        }
+
+        .key {
+            border: none;
+            outline: none;
+            padding: 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            transition: background 0.2s;
+        }
+
+        .key:active {
+            background-color: #ccc;
+        }
+
+        .key.binary {
+            font-weight: bold;
+            font-size: 1.5rem;
+            background-color: #fff;
+        }
+
+        .key.operator {
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .key.action {
+            background-color: #ffcccc;
+            color: #d32f2f;
+        }
+
+        .key.equal {
+            background-color: var(--primary-color);
+            color: white;
+            grid-column: span 2;
+        }
+
+        /* Data Management Section */
+        .data-controls {
+            margin-top: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .clear-data-btn {
+            background: transparent;
+            border: 1px solid #999;
+            color: #666;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .clear-data-btn:hover {
+            background: #eee;
+            color: #333;
+        }
+
+        /* Responsive Design / Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .calculator-wrapper {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+                height: calc(100vh - 50px);
+                display: flex;
+                flex-direction: column;
+            }
+
+            .display-screen {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .keypad {
+                flex-shrink: 0;
+            }
+
+            .key {
+                padding: 25px 0; /* Larger touch targets */
+            }
+
+            .data-controls {
+                padding: 10px;
+                background: #f9f9f9;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Binary Calculator
+    </header>
+
+    <div class="container">
+        <div class="calculator-wrapper">
+            <!-- Display -->
+            <div class="display-screen">
+                <div id="history-line"></div>
+                <div id="result-line">0</div>
+            </div>
+
+            <!-- Conversion Preview -->
+            <div class="conversions">
+                <span id="dec-preview">Dec: 0</span>
+                <span id="hex-preview">Hex: 0</span>
+            </div>
+
+            <!-- Keypad -->
+            <div class="keypad">
+                <button class="key action" onclick="calc.clear()">C</button>
+                <button class="key action" onclick="calc.deleteLast()">DEL</button>
+                <button class="key operator" onclick="calc.appendOperator('/')">÷</button>
+                <button class="key operator" onclick="calc.appendOperator('*')">×</button>
+
+                <button class="key binary" onclick="calc.appendNumber('1')">1</button>
+                <button class="key binary" onclick="calc.appendNumber('0')">0</button>
+                <button class="key operator" onclick="calc.appendOperator('+')">+</button>
+                <button class="key operator" onclick="calc.appendOperator('-')">-</button>
+
+                <!-- Filler keys for grid alignment since we only use 0 and 1 -->
+                <button class="key" disabled style="background:#eee; cursor:default;"></button>
+                <button class="key" disabled style="background:#eee; cursor:default;"></button>
+                
+                <button class="key equal" onclick="calc.calculate()">=</button>
+            </div>
+            
+            <!-- Data Management (Hidden on small mobile view inside calc, usually below) -->
+            <div class="data-controls">
+                <button class="clear-data-btn" onclick="calc.clearStorage()">Clear Saved Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BinaryCalculator {
+            constructor() {
+                this.currentInput = '';
+                this.previousInput = '';
+                this.operator = null;
+                this.displayElement = document.getElementById('result-line');
+                this.historyElement = document.getElementById('history-line');
+                this.decElement = document.getElementById('dec-preview');
+                this.hexElement = document.getElementById('hex-preview');
+                this.isResultState = false;
+
+                // Load from storage on init
+                this.loadData();
+            }
+
+            updateDisplay() {
+                this.displayElement.innerText = this.currentInput || '0';
+                
+                // Update conversions immediately if it's a valid single binary number
+                if (this.currentInput && !this.operator && /^[01]+$/.test(this.currentInput)) {
+                    this.updateConversions(parseInt(this.currentInput, 2));
+                } else if (this.currentInput === '') {
+                    this.updateConversions(0);
+                }
+                
+                this.saveData();
+            }
+
+            updateConversions(decimalValue) {
+                if (isNaN(decimalValue)) {
+                    this.decElement.innerText = 'Dec: -';
+                    this.hexElement.innerText = 'Hex: -';
+                } else {
+                    this.decElement.innerText = `Dec: ${decimalValue}`;
+                    this.hexElement.innerText = `Hex: ${decimalValue.toString(16).toUpperCase()}`;
+                }
+            }
+
+            appendNumber(number) {
+                if (this.isResultState) {
+                    this.currentInput = '';
+                    this.isResultState = false;
+                }
+                this.currentInput += number.toString();
+                this.updateDisplay();
+            }
+
+            appendOperator(op) {
+                if (this.currentInput === '') return;
+                
+                // If we already have an expression like "101 +", allow changing operator
+                const lastChar = this.currentInput.slice(-1);
+                if (['+', '-', '*', '/'].includes(lastChar)) {
+                    this.currentInput = this.currentInput.slice(0, -1) + op;
+                } else {
+                    this.currentInput += ' ' + op + ' ';
+                }
+                this.isResultState = false;
+                this.updateDisplay();
+            }
+
+            clear() {
+                this.currentInput = '';
+                this.previousInput = '';
+                this.operator = null;
+                this.historyElement.innerText = '';
+                this.updateDisplay();
+            }
+
+            deleteLast() {
+                if (this.isResultState) {
+                    this.clear();
+                    return;
+                }
+                this.currentInput = this.currentInput.toString().slice(0, -1);
+                // Remove trailing space if it was an operator deletion
+                if (this.currentInput.endsWith(' ')) {
+                    this.currentInput = this.currentInput.slice(0, -1);
+                }
+                this.updateDisplay();
+            }
+
+            calculate() {
+                try {
+                    // Replace visual operators with JS operators if needed (handled by appendOperator)
+                    // We need to parse binary numbers in the string to decimals for evaluation
+                    
+                    // 1. Split the string
+                    const parts = this.currentInput.split(' ');
+                    
+                    if (parts.length < 3) return; // Not enough parts to calculate
+
+                    let expressionString = '';
+                    
+                    // 2. Convert binary tokens to decimal for evaluation
+                    for (let part of parts) {
+                        if (part === '+' || part === '-' || part === '*' || part === '/') {
+                            expressionString += part;
+                        } else if (part !== '') {
+                            // Check if valid binary
+                            if (/^[01]+$/.test(part)) {
+                                expressionString += parseInt(part, 2);
+                            } else {
+                                throw new Error("Invalid Binary");
+                            }
+                        }
+                    }
+
+                    // 3. Evaluate safely
+                    // Note: Using Function constructor is safer than direct eval for simple math
+                    const resultDecimal = new Function('return ' + expressionString)();
+                    
+                    if (!isFinite(resultDecimal) || isNaN(resultDecimal)) {
+                        this.displayElement.innerText = "Error";
+                        this.currentInput = "";
+                        return;
+                    }
+
+                    // 4. Handle negative results (Binary calc usually unsigned, but we show signed logic)
+                    let resultBinary;
+                    if (resultDecimal < 0) {
+                        // Simple negative representation
+                        resultBinary = '-' + Math.abs(resultDecimal).toString(2);
+                    } else {
+                        resultBinary = Math.floor(resultDecimal).toString(2);
+                    }
+
+                    // Update UI
+                    this.historyElement.innerText = this.currentInput + ' =';
+                    this.currentInput = resultBinary;
+                    this.isResultState = true;
+                    this.updateDisplay();
+                    this.updateConversions(Math.floor(resultDecimal));
+
+                } catch (e) {
+                    this.displayElement.innerText = "Error";
+                }
+            }
+
+            // --- Data Persistence ---
+            saveData() {
+                const data = {
+                    current: this.currentInput,
+                    history: this.historyElement.innerText
+                };
+                localStorage.setItem('toolshub_binary_calc', JSON.stringify(data));
+            }
+
+            loadData() {
+                const saved = localStorage.getItem('toolshub_binary_calc');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        if (data.current) {
+                            this.currentInput = data.current;
+                            this.historyElement.innerText = data.history || '';
+                            
+                            // Check if result state (if history has =)
+                            if (data.history && data.history.includes('=')) {
+                                this.isResultState = true;
+                            }
+                            
+                            this.updateDisplay();
+                            
+                            // Calculate conversions based on loaded data
+                            if (/^[01-]+$/.test(this.currentInput)) {
+                                const val = parseInt(this.currentInput, 2);
+                                this.updateConversions(val);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error loading saved data");
+                    }
+                }
+            }
+
+            clearStorage() {
+                localStorage.removeItem('toolshub_binary_calc');
+                this.clear();
+                alert("Saved data cleared.");
+            }
+        }
+
+        // Initialize Calculator
+        const calc = new BinaryCalculator();
+
+        // Keyboard support
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (key === '0' || key === '1') calc.appendNumber(key);
+            if (key === '+') calc.appendOperator('+');
+            if (key === '-') calc.appendOperator('-');
+            if (key === '*') calc.appendOperator('*');
+            if (key === '/') calc.appendOperator('/');
+            if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calc.calculate();
+            }
+            if (key === 'Backspace') calc.deleteLast();
+            if (key === 'Escape') calc.clear();
+        });
+
+    </script>
+</body>
+</html>

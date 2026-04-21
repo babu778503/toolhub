@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<!-- Category: Math Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Calculator</title>
+    <meta name="description" content="Free online Matrix Calculator. Perform matrix addition, subtraction, multiplication, determinant, inverse, and transpose operations. Features auto-save and mobile-friendly interface.">
+    <meta name="keywords" content="Matrix Calculator, Matrix Multiplication, Matrix Inverse, Determinant Calculator, Linear Algebra Tool, Matrix Transpose, ToolsHub365">
+    <meta name="author" content="ToolsHub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/matrix-calculator">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Matrix Calculator",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A powerful tool to calculate Matrix operations including Multiplication, Inverse, and Determinant."
+    }
+    </script>
+
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --primary-color: #34495e;
+            --accent-color: #3498db;
+            --accent-hover: #2980b9;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --header-height: 50px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        /* --- Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* --- Layout --- */
+        .matrix-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .matrix-section {
+            background: #fdfdfd;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            min-width: 300px; /* Ensures functionality on mobile */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-header {
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* --- Dimension Selectors --- */
+        .dim-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .dim-input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* --- Matrix Grid --- */
+        .matrix-grid {
+            display: grid;
+            gap: 5px;
+            margin-top: 10px;
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 5px;
+        }
+
+        .matrix-cell {
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .matrix-cell:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        /* --- Buttons --- */
+        .controls-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-op {
+            background-color: var(--accent-color);
+            color: white;
+            flex-grow: 1;
+            max-width: 200px;
+        }
+
+        .btn-op:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-clear {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #c0392b;
+        }
+
+        /* --- Result Section --- */
+        .result-container {
+            margin-top: 30px;
+            text-align: center;
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .matrix-display {
+            display: inline-grid;
+            gap: 5px;
+            background: #eee;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #333;
+            border-right: 3px solid #333;
+        }
+
+        .res-cell {
+            width: 60px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+            border-radius: 3px;
+        }
+
+        .scalar-result {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Mobile Optimization --- */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                min-height: calc(100vh - var(--header-height));
+            }
+
+            .matrix-section {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .btn {
+                width: 48%; /* 2 buttons per row */
+                max-width: none;
+                padding: 12px;
+            }
+            
+            .controls-area {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Matrix Calculator</h1>
+    </header>
+
+    <div class="container">
+        
+        <div class="matrix-wrapper">
+            
+            <!-- Matrix A -->
+            <div class="matrix-section">
+                <div class="section-header">
+                    <span>Matrix A</span>
+                    <div class="dim-controls">
+                        <input type="number" id="rowsA" class="dim-input" value="3" min="1" max="10" onchange="generateMatrix('A')">
+                        <span>×</span>
+                        <input type="number" id="colsA" class="dim-input" value="3" min="1" max="10" onchange="generateMatrix('A')">
+                    </div>
+                </div>
+                <div id="gridA" class="matrix-grid"></div>
+            </div>
+
+            <!-- Matrix B -->
+            <div class="matrix-section">
+                <div class="section-header">
+                    <span>Matrix B</span>
+                    <div class="dim-controls">
+                        <input type="number" id="rowsB" class="dim-input" value="3" min="1" max="10" onchange="generateMatrix('B')">
+                        <span>×</span>
+                        <input type="number" id="colsB" class="dim-input" value="3" min="1" max="10" onchange="generateMatrix('B')">
+                    </div>
+                </div>
+                <div id="gridB" class="matrix-grid"></div>
+            </div>
+
+        </div>
+
+        <div class="controls-area">
+            <button class="btn btn-op" onclick="calculate('add')">A + B</button>
+            <button class="btn btn-op" onclick="calculate('sub')">A - B</button>
+            <button class="btn btn-op" onclick="calculate('mul')">A × B</button>
+            <button class="btn btn-op" onclick="calculate('detA')">Det(A)</button>
+            <button class="btn btn-op" onclick="calculate('invA')">Inv(A)</button>
+            <button class="btn btn-op" onclick="calculate('transA')">Trans(A)</button>
+            <button class="btn btn-clear" onclick="clearData()">Clear Data</button>
+        </div>
+
+        <div id="resultSection" class="result-container">
+            <h3 class="result-title" id="resTitle">Result</h3>
+            <div id="resultOutput"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Initialization ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        // --- DOM Generators ---
+
+        function generateMatrix(id, preserveData = false) {
+            const rows = parseInt(document.getElementById(`rows${id}`).value);
+            const cols = parseInt(document.getElementById(`cols${id}`).value);
+            const container = document.getElementById(`grid${id}`);
+            
+            // Save current data if preserving (during resize)
+            let currentData = [];
+            if(preserveData) {
+                currentData = getMatrixValues(id);
+            }
+
+            container.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+            container.innerHTML = '';
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'matrix-cell';
+                    input.id = `m${id}_${i}_${j}`;
+                    input.placeholder = '0';
+                    
+                    // Restore data if available within bounds
+                    if(preserveData && i < currentData.length && j < currentData[0].length) {
+                        input.value = currentData[i][j];
+                    }
+
+                    input.addEventListener('input', saveData); // Auto-save on type
+                    container.appendChild(input);
+                }
+            }
+            saveData();
+        }
+
+        // --- Matrix Helpers ---
+
+        function getMatrixValues(id) {
+            const rows = parseInt(document.getElementById(`rows${id}`).value);
+            const cols = parseInt(document.getElementById(`cols${id}`).value);
+            let matrix = [];
+            for (let i = 0; i < rows; i++) {
+                let row = [];
+                for (let j = 0; j < cols; j++) {
+                    const val = document.getElementById(`m${id}_${i}_${j}`).value;
+                    row.push(val === '' ? 0 : parseFloat(val));
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+
+        function displayMatrix(matrix) {
+            const container = document.getElementById('resultOutput');
+            container.innerHTML = '';
+            
+            const display = document.createElement('div');
+            display.className = 'matrix-display';
+            display.style.gridTemplateColumns = `repeat(${matrix[0].length}, auto)`;
+
+            matrix.forEach(row => {
+                row.forEach(val => {
+                    const cell = document.createElement('div');
+                    cell.className = 'res-cell';
+                    // Round to 4 decimals to avoid floating point errors
+                    cell.textContent = Math.round(val * 10000) / 10000;
+                    display.appendChild(cell);
+                });
+            });
+
+            container.appendChild(display);
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // Mobile scroll
+            if(window.innerWidth < 768) {
+                document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        function displayScalar(val) {
+            const container = document.getElementById('resultOutput');
+            const rounded = Math.round(val * 10000) / 10000;
+            container.innerHTML = `<div class="scalar-result">${rounded}</div>`;
+            document.getElementById('resultSection').style.display = 'block';
+             if(window.innerWidth < 768) {
+                document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        // --- Operations Logic ---
+
+        function calculate(op) {
+            const A = getMatrixValues('A');
+            const B = getMatrixValues('B');
+            const resTitle = document.getElementById('resTitle');
+
+            try {
+                if (op === 'add') {
+                    if (A.length !== B.length || A[0].length !== B[0].length) {
+                        throw "Matrices must have the same dimensions for Addition.";
+                    }
+                    const res = A.map((row, i) => row.map((val, j) => val + B[i][j]));
+                    resTitle.innerText = "Result: A + B";
+                    displayMatrix(res);
+                } 
+                else if (op === 'sub') {
+                    if (A.length !== B.length || A[0].length !== B[0].length) {
+                        throw "Matrices must have the same dimensions for Subtraction.";
+                    }
+                    const res = A.map((row, i) => row.map((val, j) => val - B[i][j]));
+                    resTitle.innerText = "Result: A - B";
+                    displayMatrix(res);
+                } 
+                else if (op === 'mul') {
+                    if (A[0].length !== B.length) {
+                        throw `Matrix A Columns (${A[0].length}) must equal Matrix B Rows (${B.length}).`;
+                    }
+                    let res = new Array(A.length).fill(0).map(() => new Array(B[0].length).fill(0));
+                    for (let i = 0; i < A.length; i++) {
+                        for (let j = 0; j < B[0].length; j++) {
+                            for (let k = 0; k < A[0].length; k++) {
+                                res[i][j] += A[i][k] * B[k][j];
+                            }
+                        }
+                    }
+                    resTitle.innerText = "Result: A × B";
+                    displayMatrix(res);
+                } 
+                else if (op === 'transA') {
+                    const res = A[0].map((_, colIndex) => A.map(row => row[colIndex]));
+                    resTitle.innerText = "Result: Transpose(A)";
+                    displayMatrix(res);
+                } 
+                else if (op === 'detA') {
+                    if (A.length !== A[0].length) throw "Matrix must be square to calculate Determinant.";
+                    const val = getDeterminant(A);
+                    resTitle.innerText = "Determinant(A)";
+                    displayScalar(val);
+                } 
+                else if (op === 'invA') {
+                    if (A.length !== A[0].length) throw "Matrix must be square to calculate Inverse.";
+                    const det = getDeterminant(A);
+                    if (Math.abs(det) < 1e-9) throw "Matrix is Singular (Determinant is 0), Inverse does not exist.";
+                    
+                    const inv = getInverse(A);
+                    resTitle.innerText = "Inverse(A)";
+                    displayMatrix(inv);
+                }
+
+            } catch (err) {
+                alert(err);
+            }
+        }
+
+        // Recursive Determinant (Laplace Expansion)
+        function getDeterminant(m) {
+            if (m.length === 1) return m[0][0];
+            if (m.length === 2) return m[0][0] * m[1][1] - m[0][1] * m[1][0];
+
+            let det = 0;
+            for (let i = 0; i < m.length; i++) {
+                let subMatrix = m.slice(1).map(row => row.filter((_, colIndex) => colIndex !== i));
+                det += m[0][i] * Math.pow(-1, i) * getDeterminant(subMatrix);
+            }
+            return det;
+        }
+
+        // Gaussian Elimination for Inverse
+        function getInverse(matrix) {
+            const n = matrix.length;
+            // Create Augmented Matrix [A | I]
+            let m = matrix.map((row, i) => [
+                ...row, 
+                ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0))
+            ]);
+
+            for (let i = 0; i < n; i++) {
+                // Pivot selection
+                let pivot = m[i][i];
+                if (pivot === 0) {
+                    // Swap with a lower row
+                    for (let k = i + 1; k < n; k++) {
+                        if (m[k][i] !== 0) {
+                            [m[i], m[k]] = [m[k], m[i]];
+                            pivot = m[i][i];
+                            break;
+                        }
+                    }
+                }
+                
+                // Divide row by pivot
+                for (let j = 0; j < 2 * n; j++) m[i][j] /= pivot;
+
+                // Eliminate other rows
+                for (let k = 0; k < n; k++) {
+                    if (k !== i) {
+                        let factor = m[k][i];
+                        for (let j = 0; j < 2 * n; j++) {
+                            m[k][j] -= factor * m[i][j];
+                        }
+                    }
+                }
+            }
+
+            // Extract Inverse (right half)
+            return m.map(row => row.slice(n));
+        }
+
+        // --- Storage Logic ---
+
+        function saveData() {
+            const data = {
+                rowsA: document.getElementById('rowsA').value,
+                colsA: document.getElementById('colsA').value,
+                valsA: getMatrixValues('A'),
+                rowsB: document.getElementById('rowsB').value,
+                colsB: document.getElementById('colsB').value,
+                valsB: getMatrixValues('B')
+            };
+            localStorage.setItem('matrix_calc_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('matrix_calc_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                // Set Inputs
+                document.getElementById('rowsA').value = data.rowsA || 3;
+                document.getElementById('colsA').value = data.colsA || 3;
+                document.getElementById('rowsB').value = data.rowsB || 3;
+                document.getElementById('colsB').value = data.colsB || 3;
+
+                // Generate grids
+                generateMatrix('A');
+                generateMatrix('B');
+
+                // Fill values
+                fillMatrix('A', data.valsA);
+                fillMatrix('B', data.valsB);
+            } else {
+                generateMatrix('A');
+                generateMatrix('B');
+            }
+        }
+
+        function fillMatrix(id, vals) {
+            if(!vals) return;
+            vals.forEach((row, i) => {
+                row.forEach((val, j) => {
+                    const el = document.getElementById(`m${id}_${i}_${j}`);
+                    if(el) el.value = val;
+                });
+            });
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear all matrices?")) {
+                localStorage.removeItem('matrix_calc_data');
+                document.getElementById('rowsA').value = 3;
+                document.getElementById('colsA').value = 3;
+                document.getElementById('rowsB').value = 3;
+                document.getElementById('colsB').value = 3;
+                generateMatrix('A');
+                generateMatrix('B');
+                document.getElementById('resultSection').style.display = 'none';
+            }
+        }
+
+    </script>
+</body>
+</html>

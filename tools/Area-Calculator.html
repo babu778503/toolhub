@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<!-- Category: Math Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO & Technical Metadata -->
+    <title>Area Calculator</title>
+    <meta name="description" content="Free online Area Calculator by toolshub365.com. Calculate the area of rectangles, triangles, circles, trapezoids, and more with automatic data saving.">
+    <meta name="keywords" content="Area Calculator, Geometry Calculator, Surface Area, Square Footage, Circle Area, Triangle Area, toolshub365, Land Area">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/area-calculator">
+    
+    <!-- JSON-LD for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Area Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "MathApplication",
+      "offer": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A responsive tool to calculate the area of various geometric shapes including squares, rectangles, circles, and triangles."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #0984e3;
+            --primary-hover: #076aad;
+            --header-bg: #2d3436;
+            --header-text: #ffffff;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dfe6e9;
+            --input-bg: #f8f9fa;
+            --result-bg: #e1f5fe;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 50px; /* Space for fixed header */
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Calculator Card */
+        .calculator-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.1);
+        }
+
+        /* Input Sections (Dynamic) */
+        .shape-inputs {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .shape-inputs.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-calc {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-clear {
+            background-color: #fab1a0;
+            color: #d63031;
+        }
+
+        .btn-clear:hover {
+            background-color: #ff7675;
+            color: white;
+        }
+
+        /* Result Display */
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--result-bg);
+            border-left: 5px solid var(--primary-color);
+            border-radius: 4px;
+            display: none; /* Hidden by default */
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .formula-text {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 10px;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .calculator-card {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+                min-height: calc(100vh - 50px);
+                padding: 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Area Calculator
+    </header>
+
+    <div class="container">
+        <div class="calculator-card">
+            
+            <div class="form-group">
+                <label for="shapeSelect">Select Shape</label>
+                <select id="shapeSelect" onchange="changeShape()">
+                    <option value="rectangle">Rectangle</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                    <option value="trapezoid">Trapezoid</option>
+                    <option value="ellipse">Ellipse</option>
+                </select>
+            </div>
+
+            <!-- Rectangle Inputs -->
+            <div id="inputs-rectangle" class="shape-inputs active">
+                <div class="form-group">
+                    <label>Length (l)</label>
+                    <input type="number" id="rect-l" placeholder="0" min="0" oninput="saveData()">
+                </div>
+                <div class="form-group">
+                    <label>Width (w)</label>
+                    <input type="number" id="rect-w" placeholder="0" min="0" oninput="saveData()">
+                </div>
+            </div>
+
+            <!-- Triangle Inputs -->
+            <div id="inputs-triangle" class="shape-inputs">
+                <div class="form-group">
+                    <label>Base (b)</label>
+                    <input type="number" id="tri-b" placeholder="0" min="0" oninput="saveData()">
+                </div>
+                <div class="form-group">
+                    <label>Height (h)</label>
+                    <input type="number" id="tri-h" placeholder="0" min="0" oninput="saveData()">
+                </div>
+            </div>
+
+            <!-- Circle Inputs -->
+            <div id="inputs-circle" class="shape-inputs">
+                <div class="form-group">
+                    <label>Radius (r)</label>
+                    <input type="number" id="circ-r" placeholder="0" min="0" oninput="saveData()">
+                </div>
+            </div>
+
+            <!-- Square Inputs -->
+            <div id="inputs-square" class="shape-inputs">
+                <div class="form-group">
+                    <label>Side (a)</label>
+                    <input type="number" id="sq-a" placeholder="0" min="0" oninput="saveData()">
+                </div>
+            </div>
+
+            <!-- Trapezoid Inputs -->
+            <div id="inputs-trapezoid" class="shape-inputs">
+                <div class="form-group">
+                    <label>Base 1 (a)</label>
+                    <input type="number" id="trap-a" placeholder="0" min="0" oninput="saveData()">
+                </div>
+                <div class="form-group">
+                    <label>Base 2 (b)</label>
+                    <input type="number" id="trap-b" placeholder="0" min="0" oninput="saveData()">
+                </div>
+                <div class="form-group">
+                    <label>Height (h)</label>
+                    <input type="number" id="trap-h" placeholder="0" min="0" oninput="saveData()">
+                </div>
+            </div>
+
+            <!-- Ellipse Inputs -->
+            <div id="inputs-ellipse" class="shape-inputs">
+                <div class="form-group">
+                    <label>Major Axis Radius (a)</label>
+                    <input type="number" id="ell-a" placeholder="0" min="0" oninput="saveData()">
+                </div>
+                <div class="form-group">
+                    <label>Minor Axis Radius (b)</label>
+                    <input type="number" id="ell-b" placeholder="0" min="0" oninput="saveData()">
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-calc" onclick="calculateArea()">Calculate Area</button>
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-title">Total Area</div>
+                <div class="result-value" id="resultValue">0</div>
+                <div class="formula-text" id="formulaText"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'toolshub365_area_calc';
+        const shapeSelect = document.getElementById('shapeSelect');
+        const resultBox = document.getElementById('resultBox');
+        const resultValue = document.getElementById('resultValue');
+        const formulaText = document.getElementById('formulaText');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        function changeShape() {
+            // Hide all input sections
+            document.querySelectorAll('.shape-inputs').forEach(el => el.classList.remove('active'));
+            
+            // Show selected input section
+            const selectedShape = shapeSelect.value;
+            document.getElementById(`inputs-${selectedShape}`).classList.add('active');
+            
+            // Hide previous result when switching shape
+            resultBox.style.display = 'none';
+            
+            saveData();
+        }
+
+        function calculateArea() {
+            const shape = shapeSelect.value;
+            let area = 0;
+            let formula = '';
+            let valid = true;
+
+            try {
+                switch(shape) {
+                    case 'rectangle':
+                        const l = parseFloat(document.getElementById('rect-l').value);
+                        const w = parseFloat(document.getElementById('rect-w').value);
+                        if(isNaN(l) || isNaN(w)) throw "Enter valid numbers";
+                        area = l * w;
+                        formula = `Area = length × width = ${l} × ${w}`;
+                        break;
+
+                    case 'triangle':
+                        const tb = parseFloat(document.getElementById('tri-b').value);
+                        const th = parseFloat(document.getElementById('tri-h').value);
+                        if(isNaN(tb) || isNaN(th)) throw "Enter valid numbers";
+                        area = 0.5 * tb * th;
+                        formula = `Area = ½ × base × height = 0.5 × ${tb} × ${th}`;
+                        break;
+
+                    case 'circle':
+                        const r = parseFloat(document.getElementById('circ-r').value);
+                        if(isNaN(r)) throw "Enter valid radius";
+                        area = Math.PI * r * r;
+                        formula = `Area = π × r² ≈ 3.14159 × ${r}²`;
+                        break;
+
+                    case 'square':
+                        const s = parseFloat(document.getElementById('sq-a').value);
+                        if(isNaN(s)) throw "Enter valid side";
+                        area = s * s;
+                        formula = `Area = side² = ${s}²`;
+                        break;
+
+                    case 'trapezoid':
+                        const ta = parseFloat(document.getElementById('trap-a').value);
+                        const tab = parseFloat(document.getElementById('trap-b').value);
+                        const tah = parseFloat(document.getElementById('trap-h').value);
+                        if(isNaN(ta) || isNaN(tab) || isNaN(tah)) throw "Enter valid numbers";
+                        area = ((ta + tab) / 2) * tah;
+                        formula = `Area = ½(a + b) × h = 0.5 × (${ta} + ${tab}) × ${tah}`;
+                        break;
+
+                    case 'ellipse':
+                        const ea = parseFloat(document.getElementById('ell-a').value);
+                        const eb = parseFloat(document.getElementById('ell-b').value);
+                        if(isNaN(ea) || isNaN(eb)) throw "Enter valid numbers";
+                        area = Math.PI * ea * eb;
+                        formula = `Area = π × a × b ≈ 3.14159 × ${ea} × ${eb}`;
+                        break;
+                }
+
+                // Display Result
+                resultValue.innerText = formatNumber(area);
+                formulaText.innerText = formula;
+                resultBox.style.display = 'block';
+                saveData(true); // Save with result flag
+
+            } catch (error) {
+                alert("Please enter valid positive numbers for all fields.");
+                resultBox.style.display = 'none';
+            }
+        }
+
+        function formatNumber(num) {
+            if (Number.isInteger(num)) return num;
+            return parseFloat(num.toFixed(4));
+        }
+
+        // --- Local Storage Logic ---
+
+        function saveData(showResult = false) {
+            const data = {
+                shape: shapeSelect.value,
+                inputs: {
+                    'rect-l': document.getElementById('rect-l').value,
+                    'rect-w': document.getElementById('rect-w').value,
+                    'tri-b': document.getElementById('tri-b').value,
+                    'tri-h': document.getElementById('tri-h').value,
+                    'circ-r': document.getElementById('circ-r').value,
+                    'sq-a': document.getElementById('sq-a').value,
+                    'trap-a': document.getElementById('trap-a').value,
+                    'trap-b': document.getElementById('trap-b').value,
+                    'trap-h': document.getElementById('trap-h').value,
+                    'ell-a': document.getElementById('ell-a').value,
+                    'ell-b': document.getElementById('ell-b').value
+                },
+                showResult: showResult || (resultBox.style.display === 'block')
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    
+                    // Set shape
+                    if(data.shape) {
+                        shapeSelect.value = data.shape;
+                        changeShape(); // Update UI
+                    }
+
+                    // Set Inputs
+                    if(data.inputs) {
+                        for (const [id, value] of Object.entries(data.inputs)) {
+                            const el = document.getElementById(id);
+                            if(el) el.value = value;
+                        }
+                    }
+
+                    // Restore result if it was showing
+                    if(data.showResult) {
+                        calculateArea();
+                    }
+                } catch (e) {
+                    console.error("Error loading data");
+                }
+            } else {
+                // Ensure correct initial state
+                changeShape();
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear all data?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Reset inputs
+                document.querySelectorAll('input').forEach(input => input.value = '');
+                // Reset select
+                shapeSelect.selectedIndex = 0;
+                // Reset UI
+                changeShape();
+                resultBox.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
