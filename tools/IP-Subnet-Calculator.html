@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<!-- Category: Other Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Subnet Calculator</title>
+    
+    <!-- SEO & Technical SEO for Search Engines and AI Crawlers -->
+    <meta name="description" content="Quickly calculate network addresses, broadcast addresses, subnet masks, and usable host ranges with our free, highly accurate IPv4 IP Subnet Calculator by toolshub365.com.">
+    <meta name="keywords" content="IP Subnet Calculator, CIDR Calculator, IPv4 Subnetting Tool, Network Address Calculator, Subnet Mask Calculator, toolshub365.com">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/ip-subnet-calculator">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="IP Subnet Calculator">
+    <meta property="og:description" content="Easily calculate and plan IPv4 subnets. Automatically saves your data locally.">
+    <meta property="og:url" content="https://toolshub365.com/ip-subnet-calculator">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Structured Data for AI Crawlers & Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "IP Subnet Calculator",
+      "url": "https://toolshub365.com/ip-subnet-calculator",
+      "description": "A user-friendly network utility to calculate IPv4 subnets, network classes, and host ranges.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "ToolsHub365",
+        "url": "https://toolshub365.com"
+      }
+    }
+    </script>
+
+    <style>
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            /* Fixed 50px header constraint */
+            padding-top: 50px; 
+        }
+
+        /* Fixed Header Constraint: exactly 50px height */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #2c3e50;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Desktop Container Measurements: Max-width 1200px */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Layout */
+        .app-wrapper {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* Top Input Section */
+        .input-section {
+            padding: 30px;
+            background: #ffffff;
+            border-bottom: 2px solid #ecf0f1;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #34495e;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #fdfdfd;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Result Section */
+        .results-section {
+            padding: 30px;
+            background: #f8fbfc;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .result-card .value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .result-card .label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            padding: 20px 30px 30px 30px;
+            background: #f8fbfc;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .btn-clear {
+            background-color: #95a5a6;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn-clear:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-clear:active {
+            transform: scale(0.98);
+        }
+
+        /* Responsive Constraints for Mobile */
+        @media (max-width: 768px) {
+            /* Remove both side blank space for mobile users */
+            .container {
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .app-wrapper {
+                border-radius: 0;
+                box-shadow: none;
+                border-left: none;
+                border-right: none;
+            }
+            .input-section {
+                padding: 20px 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-group {
+                min-width: 100%;
+            }
+            .results-section {
+                padding: 20px 15px;
+            }
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                padding: 20px 15px;
+            }
+            .btn-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IP Subnet Calculator</h1>
+    </header>
+
+    <main class="container">
+        <section class="app-wrapper">
+            <!-- Inputs -->
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="ip-input">IP Address</label>
+                    <input type="text" id="ip-input" placeholder="e.g. 192.168.1.1" autocomplete="off">
+                    <div class="error-message" id="ip-error">Invalid IP Address format.</div>
+                </div>
+                <div class="input-group">
+                    <label for="cidr-input">Subnet Mask / Prefix Length</label>
+                    <select id="cidr-input">
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="results-section">
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="value" id="res-network">N/A</div>
+                        <div class="label">Network Address</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="value" id="res-broadcast">N/A</div>
+                        <div class="label">Broadcast Address</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="value" id="res-mask">N/A</div>
+                        <div class="label">Subnet Mask</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="value" id="res-range">N/A</div>
+                        <div class="label">Usable Host Range</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="value" id="res-usable-hosts">0</div>
+                        <div class="label">Usable Hosts</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="value" id="res-total-hosts">0</div>
+                        <div class="label">Total IP Addresses</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // DOM Elements
+        const ipInput = document.getElementById('ip-input');
+        const cidrInput = document.getElementById('cidr-input');
+        const ipError = document.getElementById('ip-error');
+        
+        const resNetwork = document.getElementById('res-network');
+        const resBroadcast = document.getElementById('res-broadcast');
+        const resMask = document.getElementById('res-mask');
+        const resRange = document.getElementById('res-range');
+        const resUsableHosts = document.getElementById('res-usable-hosts');
+        const resTotalHosts = document.getElementById('res-total-hosts');
+
+        // Storage Key
+        const STORAGE_KEY = 'ipSubnetData_toolshub365';
+
+        // Utility: Generate CIDR Dropdown Options
+        function populateCidrOptions() {
+            let options = "";
+            for (let i = 32; i >= 1; i--) {
+                const mask = generateSubnetMaskStr(i);
+                options += `<option value="${i}">/${i} (${mask})</option>`;
+            }
+            cidrInput.innerHTML = options;
+        }
+
+        // Utility: CIDR to Subnet Mask String
+        function generateSubnetMaskStr(cidr) {
+            let mask = ~((1 << (32 - cidr)) - 1) >>> 0;
+            return intToIp(mask);
+        }
+
+        // Utility: IP String to Integer
+        function ipToInt(ipStr) {
+            return ipStr.split('.').reduce((int, octet) => (int << 8) + parseInt(octet, 10), 0) >>> 0;
+        }
+
+        // Utility: Integer to IP String
+        function intToIp(int) {
+            return[
+                (int >>> 24) & 255,
+                (int >>> 16) & 255,
+                (int >>> 8) & 255,
+                int & 255
+            ].join('.');
+        }
+
+        // Utility: Validate IP format
+        function isValidIP(ip) {
+            const regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            return regex.test(ip);
+        }
+
+        // Core Calculation
+        function calculateSubnet() {
+            const ip = ipInput.value.trim();
+            const cidr = parseInt(cidrInput.value, 10);
+
+            if (!ip) {
+                resetUI();
+                ipError.style.display = 'none';
+                return;
+            }
+
+            if (!isValidIP(ip)) {
+                resetUI();
+                ipError.style.display = 'block';
+                return;
+            }
+
+            ipError.style.display = 'none';
+
+            // Bitwise calculations
+            const maskInt = ~((1 << (32 - cidr)) - 1) >>> 0;
+            const ipInt = ipToInt(ip);
+            
+            const networkInt = (ipInt & maskInt) >>> 0;
+            const broadcastInt = (networkInt | ~maskInt) >>> 0;
+            
+            const totalHosts = Math.pow(2, 32 - cidr);
+            let usableHosts = totalHosts - 2;
+            if (usableHosts < 0) usableHosts = 0; // for /31 and /32
+
+            const firstHostInt = (cidr >= 31) ? networkInt : (networkInt + 1) >>> 0;
+            const lastHostInt = (cidr >= 31) ? broadcastInt : (broadcastInt - 1) >>> 0;
+
+            // Update UI
+            resNetwork.textContent = intToIp(networkInt);
+            resBroadcast.textContent = intToIp(broadcastInt);
+            resMask.textContent = intToIp(maskInt);
+            resTotalHosts.textContent = totalHosts.toLocaleString();
+            resUsableHosts.textContent = usableHosts.toLocaleString();
+            
+            if (usableHosts > 0) {
+                resRange.textContent = `${intToIp(firstHostInt)} - ${intToIp(lastHostInt)}`;
+            } else if (cidr === 31) {
+                resRange.textContent = `${intToIp(firstHostInt)} and ${intToIp(lastHostInt)}`;
+            } else if (cidr === 32) {
+                resRange.textContent = "N/A (Single Host)";
+            } else {
+                resRange.textContent = "N/A";
+            }
+            
+            saveData();
+        }
+
+        function resetUI() {
+            resNetwork.textContent = "N/A";
+            resBroadcast.textContent = "N/A";
+            resMask.textContent = "N/A";
+            resRange.textContent = "N/A";
+            resTotalHosts.textContent = "0";
+            resUsableHosts.textContent = "0";
+        }
+
+        // LocalStorage Management
+        function saveData() {
+            const data = {
+                ip: ipInput.value.trim(),
+                cidr: cidrInput.value
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed.ip) ipInput.value = parsed.ip;
+                    if (parsed.cidr) cidrInput.value = parsed.cidr;
+                } catch (e) {
+                    // Ignore parse errors
+                }
+            } else {
+                // Default value
+                ipInput.value = "192.168.1.1";
+                cidrInput.value = "24";
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                ipInput.value = "";
+                cidrInput.value = "24";
+                calculateSubnet();
+            }
+        }
+
+        // Initialization
+        function init() {
+            populateCidrOptions();
+            loadData();
+            calculateSubnet();
+
+            // Event Listeners
+            ipInput.addEventListener('input', calculateSubnet);
+            cidrInput.addEventListener('change', calculateSubnet);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

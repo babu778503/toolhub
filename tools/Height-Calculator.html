@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<!-- Category: Other Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Height Calculator</title>
+    
+    <!-- SEO & Technical SEO for Search Engines and AI Crawlers -->
+    <meta name="description" content="Predict a child's future adult height based on parents' heights using our free and accurate Height Calculator. Automatically saves data for future use by toolshub365.com.">
+    <meta name="keywords" content="Height Calculator, Child Height Predictor, Future Height Calculator, Mid-Parental Height Calculator, toolshub365.com, free online height tool">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/height-calculator">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Height Calculator">
+    <meta property="og:description" content="Calculate and predict a child's estimated adult height quickly and accurately.">
+    <meta property="og:url" content="https://toolshub365.com/height-calculator">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Structured Data for AI Crawlers & Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Height Calculator",
+      "url": "https://toolshub365.com/height-calculator",
+      "description": "A user-friendly tool to predict adult height using the mid-parental method.",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "ToolsHub365",
+        "url": "https://toolshub365.com"
+      }
+    }
+    </script>
+
+    <style>
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            /* Account for the exact fixed 50px header */
+            padding-top: 50px; 
+        }
+
+        /* Fixed Header Constraint: exactly 50px height */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #27ae60;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Desktop Container Measurements: Max-width 1200px */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Layout wrapper */
+        .app-wrapper {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* Result Section */
+        .result-container {
+            background: #eafaf1;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 2px solid #c8f0d8;
+        }
+
+        .result-container .height-score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 5px;
+            line-height: 1.2;
+            min-height: 55px;
+        }
+
+        .result-container .height-sub-score {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            min-height: 25px;
+            font-weight: 500;
+        }
+
+        .result-container .height-label {
+            font-size: 1rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        /* Form Body */
+        .calculator-body {
+            padding: 30px;
+        }
+
+        /* Toggles */
+        .toggle-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-btn {
+            background-color: #f1f2f6;
+            border: 2px solid #dfe4ea;
+            color: #57606f;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            width: 120px;
+            text-align: center;
+        }
+
+        .toggle-btn.active {
+            background-color: #27ae60;
+            border-color: #27ae60;
+            color: white;
+            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+        }
+
+        /* Input Grid */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #2f3542;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Inputs */
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced6e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #fdfdfd;
+        }
+
+        input[type="number"]:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+        }
+
+        .imperial-inputs {
+            display: none; /* hidden by default */
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-clear {
+            background-color: #b2bec3;
+            color: #2d3436;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn-clear:hover {
+            background-color: #636e72;
+            color: white;
+        }
+
+        .btn-clear:active {
+            transform: scale(0.98);
+        }
+
+        /* Responsive Constraints for Mobile */
+        @media (max-width: 768px) {
+            /* Remove both side blank space for mobile users */
+            .container {
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .app-wrapper {
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            .calculator-body {
+                padding: 20px 15px;
+            }
+            .toggle-btn {
+                flex: 1;
+                width: auto;
+            }
+            .btn-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Height Calculator</h1>
+    </header>
+
+    <main class="container">
+        <section class="app-wrapper">
+            <!-- Results Area -->
+            <div class="result-container">
+                <div class="height-score" id="primary-result">-- cm</div>
+                <div class="height-sub-score" id="secondary-result">-- ft -- in</div>
+                <div class="height-label">Predicted Adult Height</div>
+            </div>
+
+            <!-- Calculation Form -->
+            <div class="calculator-body">
+                
+                <!-- Unit Toggle -->
+                <div class="toggle-group">
+                    <div class="toggle-btn active" id="btn-metric" onclick="setUnit('metric')">Metric (cm)</div>
+                    <div class="toggle-btn" id="btn-imperial" onclick="setUnit('imperial')">Imperial (ft/in)</div>
+                </div>
+
+                <!-- Gender Toggle -->
+                <div class="toggle-group" style="margin-bottom: 30px;">
+                    <div class="toggle-btn active" id="btn-boy" onclick="setGender('boy')">Boy</div>
+                    <div class="toggle-btn" id="btn-girl" onclick="setGender('girl')">Girl</div>
+                </div>
+
+                <div class="input-grid">
+                    <!-- Father's Height -->
+                    <div class="input-group">
+                        <label>Father's Height</label>
+                        <div class="input-wrapper metric-inputs" id="father-metric">
+                            <input type="number" id="dad-cm" placeholder="cm" min="50" max="300" oninput="updateData()">
+                        </div>
+                        <div class="input-wrapper imperial-inputs" id="father-imperial">
+                            <input type="number" id="dad-ft" placeholder="ft" min="1" max="9" oninput="updateData()">
+                            <input type="number" id="dad-in" placeholder="in" min="0" max="11" oninput="updateData()">
+                        </div>
+                    </div>
+
+                    <!-- Mother's Height -->
+                    <div class="input-group">
+                        <label>Mother's Height</label>
+                        <div class="input-wrapper metric-inputs" id="mother-metric">
+                            <input type="number" id="mom-cm" placeholder="cm" min="50" max="300" oninput="updateData()">
+                        </div>
+                        <div class="input-wrapper imperial-inputs" id="mother-imperial">
+                            <input type="number" id="mom-ft" placeholder="ft" min="1" max="9" oninput="updateData()">
+                            <input type="number" id="mom-in" placeholder="in" min="0" max="11" oninput="updateData()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="btn-clear" onclick="clearData()">Clear Data</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // DOM Elements
+        const btnMetric = document.getElementById('btn-metric');
+        const btnImperial = document.getElementById('btn-imperial');
+        const btnBoy = document.getElementById('btn-boy');
+        const btnGirl = document.getElementById('btn-girl');
+        
+        const metricWrappers = document.querySelectorAll('.metric-inputs');
+        const imperialWrappers = document.querySelectorAll('.imperial-inputs');
+        
+        const primaryResult = document.getElementById('primary-result');
+        const secondaryResult = document.getElementById('secondary-result');
+
+        // Input Elements
+        const dadCm = document.getElementById('dad-cm');
+        const momCm = document.getElementById('mom-cm');
+        const dadFt = document.getElementById('dad-ft');
+        const dadIn = document.getElementById('dad-in');
+        const momFt = document.getElementById('mom-ft');
+        const momIn = document.getElementById('mom-in');
+
+        // State Data & LocalStorage Key
+        const STORAGE_KEY = 'heightCalcData_toolshub365';
+        let appState = {
+            unit: 'metric',
+            gender: 'boy',
+            dadCm: '', momCm: '',
+            dadFt: '', dadIn: '',
+            momFt: '', momIn: ''
+        };
+
+        // Initialize App
+        function init() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                appState = { ...appState, ...JSON.parse(savedData) };
+            }
+            
+            applyStateToUI();
+            calculateHeight();
+        }
+
+        // Apply state values to UI
+        function applyStateToUI() {
+            // Apply Toggles
+            setUnit(appState.unit, false);
+            setGender(appState.gender, false);
+
+            // Apply Inputs
+            dadCm.value = appState.dadCm;
+            momCm.value = appState.momCm;
+            dadFt.value = appState.dadFt;
+            dadIn.value = appState.dadIn;
+            momFt.value = appState.momFt;
+            momIn.value = appState.momIn;
+        }
+
+        // Set Unit (Metric / Imperial)
+        function setUnit(unitType, save = true) {
+            appState.unit = unitType;
+            if (unitType === 'metric') {
+                btnMetric.classList.add('active');
+                btnImperial.classList.remove('active');
+                metricWrappers.forEach(el => el.style.display = 'flex');
+                imperialWrappers.forEach(el => el.style.display = 'none');
+            } else {
+                btnImperial.classList.add('active');
+                btnMetric.classList.remove('active');
+                metricWrappers.forEach(el => el.style.display = 'none');
+                imperialWrappers.forEach(el => el.style.display = 'flex');
+            }
+            if (save) {
+                saveData();
+                calculateHeight();
+            }
+        }
+
+        // Set Gender (Boy / Girl)
+        function setGender(genderType, save = true) {
+            appState.gender = genderType;
+            if (genderType === 'boy') {
+                btnBoy.classList.add('active');
+                btnGirl.classList.remove('active');
+            } else {
+                btnGirl.classList.add('active');
+                btnBoy.classList.remove('active');
+            }
+            if (save) {
+                saveData();
+                calculateHeight();
+            }
+        }
+
+        // Update Data on Input Change
+        function updateData() {
+            appState.dadCm = dadCm.value;
+            appState.momCm = momCm.value;
+            appState.dadFt = dadFt.value;
+            appState.dadIn = dadIn.value;
+            appState.momFt = momFt.value;
+            appState.momIn = momIn.value;
+            
+            saveData();
+            calculateHeight();
+        }
+
+        // Core Calculation Logic (Mid-Parental Height Method)
+        function calculateHeight() {
+            let fatherCm = 0;
+            let motherCm = 0;
+            let isValid = false;
+
+            if (appState.unit === 'metric') {
+                const f = parseFloat(appState.dadCm);
+                const m = parseFloat(appState.momCm);
+                if (!isNaN(f) && !isNaN(m) && f > 0 && m > 0) {
+                    fatherCm = f;
+                    motherCm = m;
+                    isValid = true;
+                }
+            } else {
+                const fFt = parseFloat(appState.dadFt) || 0;
+                const fIn = parseFloat(appState.dadIn) || 0;
+                const mFt = parseFloat(appState.momFt) || 0;
+                const mIn = parseFloat(appState.momIn) || 0;
+                
+                if ((fFt > 0 || fIn > 0) && (mFt > 0 || mIn > 0)) {
+                    fatherCm = (fFt * 30.48) + (fIn * 2.54);
+                    motherCm = (mFt * 30.48) + (mIn * 2.54);
+                    isValid = true;
+                }
+            }
+
+            if (!isValid) {
+                primaryResult.textContent = '-- cm';
+                secondaryResult.textContent = '-- ft -- in';
+                return;
+            }
+
+            // Formula: Boy = (Father + Mother + 13) / 2
+            // Formula: Girl = (Father + Mother - 13) / 2
+            let predictedCm = 0;
+            if (appState.gender === 'boy') {
+                predictedCm = (fatherCm + motherCm + 13) / 2;
+            } else {
+                predictedCm = (fatherCm + motherCm - 13) / 2;
+            }
+
+            // Convert to Imperial
+            const totalInches = predictedCm / 2.54;
+            const feet = Math.floor(totalInches / 12);
+            const inches = Math.round(totalInches % 12);
+
+            // Output Adjustments
+            let finalFeet = feet;
+            let finalInches = inches;
+            if (finalInches === 12) {
+                finalFeet += 1;
+                finalInches = 0;
+            }
+
+            // Display
+            if (appState.unit === 'metric') {
+                primaryResult.textContent = `${predictedCm.toFixed(1)} cm`;
+                secondaryResult.textContent = `${finalFeet} ft ${finalInches} in`;
+            } else {
+                primaryResult.textContent = `${finalFeet} ft ${finalInches} in`;
+                secondaryResult.textContent = `${predictedCm.toFixed(1)} cm`;
+            }
+        }
+
+        // Save Data to Local Storage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        // Clear All Data
+        function clearData() {
+            if (confirm("Are you sure you want to clear all data?")) {
+                appState = {
+                    unit: 'metric',
+                    gender: 'boy',
+                    dadCm: '', momCm: '',
+                    dadFt: '', dadIn: '',
+                    momFt: '', momIn: ''
+                };
+                localStorage.removeItem(STORAGE_KEY);
+                applyStateToUI();
+                calculateHeight();
+            }
+        }
+
+        // Run on Page Load
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<!-- Category: Other Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Zone Calculator</title>
+    
+    <!-- SEO & Technical SEO for Search Engines and AI Crawlers -->
+    <meta name="description" content="Worldwide Time Zone Calculator by toolshub365.com. Instantly convert your local time to multiple worldwide timezones. Automatically saves your selected locations.">
+    <meta name="keywords" content="Time Zone Calculator, World Clock, Time Zone Converter, UTC Converter, Global Time Calculator, toolshub365.com">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/time-zone-calculator">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Time Zone Calculator">
+    <meta property="og:description" content="Convert time across different global time zones easily. Compare multiple cities at once.">
+    <meta property="og:url" content="https://toolshub365.com/time-zone-calculator">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Structured Data for AI Crawlers & Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Time Zone Calculator",
+      "url": "https://toolshub365.com/time-zone-calculator",
+      "description": "A user-friendly tool to calculate and convert time across worldwide time zones. Features multiple concurrent conversions.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "ToolsHub365",
+        "url": "https://toolshub365.com"
+      }
+    }
+    </script>
+
+    <style>
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            /* Fixed 50px header constraint */
+            padding-top: 50px; 
+        }
+
+        /* Fixed Header Constraint: exactly 50px height */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #283593; /* Indigo deep theme */
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Desktop Container Measurements: Max-width 1200px */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* App Layout */
+        .app-wrapper {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* Top Control Panel */
+        .control-panel {
+            padding: 30px;
+            background: #e8eaf6;
+            border-bottom: 2px solid #c5cae9;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #303f9f;
+            font-size: 0.95rem;
+        }
+
+        .input-group .hint {
+            font-size: 0.8rem;
+            color: #5c6bc0;
+            margin-top: -5px;
+            margin-bottom: 3px;
+        }
+
+        input[type="datetime-local"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #9fa8da;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #ffffff;
+            color: #333;
+        }
+
+        input[type="datetime-local"]:focus, select:focus {
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-add {
+            background-color: #3f51b5;
+            color: white;
+            height: 45px; /* Match input height */
+        }
+
+        .btn-add:hover {
+            background-color: #303f9f;
+        }
+
+        .btn-now {
+            background-color: #00897b;
+            color: white;
+            margin-top: 5px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            align-self: flex-start;
+        }
+
+        .btn-now:hover {
+            background-color: #00695c;
+        }
+
+        /* Results Grid */
+        .results-panel {
+            padding: 30px;
+            background: #ffffff;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .zone-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .zone-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-color: #c5cae9;
+        }
+
+        .zone-card .btn-remove {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ef5350;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .zone-card .btn-remove:hover {
+            background: #d32f2f;
+        }
+
+        .zone-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #283593;
+            margin-bottom: 15px;
+            padding-right: 25px; /* space for remove btn */
+        }
+
+        .zone-time {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .zone-date {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* Controls Area */
+        .controls {
+            display: flex;
+            justify-content: center;
+            padding: 20px 30px 30px 30px;
+            background: #ffffff;
+            border-top: 1px solid #eeeeee;
+        }
+
+        .btn-clear {
+            background-color: #90a4ae;
+            color: white;
+            padding: 12px 30px;
+            min-width: 200px;
+        }
+
+        .btn-clear:hover {
+            background-color: #607d8b;
+        }
+
+        /* Responsive Constraints for Mobile */
+        @media (max-width: 768px) {
+            /* Remove both side blank space for mobile users */
+            .container {
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .app-wrapper {
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+            .control-panel {
+                padding: 20px 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-group {
+                min-width: 100%;
+            }
+            .btn-add {
+                width: 100%;
+            }
+            .results-panel {
+                padding: 20px 15px;
+            }
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                padding: 20px 15px 30px 15px;
+            }
+            .btn-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Time Zone Calculator</h1>
+    </header>
+
+    <main class="container">
+        <section class="app-wrapper">
+            
+            <!-- Controls Panel -->
+            <div class="control-panel">
+                <div class="input-group">
+                    <label for="base-time">Your Base Time</label>
+                    <div class="hint" id="local-zone-hint">Local System Time</div>
+                    <input type="datetime-local" id="base-time" onchange="calculateTimes()">
+                    <button class="btn btn-now" onclick="setBaseTimeToNow()">Set to Current Time</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="new-zone">Add Worldwide Time Zone</label>
+                    <select id="new-zone">
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+                
+                <button class="btn btn-add" onclick="addZone()">+ Add to List</button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel">
+                <div class="results-grid" id="results-grid">
+                    <!-- Cards injected via JS -->
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="btn btn-clear" onclick="clearData()">Clear All Data</button>
+            </div>
+            
+        </section>
+    </main>
+
+    <script>
+        // DOM Elements
+        const elBaseTime = document.getElementById('base-time');
+        const elNewZone = document.getElementById('new-zone');
+        const resultsGrid = document.getElementById('results-grid');
+        const localZoneHint = document.getElementById('local-zone-hint');
+
+        // Comprehensive Worldwide Time Zones (IANA formats natively supported by browsers)
+        const availableZones =[
+            { id: 'UTC', label: 'UTC / GMT (Universal Time)' },
+            { id: 'Pacific/Honolulu', label: 'Honolulu (Hawaii Time)' },
+            { id: 'America/Anchorage', label: 'Anchorage (Alaska Time)' },
+            { id: 'America/Los_Angeles', label: 'Los Angeles (Pacific Time)' },
+            { id: 'America/Denver', label: 'Denver (Mountain Time)' },
+            { id: 'America/Chicago', label: 'Chicago (Central Time)' },
+            { id: 'America/New_York', label: 'New York (Eastern Time)' },
+            { id: 'America/Caracas', label: 'Caracas (Venezuela)' },
+            { id: 'America/Sao_Paulo', label: 'São Paulo (Brasilia Time)' },
+            { id: 'Atlantic/Reykjavik', label: 'Reykjavík (Iceland)' },
+            { id: 'Europe/London', label: 'London (UK Time)' },
+            { id: 'Europe/Paris', label: 'Paris (Central Europe)' },
+            { id: 'Europe/Berlin', label: 'Berlin (Central Europe)' },
+            { id: 'Africa/Cairo', label: 'Cairo (Egypt)' },
+            { id: 'Africa/Johannesburg', label: 'Johannesburg (South Africa)' },
+            { id: 'Europe/Moscow', label: 'Moscow (Russia)' },
+            { id: 'Asia/Riyadh', label: 'Riyadh (Saudi Arabia)' },
+            { id: 'Asia/Dubai', label: 'Dubai (UAE)' },
+            { id: 'Asia/Karachi', label: 'Karachi (Pakistan)' },
+            { id: 'Asia/Kolkata', label: 'Kolkata (India)' },
+            { id: 'Asia/Dhaka', label: 'Dhaka (Bangladesh)' },
+            { id: 'Asia/Bangkok', label: 'Bangkok (Indochina Time)' },
+            { id: 'Asia/Singapore', label: 'Singapore' },
+            { id: 'Asia/Tokyo', label: 'Tokyo (Japan)' },
+            { id: 'Australia/Sydney', label: 'Sydney (Eastern Australia)' },
+            { id: 'Pacific/Auckland', label: 'Auckland (New Zealand)' }
+        ];
+
+        // Default setup
+        const STORAGE_KEY = 'timeZoneCalcData_toolshub365';
+        let appState = {
+            baseTime: '', // Stored as ISO local string
+            selectedZones: ['UTC', 'America/New_York', 'Europe/London', 'Asia/Tokyo']
+        };
+
+        // Initialize Application
+        function init() {
+            // Display User's detected local timezone
+            const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            localZoneHint.textContent = `Assumes your local time zone (${userZone})`;
+
+            // Populate Dropdown
+            availableZones.forEach(zone => {
+                const opt = document.createElement('option');
+                opt.value = zone.id;
+                opt.textContent = zone.label;
+                elNewZone.appendChild(opt);
+            });
+
+            loadData();
+
+            // If no base time set, set to right now
+            if (!appState.baseTime) {
+                setBaseTimeToNow(false); // false means don't calculate inside, we calculate right after
+            } else {
+                elBaseTime.value = appState.baseTime;
+            }
+
+            calculateTimes();
+        }
+
+        // Set Datetime input to exact current local time
+        function setBaseTimeToNow(triggerCalculate = true) {
+            const now = new Date();
+            // Format to YYYY-MM-DDThh:mm for the input
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const localString = `${year}-${month}-${day}T${hours}:${minutes}`;
+            elBaseTime.value = localString;
+            appState.baseTime = localString;
+            saveData();
+
+            if(triggerCalculate) calculateTimes();
+        }
+
+        // Add a new timezone to the list
+        function addZone() {
+            const zoneId = elNewZone.value;
+            if (!appState.selectedZones.includes(zoneId)) {
+                appState.selectedZones.push(zoneId);
+                saveData();
+                calculateTimes();
+            } else {
+                alert("This time zone is already in your list.");
+            }
+        }
+
+        // Remove a timezone from the list
+        function removeZone(zoneId) {
+            appState.selectedZones = appState.selectedZones.filter(id => id !== zoneId);
+            saveData();
+            calculateTimes();
+        }
+
+        // Core conversion & rendering logic
+        function calculateTimes() {
+            // Update state
+            appState.baseTime = elBaseTime.value;
+            saveData();
+
+            resultsGrid.innerHTML = '';
+
+            // Read the input date. The browser parses datetime-local into the system's local timezone.
+            if (!appState.baseTime) return;
+            const sourceDate = new Date(appState.baseTime);
+
+            appState.selectedZones.forEach(zoneId => {
+                const zoneObj = availableZones.find(z => z.id === zoneId) || { id: zoneId, label: zoneId };
+                
+                // Format for specific Time Zone
+                let timeString = 'Invalid Date';
+                let dateString = '';
+                
+                try {
+                    // Using Intl.DateTimeFormat to reliably format native dates to any timezone
+                    timeString = new Intl.DateTimeFormat('en-US', {
+                        timeZone: zoneId,
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    }).format(sourceDate);
+
+                    dateString = new Intl.DateTimeFormat('en-US', {
+                        timeZone: zoneId,
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }).format(sourceDate);
+                } catch (e) {
+                    timeString = "Error formatting timezone";
+                }
+
+                // Create Card
+                const card = document.createElement('div');
+                card.className = 'zone-card';
+                card.innerHTML = `
+                    <button class="btn-remove" onclick="removeZone('${zoneId}')" aria-label="Remove ${zoneObj.label}" title="Remove">×</button>
+                    <div class="zone-name">${zoneObj.label}</div>
+                    <div class="zone-time">${timeString}</div>
+                    <div class="zone-date">${dateString}</div>
+                `;
+                resultsGrid.appendChild(card);
+            });
+
+            // If empty
+            if(appState.selectedZones.length === 0) {
+                resultsGrid.innerHTML = '<p style="color: #666; grid-column: 1/-1;">No time zones added. Please select a time zone from the list above.</p>';
+            }
+        }
+
+        // Save & Load Data
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if(parsed.selectedZones) appState.selectedZones = parsed.selectedZones;
+                    if(parsed.baseTime) appState.baseTime = parsed.baseTime;
+                } catch (e) {
+                    console.error("Error parsing saved data");
+                }
+            }
+        }
+
+        function clearData() {
+            if (confirm("Are you sure you want to clear your data and reset to defaults?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                appState = {
+                    baseTime: '',
+                    selectedZones: ['UTC', 'America/New_York', 'Europe/London', 'Asia/Tokyo']
+                };
+                setBaseTimeToNow(true);
+            }
+        }
+
+        // Execute on load
+        window.onload = init;
+    </script>
+</body>
+</html>

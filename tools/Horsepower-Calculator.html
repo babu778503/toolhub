@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<!-- Category: Other Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horsepower Calculator</title>
+    
+    <!-- SEO & Technical SEO for Search Engines and AI Crawlers -->
+    <meta name="description" content="Calculate vehicle and engine horsepower instantly. Use our free Horsepower Calculator to find HP from torque and RPM, or quarter-mile ET and trap speed by toolshub365.com.">
+    <meta name="keywords" content="Horsepower Calculator, HP Calculator, Engine Horsepower, Torque to HP, Quarter Mile HP Calculator, Elapsed Time HP, Trap Speed HP, toolshub365.com">
+    <meta name="author" content="toolshub365.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/horsepower-calculator">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Horsepower Calculator">
+    <meta property="og:description" content="Calculate your engine's horsepower accurately using Torque & RPM or Quarter-Mile data. Automatically saves your calculations.">
+    <meta property="og:url" content="https://toolshub365.com/horsepower-calculator">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Structured Data for AI Crawlers & Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Horsepower Calculator",
+      "url": "https://toolshub365.com/horsepower-calculator",
+      "description": "An automotive utility tool to calculate horsepower using torque/RPM or quarter-mile performance metrics.",
+      "applicationCategory": "AutomotiveApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "ToolsHub365",
+        "url": "https://toolshub365.com"
+      }
+    }
+    </script>
+
+    <style>
+        /* Base Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            color: #2f3640;
+            /* Account for the fixed 50px header */
+            padding-top: 50px; 
+        }
+
+        /* Fixed Header Constraint: exactly 50px height */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #e84118; /* Automotive Red Theme */
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Desktop Container Measurements: Max-width 1200px */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* App Layout */
+        .app-wrapper {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 650px; /* Optimized reading width */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Result Section */
+        .result-container {
+            background: #2f3640;
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 4px solid #c23616;
+        }
+
+        .result-container .hp-score {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #e84118;
+            margin-bottom: 5px;
+            line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .result-container .hp-label {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: #dcdde1;
+        }
+
+        /* Tab Navigation */
+        .method-tabs {
+            display: flex;
+            background: #dcdde1;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 10px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #718093;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: #f5f6fa;
+            color: #2f3640;
+        }
+
+        .tab-btn.active {
+            color: #e84118;
+            border-bottom: 3px solid #e84118;
+            background: #ffffff;
+        }
+
+        /* Calculation Form */
+        .calculator-body {
+            padding: 30px;
+            min-height: 250px;
+        }
+
+        .input-group {
+            display: none; /* Hidden by default, toggled via JS */
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .input-group.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-field label {
+            font-weight: 700;
+            color: #353b48;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #e84118;
+            box-shadow: 0 0 0 2px rgba(232, 65, 24, 0.2);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 15px;
+            border: none;
+            font-size: 1.1rem;
+            outline: none;
+            color: #2f3640;
+            background: #fdfdfd;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .unit {
+            padding: 0 15px;
+            background: #f5f6fa;
+            color: #7f8fa6;
+            font-weight: 600;
+            border-left: 1px solid #dcdde1;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            min-width: 65px;
+            justify-content: center;
+        }
+
+        /* Formula Hint */
+        .formula-hint {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #7f8fa6;
+            background: #f5f6fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 25px;
+            border-top: 1px solid #f5f6fa;
+        }
+
+        .btn-clear {
+            background-color: #718093;
+            color: white;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn-clear:hover {
+            background-color: #353b48;
+        }
+
+        .btn-clear:active {
+            transform: scale(0.98);
+        }
+
+        /* Responsive Constraints for Mobile */
+        @media (max-width: 768px) {
+            /* Remove both side blank space for mobile users */
+            .container {
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .app-wrapper {
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+            .result-container {
+                padding: 30px 15px;
+            }
+            .result-container .hp-score {
+                font-size: 3.5rem;
+            }
+            .tab-btn {
+                font-size: 0.85rem;
+                padding: 12px 5px;
+            }
+            .calculator-body {
+                padding: 20px 15px;
+            }
+            .controls {
+                padding: 20px 15px 30px 15px;
+            }
+            .btn-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Horsepower Calculator</h1>
+    </header>
+
+    <main class="container">
+        <section class="app-wrapper">
+            
+            <!-- Display Area -->
+            <div class="result-container">
+                <div class="hp-score" id="hp-display">0</div>
+                <div class="hp-label">Horsepower (HP)</div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <nav class="method-tabs">
+                <button class="tab-btn active" id="tab-torque" onclick="setMethod('torque')">Torque & RPM</button>
+                <button class="tab-btn" id="tab-et" onclick="setMethod('et')">1/4 Mile ET</button>
+                <button class="tab-btn" id="tab-speed" onclick="setMethod('speed')">Trap Speed</button>
+            </nav>
+
+            <!-- Calculator Inputs -->
+            <div class="calculator-body">
+                
+                <!-- Method 1: Torque & RPM -->
+                <div class="input-group active" id="group-torque">
+                    <div class="input-field">
+                        <label for="input-torque">Engine Torque</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="input-torque" placeholder="e.g. 350" step="any" oninput="updateData()">
+                            <div class="unit">lb-ft</div>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <label for="input-rpm">Engine Speed</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="input-rpm" placeholder="e.g. 5200" step="any" oninput="updateData()">
+                            <div class="unit">RPM</div>
+                        </div>
+                    </div>
+                    <div class="formula-hint">HP = (Torque × RPM) / 5252</div>
+                </div>
+
+                <!-- Method 2: Quarter Mile ET -->
+                <div class="input-group" id="group-et">
+                    <div class="input-field">
+                        <label for="input-weight-et">Vehicle Weight (with driver)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="input-weight-et" placeholder="e.g. 3200" step="any" oninput="updateData()">
+                            <div class="unit">lbs</div>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <label for="input-et">Elapsed Time (1/4 Mile)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="input-et" placeholder="e.g. 12.5" step="any" oninput="updateData()">
+                            <div class="unit">sec</div>
+                        </div>
+                    </div>
+                    <div class="formula-hint">HP = Weight / (ET / 5.825)³</div>
+                </div>
+
+                <!-- Method 3: Trap Speed -->
+                <div class="input-group" id="group-speed">
+                    <div class="input-field">
+                        <label for="input-weight-speed">Vehicle Weight (with driver)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="input-weight-speed" placeholder="e.g. 3200" step="any" oninput="updateData()">
+                            <div class="unit">lbs</div>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <label for="input-speed">Trap Speed (1/4 Mile)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="input-speed" placeholder="e.g. 110" step="any" oninput="updateData()">
+                            <div class="unit">mph</div>
+                        </div>
+                    </div>
+                    <div class="formula-hint">HP = Weight × (Speed / 234)³</div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="btn-clear" onclick="clearData()">Clear Data</button>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // DOM Elements
+        const hpDisplay = document.getElementById('hp-display');
+        
+        const tabs = {
+            torque: document.getElementById('tab-torque'),
+            et: document.getElementById('tab-et'),
+            speed: document.getElementById('tab-speed')
+        };
+        
+        const groups = {
+            torque: document.getElementById('group-torque'),
+            et: document.getElementById('group-et'),
+            speed: document.getElementById('group-speed')
+        };
+
+        const inputs = {
+            torque: document.getElementById('input-torque'),
+            rpm: document.getElementById('input-rpm'),
+            weightEt: document.getElementById('input-weight-et'),
+            et: document.getElementById('input-et'),
+            weightSpeed: document.getElementById('input-weight-speed'),
+            speed: document.getElementById('input-speed')
+        };
+
+        const STORAGE_KEY = 'hpCalcData_toolshub365';
+
+        // State Object
+        let appState = {
+            method: 'torque',
+            torque: '',
+            rpm: '',
+            weightEt: '',
+            et: '',
+            weightSpeed: '',
+            speed: ''
+        };
+
+        // Format number helper
+        function formatNumber(num) {
+            if (isNaN(num) || !isFinite(num)) return "0";
+            return num.toLocaleString('en-US', { maximumFractionDigits: 2 });
+        }
+
+        // Initialize App
+        function init() {
+            loadData();
+            applyStateToUI();
+            calculateHP();
+        }
+
+        // Apply state to UI Elements
+        function applyStateToUI() {
+            // Set Inputs
+            inputs.torque.value = appState.torque;
+            inputs.rpm.value = appState.rpm;
+            inputs.weightEt.value = appState.weightEt;
+            inputs.et.value = appState.et;
+            inputs.weightSpeed.value = appState.weightSpeed;
+            inputs.speed.value = appState.speed;
+
+            // Set UI Tab
+            setMethod(appState.method, false); // false to prevent double saving during init
+        }
+
+        // Switch Methods
+        function setMethod(methodName, save = true) {
+            appState.method = methodName;
+
+            // Update Tabs UI
+            for (let key in tabs) {
+                if (key === methodName) {
+                    tabs[key].classList.add('active');
+                    groups[key].classList.add('active');
+                } else {
+                    tabs[key].classList.remove('active');
+                    groups[key].classList.remove('active');
+                }
+            }
+
+            // Sync weight inputs if they were changed in another tab
+            if (methodName === 'et' && appState.weightSpeed && !appState.weightEt) {
+                appState.weightEt = appState.weightSpeed;
+                inputs.weightEt.value = appState.weightEt;
+            } else if (methodName === 'speed' && appState.weightEt && !appState.weightSpeed) {
+                appState.weightSpeed = appState.weightEt;
+                inputs.weightSpeed.value = appState.weightSpeed;
+            }
+
+            if (save) {
+                saveData();
+                calculateHP();
+            }
+        }
+
+        // Triggered on input change
+        function updateData() {
+            appState.torque = inputs.torque.value;
+            appState.rpm = inputs.rpm.value;
+            appState.weightEt = inputs.weightEt.value;
+            appState.et = inputs.et.value;
+            appState.weightSpeed = inputs.weightSpeed.value;
+            appState.speed = inputs.speed.value;
+
+            // Keep weight synced between ET and Speed tabs in state
+            if (appState.method === 'et') {
+                appState.weightSpeed = appState.weightEt;
+                inputs.weightSpeed.value = appState.weightSpeed;
+            } else if (appState.method === 'speed') {
+                appState.weightEt = appState.weightSpeed;
+                inputs.weightEt.value = appState.weightEt;
+            }
+
+            saveData();
+            calculateHP();
+        }
+
+        // Core Calculation Engine
+        function calculateHP() {
+            let hp = 0;
+
+            if (appState.method === 'torque') {
+                const torque = parseFloat(appState.torque);
+                const rpm = parseFloat(appState.rpm);
+                if (torque > 0 && rpm > 0) {
+                    // Formula: (Torque * RPM) / 5252
+                    hp = (torque * rpm) / 5252;
+                }
+            } 
+            else if (appState.method === 'et') {
+                const weight = parseFloat(appState.weightEt);
+                const et = parseFloat(appState.et);
+                if (weight > 0 && et > 0) {
+                    // Formula: Weight / (ET / 5.825)^3
+                    hp = weight / Math.pow((et / 5.825), 3);
+                }
+            } 
+            else if (appState.method === 'speed') {
+                const weight = parseFloat(appState.weightSpeed);
+                const speed = parseFloat(appState.speed);
+                if (weight > 0 && speed > 0) {
+                    // Formula: Weight * (Speed / 234)^3
+                    hp = weight * Math.pow((speed / 234), 3);
+                }
+            }
+
+            // Render Output
+            hpDisplay.textContent = formatNumber(hp);
+        }
+
+        // Save Data to Local Storage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        // Load Data from Local Storage
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    appState = { ...appState, ...parsed };
+                } catch (e) {
+                    console.error("Error loading saved data");
+                }
+            }
+        }
+
+        // Clear All Data
+        function clearData() {
+            if (confirm("Are you sure you want to clear your calculations?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                
+                appState = {
+                    method: 'torque',
+                    torque: '',
+                    rpm: '',
+                    weightEt: '',
+                    et: '',
+                    weightSpeed: '',
+                    speed: ''
+                };
+                
+                applyStateToUI();
+                calculateHP();
+            }
+        }
+
+        // Run Init on window load
+        window.onload = init;
+    </script>
+</body>
+</html>
