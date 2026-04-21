@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<!-- Category: Image -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo editor</title>
+
+    <!-- SEO Optimization -->
+    <meta name="description" content="Free online Photo editor. Apply filters, adjust brightness, contrast, crop, rotate, and enhance your images instantly at toolshub365.com.">
+    <meta name="keywords" content="Photo editor, image editor online, free photo editor, toolshub365.com, picture editor, photo filters, edit images online">
+    <meta name="author" content="toolshub365.com">
+    <link rel="canonical" href="https://toolshub365.com/">
+
+    <!-- Technical SEO for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Photo editor",
+      "url": "https://toolshub365.com/",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "description": "A comprehensive online Photo editor. Features include brightness, contrast, saturation adjustments, filters, rotation, and flipping. Works completely in-browser.",
+      "creator": {
+        "@type": "Organization",
+        "name": "toolshub365",
+        "url": "https://toolshub365.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+        /* Variables & Reset */
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-color: #f1f5f9;
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --danger: #ef4444;
+            --header-height: 50px;
+            --container-width: 1200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: var(--surface);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+        }
+
+        /* Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .upload-zone p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-zone strong {
+            color: var(--primary);
+        }
+
+        #file-input { display: none; }
+
+        /* Editor Wrapper */
+        .editor-wrapper {
+            display: none; /* Hidden until upload */
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex; /* Will be toggled via JS */
+            flex-direction: row;
+            min-height: 600px;
+        }
+
+        /* Sidebar Controls */
+        .sidebar {
+            width: 320px;
+            background: var(--surface-alt);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .control-value {
+            color: var(--primary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Transform Buttons */
+        .transform-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            padding: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: var(--text-dark);
+        }
+
+        .btn-icon:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Actions */
+        .actions-group {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover { background: #94a3b8; color: white; }
+
+        /* Main Preview Area */
+        .main-preview {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+            background-image: repeating-linear-gradient(45deg, #cbd5e1 25%, transparent 25%, transparent 75%, #cbd5e1 75%, #cbd5e1), repeating-linear-gradient(45deg, #cbd5e1 25%, #e2e8f0 25%, #e2e8f0 75%, #cbd5e1 75%, #cbd5e1);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 70vh;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            object-fit: contain;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--surface);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .auto-save { color: #10b981; font-weight: 500; }
+        
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                padding: 0; /* Remove both side blank space */
+            }
+            .editor-wrapper {
+                flex-direction: column-reverse;
+                border-radius: 0;
+                min-height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-top: 1px solid var(--border);
+                padding: 15px;
+            }
+            .main-preview {
+                padding: 10px;
+                min-height: 40vh;
+            }
+            canvas {
+                max-height: 50vh;
+            }
+            .upload-zone, .status-bar {
+                border-radius: 0;
+                margin: 0;
+                border-left: none;
+                border-right: none;
+            }
+            .status-bar {
+                margin-top: 0;
+                border-top: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Photo editor</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- Upload Area -->
+        <div class="upload-zone" id="uploadZone">
+            <p>Drag & Drop your image here</p>
+            <p>or</p>
+            <p><strong>Click to Browse</strong></p>
+            <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp">
+        </div>
+
+        <!-- Editor Workspace -->
+        <div class="editor-wrapper" id="editorWrapper" style="display: none;">
+            
+            <!-- Tools Sidebar -->
+            <div class="sidebar">
+                
+                <!-- Filters -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Brightness</label>
+                        <span class="control-value" id="val-brightness">100%</span>
+                    </div>
+                    <input type="range" id="brightness" min="0" max="200" value="100" data-unit="%">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Contrast</label>
+                        <span class="control-value" id="val-contrast">100%</span>
+                    </div>
+                    <input type="range" id="contrast" min="0" max="200" value="100" data-unit="%">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Saturation</label>
+                        <span class="control-value" id="val-saturation">100%</span>
+                    </div>
+                    <input type="range" id="saturation" min="0" max="200" value="100" data-unit="%">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Grayscale</label>
+                        <span class="control-value" id="val-grayscale">0%</span>
+                    </div>
+                    <input type="range" id="grayscale" min="0" max="100" value="0" data-unit="%">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Invert</label>
+                        <span class="control-value" id="val-invert">0%</span>
+                    </div>
+                    <input type="range" id="invert" min="0" max="100" value="0" data-unit="%">
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin: 5px 0;">
+
+                <!-- Transforms -->
+                <div class="control-group">
+                    <div class="control-header"><label>Rotate & Flip</label></div>
+                    <div class="transform-grid">
+                        <button class="btn-icon" id="rotateLeft">↺ Left</button>
+                        <button class="btn-icon" id="rotateRight">↻ Right</button>
+                        <button class="btn-icon" id="flipX">↔ Flip H</button>
+                        <button class="btn-icon" id="flipY">↕ Flip V</button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions-group">
+                    <button class="btn btn-secondary" id="resetFilters">Reset Image</button>
+                    <button class="btn btn-primary" id="downloadBtn">Download Image</button>
+                </div>
+
+            </div>
+
+            <!-- Canvas Area -->
+            <div class="main-preview">
+                <canvas id="canvas"></canvas>
+            </div>
+
+        </div>
+
+        <div class="status-bar" id="statusBar" style="display: none;">
+            <span class="auto-save">✔ Edits auto-saved</span>
+            <button class="clear-btn" id="clearDataBtn">Clear App Data</button>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('file-input');
+        const editorWrapper = document.getElementById('editorWrapper');
+        const statusBar = document.getElementById('statusBar');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+
+        // State & Settings
+        let image = null;
+        let fileName = 'edited_image.png';
+        let fileType = 'image/png';
+
+        const defaultSettings = {
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            grayscale: 0,
+            invert: 0,
+            rotate: 0,
+            flipX: 1,
+            flipY: 1
+        };
+
+        let settings = { ...defaultSettings };
+
+        // Initialize: Load Saved Data
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedSettings = localStorage.getItem('photoEditor_settings');
+            if (savedSettings) {
+                try {
+                    settings = { ...defaultSettings, ...JSON.parse(savedSettings) };
+                    updateUIFromSettings();
+                } catch(e) { console.error("Error loading settings", e); }
+            }
+        });
+
+        function saveToLocal() {
+            localStorage.setItem('photoEditor_settings', JSON.stringify(settings));
+        }
+
+        clearDataBtn.addEventListener('click', () => {
+            if(confirm('Delete all saved settings and clear the app?')) {
+                localStorage.removeItem('photoEditor_settings');
+                window.location.reload();
+            }
+        });
+
+        // Drag & Drop / Upload Logic
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) loadImage(e.target.files[0]);
+        });
+
+        function loadImage(file) {
+            if (!file.type.startsWith('image/')) return alert('Please select an image file.');
+            
+            fileName = file.name;
+            fileType = file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                image = new Image();
+                image.src = reader.result;
+                image.onload = () => {
+                    uploadZone.style.display = 'none';
+                    editorWrapper.style.display = 'flex';
+                    statusBar.style.display = 'flex';
+                    applyEdits(); // Initial render
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Sliders Event Listeners
+        const filterInputs = document.querySelectorAll('input[type="range"]');
+        filterInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const id = e.target.id;
+                const val = e.target.value;
+                settings[id] = parseInt(val);
+                document.getElementById(`val-${id}`).innerText = val + e.target.dataset.unit;
+                applyEdits();
+                saveToLocal();
+            });
+        });
+
+        // Transform Buttons
+        document.getElementById('rotateLeft').onclick = () => { settings.rotate -= 90; applyEdits(); saveToLocal(); };
+        document.getElementById('rotateRight').onclick = () => { settings.rotate += 90; applyEdits(); saveToLocal(); };
+        document.getElementById('flipX').onclick = () => { settings.flipX = settings.flipX === 1 ? -1 : 1; applyEdits(); saveToLocal(); };
+        document.getElementById('flipY').onclick = () => { settings.flipY = settings.flipY === 1 ? -1 : 1; applyEdits(); saveToLocal(); };
+
+        // Reset Filters
+        resetFiltersBtn.onclick = () => {
+            settings = { ...defaultSettings };
+            updateUIFromSettings();
+            applyEdits();
+            saveToLocal();
+        };
+
+        // Sync UI with settings object
+        function updateUIFromSettings() {
+            filterInputs.forEach(input => {
+                const id = input.id;
+                input.value = settings[id];
+                document.getElementById(`val-${id}`).innerText = settings[id] + input.dataset.unit;
+            });
+        }
+
+        // Core Canvas Rendering Logic
+        function applyEdits() {
+            if (!image) return;
+
+            // Handle Rotation Dimensions
+            const rad = (settings.rotate * Math.PI) / 180;
+            const cos = Math.abs(Math.cos(rad));
+            const sin = Math.abs(Math.sin(rad));
+            
+            // Calculate new canvas size based on rotation
+            canvas.width = Math.floor(image.width * cos + image.height * sin);
+            canvas.height = Math.floor(image.height * cos + image.width * sin);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+
+            // Move to center to rotate/scale around the center
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            
+            // Apply Transforms
+            if (settings.rotate !== 0) ctx.rotate(rad);
+            ctx.scale(settings.flipX, settings.flipY);
+
+            // Apply CSS Filters to Canvas Context
+            ctx.filter = `
+                brightness(${settings.brightness}%) 
+                contrast(${settings.contrast}%) 
+                saturate(${settings.saturation}%) 
+                grayscale(${settings.grayscale}%) 
+                invert(${settings.invert}%)
+            `;
+
+            // Draw Image (offset by half its width/height to center it on the translated origin)
+            ctx.drawImage(image, -image.width / 2, -image.height / 2);
+            
+            ctx.restore();
+        }
+
+        // Download functionality
+        downloadBtn.onclick = () => {
+            if (!image) return;
+            const link = document.createElement('a');
+            const ext = fileType === 'image/jpeg' ? 'jpg' : 'png';
+            const base = fileName.substring(0, fileName.lastIndexOf('.'));
+            
+            link.download = `${base}_edited.${ext}`;
+            // High quality download
+            link.href = canvas.toDataURL(fileType, 0.95);
+            link.click();
+        };
+    </script>
+</body>
+</html>

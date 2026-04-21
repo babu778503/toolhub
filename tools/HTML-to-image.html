@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!-- Category: Image -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Technical SEO & Meta Tags -->
+    <title>HTML to image</title>
+    <meta name="description" content="Free online HTML to image converter. Type or paste your HTML code, preview it in real-time, and download it as a high-quality PNG image. Fast, secure, and fully responsive.">
+    <meta name="keywords" content="HTML to image, convert HTML to PNG, render HTML online, HTML to picture, code to image tool, toolshub365">
+    <meta name="author" content="toolshub365.com">
+    <link rel="canonical" href="https://toolshub365.com/html-to-image">
+    
+    <!-- Open Graph for Social Media & AI Crawlers -->
+    <meta property="og:title" content="HTML to image">
+    <meta property="og:description" content="Instantly convert your HTML code into a downloadable image. Real-time preview and auto-saving feature included.">
+    <meta property="og:url" content="https://toolshub365.com/html-to-image">
+    <meta property="og:type" content="website">
+    
+    <!-- Schema.org JSON-LD for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "HTML to image",
+      "url": "https://toolshub365.com/html-to-image",
+      "description": "A developer-friendly tool to instantly render HTML code into a downloadable image file.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "provider": {
+        "@type": "Organization",
+        "name": "ToolsHub365",
+        "url": "https://toolshub365.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- html2canvas Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* Core Variables */
+        :root {
+            --primary-color: #6c5ce7;
+            --primary-hover: #5b4bc4;
+            --bg-color: #f4f7f6;
+            --panel-bg: #ffffff;
+            --text-color: #2d3436;
+            --border-color: #dfe6e9;
+            --header-height: 50px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height); /* Offset for fixed header */
+            overflow-x: hidden;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: #2d3436;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            font-weight: 600;
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            color: #555;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Editor Panel */
+        textarea {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 300px;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            outline: none;
+            background-color: #fafbfc;
+            color: #333;
+        }
+
+        /* Action Buttons */
+        .actions {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            background: var(--panel-bg);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background-color: #ff7675;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d63031;
+        }
+
+        /* Preview Panel */
+        .preview-container-wrapper {
+            padding: 20px;
+            flex-grow: 1;
+            background: #e9ecef url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2NkYGCQYKASYEzXgH8o8OEBVQE2DCpwRNgcRgAAGcYD8o2a1XAAAAAASUVORK5CYII=') repeat;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        #previewOutput {
+            background: white;
+            width: 100%;
+            min-height: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            /* Isolating styles so tool's CSS doesn't heavily break user HTML */
+            all: initial;
+            display: block;
+            font-family: sans-serif;
+            background-color: #ffffff; /* Must have background for image capture */
+        }
+
+        /* Loading Overlay */
+        #loading {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Responsive Layouts */
+        /* Desktop */
+        @media (min-width: 769px) {
+            .container {
+                max-width: 1200px;
+                flex-direction: row;
+                padding: 30px 20px;
+                align-items: stretch;
+            }
+            .panel {
+                flex: 1;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                border: 1px solid var(--border-color);
+                overflow: hidden;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                flex-direction: column;
+                padding: 0; /* Remove blank space on sides */
+                gap: 0;
+            }
+            .panel {
+                width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+                border-bottom: 2px solid var(--border-color);
+            }
+            .preview-container-wrapper {
+                min-height: 350px;
+                padding: 10px;
+            }
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HTML to image</h1>
+    </header>
+
+    <main class="container">
+        
+        <!-- Editor Panel -->
+        <div class="panel">
+            <div class="panel-header">HTML & CSS Input</div>
+            <textarea id="htmlInput" spellcheck="false" placeholder="Write or paste your HTML and inline CSS here..."></textarea>
+            <div class="actions">
+                <button id="downloadBtn" class="btn btn-primary">Download Image</button>
+                <button id="clearBtn" class="btn btn-danger">Clear Data</button>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="panel">
+            <div class="panel-header">Live Preview</div>
+            <div class="preview-container-wrapper">
+                <!-- User's HTML will be injected into this specific div -->
+                <div id="previewOutput"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Loading screen during render -->
+    <div id="loading">Generating Image...</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const htmlInput = document.getElementById('htmlInput');
+            const previewOutput = document.getElementById('previewOutput');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const loading = document.getElementById('loading');
+
+            const STORAGE_KEY = 'html_to_image_data';
+
+            const defaultHTML = `<div style="padding: 40px; text-align: center; background: linear-gradient(135deg, #74ebd5, #ACB6E5); color: #2d3436; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <h2 style="margin: 0 0 10px 0; font-size: 2em; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">Hello, World!</h2>
+    <p style="margin: 0; font-size: 1.2em; color: #fff;">This is your generated HTML image.</p>
+    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+        Start typing in the editor to see live changes!
+    </div>
+</div>`;
+
+            // Render HTML to the Preview Output
+            const updatePreview = () => {
+                previewOutput.innerHTML = htmlInput.value;
+            };
+
+            // Load data from Local Storage
+            const loadData = () => {
+                const savedData = localStorage.getItem(STORAGE_KEY);
+                if (savedData !== null) {
+                    htmlInput.value = savedData;
+                } else {
+                    htmlInput.value = defaultHTML;
+                }
+                updatePreview();
+            };
+
+            // Save data to Local Storage
+            const saveData = () => {
+                localStorage.setItem(STORAGE_KEY, htmlInput.value);
+            };
+
+            // Auto-save & Live Preview on input
+            htmlInput.addEventListener('input', () => {
+                updatePreview();
+                saveData();
+            });
+
+            // Convert and Download Image
+            downloadBtn.addEventListener('click', () => {
+                if (!htmlInput.value.trim()) {
+                    alert('Please enter some HTML code before downloading.');
+                    return;
+                }
+
+                loading.style.display = 'flex';
+
+                // Allow UI to update before heavy rendering process
+                setTimeout(() => {
+                    html2canvas(previewOutput, {
+                        scale: 2, // High quality
+                        useCORS: true, // Allow cross-origin images if present in user HTML
+                        allowTaint: true,
+                        backgroundColor: '#ffffff' // Ensure background is solid
+                    }).then(canvas => {
+                        const dataURL = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        link.download = 'html-to-image-render.png';
+                        link.href = dataURL;
+                        link.click();
+                        loading.style.display = 'none';
+                    }).catch(err => {
+                        console.error('Error generating image:', err);
+                        alert('An error occurred while generating the image. Check console for details.');
+                        loading.style.display = 'none';
+                    });
+                }, 100);
+            });
+
+            // Clear Data Logic
+            clearBtn.addEventListener('click', () => {
+                if(confirm('Are you sure you want to clear the editor and reset to default?')) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    htmlInput.value = defaultHTML;
+                    updatePreview();
+                }
+            });
+
+            // Initialize app
+            loadData();
+        });
+    </script>
+</body>
+</html>
