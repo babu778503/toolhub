@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMR Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free BMR Calculator. Calculate your Basal Metabolic Rate using the Mifflin-St Jeor equation to know how many calories your body burns at rest. Auto-saves results.">
+    <meta name="keywords" content="BMR Calculator, Basal Metabolic Rate Calculator, Mifflin-St Jeor, BMR formula, metabolism calculator, daily calorie needs, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/bmr-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "BMR Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A tool to calculate Basal Metabolic Rate (BMR) based on age, gender, height, and weight."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #0d9488; /* Teal */
+            --primary-dark: #0f766e;
+            --secondary-color: #f0fdfa;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .calculator-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: var(--secondary-color);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+        }
+
+        /* Unit Toggle */
+        .unit-toggle {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .unit-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Gender Radio */
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .radio-label input {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        /* Imperial Layout */
+        .imperial-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Styling */
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid #ccfbf1;
+        }
+
+        .bmr-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .bmr-unit {
+            font-size: 1rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .activity-table th, .activity-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .activity-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .activity-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .activity-table td:last-child {
+            text-align: right;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .calculator-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>BMR Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calculator-wrapper">
+            
+            <!-- Left Side: Inputs -->
+            <div class="input-section">
+                <!-- Unit Switcher -->
+                <div class="unit-toggle">
+                    <button class="unit-btn active" id="btn-metric" onclick="setUnit('metric')">Metric (cm/kg)</button>
+                    <button class="unit-btn" id="btn-imperial" onclick="setUnit('imperial')">Imperial (ft/lbs)</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" checked onchange="calculate()"> Male
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female" onchange="calculate()"> Female
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="e.g. 30" min="10" max="100" oninput="calculate()">
+                </div>
+
+                <!-- Metric Inputs -->
+                <div id="metric-inputs">
+                    <div class="form-group">
+                        <label for="height-cm">Height (cm)</label>
+                        <input type="number" id="height-cm" placeholder="e.g. 175" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-kg">Weight (kg)</label>
+                        <input type="number" id="weight-kg" placeholder="e.g. 70" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Imperial Inputs -->
+                <div id="imperial-inputs" style="display: none;">
+                    <div class="form-group">
+                        <label>Height</label>
+                        <div class="imperial-row">
+                            <input type="number" id="height-ft" placeholder="ft" oninput="calculate()">
+                            <input type="number" id="height-in" placeholder="in" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-lbs">Weight (lbs)</label>
+                        <input type="number" id="weight-lbs" placeholder="e.g. 154" oninput="calculate()">
+                    </div>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Right Side: Results -->
+            <div class="result-section">
+                <div class="result-card">
+                    <div style="font-weight: 600; color: var(--text-light);">Your BMR</div>
+                    <div class="bmr-value" id="res-bmr">0</div>
+                    <div class="bmr-unit">Calories / Day</div>
+                </div>
+
+                <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main);">Daily Calorie Needs</h3>
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Activity Level</th>
+                            <th>Calories</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sedentary <span style="display:block; font-size:0.75rem; font-weight:400; color:#9ca3af">Little or no exercise</span></td>
+                            <td id="cal-sedentary">-</td>
+                        </tr>
+                        <tr>
+                            <td>Lightly Active <span style="display:block; font-size:0.75rem; font-weight:400; color:#9ca3af">Exercise 1-3 times/week</span></td>
+                            <td id="cal-light">-</td>
+                        </tr>
+                        <tr>
+                            <td>Moderately Active <span style="display:block; font-size:0.75rem; font-weight:400; color:#9ca3af">Exercise 4-5 times/week</span></td>
+                            <td id="cal-moderate">-</td>
+                        </tr>
+                        <tr>
+                            <td>Very Active <span style="display:block; font-size:0.75rem; font-weight:400; color:#9ca3af">Daily exercise/intense</span></td>
+                            <td id="cal-active">-</td>
+                        </tr>
+                        <tr>
+                            <td>Extra Active <span style="display:block; font-size:0.75rem; font-weight:400; color:#9ca3af">Intense exercise 2x/day</span></td>
+                            <td id="cal-extra">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'metric';
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Toggle Unit System
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'unit-btn active' : 'unit-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'unit-btn active' : 'unit-btn';
+            
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+
+            localStorage.setItem('bmr_unit', unit);
+            calculate();
+        }
+
+        // Calculation Logic (Mifflin-St Jeor Equation)
+        function calculate() {
+            let heightCm = 0;
+            let weightKg = 0;
+            let isValid = false;
+
+            // Gather Common Inputs
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+
+            // Handle Units
+            if (currentUnit === 'metric') {
+                const h = parseFloat(document.getElementById('height-cm').value);
+                const w = parseFloat(document.getElementById('weight-kg').value);
+                if (h > 0 && w > 0) {
+                    heightCm = h;
+                    weightKg = w;
+                    isValid = true;
+                    saveInputData('metric', { h, w });
+                }
+            } else {
+                const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('height-in').value) || 0;
+                const lbs = parseFloat(document.getElementById('weight-lbs').value);
+                
+                if ((ft > 0 || inc > 0) && lbs > 0) {
+                    heightCm = (ft * 30.48) + (inc * 2.54);
+                    weightKg = lbs * 0.45359237;
+                    isValid = true;
+                    saveInputData('imperial', { ft, inc, lbs });
+                }
+            }
+
+            // Save Common Data
+            if(age) localStorage.setItem('bmr_age', age);
+            localStorage.setItem('bmr_gender', gender);
+
+            if (isValid && age > 0) {
+                // Calculate BMR
+                // Men: (10 × weight) + (6.25 × height) - (5 × age) + 5
+                // Women: (10 × weight) + (6.25 × height) - (5 × age) - 161
+                let bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age);
+                
+                if (gender === 'male') {
+                    bmr += 5;
+                } else {
+                    bmr -= 161;
+                }
+
+                bmr = Math.round(bmr);
+                updateResults(bmr);
+            } else {
+                resetResults();
+            }
+        }
+
+        function updateResults(bmr) {
+            // Format number with commas
+            const fmt = (n) => n.toLocaleString('en-US');
+
+            document.getElementById('res-bmr').textContent = fmt(bmr);
+
+            // Calculate Activity Levels
+            document.getElementById('cal-sedentary').textContent = fmt(Math.round(bmr * 1.2));
+            document.getElementById('cal-light').textContent = fmt(Math.round(bmr * 1.375));
+            document.getElementById('cal-moderate').textContent = fmt(Math.round(bmr * 1.55));
+            document.getElementById('cal-active').textContent = fmt(Math.round(bmr * 1.725));
+            document.getElementById('cal-extra').textContent = fmt(Math.round(bmr * 1.9));
+        }
+
+        function resetResults() {
+            document.getElementById('res-bmr').textContent = "0";
+            document.getElementById('cal-sedentary').textContent = "-";
+            document.getElementById('cal-light').textContent = "-";
+            document.getElementById('cal-moderate').textContent = "-";
+            document.getElementById('cal-active').textContent = "-";
+            document.getElementById('cal-extra').textContent = "-";
+        }
+
+        // Local Storage Helpers
+        function saveInputData(type, data) {
+            if (type === 'metric') {
+                localStorage.setItem('bmr_h_cm', data.h);
+                localStorage.setItem('bmr_w_kg', data.w);
+            } else {
+                localStorage.setItem('bmr_h_ft', data.ft);
+                localStorage.setItem('bmr_h_in', data.inc);
+                localStorage.setItem('bmr_w_lbs', data.lbs);
+            }
+        }
+
+        function loadSavedData() {
+            const unit = localStorage.getItem('bmr_unit') || 'metric';
+            setUnit(unit);
+
+            const age = localStorage.getItem('bmr_age');
+            if(age) document.getElementById('age').value = age;
+
+            const gender = localStorage.getItem('bmr_gender');
+            if(gender) {
+                const el = document.querySelector(`input[name="gender"][value="${gender}"]`);
+                if(el) el.checked = true;
+            }
+
+            const cm = localStorage.getItem('bmr_h_cm');
+            const kg = localStorage.getItem('bmr_w_kg');
+            if(cm) document.getElementById('height-cm').value = cm;
+            if(kg) document.getElementById('weight-kg').value = kg;
+
+            const ft = localStorage.getItem('bmr_h_ft');
+            const inc = localStorage.getItem('bmr_h_in');
+            const lbs = localStorage.getItem('bmr_w_lbs');
+            if(ft) document.getElementById('height-ft').value = ft;
+            if(inc) document.getElementById('height-in').value = inc;
+            if(lbs) document.getElementById('weight-lbs').value = lbs;
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.querySelectorAll('input').forEach(input => {
+                if(input.type === 'radio') return;
+                input.value = '';
+            });
+            document.querySelector('input[name="gender"][value="male"]').checked = true;
+            setUnit('metric'); // Reset unit preference
+            resetResults();
+        }
+    </script>
+</body>
+</html>

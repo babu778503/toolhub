@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean Body Mass Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Lean Body Mass Calculator. Calculate your Lean Body Mass (LBM) and Body Fat percentage using Boer, James, and Hume formulas. Auto-saves data.">
+    <meta name="keywords" content="Lean Body Mass Calculator, LBM Calculator, Boer Formula, James Formula, Hume Formula, Body Composition, Muscle Mass Calculator, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/lean-body-mass-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Lean Body Mass Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate Lean Body Mass (LBM) based on height, weight, and gender using standard medical formulas."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #4f46e5; /* Indigo/Slate Blue */
+            --primary-dark: #4338ca;
+            --accent-color: #eef2ff;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Toggle Buttons */
+        .toggle-group {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Imperial Layout */
+        .imperial-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Result Cards */
+        .result-card {
+            background: var(--accent-color);
+            border: 1px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .lbm-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .lbm-unit {
+            font-size: 1.2rem;
+            color: var(--text-light);
+        }
+
+        .secondary-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-label { font-size: 0.8rem; color: var(--text-light); }
+        .stat-val { font-size: 1.1rem; font-weight: 700; color: var(--primary-color); }
+
+        /* Formula Table */
+        .formula-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .formula-table th, .formula-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .formula-table th {
+            background-color: #f9fafb;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .formula-table td:last-child {
+            text-align: right;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Lean Body Mass Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Left: Inputs -->
+            <div class="input-section">
+                
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" id="btn-male" onclick="setGender('male')">Male</button>
+                        <button class="toggle-btn" id="btn-female" onclick="setGender('female')">Female</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Measurement Unit</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" id="btn-metric" onclick="setUnit('metric')">Metric (cm/kg)</button>
+                        <button class="toggle-btn" id="btn-imperial" onclick="setUnit('imperial')">Imperial (ft/lbs)</button>
+                    </div>
+                </div>
+
+                <!-- Metric Inputs -->
+                <div id="metric-inputs">
+                    <div class="form-group">
+                        <label>Height (cm)</label>
+                        <input type="number" id="h-cm" placeholder="e.g. 175" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="w-kg" placeholder="e.g. 75" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Imperial Inputs -->
+                <div id="imperial-inputs" style="display: none;">
+                    <div class="form-group">
+                        <label>Height</label>
+                        <div class="imperial-row">
+                            <input type="number" id="h-ft" placeholder="ft" oninput="calculate()">
+                            <input type="number" id="h-in" placeholder="in" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" id="w-lbs" placeholder="e.g. 165" oninput="calculate()">
+                    </div>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="result-section">
+                
+                <div class="result-card">
+                    <div class="result-title">Estimated Lean Body Mass</div>
+                    <div class="lbm-value" id="res-lbm">--</div>
+                    <div class="lbm-unit" id="res-unit">kg</div>
+
+                    <div class="secondary-stats">
+                        <div class="stat-box">
+                            <div class="stat-label">Body Fat %</div>
+                            <div class="stat-val" id="res-bf-pct">--</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Body Fat Mass</div>
+                            <div class="stat-val" id="res-bf-mass">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--text-main);">Formula Comparison</h3>
+                <table class="formula-table">
+                    <thead>
+                        <tr>
+                            <th>Formula</th>
+                            <th>LBM Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Boer (1984)</td>
+                            <td id="val-boer">-</td>
+                        </tr>
+                        <tr>
+                            <td>James (1976)</td>
+                            <td id="val-james">-</td>
+                        </tr>
+                        <tr>
+                            <td>Hume (1966)</td>
+                            <td id="val-hume">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; font-size: 0.8rem; color: #6b7280; text-align: center;">
+                    *Boer Formula is considered the standard for general use.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGender = 'male';
+        let currentUnit = 'metric';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        function setGender(gender) {
+            currentGender = gender;
+            document.getElementById('btn-male').className = gender === 'male' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-female').className = gender === 'female' ? 'toggle-btn active' : 'toggle-btn';
+            
+            localStorage.setItem('lbm_gender', gender);
+            calculate();
+        }
+
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'toggle-btn active' : 'toggle-btn';
+            
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+
+            localStorage.setItem('lbm_unit', unit);
+            calculate();
+        }
+
+        function calculate() {
+            let heightCm = 0;
+            let weightKg = 0;
+            let isValid = false;
+
+            // Get Input Values
+            if (currentUnit === 'metric') {
+                const h = parseFloat(document.getElementById('h-cm').value);
+                const w = parseFloat(document.getElementById('w-kg').value);
+                if (h > 0 && w > 0) {
+                    heightCm = h;
+                    weightKg = w;
+                    isValid = true;
+                    saveData('metric', {h, w});
+                }
+            } else {
+                const ft = parseFloat(document.getElementById('h-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('h-in').value) || 0;
+                const lbs = parseFloat(document.getElementById('w-lbs').value);
+                
+                if ((ft > 0 || inc > 0) && lbs > 0) {
+                    heightCm = (ft * 30.48) + (inc * 2.54);
+                    weightKg = lbs * 0.45359237;
+                    isValid = true;
+                    saveData('imperial', {ft, inc, lbs});
+                }
+            }
+
+            if (isValid) {
+                // Calculate LBM using different formulas (Inputs: kg, cm)
+                let boer = 0;
+                let james = 0;
+                let hume = 0;
+
+                if (currentGender === 'male') {
+                    // Boer Male: 0.407 * W + 0.267 * H - 19.2
+                    boer = (0.407 * weightKg) + (0.267 * heightCm) - 19.2;
+                    // James Male: 1.1 * W - 128 * (W/H)^2
+                    james = (1.1 * weightKg) - (128 * Math.pow((weightKg/heightCm), 2));
+                    // Hume Male: 0.32810 * W + 0.33929 * H - 29.5336
+                    hume = (0.32810 * weightKg) + (0.33929 * heightCm) - 29.5336;
+                } else {
+                    // Boer Female: 0.252 * W + 0.473 * H - 48.3
+                    boer = (0.252 * weightKg) + (0.473 * heightCm) - 48.3;
+                    // James Female: 1.07 * W - 148 * (W/H)^2
+                    james = (1.07 * weightKg) - (148 * Math.pow((weightKg/heightCm), 2));
+                    // Hume Female: 0.29569 * W + 0.41813 * H - 43.2933
+                    hume = (0.29569 * weightKg) + (0.41813 * heightCm) - 43.2933;
+                }
+
+                updateResults(boer, james, hume, weightKg);
+            } else {
+                resetResults();
+            }
+        }
+
+        function updateResults(boer, james, hume, totalWeight) {
+            // Using Boer as the primary display
+            const lbm = boer;
+            const fatMass = totalWeight - lbm;
+            const fatPct = (fatMass / totalWeight) * 100;
+
+            const unitLabel = currentUnit === 'metric' ? 'kg' : 'lbs';
+            const multiplier = currentUnit === 'metric' ? 1 : 2.20462;
+
+            // Update Main Card
+            document.getElementById('res-lbm').textContent = (lbm * multiplier).toFixed(1);
+            document.getElementById('res-unit').textContent = unitLabel;
+            
+            document.getElementById('res-bf-pct').textContent = fatPct.toFixed(1) + "%";
+            document.getElementById('res-bf-mass').textContent = (fatMass * multiplier).toFixed(1) + " " + unitLabel;
+
+            // Update Table
+            document.getElementById('val-boer').textContent = (boer * multiplier).toFixed(1) + " " + unitLabel;
+            document.getElementById('val-james').textContent = (james * multiplier).toFixed(1) + " " + unitLabel;
+            document.getElementById('val-hume').textContent = (hume * multiplier).toFixed(1) + " " + unitLabel;
+        }
+
+        function resetResults() {
+            document.getElementById('res-lbm').textContent = "--";
+            document.getElementById('res-bf-pct').textContent = "--";
+            document.getElementById('res-bf-mass').textContent = "--";
+            document.getElementById('val-boer').textContent = "-";
+            document.getElementById('val-james').textContent = "-";
+            document.getElementById('val-hume').textContent = "-";
+        }
+
+        // Local Storage
+        function saveData(type, data) {
+            if (type === 'metric') {
+                localStorage.setItem('lbm_cm', data.h);
+                localStorage.setItem('lbm_kg', data.w);
+            } else {
+                localStorage.setItem('lbm_ft', data.ft);
+                localStorage.setItem('lbm_in', data.inc);
+                localStorage.setItem('lbm_lbs', data.lbs);
+            }
+        }
+
+        function loadSavedData() {
+            // Settings
+            const gender = localStorage.getItem('lbm_gender') || 'male';
+            const unit = localStorage.getItem('lbm_unit') || 'metric';
+            setGender(gender);
+            setUnit(unit);
+
+            // Metric
+            const cm = localStorage.getItem('lbm_cm');
+            const kg = localStorage.getItem('lbm_kg');
+            if(cm) document.getElementById('h-cm').value = cm;
+            if(kg) document.getElementById('w-kg').value = kg;
+
+            // Imperial
+            const ft = localStorage.getItem('lbm_ft');
+            const inc = localStorage.getItem('lbm_in');
+            const lbs = localStorage.getItem('lbm_lbs');
+            if(ft) document.getElementById('h-ft').value = ft;
+            if(inc) document.getElementById('h-in').value = inc;
+            if(lbs) document.getElementById('w-lbs').value = lbs;
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            setGender('male');
+            setUnit('metric');
+            resetResults();
+        }
+    </script>
+</body>
+</html>

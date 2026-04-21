@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAC Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free BAC Calculator. Estimate your Blood Alcohol Content (BAC) based on weight, gender, drinks consumed, and time elapsed using the Widmark Formula.">
+    <meta name="keywords" content="BAC Calculator, Blood Alcohol Calculator, DUI Calculator, Alcohol Metabolism, Widmark Formula, Time to Sober, Breathalyzer Estimate, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/bac-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "BAC Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate estimated Blood Alcohol Content (BAC) and time until sobriety based on alcohol consumption and body metrics."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #dc2626; /* Alert Red for Safety */
+            --primary-dark: #b91c1c;
+            --secondary-color: #1e293b; /* Slate */
+            --accent-color: #fef2f2;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 340px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 340px;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        /* Toggles */
+        .toggle-group {
+            display: flex;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: var(--secondary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Drink Section */
+        .drink-adder {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .quick-add-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            flex: 1;
+            padding: 8px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            min-width: 80px;
+        }
+        
+        .quick-btn:hover { background: #e2e8f0; }
+
+        .add-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-add {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-add:hover { background: #334155; }
+
+        /* Drink List */
+        .drink-list {
+            margin-bottom: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .drink-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .drink-item:last-child { border-bottom: none; }
+
+        .remove-drink {
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: bold;
+            padding: 4px 8px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results */
+        .result-card {
+            background: white;
+            border: 2px solid var(--secondary-color);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .bac-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            line-height: 1;
+        }
+
+        .bac-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-sober { background: #dcfce7; color: #166534; }
+        .status-warn { background: #fef3c7; color: #92400e; }
+        .status-danger { background: #fee2e2; color: #b91c1c; }
+
+        .time-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: auto;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+                border-top: none;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>BAC Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Left: Inputs -->
+            <div class="input-section">
+                
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" id="btn-male" onclick="setGender('male')">Male</button>
+                        <button class="toggle-btn" id="btn-female" onclick="setGender('female')">Female</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Weight</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn" id="btn-kg" onclick="setUnit('metric')">Metric (kg)</button>
+                        <button class="toggle-btn active" id="btn-lbs" onclick="setUnit('imperial')">Imperial (lbs)</button>
+                    </div>
+                    <input type="number" id="weight" placeholder="e.g. 180" oninput="calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label>Time Since First Drink (Hours)</label>
+                    <input type="number" id="time" placeholder="e.g. 2" step="0.5" oninput="calculate()">
+                </div>
+
+                <label>Drinks Consumed</label>
+                <div class="drink-adder">
+                    <div class="quick-add-buttons">
+                        <button class="quick-btn" onclick="quickFill(12, 5)">Beer (12oz)</button>
+                        <button class="quick-btn" onclick="quickFill(5, 12)">Wine (5oz)</button>
+                        <button class="quick-btn" onclick="quickFill(1.5, 40)">Shot (1.5oz)</button>
+                    </div>
+                    
+                    <div class="add-row">
+                        <div style="flex:1">
+                            <input type="number" id="drink-vol" placeholder="Vol (oz)">
+                        </div>
+                        <div style="flex:1">
+                            <input type="number" id="drink-abv" placeholder="ABV %">
+                        </div>
+                        <button class="btn-add" onclick="addDrink()">Add</button>
+                    </div>
+                </div>
+
+                <div class="drink-list" id="drink-list-container">
+                    <!-- Drink items go here -->
+                    <div style="padding:10px; color:#94a3b8; text-align:center; font-size:0.9rem;">No drinks added yet.</div>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="result-section">
+                
+                <div class="result-card">
+                    <div class="bac-value" id="res-bac">0.00%</div>
+                    <div class="bac-label">Estimated Blood Alcohol Content</div>
+                </div>
+
+                <div class="status-box status-sober" id="res-status">
+                    Safe Limit
+                </div>
+
+                <div class="time-box">
+                    <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px;">Estimated Time Until Sober (0.00%)</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);" id="res-time">0h 0m</div>
+                </div>
+
+                <div class="disclaimer">
+                    <strong>DISCLAIMER:</strong> This tool provides an estimate only based on averages (Widmark Formula). Actual BAC depends on metabolism, food intake, genetics, and health. Do not rely on this calculator to determine if you are fit to drive. <strong>Never drink and drive.</strong>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // State
+        let drinks = []; // Array of {volume, abv}
+        let currentGender = 'male';
+        let currentUnit = 'imperial'; // 'imperial' (lbs/oz) or 'metric' (kg/ml)
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        function setGender(g) {
+            currentGender = g;
+            document.getElementById('btn-male').className = g === 'male' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-female').className = g === 'female' ? 'toggle-btn active' : 'toggle-btn';
+            saveAndCalc();
+        }
+
+        function setUnit(u) {
+            currentUnit = u;
+            document.getElementById('btn-kg').className = u === 'metric' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-lbs').className = u === 'imperial' ? 'toggle-btn active' : 'toggle-btn';
+            
+            // Update placeholders
+            const volInput = document.getElementById('drink-vol');
+            const wInput = document.getElementById('weight');
+            
+            if (u === 'metric') {
+                volInput.placeholder = "Vol (ml)";
+                wInput.placeholder = "e.g. 80";
+            } else {
+                volInput.placeholder = "Vol (oz)";
+                wInput.placeholder = "e.g. 180";
+            }
+            
+            // Update Quick Buttons labels
+            const quickBtns = document.querySelectorAll('.quick-btn');
+            if (u === 'metric') {
+                quickBtns[0].textContent = "Beer (350ml)";
+                quickBtns[0].onclick = () => quickFill(350, 5);
+                quickBtns[1].textContent = "Wine (150ml)";
+                quickBtns[1].onclick = () => quickFill(150, 12);
+                quickBtns[2].textContent = "Shot (45ml)";
+                quickBtns[2].onclick = () => quickFill(45, 40);
+            } else {
+                quickBtns[0].textContent = "Beer (12oz)";
+                quickBtns[0].onclick = () => quickFill(12, 5);
+                quickBtns[1].textContent = "Wine (5oz)";
+                quickBtns[1].onclick = () => quickFill(5, 12);
+                quickBtns[2].textContent = "Shot (1.5oz)";
+                quickBtns[2].onclick = () => quickFill(1.5, 40);
+            }
+
+            saveAndCalc();
+        }
+
+        function quickFill(vol, abv) {
+            document.getElementById('drink-vol').value = vol;
+            document.getElementById('drink-abv').value = abv;
+        }
+
+        function addDrink() {
+            const vol = parseFloat(document.getElementById('drink-vol').value);
+            const abv = parseFloat(document.getElementById('drink-abv').value);
+
+            if (vol > 0 && abv > 0) {
+                drinks.push({ vol, abv, unit: currentUnit });
+                document.getElementById('drink-vol').value = '';
+                document.getElementById('drink-abv').value = '';
+                renderDrinks();
+                saveAndCalc();
+            }
+        }
+
+        function removeDrink(index) {
+            drinks.splice(index, 1);
+            renderDrinks();
+            saveAndCalc();
+        }
+
+        function renderDrinks() {
+            const container = document.getElementById('drink-list-container');
+            container.innerHTML = '';
+
+            if (drinks.length === 0) {
+                container.innerHTML = '<div style="padding:10px; color:#94a3b8; text-align:center; font-size:0.9rem;">No drinks added yet.</div>';
+                return;
+            }
+
+            drinks.forEach((d, index) => {
+                const div = document.createElement('div');
+                div.className = 'drink-item';
+                const unitLabel = d.unit === 'metric' ? 'ml' : 'oz';
+                div.innerHTML = `
+                    <span>Drink ${index + 1}: ${d.vol}${unitLabel} @ ${d.abv}%</span>
+                    <span class="remove-drink" onclick="removeDrink(${index})">✕</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function calculate() {
+            const weightInput = parseFloat(document.getElementById('weight').value);
+            const hours = parseFloat(document.getElementById('time').value) || 0;
+
+            if (!weightInput || drinks.length === 0) {
+                resetResults();
+                return;
+            }
+
+            // Convert Weight to Grams
+            // 1 lb = 453.592 g
+            // 1 kg = 1000 g
+            let weightGrams = currentUnit === 'imperial' ? weightInput * 453.592 : weightInput * 1000;
+            // If user switched units but didn't change input number, this might look weird, 
+            // but we assume input matches current toggle.
+
+            // Calculate Total Alcohol in Grams
+            // Mass = Volume * ABV * Density of Ethanol (0.789 g/ml)
+            let totalAlcoholGrams = 0;
+
+            drinks.forEach(d => {
+                let volMl = d.unit === 'imperial' ? d.vol * 29.5735 : d.vol;
+                let alcoholMl = volMl * (d.abv / 100);
+                totalAlcoholGrams += alcoholMl * 0.789;
+            });
+
+            // Widmark Formula
+            // BAC = [Alcohol(g) / (BodyWeight(g) * r)] * 100 - (Elapsed Time * 0.015)
+            // r = 0.68 for men, 0.55 for women
+            const r = currentGender === 'male' ? 0.68 : 0.55;
+            
+            let bac = (totalAlcoholGrams / (weightGrams * r)) * 100;
+            
+            // Subtract metabolism over time
+            let metabolized = hours * 0.015;
+            let currentBac = bac - metabolized;
+
+            if (currentBac < 0) currentBac = 0;
+
+            // Time to Sober (BAC / 0.015)
+            let hoursToSober = currentBac / 0.015;
+            
+            updateUI(currentBac, hoursToSober);
+        }
+
+        function updateUI(bac, hoursLeft) {
+            document.getElementById('res-bac').textContent = bac.toFixed(3) + "%";
+
+            // Status Logic
+            const statusEl = document.getElementById('res-status');
+            const cardEl = document.querySelector('.result-card');
+
+            if (bac === 0) {
+                statusEl.textContent = "Sober / Safe";
+                statusEl.className = "status-box status-sober";
+                cardEl.style.borderColor = "#166534";
+                document.getElementById('res-bac').style.color = "#166534";
+            } else if (bac < 0.08) {
+                statusEl.textContent = "Caution (May be impaired)";
+                statusEl.className = "status-box status-warn";
+                cardEl.style.borderColor = "#d97706";
+                document.getElementById('res-bac').style.color = "#d97706";
+            } else {
+                statusEl.textContent = "Legally Intoxicated (Do Not Drive)";
+                statusEl.className = "status-box status-danger";
+                cardEl.style.borderColor = "#dc2626";
+                document.getElementById('res-bac').style.color = "#dc2626";
+            }
+
+            // Time formatting
+            if (hoursLeft > 0) {
+                const h = Math.floor(hoursLeft);
+                const m = Math.round((hoursLeft - h) * 60);
+                document.getElementById('res-time').textContent = `${h}h ${m}m`;
+            } else {
+                document.getElementById('res-time').textContent = "0h 0m";
+            }
+        }
+
+        function resetResults() {
+            document.getElementById('res-bac').textContent = "0.00%";
+            document.getElementById('res-time').textContent = "0h 0m";
+            const statusEl = document.getElementById('res-status');
+            statusEl.textContent = "Safe Limit";
+            statusEl.className = "status-box status-sober";
+            const cardEl = document.querySelector('.result-card');
+            cardEl.style.borderColor = "#1e293b";
+            document.getElementById('res-bac').style.color = "#1e293b";
+        }
+
+        function saveAndCalc() {
+            saveData();
+            calculate();
+        }
+
+        function saveData() {
+            localStorage.setItem('bac_gender', currentGender);
+            localStorage.setItem('bac_unit', currentUnit);
+            localStorage.setItem('bac_weight', document.getElementById('weight').value);
+            localStorage.setItem('bac_time', document.getElementById('time').value);
+            localStorage.setItem('bac_drinks', JSON.stringify(drinks));
+        }
+
+        function loadSavedData() {
+            const gender = localStorage.getItem('bac_gender');
+            if (gender) setGender(gender);
+
+            const unit = localStorage.getItem('bac_unit');
+            if (unit) setUnit(unit);
+
+            const weight = localStorage.getItem('bac_weight');
+            if (weight) document.getElementById('weight').value = weight;
+
+            const time = localStorage.getItem('bac_time');
+            if (time) document.getElementById('time').value = time;
+
+            const savedDrinks = localStorage.getItem('bac_drinks');
+            if (savedDrinks) {
+                drinks = JSON.parse(savedDrinks);
+                renderDrinks();
+            }
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.getElementById('weight').value = '';
+            document.getElementById('time').value = '';
+            document.getElementById('drink-vol').value = '';
+            document.getElementById('drink-abv').value = '';
+            drinks = [];
+            renderDrinks();
+            setGender('male');
+            setUnit('imperial');
+            resetResults();
+        }
+    </script>
+</body>
+</html>

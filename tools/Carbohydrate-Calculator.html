@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carbohydrate Calculator</title>
+    <meta name="description" content="Free AI-powered Carbohydrate Calculator. Calculate your daily carb needs for Keto, Low Carb, Weight Loss, or Muscle Gain. Auto-saving feature included.">
+    <meta name="keywords" content="Carbohydrate Calculator, Daily Carb Intake, Keto Calculator, Low Carb Diet, Macro Calculator, ToolsHub365, Nutrition Planner">
+    <meta name="author" content="ToolsHub365">
+    <link rel="canonical" href="https://toolshub365.com/carbohydrate-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/carbohydrate-calculator">
+    <meta property="og:title" content="Carbohydrate Calculator - Optimize Your Intake">
+    <meta property="og:description" content="Discover exactly how many carbohydrates you should eat daily based on your body and goals.">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Carbohydrate Calculator",
+      "url": "https://toolshub365.com/carbohydrate-calculator",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Any",
+      "description": "Calculates daily carbohydrate requirements based on TDEE and specific diet goals (Keto, Moderate, High Carb).",
+      "featureList": "Carb Calculation, Diet Goal Selection, Auto-save",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+        :root {
+            /* Warm Amber/Orange Theme for "Energy/Carbs" */
+            --primary-color: #f59e0b; 
+            --primary-hover: #d97706;
+            --secondary-color: #fffbeb;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --bg-color: #f9fafb;
+            --border-radius: 10px;
+            --header-height: 50px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: linear-gradient(90deg, #f59e0b, #ea580c);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 25px;
+            background-color: var(--white);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+                width: 100%;
+            }
+        }
+
+        /* --- Form Elements --- */
+        .calc-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .unit-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .unit-toggle button {
+            padding: 8px 24px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .unit-toggle button.active {
+            background: var(--white);
+            color: var(--primary-hover);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: #f9fafb;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--white);
+        }
+
+        /* Radio Group for Gender */
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 5px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .radio-label input {
+            margin-right: 8px;
+            accent-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        /* Buttons */
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background-color: var(--white);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            flex: 0 0 auto;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* --- Results Area --- */
+        #results-area {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: var(--white);
+            border: 1px solid #fed7aa;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .result-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .result-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        .main-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-hover);
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .unit-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .info-box {
+            background: var(--secondary-color);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .info-box span {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .info-box strong {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Carbohydrate Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calc-wrapper">
+            
+            <!-- Unit Toggle -->
+            <div class="unit-toggle">
+                <button type="button" class="active" id="btn-metric" onclick="setUnit('metric')">Metric</button>
+                <button type="button" id="btn-imperial" onclick="setUnit('imperial')">Imperial</button>
+            </div>
+
+            <form id="carbForm" onsubmit="calculateCarbs(event)">
+                <div class="form-grid">
+                    
+                    <!-- Gender -->
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="male" checked onchange="saveData()"> Male
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="female" onchange="saveData()"> Female
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Age -->
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" class="form-control" placeholder="Years" min="10" max="100" required onchange="saveData()">
+                    </div>
+
+                    <!-- Height -->
+                    <div class="form-group" id="grp-height-metric">
+                        <label for="height-cm">Height (cm)</label>
+                        <input type="number" id="height-cm" class="form-control" placeholder="175" onchange="saveData()">
+                    </div>
+                    <div class="form-group" id="grp-height-imperial" style="display:none;">
+                        <label>Height (ft/in)</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="number" id="height-ft" class="form-control" placeholder="ft" onchange="saveData()">
+                            <input type="number" id="height-in" class="form-control" placeholder="in" onchange="saveData()">
+                        </div>
+                    </div>
+
+                    <!-- Weight -->
+                    <div class="form-group">
+                        <label id="lbl-weight" for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" class="form-control" placeholder="70" step="0.1" required onchange="saveData()">
+                    </div>
+
+                    <!-- Activity -->
+                    <div class="form-group">
+                        <label for="activity">Activity Level</label>
+                        <select id="activity" class="form-control" onchange="saveData()">
+                            <option value="1.2">Sedentary (Office job)</option>
+                            <option value="1.375">Light Exercise (1-2 days/week)</option>
+                            <option value="1.55">Moderate Exercise (3-5 days/week)</option>
+                            <option value="1.725">Heavy Exercise (6-7 days/week)</option>
+                            <option value="1.9">Athlete / Physical Job</option>
+                        </select>
+                    </div>
+
+                    <!-- Goal / Diet Type -->
+                    <div class="form-group">
+                        <label for="dietType">Diet Goal</label>
+                        <select id="dietType" class="form-control" onchange="saveData()">
+                            <option value="0.50">Standard (50% Carbs)</option>
+                            <option value="0.40">Moderate Low Carb (40%)</option>
+                            <option value="0.20">Low Carb (20%)</option>
+                            <option value="0.05">Keto (5%)</option>
+                            <option value="0.60">High Carb / Athlete (60%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">Calculate Carbs</button>
+                    <button type="button" class="btn btn-danger" onclick="clearData()">Clear Data</button>
+                </div>
+            </form>
+
+            <!-- Results -->
+            <div id="results-area">
+                <div class="result-card">
+                    <div class="result-header">
+                        <h2>Your Daily Carbohydrate Target</h2>
+                    </div>
+                    
+                    <div class="main-value" id="res-grams">0</div>
+                    <div class="unit-label">Grams per Day</div>
+
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <span>Carb Calories</span>
+                            <strong id="res-cals">0 kcal</strong>
+                        </div>
+                        <div class="info-box">
+                            <span>Total Daily Calories</span>
+                            <strong id="res-tdee">0 kcal</strong>
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top:20px; font-size:0.9rem; color:var(--text-light);">
+                        *Based on your selected diet preference and total energy expenditure.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Logic & State ---
+        let currentUnit = 'metric';
+
+        // Initialize
+        window.onload = function() {
+            loadData();
+        };
+
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('btn-metric').classList.remove('active');
+            document.getElementById('btn-imperial').classList.remove('active');
+            document.getElementById(`btn-${unit}`).classList.add('active');
+
+            if (unit === 'metric') {
+                document.getElementById('grp-height-metric').style.display = 'block';
+                document.getElementById('grp-height-imperial').style.display = 'none';
+                document.getElementById('lbl-weight').innerText = 'Weight (kg)';
+                document.getElementById('weight').placeholder = '70';
+            } else {
+                document.getElementById('grp-height-metric').style.display = 'none';
+                document.getElementById('grp-height-imperial').style.display = 'block';
+                document.getElementById('lbl-weight').innerText = 'Weight (lbs)';
+                document.getElementById('weight').placeholder = '150';
+            }
+            saveData();
+        }
+
+        function calculateCarbs(e) {
+            if(e) e.preventDefault();
+
+            // 1. Inputs
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const age = parseFloat(document.getElementById('age').value);
+            let weight = parseFloat(document.getElementById('weight').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const carbRatio = parseFloat(document.getElementById('dietType').value);
+            let height = 0;
+
+            if(!age || !weight) {
+                alert("Please check your age and weight inputs.");
+                return;
+            }
+
+            // 2. Conversion to Metric (Mifflin-St Jeor uses kg and cm)
+            if (currentUnit === 'imperial') {
+                const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('height-in').value) || 0;
+                height = ((ft * 12) + inc) * 2.54; // Inches to cm
+                weight = weight * 0.453592; // lbs to kg
+            } else {
+                height = parseFloat(document.getElementById('height-cm').value);
+            }
+
+            if(!height) {
+                alert("Please enter your height.");
+                return;
+            }
+
+            // 3. Calculate BMR (Mifflin-St Jeor)
+            // Men: (10 × weight) + (6.25 × height) - (5 × age) + 5
+            // Women: (10 × weight) + (6.25 × height) - (5 × age) - 161
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+            if(gender === 'male') {
+                bmr += 5;
+            } else {
+                bmr -= 161;
+            }
+
+            // 4. Calculate TDEE (Total Daily Energy Expenditure)
+            const tdee = Math.round(bmr * activity);
+
+            // 5. Calculate Carbs
+            // Carb Calories = TDEE * Ratio
+            // Carb Grams = Carb Calories / 4
+            const carbCalories = Math.round(tdee * carbRatio);
+            const carbGrams = Math.round(carbCalories / 4);
+
+            // 6. Display
+            document.getElementById('res-grams').innerText = carbGrams;
+            document.getElementById('res-cals').innerText = carbCalories + " kcal";
+            document.getElementById('res-tdee').innerText = tdee + " kcal";
+
+            document.getElementById('results-area').style.display = 'block';
+
+            // Auto-scroll for mobile
+            if(window.innerWidth < 768) {
+                document.getElementById('results-area').scrollIntoView({behavior: 'smooth'});
+            }
+
+            saveData();
+        }
+
+        // --- Local Storage Functions ---
+        function saveData() {
+            const data = {
+                unit: currentUnit,
+                gender: document.querySelector('input[name="gender"]:checked').value,
+                age: document.getElementById('age').value,
+                weight: document.getElementById('weight').value,
+                heightCm: document.getElementById('height-cm').value,
+                heightFt: document.getElementById('height-ft').value,
+                heightIn: document.getElementById('height-in').value,
+                activity: document.getElementById('activity').value,
+                dietType: document.getElementById('dietType').value,
+                
+                resultsVisible: document.getElementById('results-area').style.display === 'block',
+                resGrams: document.getElementById('res-grams').innerText,
+                resCals: document.getElementById('res-cals').innerText,
+                resTdee: document.getElementById('res-tdee').innerText
+            };
+            localStorage.setItem('carbCalc_v1', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('carbCalc_v1');
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    
+                    setUnit(data.unit || 'metric');
+                    
+                    if(data.gender) document.querySelector(`input[name="gender"][value="${data.gender}"]`).checked = true;
+                    if(data.age) document.getElementById('age').value = data.age;
+                    if(data.weight) document.getElementById('weight').value = data.weight;
+                    if(data.heightCm) document.getElementById('height-cm').value = data.heightCm;
+                    if(data.heightFt) document.getElementById('height-ft').value = data.heightFt;
+                    if(data.heightIn) document.getElementById('height-in').value = data.heightIn;
+                    if(data.activity) document.getElementById('activity').value = data.activity;
+                    if(data.dietType) document.getElementById('dietType').value = data.dietType;
+
+                    if(data.resultsVisible) {
+                        document.getElementById('results-area').style.display = 'block';
+                        document.getElementById('res-grams').innerText = data.resGrams;
+                        document.getElementById('res-cals').innerText = data.resCals;
+                        document.getElementById('res-tdee').innerText = data.resTdee;
+                    }
+
+                } catch(e) {
+                    console.error("Error loading saved data");
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to clear your data?")) {
+                localStorage.removeItem('carbCalc_v1');
+                document.getElementById('carbForm').reset();
+                document.getElementById('results-area').style.display = 'none';
+                setUnit('metric'); // Reset unit default
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Army Body Fat Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Army Body Fat Calculator. Calculate your Body Fat Percentage according to U.S. Army Regulation 600-9 standards (Tape Test). Auto-saves data.">
+    <meta name="keywords" content="Army Body Fat Calculator, AR 600-9 Calculator, Army Tape Test, Body Composition Program, ABCP Calculator, Military Body Fat, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/army-body-fat-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Army Body Fat Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate body fat percentage based on U.S. Army Regulation 600-9 standards using neck, waist, and hip measurements."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #4d7c0f; /* Army Green */
+            --primary-dark: #3f6212;
+            --accent-color: #ecfccb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #4b5563;
+            --header-height: 50px;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-dark);
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(77, 124, 15, 0.2);
+        }
+
+        /* Toggles (Gender & Unit) */
+        .toggle-group {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Imperial Layout */
+        .imperial-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #dc2626; /* Red */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Result Display */
+        .result-card {
+            background: var(--accent-color);
+            border: 1px solid #bef264;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .bf-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .bf-unit {
+            font-size: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .status-pass { background-color: #16a34a; color: white; }
+        .status-fail { background-color: #dc2626; color: white; }
+
+        .info-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+                border-top: none;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Army Body Fat Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Left: Inputs -->
+            <div class="input-section">
+                
+                <!-- Gender Switch -->
+                <div class="form-group">
+                    <label>Soldier's Gender</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" id="btn-male" onclick="setGender('male')">Male</button>
+                        <button class="toggle-btn" id="btn-female" onclick="setGender('female')">Female</button>
+                    </div>
+                </div>
+
+                <!-- Unit Switch -->
+                <div class="form-group">
+                    <label>Measurement Unit</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn" id="btn-metric" onclick="setUnit('metric')">Metric (cm)</button>
+                        <button class="toggle-btn active" id="btn-imperial" onclick="setUnit('imperial')">Standard (in)</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="e.g. 25" min="17" max="62" oninput="calculate()">
+                </div>
+
+                <!-- Imperial Inputs -->
+                <div id="imperial-inputs">
+                    <div class="form-group">
+                        <label>Height</label>
+                        <div class="imperial-row">
+                            <input type="number" id="h-ft" placeholder="ft" oninput="calculate()">
+                            <input type="number" id="h-in" placeholder="in" oninput="calculate()">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Neck (inches)</label>
+                        <input type="number" id="n-in" placeholder="e.g. 15.5" step="0.5" oninput="calculate()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Waist (inches)</label>
+                        <input type="number" id="w-in" placeholder="at navel" step="0.5" oninput="calculate()">
+                    </div>
+
+                    <!-- Female Only -->
+                    <div class="form-group" id="hip-group-imp" style="display: none;">
+                        <label>Hips (inches)</label>
+                        <input type="number" id="hip-in" placeholder="widest point" step="0.5" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Metric Inputs -->
+                <div id="metric-inputs" style="display: none;">
+                    <div class="form-group">
+                        <label>Height (cm)</label>
+                        <input type="number" id="h-cm" placeholder="e.g. 175" oninput="calculate()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Neck (cm)</label>
+                        <input type="number" id="n-cm" placeholder="e.g. 40" oninput="calculate()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Waist (cm)</label>
+                        <input type="number" id="w-cm" placeholder="at navel" oninput="calculate()">
+                    </div>
+
+                    <!-- Female Only -->
+                    <div class="form-group" id="hip-group-met" style="display: none;">
+                        <label>Hips (cm)</label>
+                        <input type="number" id="hip-cm" placeholder="widest point" oninput="calculate()">
+                    </div>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="result-section">
+                <div class="result-card">
+                    <div class="result-title">Body Fat Percentage</div>
+                    <div class="bf-value" id="res-percent">--</div>
+                    <div class="bf-unit">%</div>
+                    
+                    <div class="status-badge" id="res-status" style="display:none;">--</div>
+                </div>
+
+                <div class="result-card" style="background: white; border-color: #e5e7eb; padding: 15px;">
+                    <div class="result-title">Max Allowable (AR 600-9)</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);" id="res-max">--</div>
+                </div>
+
+                <p class="info-text">
+                    Calculations based on U.S. Army Regulation 600-9 (The Army Body Composition Program). Results are estimates for compliance screening.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGender = 'male';
+        let currentUnit = 'imperial';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        function setGender(gender) {
+            currentGender = gender;
+            
+            // Toggle Buttons
+            document.getElementById('btn-male').className = gender === 'male' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-female').className = gender === 'female' ? 'toggle-btn active' : 'toggle-btn';
+
+            // Toggle Hip Inputs visibility
+            document.getElementById('hip-group-imp').style.display = gender === 'female' ? 'block' : 'none';
+            document.getElementById('hip-group-met').style.display = gender === 'female' ? 'block' : 'none';
+
+            localStorage.setItem('abfc_gender', gender);
+            calculate();
+        }
+
+        function setUnit(unit) {
+            currentUnit = unit;
+
+            // Toggle Buttons
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'toggle-btn active' : 'toggle-btn';
+
+            // Toggle Sections
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+
+            localStorage.setItem('abfc_unit', unit);
+            calculate();
+        }
+
+        function calculate() {
+            let height = 0; // in inches
+            let neck = 0; // in inches
+            let waist = 0; // in inches
+            let hip = 0; // in inches
+            let isValid = false;
+
+            const age = parseInt(document.getElementById('age').value);
+
+            if (currentUnit === 'imperial') {
+                const ft = parseFloat(document.getElementById('h-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('h-in').value) || 0;
+                const n = parseFloat(document.getElementById('n-in').value);
+                const w = parseFloat(document.getElementById('w-in').value);
+                
+                if ((ft > 0 || inc > 0) && n > 0 && w > 0) {
+                    height = (ft * 12) + inc;
+                    neck = n;
+                    waist = w;
+                    if (currentGender === 'female') {
+                        hip = parseFloat(document.getElementById('hip-in').value);
+                        if (hip > 0) isValid = true;
+                    } else {
+                        isValid = true;
+                    }
+                    saveData('imperial', {ft, inc, n, w, h: hip});
+                }
+            } else {
+                // Metric
+                const hCm = parseFloat(document.getElementById('h-cm').value);
+                const nCm = parseFloat(document.getElementById('n-cm').value);
+                const wCm = parseFloat(document.getElementById('w-cm').value);
+
+                if (hCm > 0 && nCm > 0 && wCm > 0) {
+                    // Convert to Inches for Formula
+                    height = hCm / 2.54;
+                    neck = nCm / 2.54;
+                    waist = wCm / 2.54;
+                    if (currentGender === 'female') {
+                        const hipCm = parseFloat(document.getElementById('hip-cm').value);
+                        if (hipCm > 0) {
+                            hip = hipCm / 2.54;
+                            isValid = true;
+                        }
+                    } else {
+                        isValid = true;
+                    }
+                    saveData('metric', {hCm, nCm, wCm, hipCm: (currentGender === 'female' ? hip * 2.54 : 0)});
+                }
+            }
+
+            if (age) localStorage.setItem('abfc_age', age);
+
+            if (isValid && age >= 17) {
+                let bodyFat = 0;
+
+                // Army Formulas (AR 600-9)
+                if (currentGender === 'male') {
+                    // %BF = [86.010 x log10(abdomen - neck)] - [70.041 x log10(height)] + 36.76
+                    // Note: Abdomen in formula is Waist circumference
+                    // Important: The formula works with inches. log10 is base 10.
+                    // Validation: Waist must be > Neck
+                    if (waist > neck) {
+                        bodyFat = (86.010 * Math.log10(waist - neck)) - (70.041 * Math.log10(height)) + 36.76;
+                    }
+                } else {
+                    // %BF = [163.205 x log10(waist + hip - neck)] - [97.684 x log10(height)] - 78.387
+                    const circ = waist + hip - neck;
+                    if (circ > 0) {
+                        bodyFat = (163.205 * Math.log10(circ)) - (97.684 * Math.log10(height)) - 78.387;
+                    }
+                }
+
+                updateResults(bodyFat, age);
+            } else {
+                resetResults();
+            }
+        }
+
+        function updateResults(bf, age) {
+            const bfRounded = Math.round(bf); // Army usually rounds to nearest whole number
+            document.getElementById('res-percent').textContent = bfRounded;
+
+            // Determine Max Allowable
+            let maxAllowed = 0;
+            if (currentGender === 'male') {
+                if (age <= 20) maxAllowed = 20;
+                else if (age <= 27) maxAllowed = 22;
+                else if (age <= 39) maxAllowed = 24;
+                else if (age <= 59) maxAllowed = 26;
+                else maxAllowed = 26; // 60+
+            } else {
+                if (age <= 20) maxAllowed = 30;
+                else if (age <= 27) maxAllowed = 32;
+                else if (age <= 39) maxAllowed = 34;
+                else if (age <= 59) maxAllowed = 36;
+                else maxAllowed = 36; // 60+
+            }
+
+            document.getElementById('res-max').textContent = maxAllowed + "%";
+
+            // Status
+            const statusBadge = document.getElementById('res-status');
+            statusBadge.style.display = "inline-block";
+            
+            if (bfRounded <= maxAllowed) {
+                statusBadge.textContent = "MEETS STANDARDS";
+                statusBadge.className = "status-badge status-pass";
+            } else {
+                statusBadge.textContent = "EXCEEDS STANDARDS";
+                statusBadge.className = "status-badge status-fail";
+            }
+        }
+
+        function resetResults() {
+            document.getElementById('res-percent').textContent = "--";
+            document.getElementById('res-max').textContent = "--";
+            document.getElementById('res-status').style.display = "none";
+        }
+
+        function saveData(type, data) {
+            if (type === 'imperial') {
+                localStorage.setItem('abfc_h_ft', data.ft);
+                localStorage.setItem('abfc_h_in', data.inc);
+                localStorage.setItem('abfc_n_in', data.n);
+                localStorage.setItem('abfc_w_in', data.w);
+                if (data.h) localStorage.setItem('abfc_hip_in', data.h);
+            } else {
+                localStorage.setItem('abfc_h_cm', data.hCm);
+                localStorage.setItem('abfc_n_cm', data.nCm);
+                localStorage.setItem('abfc_w_cm', data.wCm);
+                if (data.hipCm) localStorage.setItem('abfc_hip_cm', data.hipCm);
+            }
+        }
+
+        function loadSavedData() {
+            // Load Settings
+            const gender = localStorage.getItem('abfc_gender') || 'male';
+            const unit = localStorage.getItem('abfc_unit') || 'imperial';
+            setGender(gender);
+            setUnit(unit);
+
+            // Load Age
+            const age = localStorage.getItem('abfc_age');
+            if (age) document.getElementById('age').value = age;
+
+            // Load Imperial
+            const ft = localStorage.getItem('abfc_h_ft');
+            const inc = localStorage.getItem('abfc_h_in');
+            const nIn = localStorage.getItem('abfc_n_in');
+            const wIn = localStorage.getItem('abfc_w_in');
+            const hipIn = localStorage.getItem('abfc_hip_in');
+
+            if(ft) document.getElementById('h-ft').value = ft;
+            if(inc) document.getElementById('h-in').value = inc;
+            if(nIn) document.getElementById('n-in').value = nIn;
+            if(wIn) document.getElementById('w-in').value = wIn;
+            if(hipIn) document.getElementById('hip-in').value = hipIn;
+
+            // Load Metric
+            const hCm = localStorage.getItem('abfc_h_cm');
+            const nCm = localStorage.getItem('abfc_n_cm');
+            const wCm = localStorage.getItem('abfc_w_cm');
+            const hipCm = localStorage.getItem('abfc_hip_cm');
+
+            if(hCm) document.getElementById('h-cm').value = hCm;
+            if(nCm) document.getElementById('n-cm').value = nCm;
+            if(wCm) document.getElementById('w-cm').value = wCm;
+            if(hipCm) document.getElementById('hip-cm').value = hipCm;
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            setGender('male');
+            setUnit('imperial');
+            resetResults();
+        }
+    </script>
+</body>
+</html>

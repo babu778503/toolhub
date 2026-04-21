@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Watcher Points Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Weight Watcher Points Calculator. Calculate SmartPoints, PointsPlus, and Original Points values from food nutrition labels. Auto-saves your data.">
+    <meta name="keywords" content="Weight Watcher Points Calculator, SmartPoints Calculator, PointsPlus Calculator, Original Points Calculator, WW Calculator, Food Points Tracker, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/weight-watcher-points-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Weight Watcher Points Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate WW points using SmartPoints, PointsPlus, or Original formulas based on nutrition facts."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #005a8d; /* Classic WW Blue */
+            --primary-dark: #004165;
+            --accent-color: #e0f2fe;
+            --bg-color: #f0f9ff;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --header-height: 50px;
+            --border-radius: 10px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border-top: 5px solid var(--primary-dark);
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e0f2fe;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+            display: block; /* Default display */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 90, 141, 0.15);
+        }
+
+        /* System Switcher */
+        .system-select {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Result Visuals */
+        .result-circle {
+            width: 180px;
+            height: 180px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 90, 141, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .points-val {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .points-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .result-system {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+                border-top: none;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e0f2fe;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Weight Watcher Points Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Input Section -->
+            <div class="input-section">
+                
+                <div class="system-select">
+                    <label for="calc-system">Calculation System</label>
+                    <select id="calc-system" onchange="changeSystem()">
+                        <option value="smart">SmartPoints (Modern)</option>
+                        <option value="plus">PointsPlus (Legacy)</option>
+                        <option value="original">Original Points (Classic)</option>
+                    </select>
+                </div>
+
+                <!-- Inputs: Visibility toggled by JS -->
+                
+                <div class="form-group" id="grp-cal">
+                    <label>Calories</label>
+                    <input type="number" id="calories" placeholder="e.g. 150" oninput="calculate()">
+                </div>
+
+                <div class="form-group" id="grp-protein">
+                    <label>Protein (g)</label>
+                    <input type="number" id="protein" placeholder="e.g. 10" oninput="calculate()">
+                </div>
+
+                <div class="form-group" id="grp-sugar">
+                    <label>Sugar (g)</label>
+                    <input type="number" id="sugar" placeholder="e.g. 5" oninput="calculate()">
+                </div>
+
+                <div class="form-group" id="grp-satfat">
+                    <label>Saturated Fat (g)</label>
+                    <input type="number" id="satfat" placeholder="e.g. 2" oninput="calculate()">
+                </div>
+
+                <div class="form-group hidden" id="grp-fat">
+                    <label>Total Fat (g)</label>
+                    <input type="number" id="fat" placeholder="e.g. 5" oninput="calculate()">
+                </div>
+
+                <div class="form-group hidden" id="grp-carbs">
+                    <label>Total Carbohydrates (g)</label>
+                    <input type="number" id="carbs" placeholder="e.g. 20" oninput="calculate()">
+                </div>
+
+                <div class="form-group hidden" id="grp-fiber">
+                    <label>Dietary Fiber (g)</label>
+                    <input type="number" id="fiber" placeholder="e.g. 3" oninput="calculate()">
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                
+                <div class="result-system" id="res-sys-name">SmartPoints</div>
+                <div class="result-circle">
+                    <div class="points-val" id="res-points">0</div>
+                    <div class="points-label">Points</div>
+                </div>
+
+                <div style="text-align: center; color: var(--text-light); font-size: 0.9rem; max-width: 80%;">
+                    Values are calculated based on nutrition facts per serving.
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const inputs = {
+            sys: document.getElementById('calc-system'),
+            cal: document.getElementById('calories'),
+            pro: document.getElementById('protein'),
+            sugar: document.getElementById('sugar'),
+            satfat: document.getElementById('satfat'),
+            fat: document.getElementById('fat'),
+            carbs: document.getElementById('carbs'),
+            fiber: document.getElementById('fiber')
+        };
+
+        const groups = {
+            cal: document.getElementById('grp-cal'),
+            pro: document.getElementById('grp-protein'),
+            sugar: document.getElementById('grp-sugar'),
+            satfat: document.getElementById('grp-satfat'),
+            fat: document.getElementById('grp-fat'),
+            carbs: document.getElementById('grp-carbs'),
+            fiber: document.getElementById('grp-fiber')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Toggle Inputs based on System
+        function changeSystem() {
+            const sys = inputs.sys.value;
+            
+            // Reset visibility
+            Object.values(groups).forEach(g => g.classList.add('hidden'));
+
+            if (sys === 'smart') {
+                groups.cal.classList.remove('hidden');
+                groups.satfat.classList.remove('hidden');
+                groups.sugar.classList.remove('hidden');
+                groups.pro.classList.remove('hidden');
+                document.getElementById('res-sys-name').textContent = "SmartPoints";
+            } 
+            else if (sys === 'plus') {
+                groups.pro.classList.remove('hidden');
+                groups.carbs.classList.remove('hidden');
+                groups.fat.classList.remove('hidden');
+                groups.fiber.classList.remove('hidden');
+                document.getElementById('res-sys-name').textContent = "PointsPlus";
+            } 
+            else if (sys === 'original') {
+                groups.cal.classList.remove('hidden');
+                groups.fat.classList.remove('hidden');
+                groups.fiber.classList.remove('hidden');
+                document.getElementById('res-sys-name').textContent = "Original Points";
+            }
+
+            localStorage.setItem('ww_system', sys);
+            calculate();
+        }
+
+        // Main Calculation Logic
+        function calculate() {
+            const sys = inputs.sys.value;
+            let points = 0;
+
+            if (sys === 'smart') {
+                // SmartPoints: Based on Calories, Sat Fat, Sugar, Protein
+                const cal = parseFloat(inputs.cal.value) || 0;
+                const sat = parseFloat(inputs.satfat.value) || 0;
+                const sug = parseFloat(inputs.sugar.value) || 0;
+                const pro = parseFloat(inputs.pro.value) || 0;
+
+                // Approximate SmartPoints Formula
+                // (Calories * 0.0305) + (Sat Fat * 0.275) + (Sugar * 0.12) - (Protein * 0.098)
+                if (cal || sat || sug || pro) {
+                    points = (cal * 0.0305) + (sat * 0.275) + (sug * 0.12) - (pro * 0.098);
+                }
+            } 
+            else if (sys === 'plus') {
+                // PointsPlus: Protein, Carbs, Fat, Fiber
+                const pro = parseFloat(inputs.pro.value) || 0;
+                const carb = parseFloat(inputs.carbs.value) || 0;
+                const fat = parseFloat(inputs.fat.value) || 0;
+                const fib = parseFloat(inputs.fiber.value) || 0;
+
+                // Formula: (Protein / 10.9375) + (Carbs / 9.2105) + (Fat / 3.8889) - (Fiber / 12.5)
+                if (pro || carb || fat || fib) {
+                    points = (pro / 10.9375) + (carb / 9.2105) + (fat / 3.8889) - (fib / 12.5);
+                }
+            } 
+            else if (sys === 'original') {
+                // Original: Calories, Fat, Fiber
+                const cal = parseFloat(inputs.cal.value) || 0;
+                const fat = parseFloat(inputs.fat.value) || 0;
+                let fib = parseFloat(inputs.fiber.value) || 0;
+
+                // Fiber cap is usually 4 in original system
+                if (fib > 4) fib = 4;
+
+                // Formula: (Calories / 50) + (Fat / 12) - (Fiber / 5)
+                if (cal || fat || fib) {
+                    points = (cal / 50) + (fat / 12) - (fib / 5);
+                }
+            }
+
+            // Ensure non-negative and round
+            points = Math.max(0, Math.round(points));
+            document.getElementById('res-points').textContent = points;
+
+            // Save Input Data
+            saveData();
+        }
+
+        // Local Storage Functions
+        function saveData() {
+            localStorage.setItem('ww_cal', inputs.cal.value);
+            localStorage.setItem('ww_pro', inputs.pro.value);
+            localStorage.setItem('ww_sugar', inputs.sugar.value);
+            localStorage.setItem('ww_satfat', inputs.satfat.value);
+            localStorage.setItem('ww_fat', inputs.fat.value);
+            localStorage.setItem('ww_carbs', inputs.carbs.value);
+            localStorage.setItem('ww_fiber', inputs.fiber.value);
+        }
+
+        function loadSavedData() {
+            const sys = localStorage.getItem('ww_system') || 'smart';
+            inputs.sys.value = sys;
+
+            inputs.cal.value = localStorage.getItem('ww_cal') || '';
+            inputs.pro.value = localStorage.getItem('ww_pro') || '';
+            inputs.sugar.value = localStorage.getItem('ww_sugar') || '';
+            inputs.satfat.value = localStorage.getItem('ww_satfat') || '';
+            inputs.fat.value = localStorage.getItem('ww_fat') || '';
+            inputs.carbs.value = localStorage.getItem('ww_carbs') || '';
+            inputs.fiber.value = localStorage.getItem('ww_fiber') || '';
+
+            changeSystem(); // This triggers visibility and calculate
+        }
+
+        function clearData() {
+            localStorage.removeItem('ww_cal');
+            localStorage.removeItem('ww_pro');
+            localStorage.removeItem('ww_sugar');
+            localStorage.removeItem('ww_satfat');
+            localStorage.removeItem('ww_fat');
+            localStorage.removeItem('ww_carbs');
+            localStorage.removeItem('ww_fiber');
+
+            // Clear Inputs
+            Object.values(inputs).forEach(input => {
+                if(input.tagName === 'INPUT') input.value = '';
+            });
+
+            // Reset result
+            document.getElementById('res-points').textContent = '0';
+        }
+    </script>
+</body>
+</html>

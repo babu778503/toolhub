@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Period Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Period Calculator. Predict your next period, ovulation date, and fertile window. Track your menstrual cycle with auto-save functionality.">
+    <meta name="keywords" content="Period Calculator, Menstrual Cycle Calculator, Next Period Calculator, Ovulation Tracker, PMS Calculator, Period Calendar, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/period-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Period Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate upcoming menstrual cycles, ovulation dates, and fertile windows based on last period date and cycle length."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #be123c; /* Rose Red */
+            --primary-light: #fff1f2;
+            --primary-dark: #881337;
+            --accent-color: #f43f5e;
+            --bg-color: #fff5f5;
+            --card-bg: #ffffff;
+            --text-main: #374151;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-dark);
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 300px;
+            border-right: 1px solid #fce7f3;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1.5;
+            padding: 30px;
+            min-width: 300px;
+            background-color: #fff9fa;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #fbcfe8;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+            color: var(--text-main);
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.15);
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background-color: #9ca3af;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #6b7280;
+        }
+
+        /* Result Cards */
+        .main-result-card {
+            background: linear-gradient(135deg, #be123c 0%, #fb7185 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(190, 18, 60, 0.2);
+        }
+
+        .next-period-date {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 10px 0;
+        }
+
+        .days-left {
+            font-size: 1rem;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* Forecast List */
+        .forecast-title {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #fecdd3;
+            padding-bottom: 10px;
+        }
+
+        .forecast-item {
+            background: white;
+            border: 1px solid #fce7f3;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .forecast-date {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .forecast-type {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .tag-ovulation {
+            color: #d97706;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+                border-top: none;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #fce7f3;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+
+            .next-period-date {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Period Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Input Section -->
+            <div class="input-section">
+                
+                <div class="form-group">
+                    <label for="last-period">Last Period Start Date</label>
+                    <input type="date" id="last-period" onchange="calculate()">
+                    <div class="help-text">Select the first day of your last period.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cycle-length">Cycle Length (Days)</label>
+                    <input type="number" id="cycle-length" value="28" min="21" max="45" oninput="calculate()">
+                    <div class="help-text">Time between periods (default is 28).</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-duration">Period Duration (Days)</label>
+                    <input type="number" id="period-duration" value="5" min="2" max="10" oninput="calculate()">
+                    <div class="help-text">How long bleeding lasts (default is 5).</div>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                
+                <div class="main-result-card">
+                    <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Next Period Starts</div>
+                    <div class="next-period-date" id="res-next-date">--</div>
+                    <div class="days-left" id="res-days-left">Enter details</div>
+                </div>
+
+                <h3 class="forecast-title">Upcoming Cycle (3 Months)</h3>
+                
+                <div id="forecast-container">
+                    <!-- Dynamic Content -->
+                    <div style="text-align: center; color: #9ca3af; padding: 20px;">
+                        Please enter your dates to see the forecast.
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; font-size: 0.8rem; color: #9ca3af; text-align: center;">
+                    *Predictions are estimates based on regular cycles. Consult a doctor for medical advice.
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        function calculate() {
+            const lmpInput = document.getElementById('last-period').value;
+            const cycleLength = parseInt(document.getElementById('cycle-length').value) || 28;
+            const duration = parseInt(document.getElementById('period-duration').value) || 5;
+
+            if (!lmpInput) {
+                resetResults();
+                return;
+            }
+
+            // Date Parsing (handling timezone offset by creating date from parts)
+            const parts = lmpInput.split('-');
+            const lmpDate = new Date(parts[0], parts[1] - 1, parts[2]); // Year, Month (0-11), Day
+
+            // Save Data
+            saveData(lmpInput, cycleLength, duration);
+
+            // Calculate Next Period
+            const today = new Date();
+            let nextDate = new Date(lmpDate);
+            nextDate.setDate(lmpDate.getDate() + cycleLength);
+
+            // Display Main Result
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('res-next-date').textContent = nextDate.toLocaleDateString('en-US', options);
+
+            // Days Left Calculation
+            const timeDiff = nextDate.getTime() - today.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            let statusText = "";
+            if (daysDiff > 0) {
+                statusText = `in ${daysDiff} Days`;
+            } else if (daysDiff === 0) {
+                statusText = "Today";
+            } else {
+                statusText = `${Math.abs(daysDiff)} Days Late`;
+            }
+            document.getElementById('res-days-left').textContent = statusText;
+
+            // Generate Forecast (3 Cycles)
+            generateForecast(lmpDate, cycleLength, duration);
+        }
+
+        function generateForecast(startDate, cycle, duration) {
+            const container = document.getElementById('forecast-container');
+            container.innerHTML = ""; // Clear previous
+
+            // Iterate for 3 cycles
+            for (let i = 1; i <= 3; i++) {
+                // Calculate Cycle Start
+                let pStart = new Date(startDate);
+                pStart.setDate(startDate.getDate() + (cycle * i));
+                
+                // Calculate Cycle End
+                let pEnd = new Date(pStart);
+                pEnd.setDate(pStart.getDate() + (duration - 1));
+
+                // Calculate Ovulation (approx 14 days before NEXT period)
+                // Next period is Cycle * (i+1)
+                let nextPStart = new Date(startDate);
+                nextPStart.setDate(startDate.getDate() + (cycle * (i + 1)));
+                
+                let ovulation = new Date(nextPStart);
+                ovulation.setDate(nextPStart.getDate() - 14);
+
+                // Create HTML Elements
+                const div = document.createElement('div');
+                div.className = 'forecast-item';
+                
+                const dateOptions = { month: 'short', day: 'numeric' };
+                const pRange = `${pStart.toLocaleDateString('en-US', dateOptions)} - ${pEnd.toLocaleDateString('en-US', dateOptions)}`;
+                const ovDate = ovulation.toLocaleDateString('en-US', dateOptions);
+
+                div.innerHTML = `
+                    <div>
+                        <div class="forecast-date">Period: ${pRange}</div>
+                        <div class="forecast-type">Cycle ${i}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="tag-ovulation">Ovulation</div>
+                        <div style="font-size: 0.85rem;">~ ${ovDate}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function resetResults() {
+            document.getElementById('res-next-date').textContent = "--";
+            document.getElementById('res-days-left').textContent = "Enter details";
+            document.getElementById('forecast-container').innerHTML = `
+                <div style="text-align: center; color: #9ca3af; padding: 20px;">
+                    Please enter your dates to see the forecast.
+                </div>
+            `;
+        }
+
+        // Local Storage
+        function saveData(lmp, cycle, duration) {
+            localStorage.setItem('pc_lmp', lmp);
+            localStorage.setItem('pc_cycle', cycle);
+            localStorage.setItem('pc_duration', duration);
+        }
+
+        function loadSavedData() {
+            const lmp = localStorage.getItem('pc_lmp');
+            const cycle = localStorage.getItem('pc_cycle');
+            const duration = localStorage.getItem('pc_duration');
+
+            if (lmp) document.getElementById('last-period').value = lmp;
+            if (cycle) document.getElementById('cycle-length').value = cycle;
+            if (duration) document.getElementById('period-duration').value = duration;
+
+            if (lmp) calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.getElementById('last-period').value = '';
+            document.getElementById('cycle-length').value = '28';
+            document.getElementById('period-duration').value = '5';
+            resetResults();
+        }
+    </script>
+</body>
+</html>

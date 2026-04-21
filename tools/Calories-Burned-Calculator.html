@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calories Burned Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Calories Burned Calculator. Estimate calories burned for over 20 different activities including running, walking, cycling, and swimming based on your weight and duration.">
+    <meta name="keywords" content="Calories Burned Calculator, Exercise Calorie Calculator, Activity Calculator, MET Calculator, Calories Burned Walking, Calories Burned Running, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/calories-burned-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Calories Burned Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate calories burned based on activity type (MET value), duration, and body weight."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #f97316; /* Energetic Orange */
+            --primary-dark: #ea580c;
+            --accent-color: #ffedd5;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-dark);
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #fff7ed; /* Very light orange */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+
+        /* Unit Toggle */
+        .unit-toggle {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .unit-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Styling */
+        .result-card {
+            background: white;
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2);
+            border: 5px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .cal-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .cal-unit {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .result-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 10px;
+            max-width: 80%;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+                border-top: none;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Calories Burned Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Input Section -->
+            <div class="input-section">
+                <!-- Unit Switcher -->
+                <div class="unit-toggle">
+                    <button class="unit-btn active" id="btn-metric" onclick="setUnit('metric')">Metric (kg)</button>
+                    <button class="unit-btn" id="btn-imperial" onclick="setUnit('imperial')">Imperial (lbs)</button>
+                </div>
+
+                <!-- Weight Inputs -->
+                <div id="metric-inputs">
+                    <div class="form-group">
+                        <label>Your Weight (kg)</label>
+                        <input type="number" id="weight-kg" placeholder="e.g. 70" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div id="imperial-inputs" style="display: none;">
+                    <div class="form-group">
+                        <label>Your Weight (lbs)</label>
+                        <input type="number" id="weight-lbs" placeholder="e.g. 154" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Activity Selection -->
+                <div class="form-group">
+                    <label>Activity</label>
+                    <select id="activity" onchange="calculate()">
+                        <option value="0">-- Select Activity --</option>
+                        <option value="1.0">Sleeping / Resting</option>
+                        <option value="1.5">Desk Work / Sitting</option>
+                        <option value="2.3">Stretching / Hatha Yoga</option>
+                        <option value="3.0">Walking (Light - 2 mph)</option>
+                        <option value="3.5">Weight Lifting (Light)</option>
+                        <option value="4.0">Walking (Moderate - 3.5 mph)</option>
+                        <option value="5.0">Aerobics (Low Impact)</option>
+                        <option value="6.0">Weight Lifting (Vigorous)</option>
+                        <option value="6.0">Swimming (Leisure)</option>
+                        <option value="7.0">Jogging (5 mph)</option>
+                        <option value="7.5">Cycling (Moderate - 12-14 mph)</option>
+                        <option value="8.0">Circuit Training (Vigorous)</option>
+                        <option value="8.0">Hiking (Cross Country)</option>
+                        <option value="9.8">Running (6 mph)</option>
+                        <option value="10.0">Swimming (Laps, Vigorous)</option>
+                        <option value="11.0">Running (7 mph)</option>
+                        <option value="12.0">Jump Rope (Moderate)</option>
+                        <option value="13.5">Running (Fast - 9 mph)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Duration (minutes)</label>
+                    <input type="number" id="duration" placeholder="e.g. 30" oninput="calculate()">
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                <h3 style="margin-bottom: 20px; color: var(--text-main);">Estimated Energy Expenditure</h3>
+                
+                <div class="result-card">
+                    <div class="cal-value" id="res-calories">0</div>
+                    <div class="cal-unit">Calories (kcal)</div>
+                </div>
+
+                <div class="result-subtitle">
+                    Values are estimates based on MET (Metabolic Equivalent of Task) values for the selected activity.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'metric';
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Toggle Unit System
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'unit-btn active' : 'unit-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'unit-btn active' : 'unit-btn';
+            
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+
+            localStorage.setItem('cbc_unit', unit);
+            calculate();
+        }
+
+        // Calculation Logic
+        // Formula: Calories = (MET * Weight in kg * 3.5) / 200 * Duration in minutes
+        function calculate() {
+            let weightKg = 0;
+            let isValid = false;
+
+            // Get Weight
+            if (currentUnit === 'metric') {
+                const kg = parseFloat(document.getElementById('weight-kg').value);
+                if (kg > 0) {
+                    weightKg = kg;
+                    isValid = true;
+                    saveInput('metric', kg);
+                }
+            } else {
+                const lbs = parseFloat(document.getElementById('weight-lbs').value);
+                if (lbs > 0) {
+                    weightKg = lbs * 0.45359237; // Convert to kg
+                    isValid = true;
+                    saveInput('imperial', lbs);
+                }
+            }
+
+            // Get Activity & Duration
+            const met = parseFloat(document.getElementById('activity').value);
+            const duration = parseFloat(document.getElementById('duration').value);
+
+            // Save common inputs
+            localStorage.setItem('cbc_activity', document.getElementById('activity').value);
+            if(duration) localStorage.setItem('cbc_duration', duration);
+
+            if (isValid && met > 0 && duration > 0) {
+                // Calculation
+                // Standard Formula: Total Calories = Duration(min) * (MET * 3.5 * Weight(kg)) / 200
+                const calories = (duration * (met * 3.5 * weightKg)) / 200;
+                
+                document.getElementById('res-calories').textContent = Math.round(calories);
+            } else {
+                document.getElementById('res-calories').textContent = "0";
+            }
+        }
+
+        // Local Storage Helpers
+        function saveInput(type, value) {
+            if (type === 'metric') {
+                localStorage.setItem('cbc_kg', value);
+            } else {
+                localStorage.setItem('cbc_lbs', value);
+            }
+        }
+
+        function loadSavedData() {
+            const unit = localStorage.getItem('cbc_unit') || 'metric';
+            setUnit(unit);
+
+            const kg = localStorage.getItem('cbc_kg');
+            if(kg) document.getElementById('weight-kg').value = kg;
+
+            const lbs = localStorage.getItem('cbc_lbs');
+            if(lbs) document.getElementById('weight-lbs').value = lbs;
+
+            const activity = localStorage.getItem('cbc_activity');
+            if(activity) document.getElementById('activity').value = activity;
+
+            const duration = localStorage.getItem('cbc_duration');
+            if(duration) document.getElementById('duration').value = duration;
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.getElementById('weight-kg').value = '';
+            document.getElementById('weight-lbs').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('activity').selectedIndex = 0;
+            setUnit('metric');
+            document.getElementById('res-calories').textContent = "0";
+        }
+    </script>
+</body>
+</html>

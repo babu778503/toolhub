@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overweight Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Overweight Calculator. Determine your BMI and calculate exactly how much weight you need to lose to reach a healthy range. Auto-saves your progress.">
+    <meta name="keywords" content="Overweight Calculator, Weight Loss Calculator, BMI Calculator, Obesity Calculator, Ideal Weight Calculator, Excess Weight Calculator, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/overweight-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Overweight Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A tool to calculate Body Mass Index (BMI) and determine the amount of excess weight based on height and weight."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #f97316; /* Orange for 'Overweight' alert theme */
+            --primary-dark: #ea580c;
+            --secondary-color: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Tool Wrapper */
+        .calculator-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+        }
+
+        /* Sections */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #fff7ed; /* Light orange tint */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Input Controls */
+        .unit-toggle {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .unit-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        .row-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Styling */
+        .result-title {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .bmi-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            background: #e5e7eb;
+            color: var(--text-main);
+        }
+
+        /* Dynamic Status Colors */
+        .status-normal { background: #dcfce7; color: #15803d; }
+        .status-over { background: #ffedd5; color: #c2410c; }
+        .status-obese { background: #fee2e2; color: #b91c1c; }
+        .status-under { background: #dbeafe; color: #1d4ed8; }
+
+        .excess-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .excess-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0; /* Remove blank space */
+                margin-top: 20px;
+            }
+            
+            .calculator-card {
+                border-radius: 0;
+                box-shadow: none;
+                flex-direction: column;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Overweight Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calculator-card">
+            
+            <!-- Left Side: Inputs -->
+            <div class="input-section">
+                <!-- Unit Switcher -->
+                <div class="unit-toggle">
+                    <button class="unit-btn active" id="btn-metric" onclick="setUnit('metric')">Metric (cm/kg)</button>
+                    <button class="unit-btn" id="btn-imperial" onclick="setUnit('imperial')">Imperial (ft/lbs)</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" onchange="calculate()">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="e.g., 30" oninput="calculate()">
+                </div>
+
+                <!-- Metric Inputs -->
+                <div id="metric-inputs">
+                    <div class="form-group">
+                        <label>Height (cm)</label>
+                        <input type="number" id="height-cm" placeholder="e.g., 175" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="weight-kg" placeholder="e.g., 85" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Imperial Inputs -->
+                <div id="imperial-inputs" style="display: none;">
+                    <div class="form-group">
+                        <label>Height</label>
+                        <div class="row-inputs">
+                            <input type="number" id="height-ft" placeholder="ft" oninput="calculate()">
+                            <input type="number" id="height-in" placeholder="in" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" id="weight-lbs" placeholder="e.g., 180" oninput="calculate()">
+                    </div>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Right Side: Results -->
+            <div class="result-section">
+                <div class="result-title">Your BMI Score</div>
+                <div class="bmi-display" id="res-bmi">--.--</div>
+                <div class="status-badge" id="res-status">--</div>
+
+                <div class="excess-card">
+                    <div class="result-title">Overweight By</div>
+                    <div class="excess-value" id="res-excess">--</div>
+                    <p class="info-text">Amount to lose to reach Normal BMI (25)</p>
+                </div>
+                
+                <p style="margin-top: 20px; font-size: 0.85rem; color: #9ca3af;">
+                    *Results are estimates based on standard BMI.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'metric';
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Switch Units
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'unit-btn active' : 'unit-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'unit-btn active' : 'unit-btn';
+            
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+
+            localStorage.setItem('owc_unit', unit);
+            calculate();
+        }
+
+        // Calculation Logic
+        function calculate() {
+            let heightM = 0;
+            let weightKg = 0;
+            let isValid = false;
+
+            // Get values based on unit system
+            if (currentUnit === 'metric') {
+                const cm = parseFloat(document.getElementById('height-cm').value);
+                const kg = parseFloat(document.getElementById('weight-kg').value);
+                if (cm > 0 && kg > 0) {
+                    heightM = cm / 100;
+                    weightKg = kg;
+                    isValid = true;
+                    saveInput('metric', { cm, kg });
+                }
+            } else {
+                const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('height-in').value) || 0;
+                const lbs = parseFloat(document.getElementById('weight-lbs').value);
+                
+                if ((ft > 0 || inc > 0) && lbs > 0) {
+                    const totalInches = (ft * 12) + inc;
+                    heightM = totalInches * 0.0254;
+                    weightKg = lbs * 0.45359237;
+                    isValid = true;
+                    saveInput('imperial', { ft, inc, lbs });
+                }
+            }
+
+            // Save common fields
+            const gender = document.getElementById('gender').value;
+            const age = document.getElementById('age').value;
+            localStorage.setItem('owc_gender', gender);
+            localStorage.setItem('owc_age', age);
+
+            if (isValid) {
+                updateUI(heightM, weightKg);
+            } else {
+                resetUI();
+            }
+        }
+
+        function updateUI(h, w) {
+            // Calculate BMI
+            const bmi = w / (h * h);
+            const bmiFormatted = bmi.toFixed(1);
+
+            document.getElementById('res-bmi').textContent = bmiFormatted;
+
+            // Determine Status & Color
+            const statusEl = document.getElementById('res-status');
+            let status = '';
+            let statusClass = '';
+
+            if (bmi < 18.5) {
+                status = 'Underweight';
+                statusClass = 'status-under';
+            } else if (bmi >= 18.5 && bmi < 25) {
+                status = 'Normal Weight';
+                statusClass = 'status-normal';
+            } else if (bmi >= 25 && bmi < 30) {
+                status = 'Overweight';
+                statusClass = 'status-over';
+            } else {
+                status = 'Obese';
+                statusClass = 'status-obese';
+            }
+
+            statusEl.textContent = status;
+            statusEl.className = 'status-badge ' + statusClass;
+
+            // Calculate Excess Weight (Target BMI 25)
+            // Target Weight = 25 * h * h
+            const maxNormalWeight = 25 * h * h;
+            const excess = w - maxNormalWeight;
+            const excessEl = document.getElementById('res-excess');
+
+            if (excess > 0) {
+                // Formatting based on unit preference
+                if (currentUnit === 'metric') {
+                    excessEl.textContent = excess.toFixed(1) + ' kg';
+                } else {
+                    const excessLbs = excess / 0.45359237;
+                    excessEl.textContent = excessLbs.toFixed(1) + ' lbs';
+                }
+                excessEl.style.color = '#ef4444'; // Red
+            } else {
+                excessEl.textContent = "0";
+                excessEl.style.color = '#10b981'; // Green
+                document.querySelector('.info-text').textContent = "You are not overweight.";
+            }
+            
+            if(excess > 0) {
+                document.querySelector('.info-text').textContent = "Amount to lose to reach Normal BMI (25)";
+            }
+        }
+
+        function resetUI() {
+            document.getElementById('res-bmi').textContent = "--.--";
+            document.getElementById('res-status').textContent = "--";
+            document.getElementById('res-status').className = 'status-badge';
+            document.getElementById('res-excess').textContent = "--";
+        }
+
+        // Local Storage Helpers
+        function saveInput(type, data) {
+            if (type === 'metric') {
+                localStorage.setItem('owc_cm', data.cm);
+                localStorage.setItem('owc_kg', data.kg);
+            } else {
+                localStorage.setItem('owc_ft', data.ft);
+                localStorage.setItem('owc_in', data.inc);
+                localStorage.setItem('owc_lbs', data.lbs);
+            }
+        }
+
+        function loadSavedData() {
+            // Load Unit
+            const unit = localStorage.getItem('owc_unit');
+            if (unit) setUnit(unit);
+            else setUnit('metric');
+
+            // Load Common
+            const gender = localStorage.getItem('owc_gender');
+            if(gender) document.getElementById('gender').value = gender;
+            const age = localStorage.getItem('owc_age');
+            if(age) document.getElementById('age').value = age;
+
+            // Load Metric
+            const cm = localStorage.getItem('owc_cm');
+            const kg = localStorage.getItem('owc_kg');
+            if(cm) document.getElementById('height-cm').value = cm;
+            if(kg) document.getElementById('weight-kg').value = kg;
+
+            // Load Imperial
+            const ft = localStorage.getItem('owc_ft');
+            const inc = localStorage.getItem('owc_in');
+            const lbs = localStorage.getItem('owc_lbs');
+            if(ft) document.getElementById('height-ft').value = ft;
+            if(inc) document.getElementById('height-in').value = inc;
+            if(lbs) document.getElementById('weight-lbs').value = lbs;
+
+            // Trigger Calc
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.removeItem('owc_unit');
+            localStorage.removeItem('owc_gender');
+            localStorage.removeItem('owc_age');
+            localStorage.removeItem('owc_cm');
+            localStorage.removeItem('owc_kg');
+            localStorage.removeItem('owc_ft');
+            localStorage.removeItem('owc_in');
+            localStorage.removeItem('owc_lbs');
+
+            // Clear inputs visually
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+            document.getElementById('gender').selectedIndex = 0;
+            
+            setUnit('metric'); // Reset to default
+            resetUI();
+        }
+    </script>
+</body>
+</html>

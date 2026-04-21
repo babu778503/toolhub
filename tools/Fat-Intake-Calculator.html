@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fat Intake Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Fat Intake Calculator. Calculate your daily recommended dietary fat intake (grams) based on your TDEE and fitness goals (Keto, Low Fat, or Balanced). Auto-saves data.">
+    <meta name="keywords" content="Fat Intake Calculator, Daily Fat Calculator, Macro Calculator, Dietary Fat Needs, Saturated Fat Calculator, Keto Calculator, Healthy Fats, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/fat-intake-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Fat Intake Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Calculate daily fat intake in grams based on total daily energy expenditure and diet type."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #d97706; /* Amber/Gold for Fats/Oils */
+            --primary-dark: #b45309;
+            --accent-color: #fffbeb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tool Wrapper */
+        .tool-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-dark);
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #fffbf0; /* Very light amber */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+        }
+
+        /* Unit Toggle */
+        .toggle-group {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Gender Radio */
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .radio-label input {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            accent-color: var(--primary-color);
+        }
+
+        /* Imperial Layout */
+        .imperial-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Result Visuals */
+        .result-card {
+            background: white;
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .result-title {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .fat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+
+        .fat-unit {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .fat-range {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: #fffbeb;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-top: 20px;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+                border-top: none;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Fat Intake Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Inputs -->
+            <div class="input-section">
+                <!-- Gender -->
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" checked onchange="calculate()"> Male
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female" onchange="calculate()"> Female
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Unit Switch -->
+                <div class="toggle-group">
+                    <button class="toggle-btn active" id="btn-metric" onclick="setUnit('metric')">Metric</button>
+                    <button class="toggle-btn" id="btn-imperial" onclick="setUnit('imperial')">Imperial</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age" placeholder="e.g. 30" oninput="calculate()">
+                </div>
+
+                <!-- Metric Inputs -->
+                <div id="metric-inputs">
+                    <div class="form-group">
+                        <label>Height (cm)</label>
+                        <input type="number" id="height-cm" placeholder="e.g. 175" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="weight-kg" placeholder="e.g. 70" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Imperial Inputs -->
+                <div id="imperial-inputs" style="display: none;">
+                    <div class="form-group">
+                        <label>Height</label>
+                        <div class="imperial-row">
+                            <input type="number" id="height-ft" placeholder="ft" oninput="calculate()">
+                            <input type="number" id="height-in" placeholder="in" oninput="calculate()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" id="weight-lbs" placeholder="e.g. 154" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Activity Level</label>
+                    <select id="activity" onchange="calculate()">
+                        <option value="1.2">Sedentary (Office Job)</option>
+                        <option value="1.375">Light Exercise (1-2 days/week)</option>
+                        <option value="1.55">Moderate Exercise (3-5 days/week)</option>
+                        <option value="1.725">Heavy Exercise (6-7 days/week)</option>
+                        <option value="1.9">Athlete (2x per day)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Diet Goal</label>
+                    <select id="goal" onchange="calculate()">
+                        <option value="lose">Weight Loss (-500 kcal)</option>
+                        <option value="maintain" selected>Maintain Weight</option>
+                        <option value="gain">Weight Gain (+500 kcal)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Diet Type (Fat %)</label>
+                    <select id="diet-type" onchange="calculate()">
+                        <option value="0.20">Low Fat (20%)</option>
+                        <option value="0.30" selected>Balanced/Standard (30%)</option>
+                        <option value="0.40">Moderate Fat (40%)</option>
+                        <option value="0.70">Keto / High Fat (70%)</option>
+                    </select>
+                </div>
+
+                <button class="btn-clear" onclick="clearData()">Clear Data</button>
+            </div>
+
+            <!-- Results -->
+            <div class="result-section">
+                
+                <div class="result-card">
+                    <div class="result-title">Daily Fat Target</div>
+                    <div class="fat-value" id="res-target">0</div>
+                    <div class="fat-unit">grams per day</div>
+                    <div class="fat-range" id="res-range">Range: 0 - 0 g</div>
+                </div>
+
+                <div class="result-card" style="border-color: #e5e7eb;">
+                    <div class="result-title">Saturated Fat Limit</div>
+                    <div class="fat-value" style="color: #ef4444; font-size: 2rem;" id="res-sat">0</div>
+                    <div class="fat-unit">grams max (<10%)</div>
+                </div>
+
+                <div class="result-card" style="border-color: #e5e7eb;">
+                    <div class="result-title">Total Calories</div>
+                    <div class="fat-value" style="color: #1f2937; font-size: 1.8rem;" id="res-cals">0</div>
+                    <div class="fat-unit">kcal / day</div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Note:</strong> 1 gram of fat equals 9 calories. Standard recommendations suggest fats should make up 20-35% of your total calories.
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'metric';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Switch Units
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'toggle-btn active' : 'toggle-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'toggle-btn active' : 'toggle-btn';
+            
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+
+            localStorage.setItem('fic_unit', unit);
+            calculate();
+        }
+
+        // Calculation Logic
+        function calculate() {
+            let heightCm = 0;
+            let weightKg = 0;
+            let isValid = false;
+
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+            const dietPct = parseFloat(document.getElementById('diet-type').value);
+
+            // Get Measurements
+            if (currentUnit === 'metric') {
+                const h = parseFloat(document.getElementById('height-cm').value);
+                const w = parseFloat(document.getElementById('weight-kg').value);
+                if (h > 0 && w > 0) {
+                    heightCm = h;
+                    weightKg = w;
+                    isValid = true;
+                    saveData('metric', {h, w});
+                }
+            } else {
+                const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('height-in').value) || 0;
+                const lbs = parseFloat(document.getElementById('weight-lbs').value);
+                if ((ft > 0 || inc > 0) && lbs > 0) {
+                    heightCm = (ft * 30.48) + (inc * 2.54);
+                    weightKg = lbs * 0.45359237;
+                    isValid = true;
+                    saveData('imperial', {ft, inc, lbs});
+                }
+            }
+
+            // Save other settings
+            if (age) localStorage.setItem('fic_age', age);
+            localStorage.setItem('fic_gender', gender);
+            localStorage.setItem('fic_activity', activity);
+            localStorage.setItem('fic_goal', goal);
+            localStorage.setItem('fic_diet', dietPct);
+
+            if (isValid && age > 0) {
+                // Mifflin-St Jeor Formula
+                let bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age);
+                if (gender === 'male') bmr += 5;
+                else bmr -= 161;
+
+                // TDEE
+                let tdee = bmr * activity;
+
+                // Goal Adjustment
+                if (goal === 'lose') tdee -= 500;
+                if (goal === 'gain') tdee += 500;
+
+                // Fat Calculations (1g fat = 9 calories)
+                // Target Fat
+                const fatCalories = tdee * dietPct;
+                const fatGrams = fatCalories / 9;
+
+                // Range (Using standard 20-35% logic for standard range display, regardless of specific diet selection, or dynamic based on diet)
+                // Let's make range dynamic +/- 5% of selection for flexibility
+                const minFat = (tdee * Math.max(0.20, dietPct - 0.05)) / 9;
+                const maxFat = (tdee * Math.min(0.75, dietPct + 0.05)) / 9;
+
+                // Saturated Fat (<10% of calories)
+                const satFatLimit = (tdee * 0.10) / 9;
+
+                updateResults(fatGrams, minFat, maxFat, satFatLimit, tdee);
+            } else {
+                resetResults();
+            }
+        }
+
+        function updateResults(target, min, max, satLimit, tdee) {
+            document.getElementById('res-target').textContent = Math.round(target);
+            document.getElementById('res-range').textContent = `Range: ${Math.round(min)} - ${Math.round(max)} g`;
+            document.getElementById('res-sat').textContent = Math.round(satLimit);
+            document.getElementById('res-cals').textContent = Math.round(tdee);
+        }
+
+        function resetResults() {
+            document.getElementById('res-target').textContent = "0";
+            document.getElementById('res-range').textContent = "Range: 0 - 0 g";
+            document.getElementById('res-sat').textContent = "0";
+            document.getElementById('res-cals').textContent = "0";
+        }
+
+        // Storage
+        function saveData(type, data) {
+            if (type === 'metric') {
+                localStorage.setItem('fic_cm', data.h);
+                localStorage.setItem('fic_kg', data.w);
+            } else {
+                localStorage.setItem('fic_ft', data.ft);
+                localStorage.setItem('fic_in', data.inc);
+                localStorage.setItem('fic_lbs', data.lbs);
+            }
+        }
+
+        function loadSavedData() {
+            const unit = localStorage.getItem('fic_unit') || 'metric';
+            setUnit(unit);
+
+            const age = localStorage.getItem('fic_age');
+            if (age) document.getElementById('age').value = age;
+
+            const gender = localStorage.getItem('fic_gender');
+            if (gender) {
+                const el = document.querySelector(`input[name="gender"][value="${gender}"]`);
+                if (el) el.checked = true;
+            }
+
+            const activity = localStorage.getItem('fic_activity');
+            if (activity) document.getElementById('activity').value = activity;
+
+            const goal = localStorage.getItem('fic_goal');
+            if (goal) document.getElementById('goal').value = goal;
+
+            const diet = localStorage.getItem('fic_diet');
+            if (diet) document.getElementById('diet-type').value = diet;
+
+            const cm = localStorage.getItem('fic_cm');
+            const kg = localStorage.getItem('fic_kg');
+            if (cm) document.getElementById('height-cm').value = cm;
+            if (kg) document.getElementById('weight-kg').value = kg;
+
+            const ft = localStorage.getItem('fic_ft');
+            const inc = localStorage.getItem('fic_in');
+            const lbs = localStorage.getItem('fic_lbs');
+            if (ft) document.getElementById('height-ft').value = ft;
+            if (inc) document.getElementById('height-in').value = inc;
+            if (lbs) document.getElementById('weight-lbs').value = lbs;
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            document.querySelectorAll('input').forEach(i => {
+                if(i.type !== 'radio') i.value = '';
+            });
+            document.getElementById('activity').selectedIndex = 0;
+            document.getElementById('goal').selectedIndex = 1;
+            document.querySelector('input[name="gender"][value="male"]').checked = true;
+            setUnit('metric');
+            resetResults();
+        }
+    </script>
+</body>
+</html>

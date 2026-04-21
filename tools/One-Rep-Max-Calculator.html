@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>One Rep Max Calculator</title>
+    <meta name="description" content="Free AI-powered One Rep Max Calculator. Calculate your maximum lift (1RM) and training percentages for Bench Press, Squat, and Deadlift. Auto-saving included.">
+    <meta name="keywords" content="One Rep Max Calculator, 1RM Calculator, Max Lift Calculator, Bench Press Calculator, Strength Training Tool, Weightlifting Calculator, ToolsHub365">
+    <meta name="author" content="ToolsHub365">
+    <link rel="canonical" href="https://toolshub365.com/one-rep-max-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/one-rep-max-calculator">
+    <meta property="og:title" content="One Rep Max Calculator - Measure Your Strength">
+    <meta property="og:description" content="Calculate your 1RM instantly based on your current lifting stats.">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "One Rep Max Calculator",
+      "url": "https://toolshub365.com/one-rep-max-calculator",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Any",
+      "description": "Calculates the maximum weight a person can lift for one repetition based on weight lifted for multiple repetitions using standard formulas.",
+      "featureList": "1RM Calculation, Training Percentages Table, Unit Conversion, Auto-save",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #dc2626; /* Power Red */
+            --primary-hover: #b91c1c;
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border-radius: 8px;
+            --header-height: 50px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* --- Fixed Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            background-color: var(--white);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Mobile Optimization: Remove side blanks */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px; /* Minimal horizontal padding */
+                width: 100%;
+            }
+        }
+
+        /* --- Calculator Interface --- */
+        .calc-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Unit Toggle */
+        .unit-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 25px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .unit-toggle button {
+            padding: 8px 24px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .unit-toggle button.active {
+            background: var(--white);
+            color: var(--primary-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            text-align: center;
+            background-color: #f9fafb;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--white);
+        }
+
+        /* Buttons */
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid #d1d5db;
+            flex: 0 0 auto;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* --- Results Section --- */
+        #results-area {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: var(--dark-bg);
+            color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .result-title {
+            color: #9ca3af;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .one-rep-max-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-color); /* Matches header/branding */
+            line-height: 1;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .unit-label {
+            font-size: 1.2rem;
+            color: #d1d5db;
+            font-weight: 500;
+        }
+
+        /* Percentage Table */
+        .percentage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .percentage-table th, 
+        .percentage-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .percentage-table th {
+            background-color: #f3f4f6;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .percentage-table td {
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+        
+        .percentage-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .percentage-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Highlight specific training zones */
+        .zone-strength { color: var(--primary-color); font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>One Rep Max Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calc-wrapper">
+            
+            <!-- Unit Selection -->
+            <div class="unit-toggle">
+                <button type="button" class="active" id="btn-kg" onclick="setUnit('kg')">Metric (KG)</button>
+                <button type="button" id="btn-lbs" onclick="setUnit('lbs')">Imperial (LBS)</button>
+            </div>
+
+            <form id="ormForm" onsubmit="calculateORM(event)">
+                <div class="form-row">
+                    <!-- Weight Lifted -->
+                    <div class="form-group">
+                        <label for="liftWeight">Weight Lifted</label>
+                        <input type="number" id="liftWeight" class="form-control" placeholder="0" step="0.5" required onchange="saveData()">
+                    </div>
+
+                    <!-- Repetitions -->
+                    <div class="form-group">
+                        <label for="liftReps">Repetitions</label>
+                        <input type="number" id="liftReps" class="form-control" placeholder="0" min="1" max="15" required onchange="saveData()">
+                        <small style="color:var(--text-light); display:block; margin-top:5px; font-size:0.8rem;">Max recommended: 10</small>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">Calculate 1RM</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearData()">Clear</button>
+                </div>
+            </form>
+
+            <!-- Results -->
+            <div id="results-area">
+                
+                <!-- Main Result Card -->
+                <div class="result-card">
+                    <div class="result-title">Your Estimated One Rep Max</div>
+                    <div class="one-rep-max-display" id="display-orm">0</div>
+                    <div class="unit-label" id="display-unit">KG</div>
+                </div>
+
+                <!-- Training Percentages Table -->
+                <h3 style="margin-bottom: 15px; color: var(--text-dark); text-align: center;">Training Percentages</h3>
+                <table class="percentage-table">
+                    <thead>
+                        <tr>
+                            <th>% of 1RM</th>
+                            <th>Weight</th>
+                            <th>Reps (Est.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="percentage-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.85rem; color: var(--text-light);">
+                    *Calculations based on the Epley Formula. Results are estimates.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Logic & State ---
+        let currentUnit = 'kg';
+
+        window.onload = function() {
+            loadData();
+        };
+
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('btn-kg').classList.remove('active');
+            document.getElementById('btn-lbs').classList.remove('active');
+            document.getElementById(`btn-${unit}`).classList.add('active');
+            
+            // Update display unit immediately if result is showing
+            const displayUnit = document.getElementById('display-unit');
+            if(displayUnit) displayUnit.innerText = unit.toUpperCase();
+
+            saveData();
+        }
+
+        function calculateORM(e) {
+            if(e) e.preventDefault();
+
+            const weight = parseFloat(document.getElementById('liftWeight').value);
+            const reps = parseFloat(document.getElementById('liftReps').value);
+
+            if (!weight || !reps) {
+                alert("Please enter both weight and repetitions.");
+                return;
+            }
+
+            if (reps > 15) {
+                alert("Calculators are most accurate for reps under 10. Results may vary for high reps.");
+            }
+
+            // Epley Formula: 1RM = Weight * (1 + Reps/30)
+            let oneRepMax = 0;
+            if (reps === 1) {
+                oneRepMax = weight;
+            } else {
+                oneRepMax = weight * (1 + (reps / 30));
+            }
+
+            // Display Main Result
+            const finalOrm = Math.round(oneRepMax);
+            document.getElementById('display-orm').innerText = finalOrm;
+            document.getElementById('display-unit').innerText = currentUnit.toUpperCase();
+
+            // Generate Table
+            generateTable(oneRepMax);
+
+            // Show results
+            document.getElementById('results-area').style.display = 'block';
+
+            // Mobile Scroll
+            if(window.innerWidth < 768) {
+                document.getElementById('results-area').scrollIntoView({behavior: 'smooth'});
+            }
+
+            saveData();
+        }
+
+        function generateTable(orm) {
+            const tbody = document.getElementById('percentage-body');
+            tbody.innerHTML = ""; // Clear existing
+
+            // Percentages to show
+            const percentages = [
+                { pct: 100, reps: 1 },
+                { pct: 95, reps: 2 },
+                { pct: 90, reps: 4 },
+                { pct: 85, reps: 6 },
+                { pct: 80, reps: 8 },
+                { pct: 75, reps: 10 },
+                { pct: 70, reps: 12 },
+                { pct: 60, reps: 15 },
+                { pct: 50, reps: 20 }
+            ];
+
+            percentages.forEach(row => {
+                const weight = Math.round(orm * (row.pct / 100));
+                
+                // Styling for different intensities
+                let classAdd = "";
+                if(row.pct >= 85) classAdd = "zone-strength";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="${classAdd}">${row.pct}%</td>
+                    <td class="${classAdd}">${weight} <small>${currentUnit}</small></td>
+                    <td>${row.reps}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Local Storage Functions ---
+
+        function saveData() {
+            const data = {
+                unit: currentUnit,
+                weight: document.getElementById('liftWeight').value,
+                reps: document.getElementById('liftReps').value,
+                resultsVisible: document.getElementById('results-area').style.display === 'block',
+                savedOrm: document.getElementById('display-orm').innerText
+            };
+            localStorage.setItem('ormCalc_v1', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('ormCalc_v1');
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    
+                    // Restore Unit
+                    setUnit(data.unit || 'kg');
+
+                    // Restore Inputs
+                    if(data.weight) document.getElementById('liftWeight').value = data.weight;
+                    if(data.reps) document.getElementById('liftReps').value = data.reps;
+
+                    // Restore Results if they were open
+                    if(data.resultsVisible && data.savedOrm) {
+                        document.getElementById('results-area').style.display = 'block';
+                        document.getElementById('display-orm').innerText = data.savedOrm;
+                        // Re-calculate table based on saved inputs to ensure accuracy
+                        const w = parseFloat(data.weight);
+                        const r = parseFloat(data.reps);
+                        if(w && r) {
+                            let orm = (r === 1) ? w : w * (1 + (r / 30));
+                            generateTable(orm);
+                        }
+                    }
+
+                } catch(e) {
+                    console.error("Error loading data");
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Clear all data?")) {
+                localStorage.removeItem('ormCalc_v1');
+                document.getElementById('ormForm').reset();
+                document.getElementById('results-area').style.display = 'none';
+                setUnit('kg'); // Reset to default
+            }
+        }
+
+    </script>
+</body>
+</html>

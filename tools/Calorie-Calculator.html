@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Calculator</title>
+    
+    <!-- SEO & Technical Metadata -->
+    <meta name="description" content="Free Calorie Calculator. Calculate your daily caloric needs (TDEE) for weight loss, maintenance, or muscle gain using the Mifflin-St Jeor equation. Auto-saves data.">
+    <meta name="keywords" content="Calorie Calculator, TDEE Calculator, Daily Calorie Intake, Weight Loss Calculator, BMR Calculator, Macro Calculator, toolshub365">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://toolshub365.com/calorie-calculator">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Calorie Calculator",
+      "operatingSystem": "Any",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "A tool to calculate daily calorie maintenance levels and weight loss targets based on age, gender, height, weight, and activity level."
+    }
+    </script>
+
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --primary-color: #10b981; /* Fresh Green */
+            --primary-dark: #059669;
+            --secondary-color: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --header-height: 50px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: var(--header-height);
+        }
+
+        /* Main Layout */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tool-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Input Section */
+        .input-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* Result Section */
+        .result-section {
+            flex: 1;
+            padding: 30px;
+            min-width: 320px;
+            background-color: #f9fafb;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Unit Toggle */
+        .unit-toggle {
+            display: flex;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .unit-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Gender Radio */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .radio-label input {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        /* Imperial Height Group */
+        .imperial-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-clear {
+            padding: 12px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Results Styling */
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .maintenance-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .maintenance-val {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .maintenance-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Goals Table */
+        .goals-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .goals-table tr {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .goals-table td {
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .goals-table tr td:first-child {
+            border-left: 1px solid #e5e7eb;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .goals-table tr td:last-child {
+            border-right: 1px solid #e5e7eb;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .goal-loss { color: #d97706 !important; }
+        .goal-extreme { color: #dc2626 !important; }
+        .goal-gain { color: #2563eb !important; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                width: 100%;
+            }
+            
+            .tool-wrapper {
+                box-shadow: none;
+                border-radius: 0;
+                flex-direction: column;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+
+            .maintenance-val {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Calorie Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="tool-wrapper">
+            
+            <!-- Input Section -->
+            <div class="input-section">
+                <!-- Unit Switch -->
+                <div class="unit-toggle">
+                    <button class="unit-btn active" id="btn-metric" onclick="setUnit('metric')">Metric</button>
+                    <button class="unit-btn" id="btn-imperial" onclick="setUnit('imperial')">US Units</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" checked onchange="calculate()"> Male
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female" onchange="calculate()"> Female
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="e.g. 30" min="15" max="80" oninput="calculate()">
+                </div>
+
+                <!-- Metric Inputs -->
+                <div id="metric-inputs">
+                    <div class="form-group">
+                        <label for="height-cm">Height (cm)</label>
+                        <input type="number" id="height-cm" placeholder="e.g. 175" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-kg">Weight (kg)</label>
+                        <input type="number" id="weight-kg" placeholder="e.g. 70" oninput="calculate()">
+                    </div>
+                </div>
+
+                <!-- Imperial Inputs -->
+                <div id="imperial-inputs" style="display: none;">
+                    <label>Height</label>
+                    <div class="form-group imperial-group">
+                        <input type="number" id="height-ft" placeholder="ft" oninput="calculate()">
+                        <input type="number" id="height-in" placeholder="in" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-lbs">Weight (lbs)</label>
+                        <input type="number" id="weight-lbs" placeholder="e.g. 154" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">Activity Level</label>
+                    <select id="activity" onchange="calculate()">
+                        <option value="1.2">Sedentary (office job)</option>
+                        <option value="1.375">Light Exercise (1-2 days/week)</option>
+                        <option value="1.55">Moderate Exercise (3-5 days/week)</option>
+                        <option value="1.725">Heavy Exercise (6-7 days/week)</option>
+                        <option value="1.9">Athlete (2x per day)</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-clear" onclick="clearData()">Clear Data</button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                <div class="maintenance-card">
+                    <div class="maintenance-val" id="res-maintain">0</div>
+                    <div class="maintenance-label">Calories/day to Maintain Weight</div>
+                </div>
+
+                <h3 style="margin-bottom: 15px; color: var(--text-main); font-size: 1.1rem;">Weight Goals</h3>
+                <table class="goals-table">
+                    <tbody>
+                        <tr>
+                            <td>Mild Weight Loss <br><span style="font-size:0.8rem; color:#6b7280; font-weight:400;">0.25 kg/week</span></td>
+                            <td class="goal-loss" id="res-loss-mild">-</td>
+                        </tr>
+                        <tr>
+                            <td>Weight Loss <br><span style="font-size:0.8rem; color:#6b7280; font-weight:400;">0.5 kg/week</span></td>
+                            <td class="goal-loss" id="res-loss">-</td>
+                        </tr>
+                        <tr>
+                            <td>Extreme Loss <br><span style="font-size:0.8rem; color:#6b7280; font-weight:400;">1 kg/week</span></td>
+                            <td class="goal-extreme" id="res-loss-extreme">-</td>
+                        </tr>
+                        <tr>
+                            <td>Mild Weight Gain <br><span style="font-size:0.8rem; color:#6b7280; font-weight:400;">0.25 kg/week</span></td>
+                            <td class="goal-gain" id="res-gain-mild">-</td>
+                        </tr>
+                        <tr>
+                            <td>Weight Gain <br><span style="font-size:0.8rem; color:#6b7280; font-weight:400;">0.5 kg/week</span></td>
+                            <td class="goal-gain" id="res-gain">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'metric';
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+        });
+
+        // Toggle Unit System
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            document.getElementById('btn-metric').className = unit === 'metric' ? 'unit-btn active' : 'unit-btn';
+            document.getElementById('btn-imperial').className = unit === 'imperial' ? 'unit-btn active' : 'unit-btn';
+            
+            document.getElementById('metric-inputs').style.display = unit === 'metric' ? 'block' : 'none';
+            document.getElementById('imperial-inputs').style.display = unit === 'imperial' ? 'block' : 'none';
+
+            localStorage.setItem('cal_unit', unit);
+            calculate();
+        }
+
+        // Calculation Logic (Mifflin-St Jeor)
+        function calculate() {
+            let heightCm = 0;
+            let weightKg = 0;
+            let isValid = false;
+
+            // Gather inputs
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const activity = parseFloat(document.getElementById('activity').value);
+
+            // Unit conversion
+            if (currentUnit === 'metric') {
+                const h = parseFloat(document.getElementById('height-cm').value);
+                const w = parseFloat(document.getElementById('weight-kg').value);
+                if (h > 0 && w > 0) {
+                    heightCm = h;
+                    weightKg = w;
+                    isValid = true;
+                    saveData('metric', { h, w });
+                }
+            } else {
+                const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+                const inc = parseFloat(document.getElementById('height-in').value) || 0;
+                const lbs = parseFloat(document.getElementById('weight-lbs').value);
+                
+                if ((ft > 0 || inc > 0) && lbs > 0) {
+                    heightCm = (ft * 30.48) + (inc * 2.54);
+                    weightKg = lbs * 0.453592;
+                    isValid = true;
+                    saveData('imperial', { ft, inc, lbs });
+                }
+            }
+
+            // Save common inputs
+            if(age) localStorage.setItem('cal_age', age);
+            localStorage.setItem('cal_gender', gender);
+            localStorage.setItem('cal_activity', activity);
+
+            if (isValid && age > 0) {
+                // BMR Calculation
+                let bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age);
+                
+                if (gender === 'male') {
+                    bmr += 5;
+                } else {
+                    bmr -= 161;
+                }
+
+                // TDEE
+                const tdee = Math.round(bmr * activity);
+                updateResults(tdee);
+            } else {
+                resetResults();
+            }
+        }
+
+        function updateResults(tdee) {
+            // Formatting helper
+            const format = (num) => num.toLocaleString('en-US') + " kcal";
+
+            document.getElementById('res-maintain').textContent = format(tdee);
+            
+            // Weight Goals Logic
+            // 1 kg fat approx 7700 kcal. 0.5kg/week = ~500kcal deficit/day
+            document.getElementById('res-loss-mild').textContent = format(tdee - 250);
+            document.getElementById('res-loss').textContent = format(tdee - 500);
+            document.getElementById('res-loss-extreme').textContent = format(tdee - 1000);
+            document.getElementById('res-gain-mild').textContent = format(tdee + 250);
+            document.getElementById('res-gain').textContent = format(tdee + 500);
+        }
+
+        function resetResults() {
+            document.getElementById('res-maintain').textContent = "0";
+            document.getElementById('res-loss-mild').textContent = "-";
+            document.getElementById('res-loss').textContent = "-";
+            document.getElementById('res-loss-extreme').textContent = "-";
+            document.getElementById('res-gain-mild').textContent = "-";
+            document.getElementById('res-gain').textContent = "-";
+        }
+
+        // Storage Management
+        function saveData(type, data) {
+            if(type === 'metric') {
+                localStorage.setItem('cal_h_cm', data.h);
+                localStorage.setItem('cal_w_kg', data.w);
+            } else {
+                localStorage.setItem('cal_h_ft', data.ft);
+                localStorage.setItem('cal_h_in', data.inc);
+                localStorage.setItem('cal_w_lbs', data.lbs);
+            }
+        }
+
+        function loadSavedData() {
+            // Unit
+            const unit = localStorage.getItem('cal_unit') || 'metric';
+            setUnit(unit);
+
+            // Common
+            const age = localStorage.getItem('cal_age');
+            if(age) document.getElementById('age').value = age;
+            
+            const gender = localStorage.getItem('cal_gender');
+            if(gender) {
+                const el = document.querySelector(`input[name="gender"][value="${gender}"]`);
+                if(el) el.checked = true;
+            }
+
+            const activity = localStorage.getItem('cal_activity');
+            if(activity) document.getElementById('activity').value = activity;
+
+            // Metric
+            const hCm = localStorage.getItem('cal_h_cm');
+            const wKg = localStorage.getItem('cal_w_kg');
+            if(hCm) document.getElementById('height-cm').value = hCm;
+            if(wKg) document.getElementById('weight-kg').value = wKg;
+
+            // Imperial
+            const hFt = localStorage.getItem('cal_h_ft');
+            const hIn = localStorage.getItem('cal_h_in');
+            const wLbs = localStorage.getItem('cal_w_lbs');
+            if(hFt) document.getElementById('height-ft').value = hFt;
+            if(hIn) document.getElementById('height-in').value = hIn;
+            if(wLbs) document.getElementById('weight-lbs').value = wLbs;
+
+            calculate();
+        }
+
+        function clearData() {
+            localStorage.clear();
+            
+            // Reset UI
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            document.getElementById('activity').selectedIndex = 1; // Default Light
+            document.querySelector('input[name="gender"][value="male"]').checked = true;
+            
+            setUnit('metric'); // Reset unit
+            resetResults();
+        }
+    </script>
+</body>
+</html>

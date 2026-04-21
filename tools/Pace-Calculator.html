@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<!-- Category: Fitness and Health Calculators -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pace Calculator</title>
+    <meta name="description" content="Free AI-powered Pace Calculator. Calculate running pace, distance, or finish time for marathons, 5K, 10K, and custom runs. Auto-saving included.">
+    <meta name="keywords" content="Pace Calculator, Running Calculator, Marathon Pace, 5K Time, Split Calculator, ToolsHub365, Running Speed">
+    <meta name="author" content="ToolsHub365">
+    <link rel="canonical" href="https://toolshub365.com/pace-calculator">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://toolshub365.com/pace-calculator">
+    <meta property="og:title" content="Pace Calculator - Plan Your Run">
+    <meta property="og:description" content="Calculate your running pace, time, or distance instantly.">
+
+    <!-- Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Pace Calculator",
+      "url": "https://toolshub365.com/pace-calculator",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Any",
+      "description": "A tool to calculate running pace, time, and distance.",
+      "featureList": "Time Calculation, Distance Calculation, Pace Calculation, Auto-save",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #059669; /* Emerald Green */
+            --primary-hover: #047857;
+            --secondary-color: #10b981;
+            --bg-color: #f3f4f6;
+            --container-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --header-height: 50px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* --- Fixed Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            background-color: var(--container-bg);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Mobile Optimization: Full width, no side blanks */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+                width: 100%;
+            }
+        }
+
+        /* --- Form Sections --- */
+        .calculator-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .mode-selector {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .mode-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-right: 10px;
+        }
+
+        select.main-select {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 2px solid #d1d5db;
+            background: #fff;
+            color: var(--text-main);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .input-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-card h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Time inputs specificity */
+        .time-inputs {
+            display: flex;
+            gap: 5px;
+        }
+        .time-field {
+            text-align: center;
+        }
+
+        /* Quick Event Selector */
+        .quick-select {
+            margin-bottom: 15px;
+        }
+
+        /* Buttons */
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #fff;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            flex: 0 0 auto;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        /* --- Results --- */
+        #results-area {
+            display: none;
+            margin-top: 30px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-box {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .result-label {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 10px 0;
+            line-height: 1;
+        }
+
+        .result-sub {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Pace Calculator</h1>
+    </header>
+
+    <div class="container">
+        <div class="calculator-wrapper">
+            
+            <!-- Calculation Mode -->
+            <div class="mode-selector">
+                <select id="calcMode" class="main-select" onchange="updateMode()">
+                    <option value="pace">Calculate Pace</option>
+                    <option value="time">Calculate Time</option>
+                    <option value="distance">Calculate Distance</option>
+                </select>
+            </div>
+
+            <form id="paceForm" onsubmit="calculate(event)">
+
+                <!-- Time Input Section -->
+                <div id="section-time" class="input-card">
+                    <h3>Time <small style="color:var(--text-muted); font-weight:normal; font-size:0.8rem;">(Hr : Min : Sec)</small></h3>
+                    <div class="time-inputs">
+                        <div class="form-group">
+                            <input type="number" id="timeHrs" class="form-control time-field" placeholder="00" min="0" onchange="saveData()">
+                        </div>
+                        <span style="align-self:center; font-weight:bold;">:</span>
+                        <div class="form-group">
+                            <input type="number" id="timeMins" class="form-control time-field" placeholder="00" min="0" max="59" onchange="saveData()">
+                        </div>
+                        <span style="align-self:center; font-weight:bold;">:</span>
+                        <div class="form-group">
+                            <input type="number" id="timeSecs" class="form-control time-field" placeholder="00" min="0" max="59" onchange="saveData()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distance Input Section -->
+                <div id="section-distance" class="input-card">
+                    <h3>Distance</h3>
+                    <div class="quick-select">
+                        <select id="eventSelect" class="form-control" onchange="setDistancePreset()">
+                            <option value="">Select a common race...</option>
+                            <option value="5k">5K (5 km)</option>
+                            <option value="10k">10K (10 km)</option>
+                            <option value="half">Half Marathon (21.0975 km)</option>
+                            <option value="marathon">Marathon (42.195 km)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <input type="number" id="distValue" class="form-control" placeholder="Distance" step="0.01" onchange="saveData()">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <select id="distUnit" class="form-control" onchange="saveData()">
+                                <option value="km">Kilometers</option>
+                                <option value="mi">Miles</option>
+                                <option value="m">Meters</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pace Input Section -->
+                <div id="section-pace" class="input-card">
+                    <h3>Pace <small style="color:var(--text-muted); font-weight:normal; font-size:0.8rem;">(Min : Sec)</small></h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="number" id="paceMin" class="form-control time-field" placeholder="Min" min="0" onchange="saveData()">
+                        </div>
+                        <span style="align-self:center; font-weight:bold;">:</span>
+                        <div class="form-group">
+                            <input type="number" id="paceSec" class="form-control time-field" placeholder="Sec" min="0" max="59" onchange="saveData()">
+                        </div>
+                        <div class="form-group" style="flex: 1.5;">
+                            <select id="paceUnit" class="form-control" onchange="saveData()">
+                                <option value="km">per Km</option>
+                                <option value="mi">per Mile</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearData()">Clear</button>
+                </div>
+            </form>
+
+            <!-- Results -->
+            <div id="results-area">
+                <div class="result-box">
+                    <div class="result-label" id="res-label">Result</div>
+                    <div class="result-value" id="res-main">--</div>
+                    <div class="result-sub" id="res-sub"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Core Logic ---
+
+        window.onload = function() {
+            loadData();
+            updateMode(); // Ensure UI matches loaded mode
+        };
+
+        function updateMode() {
+            const mode = document.getElementById('calcMode').value;
+            
+            // Show/Hide sections based on what we want to calculate
+            // Calculate Pace -> Need Time & Distance (Hide Pace)
+            // Calculate Time -> Need Distance & Pace (Hide Time)
+            // Calculate Distance -> Need Time & Pace (Hide Distance)
+            
+            document.getElementById('section-time').style.display = (mode === 'time') ? 'none' : 'block';
+            document.getElementById('section-distance').style.display = (mode === 'distance') ? 'none' : 'block';
+            document.getElementById('section-pace').style.display = (mode === 'pace') ? 'none' : 'block';
+
+            document.getElementById('results-area').style.display = 'none'; // Hide old results on mode switch
+            saveData();
+        }
+
+        function setDistancePreset() {
+            const preset = document.getElementById('eventSelect').value;
+            const distInput = document.getElementById('distValue');
+            const unitSelect = document.getElementById('distUnit');
+
+            if(preset === '5k') { distInput.value = 5; unitSelect.value = 'km'; }
+            else if(preset === '10k') { distInput.value = 10; unitSelect.value = 'km'; }
+            else if(preset === 'half') { distInput.value = 21.0975; unitSelect.value = 'km'; }
+            else if(preset === 'marathon') { distInput.value = 42.195; unitSelect.value = 'km'; }
+            
+            saveData();
+        }
+
+        function calculate(e) {
+            if(e) e.preventDefault();
+
+            const mode = document.getElementById('calcMode').value;
+            
+            // 1. Get Values
+            const h = parseFloat(document.getElementById('timeHrs').value) || 0;
+            const m = parseFloat(document.getElementById('timeMins').value) || 0;
+            const s = parseFloat(document.getElementById('timeSecs').value) || 0;
+            const totalSeconds = (h * 3600) + (m * 60) + s;
+
+            let dist = parseFloat(document.getElementById('distValue').value) || 0;
+            const distUnit = document.getElementById('distUnit').value;
+
+            const pMin = parseFloat(document.getElementById('paceMin').value) || 0;
+            const pSec = parseFloat(document.getElementById('paceSec').value) || 0;
+            const paceSeconds = (pMin * 60) + pSec;
+            const paceUnit = document.getElementById('paceUnit').value;
+
+            // 2. Normalize Distance to KM for calculation
+            let distKm = dist;
+            if (distUnit === 'mi') distKm = dist * 1.60934;
+            if (distUnit === 'm') distKm = dist / 1000;
+
+            // 3. Normalize Pace to Seconds per KM
+            let paceSecPerKm = paceSeconds;
+            if (paceUnit === 'mi') paceSecPerKm = paceSeconds / 1.60934;
+
+            let resultTitle = "";
+            let resultMain = "";
+            let resultSub = "";
+
+            // 4. Calculate
+            if (mode === 'pace') {
+                if (totalSeconds === 0 || distKm === 0) { alert("Please enter Time and Distance."); return; }
+                
+                // Result: Pace
+                const resSecPerKm = totalSeconds / distKm;
+                const resSecPerMile = resSecPerKm * 1.60934;
+
+                resultTitle = "Your Pace";
+                resultMain = formatTime(resSecPerKm, false) + " /km";
+                resultSub = formatTime(resSecPerMile, false) + " /mile";
+
+            } else if (mode === 'time') {
+                if (distKm === 0 || paceSecPerKm === 0) { alert("Please enter Distance and Pace."); return; }
+                
+                // Result: Time
+                const resTotalSeconds = distKm * paceSecPerKm;
+                
+                resultTitle = "Finish Time";
+                resultMain = formatTime(resTotalSeconds, true);
+                resultSub = "at " + formatTime(paceSecPerKm, false) + "/km";
+
+            } else if (mode === 'distance') {
+                if (totalSeconds === 0 || paceSecPerKm === 0) { alert("Please enter Time and Pace."); return; }
+
+                // Result: Distance
+                const resKm = totalSeconds / paceSecPerKm;
+                const resMiles = resKm / 1.60934;
+
+                resultTitle = "Distance";
+                resultMain = resKm.toFixed(2) + " km";
+                resultSub = resMiles.toFixed(2) + " miles";
+            }
+
+            // 5. Display
+            document.getElementById('res-label').innerText = resultTitle;
+            document.getElementById('res-main').innerText = resultMain;
+            document.getElementById('res-sub').innerText = resultSub;
+            document.getElementById('results-area').style.display = 'block';
+
+            // Scroll on mobile
+            if(window.innerWidth < 768) {
+                document.getElementById('results-area').scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+            
+            saveData();
+        }
+
+        // Helper: Format seconds into HH:MM:SS or MM:SS
+        function formatTime(totalSeconds, includeHours) {
+            let sec = Math.round(totalSeconds);
+            let hours = Math.floor(sec / 3600);
+            sec %= 3600;
+            let min = Math.floor(sec / 60);
+            let s = sec % 60;
+
+            let sStr = s < 10 ? "0" + s : s;
+            let mStr = min < 10 ? "0" + min : min;
+            
+            if (includeHours || hours > 0) {
+                return `${hours}:${mStr}:${sStr}`;
+            } else {
+                return `${min}:${sStr}`;
+            }
+        }
+
+        // --- Local Storage ---
+        function saveData() {
+            const data = {
+                mode: document.getElementById('calcMode').value,
+                timeH: document.getElementById('timeHrs').value,
+                timeM: document.getElementById('timeMins').value,
+                timeS: document.getElementById('timeSecs').value,
+                distVal: document.getElementById('distValue').value,
+                distUnit: document.getElementById('distUnit').value,
+                preset: document.getElementById('eventSelect').value,
+                paceMin: document.getElementById('paceMin').value,
+                paceSec: document.getElementById('paceSec').value,
+                paceUnit: document.getElementById('paceUnit').value,
+                
+                // Result state
+                resVisible: document.getElementById('results-area').style.display === 'block',
+                resLabel: document.getElementById('res-label').innerText,
+                resMain: document.getElementById('res-main').innerText,
+                resSub: document.getElementById('res-sub').innerText
+            };
+            localStorage.setItem('paceCalc_v1', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('paceCalc_v1');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    
+                    if(data.mode) document.getElementById('calcMode').value = data.mode;
+                    if(data.timeH) document.getElementById('timeHrs').value = data.timeH;
+                    if(data.timeM) document.getElementById('timeMins').value = data.timeM;
+                    if(data.timeS) document.getElementById('timeSecs').value = data.timeS;
+                    if(data.distVal) document.getElementById('distValue').value = data.distVal;
+                    if(data.distUnit) document.getElementById('distUnit').value = data.distUnit;
+                    if(data.preset) document.getElementById('eventSelect').value = data.preset;
+                    if(data.paceMin) document.getElementById('paceMin').value = data.paceMin;
+                    if(data.paceSec) document.getElementById('paceSec').value = data.paceSec;
+                    if(data.paceUnit) document.getElementById('paceUnit').value = data.paceUnit;
+
+                    if(data.resVisible) {
+                        document.getElementById('results-area').style.display = 'block';
+                        document.getElementById('res-label').innerText = data.resLabel;
+                        document.getElementById('res-main').innerText = data.resMain;
+                        document.getElementById('res-sub').innerText = data.resSub;
+                    }
+                } catch(e) {
+                    console.error("Error loading data");
+                }
+            }
+        }
+
+        function clearData() {
+            if(confirm("Clear all data?")) {
+                localStorage.removeItem('paceCalc_v1');
+                document.getElementById('paceForm').reset();
+                document.getElementById('calcMode').value = "pace"; // Default
+                document.getElementById('results-area').style.display = 'none';
+                updateMode();
+            }
+        }
+    </script>
+</body>
+</html>
